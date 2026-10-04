@@ -1,0 +1,1 @@
+const {api,$,money,toast}=window.MC;requireAdmin().then(d=>{if(!d)return;$('#stats').innerHTML=Object.entries(d).map(([k,v])=>`<div class="stat"><span>${k.replace(/([A-Z])/g,' $1')}</span><b>${k.includes('Sales')?money(v):v}</b></div>`).join('')}).catch(e=>toast(e.message,'error'));
