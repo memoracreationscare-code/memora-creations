@@ -1,36 +1,36 @@
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Admin Dashboard</title>
+const { api, $, money, esc, toast } = window.MC;
 
-  <link rel="stylesheet" href="/memora-creations/admin/css/style.css">
-</head>
+async function loadDashboard() {
+  try {
+    const dashboard = await requireAdmin();
+    if (!dashboard) return;
 
-<body>
+    const stats = dashboard.stats || dashboard;
 
-<nav class="adminnav">
-  <div class="container">
-    <b>MEMORA ADMIN</b>
+    $('#stats').innerHTML = `
+      <div class="stat">
+        <h3>Products</h3>
+        <strong>${stats.products ?? stats.totalProducts ?? 0}</strong>
+      </div>
 
-    <a href="/memora-creations/admin/dashboard.html">Dashboard</a>
-    <a href="/memora-creations/admin/products.html">Products</a>
-    <a href="/memora-creations/admin/orders.html">Orders</a>
-    <a href="/memora-creations/admin/users.html">Users</a>
+      <div class="stat">
+        <h3>Orders</h3>
+        <strong>${stats.orders ?? stats.totalOrders ?? 0}</strong>
+      </div>
 
-    <button id="logout" class="btn secondary">Logout</button>
-  </div>
-</nav>
+      <div class="stat">
+        <h3>Users</h3>
+        <strong>${stats.users ?? stats.totalUsers ?? 0}</strong>
+      </div>
 
-<main class="container adminmain">
-  <h1>Dashboard</h1>
-  <div id="stats" class="stats"></div>
-</main>
+      <div class="stat">
+        <h3>Revenue</h3>
+        <strong>${money(stats.revenue ?? stats.totalRevenue ?? 0)}</strong>
+      </div>
+    `;
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
 
-<script src="/memora-creations/frontend/js/app.js"></script>
-<script src="/memora-creations/admin/js/auth.js"></script>
-<script src="/memora-creations/admin/js/dashboard.js"></script>
-
-</body>
-</html>
+loadDashboard();
