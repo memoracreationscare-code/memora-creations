@@ -1,2 +1,2 @@
-@import url('/frontend/css/style.css');
+@import url('../../frontend/css/style.css');
 body{background:#f5f2ef}.adminnav .container{display:flex;align-items:center;gap:18px;flex-wrap:wrap}.adminnav a{font-size:14px}.adminmain h1{margin-top:0}.admin-card{background:white;border:1px solid #e8e0d9;border-radius:16px;padding:18px;margin-bottom:18px}.mini{font-size:12px;color:#756f69}.formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.formgrid .full{grid-column:1/-1}@media(max-width:700px){.formgrid{grid-template-columns:1fr}.formgrid .full{grid-column:auto}}
