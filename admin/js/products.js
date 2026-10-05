@@ -1,4 +1,4 @@
-let productState = { products: [], categories: [] };
+let productState = { products: [], categories: [] }; 
 
 async function loadProducts() {
   await requireAdmin();
