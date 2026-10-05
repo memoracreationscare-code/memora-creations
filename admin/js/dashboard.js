@@ -1,13 +1,14 @@
-const { api, $, money, esc, toast } = window.MC;
-
-async function loadDashboard() {
+(async function () {
   try {
-    const dashboard = await requireAdmin();
+    const dashboard = await window.requireAdmin();
     if (!dashboard) return;
 
     const stats = dashboard.stats || dashboard;
+    const statsBox = document.querySelector('#stats');
 
-    $('#stats').innerHTML = `
+    if (!statsBox) return;
+
+    statsBox.innerHTML = `
       <div class="stat">
         <h3>Products</h3>
         <strong>${stats.products ?? stats.totalProducts ?? 0}</strong>
@@ -25,12 +26,10 @@ async function loadDashboard() {
 
       <div class="stat">
         <h3>Revenue</h3>
-        <strong>${money(stats.revenue ?? stats.totalRevenue ?? 0)}</strong>
+        <strong>${window.MC.money(stats.revenue ?? stats.totalRevenue ?? 0)}</strong>
       </div>
     `;
   } catch (e) {
-    toast(e.message, 'error');
+    window.MC.toast(e.message, 'error');
   }
-}
-
-loadDashboard();
+})();
