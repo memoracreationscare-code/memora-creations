@@ -16,34 +16,86 @@ async function loadOrdersPage() {
 
     ordersBox.innerHTML = orders.length
       ? orders.map(order => `
-          <div class="orderrow">
+
+        <div
+          class="card"
+          style="margin-bottom:16px;"
+        >
+
+          <div
+            class="cardbody"
+            style="
+              display:grid;
+              grid-template-columns:1.4fr 1fr 1fr auto;
+              gap:20px;
+              align-items:center;
+            "
+          >
 
             <div>
-              <b>${window.MC.esc(order.orderId)}</b>
+
+              <div
+                style="
+                  font-weight:800;
+                  font-size:17px;
+                  margin-bottom:6px;
+                "
+              >
+                ${window.MC.esc(order.orderId)}
+              </div>
 
               <div class="muted">
-                ${new Date(order.createdAt).toLocaleString('en-IN')}
+                ${new Date(order.createdAt)
+                  .toLocaleString('en-IN')}
               </div>
+
             </div>
 
-            <div>
-              ${order.items.length} item(s)
-              <br>
-              ${window.MC.esc(order.paymentMethod)}
-              /
-              ${window.MC.esc(order.paymentStatus)}
-            </div>
 
             <div>
-              <b>${window.MC.money(order.grandTotal)}</b>
-              <br>
+
+              <div>
+                <b>${order.items.length}</b>
+                item(s)
+              </div>
+
+              <div class="muted">
+                ${
+                  order.paymentMethod === 'COD'
+                    ? 'Cash on Delivery'
+                    : 'Online Payment'
+                }
+              </div>
+
+              <div class="muted">
+                ${window.MC.esc(order.paymentStatus)}
+              </div>
+
+            </div>
+
+
+            <div>
+
+              <div
+                class="price"
+                style="margin-bottom:7px;"
+              >
+                ${window.MC.money(order.grandTotal)}
+              </div>
 
               <span class="pill">
                 ${window.MC.esc(order.orderStatus)}
               </span>
+
             </div>
 
-            <div class="actions">
+
+            <div
+              class="actions"
+              style="
+                justify-content:flex-end;
+              "
+            >
 
               <a
                 class="btn secondary"
@@ -53,7 +105,9 @@ async function loadOrdersPage() {
               </a>
 
               ${
-                ['Order Placed', 'Confirmed'].includes(order.orderStatus)
+                ['Order Placed', 'Confirmed']
+                  .includes(order.orderStatus)
+
                   ? `
                     <button
                       class="btn danger cancel-order"
@@ -63,45 +117,63 @@ async function loadOrdersPage() {
                       Cancel
                     </button>
                   `
+
                   : ''
               }
 
             </div>
 
           </div>
-        `).join('')
+
+        </div>
+
+      `).join('')
+
       : `
-          <div class="empty">
-            No orders yet.
-          </div>
-        `;
+        <div class="empty">
+          No orders yet.
+        </div>
+      `;
 
-    window.MC.$$('.cancel-order').forEach(button => {
 
-      button.addEventListener('click', () => {
-        cancelOrder(button.dataset.id);
+    window.MC.$$('.cancel-order')
+      .forEach(button => {
+
+        button.onclick = () => {
+          cancelCustomerOrder(
+            button.dataset.id
+          );
+        };
+
       });
 
-    });
 
   } catch (error) {
 
-    console.error('Orders load error:', error);
+    console.error(
+      'Orders load error:',
+      error
+    );
 
     window.MC.toast(
-      error.message || 'Orders load failed.',
+      error.message ||
+      'Orders load failed.',
       'error'
     );
+
   }
+
 }
 
-async function cancelOrder(id) {
+
+async function cancelCustomerOrder(id) {
 
   const confirmed = confirm(
     'Are you sure you want to cancel this order?'
   );
 
   if (!confirmed) return;
+
 
   try {
 
@@ -121,15 +193,23 @@ async function cancelOrder(id) {
 
     await loadOrdersPage();
 
+
   } catch (error) {
 
     window.MC.toast(
-      error.message || 'Order cancel failed.',
+      error.message ||
+      'Order cancel failed.',
       'error'
     );
+
   }
+
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  loadOrdersPage();
-});
+
+document.addEventListener(
+  'DOMContentLoaded',
+  () => {
+    loadOrdersPage();
+  }
+);
