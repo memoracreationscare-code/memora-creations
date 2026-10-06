@@ -2,7 +2,12 @@ const router = require('express').Router();
 
 const c = require('../controllers/adminController');
 const { requireAdmin } = require('../middleware/auth');
-const cloudinaryController = require('../controllers/cloudinaryController');
+
+const cloudinaryController =
+  require('../controllers/cloudinaryController');
+
+const shiprocketController =
+  require('../controllers/shiprocketController');
 
 const {
   configured: shiprocketConfigured,
@@ -10,35 +15,45 @@ const {
 } = require('../services/shiprocketService');
 
 
-/* ADMIN AUTH */
+/* =========================
+   ADMIN AUTH
+========================= */
 
 router.post('/login', c.login);
 router.post('/logout', c.logout);
 
 
-/* ADMIN LOGIN REQUIRED */
+/* =========================
+   ADMIN LOGIN REQUIRED
+========================= */
 
 router.use(requireAdmin);
 
 
-/* SHIPROCKET CONNECTION TEST */
+/* =========================
+   SHIPROCKET TEST
+========================= */
 
 router.get('/shiprocket/test', async (req, res) => {
 
   try {
 
     if (!shiprocketConfigured()) {
+
       return res.status(500).json({
         success: false,
-        message: 'Shiprocket credentials are not configured.'
+        message:
+          'Shiprocket credentials are not configured.'
       });
+
     }
 
     await getShiprocketToken();
 
     return res.json({
       success: true,
-      message: 'Shiprocket connected successfully.'
+      message:
+        'Shiprocket connected successfully.'
     });
 
   } catch (error) {
@@ -60,7 +75,9 @@ router.get('/shiprocket/test', async (req, res) => {
 });
 
 
-/* CLOUDINARY */
+/* =========================
+   CLOUDINARY
+========================= */
 
 router.post(
   '/cloudinary/signature',
@@ -68,7 +85,9 @@ router.post(
 );
 
 
-/* DASHBOARD */
+/* =========================
+   DASHBOARD
+========================= */
 
 router.get(
   '/dashboard',
@@ -76,7 +95,9 @@ router.get(
 );
 
 
-/* PRODUCTS */
+/* =========================
+   PRODUCTS
+========================= */
 
 router.get(
   '/products',
@@ -99,7 +120,9 @@ router.delete(
 );
 
 
-/* CATEGORIES */
+/* =========================
+   CATEGORIES
+========================= */
 
 router.post(
   '/categories',
@@ -117,7 +140,9 @@ router.delete(
 );
 
 
-/* ORDERS */
+/* =========================
+   ORDERS
+========================= */
 
 router.get(
   '/orders',
@@ -130,7 +155,17 @@ router.put(
 );
 
 
-/* USERS */
+/* CREATE SHIPROCKET SHIPMENT */
+
+router.post(
+  '/orders/:id/create-shipment',
+  shiprocketController.createShipment
+);
+
+
+/* =========================
+   USERS
+========================= */
 
 router.get(
   '/users',
