@@ -1,28 +1,60 @@
-const nodemailer = require('nodemailer');
-
-function configured() { return Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASSWORD && process.env.MAIL_FROM); }
-function transporter() {
-  if (!configured()) return null;
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT || 587),
-    secure: String(process.env.SMTP_SECURE) === 'true',
-    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASSWORD }
-  });
+function configured() {
+  return Boolean(
+    process.env.RESEND_API_KEY &&
+    process.env.MAIL_FROM
+  );
 }
 
 async function sendPasswordResetEmail(to, token) {
-  const tx = transporter();
-  if (!tx) return false;
-  const base = process.env.CLIENT_URL || 'http://localhost:5000';
-  const link = `${base}/frontend/reset-password.html?token=${encodeURIComponent(token)}`;
-  await tx.sendMail({
-    from: process.env.MAIL_FROM,
-    to,
-    subject: 'MEMORA CREATIONS password reset',
-    text: `Reset your password using this link: ${link}`
-  });
+  if (!configured()) return false;
+
+  const base =
+    process.env.CLIENT_URL ||
+    'http://localhost:5000';
+
+  const link =
+    `${base}/frontend/reset-password.html?token=${encodeURIComponent(token)}`;
+
+  const response = await fetch(
+    'https://api.resend.com/emails',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: process.env.MAIL_FROM,
+        to: [to],
+        subject: 'MEMORA CREATIONS password reset',
+        html: `
+          <h2>Reset your password</h2>
+          <p>Click the button below to reset your MEMORA CREATIONS password.</p>
+          <p>
+            <a href="${link}">
+              Reset Password
+            </a>
+          </p>
+          <p>This link will expire in 30 minutes.</p>
+        `
+      })
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    console.error('Resend error:', data);
+    throw new Error(
+      data?.message ||
+      'Failed to send password reset email.'
+    );
+  }
+
   return true;
 }
 
-module.exports = { sendPasswordResetEmail, configured };
+module.exports = {
+  sendPasswordResetEmail,
+  configured
+};
