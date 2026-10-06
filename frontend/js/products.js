@@ -1,21 +1,11 @@
-const {
-  api,
-  $,
-  $$,
-  money,
-  esc,
-  toast,
-  updateCartCount
-} = window.MC;
-
-const BASE = '/memora-creations';
+const PRODUCTS_BASE = '/memora-creations';
 
 /* =========================
    LOAD ALL PRODUCTS
 ========================= */
 
 async function loadProducts() {
-  const grid = $('#productGrid');
+  const grid = window.MC.$('#productGrid');
 
   if (!grid) return;
 
@@ -23,124 +13,116 @@ async function loadProducts() {
 
   try {
     const [d, cats] = await Promise.all([
-      api('/products?' + params.toString()),
-      api('/products/categories')
+      window.MC.api('/products?' + params.toString()),
+      window.MC.api('/products/categories')
     ]);
 
-    /* Categories */
-    if ($('#categorySelect')) {
-      $('#categorySelect').innerHTML =
+    const categorySelect = window.MC.$('#categorySelect');
+
+    if (categorySelect) {
+      categorySelect.innerHTML =
         '<option value="">All Categories</option>' +
-        cats.categories
-          .map(
-            c => `
-              <option
-                value="${c._id}"
-                ${
-                  params.get('category') === String(c._id)
-                    ? 'selected'
-                    : ''
-                }
-              >
-                ${esc(c.name)}
-              </option>
-            `
-          )
+        (cats.categories || [])
+          .map(c => `
+            <option
+              value="${c._id}"
+              ${params.get('category') === String(c._id) ? 'selected' : ''}
+            >
+              ${window.MC.esc(c.name)}
+            </option>
+          `)
           .join('');
     }
 
-    /* Product count */
-    if ($('#resultCount')) {
-      $('#resultCount').textContent =
-        `${d.pagination.total} products`;
+    const resultCount = window.MC.$('#resultCount');
+
+    if (resultCount) {
+      resultCount.textContent =
+        `${d.pagination?.total ?? d.products?.length ?? 0} products`;
     }
 
-    /* Products */
-    grid.innerHTML = d.products.length
-      ? d.products
-          .map(
-            p => `
-              <article class="card">
+    const products = d.products || [];
 
-                <a href="${BASE}/frontend/product.html?id=${p._id}">
+    grid.innerHTML = products.length
+      ? products.map(p => `
+          <article class="card">
 
-                  <img
-                    class="productimg"
-                    src="${esc(
-                      p.images?.[0]?.url ||
-                      'https://placehold.co/600x600?text=Memora'
-                    )}"
-                    alt="${esc(p.name)}"
-                  >
+            <a href="${PRODUCTS_BASE}/frontend/product.html?id=${encodeURIComponent(p._id)}">
 
-                  <div class="cardbody">
+              <img
+                class="productimg"
+                src="${window.MC.esc(
+                  p.images?.[0]?.url ||
+                  'https://placehold.co/600x600?text=Memora'
+                )}"
+                alt="${window.MC.esc(p.name)}"
+              >
 
-                    <span class="pill">
-                      ${esc(p.category?.name || 'Category')}
-                    </span>
+              <div class="cardbody">
 
-                    <h3>${esc(p.name)}</h3>
+                <span class="pill">
+                  ${window.MC.esc(p.category?.name || 'Category')}
+                </span>
 
-                    <div class="price">
-                      ${money(p.sellingPrice)}
+                <h3>${window.MC.esc(p.name)}</h3>
 
-                      <span class="old">
-                        ${money(p.originalPrice)}
-                      </span>
-                    </div>
+                <div class="price">
+                  ${window.MC.money(p.sellingPrice)}
 
-                    <p class="muted">
-                      ${
-                        p.stock > 0
-                          ? 'In stock'
-                          : 'Out of stock'
-                      }
-                    </p>
-
-                  </div>
-
-                </a>
-
-                <div class="cardbody">
-
-                  <button
-                    class="btn add"
-                    data-id="${p._id}"
-                    ${p.stock < 1 ? 'disabled' : ''}
-                  >
-                    Add to Cart
-                  </button>
-
-                  <button
-                    class="btn secondary buy"
-                    data-id="${p._id}"
-                    ${p.stock < 1 ? 'disabled' : ''}
-                  >
-                    Buy Now
-                  </button>
-
+                  ${
+                    Number(p.originalPrice) > Number(p.sellingPrice)
+                      ? `<span class="old">${window.MC.money(p.originalPrice)}</span>`
+                      : ''
+                  }
                 </div>
 
-              </article>
-            `
-          )
-          .join('')
+                <p class="muted">
+                  ${p.stock > 0 ? 'In stock' : 'Out of stock'}
+                </p>
+
+              </div>
+            </a>
+
+            <div class="cardbody actions">
+
+              <button
+                class="btn add"
+                type="button"
+                data-id="${p._id}"
+                ${p.stock < 1 ? 'disabled' : ''}
+              >
+                Add to Cart
+              </button>
+
+              <button
+                class="btn secondary buy"
+                type="button"
+                data-id="${p._id}"
+                ${p.stock < 1 ? 'disabled' : ''}
+              >
+                Buy Now
+              </button>
+
+            </div>
+
+          </article>
+        `).join('')
       : `
           <div class="empty">
             No products found.
           </div>
         `;
 
-    $$('.add').forEach(button => {
-      button.onclick = () => add(button.dataset.id);
+    window.MC.$$('.add').forEach(button => {
+      button.onclick = () => addProductToCart(button.dataset.id);
     });
 
-    $$('.buy').forEach(button => {
-      button.onclick = () => buy(button.dataset.id);
+    window.MC.$$('.buy').forEach(button => {
+      button.onclick = () => buyProductNow(button.dataset.id);
     });
 
   } catch (error) {
-    console.error(error);
+    console.error('Product loading error:', error);
 
     grid.innerHTML = `
       <div class="empty">
@@ -148,7 +130,10 @@ async function loadProducts() {
       </div>
     `;
 
-    toast(error.message || 'Products load failed.', 'error');
+    window.MC.toast(
+      error.message || 'Products load failed.',
+      'error'
+    );
   }
 }
 
@@ -157,10 +142,9 @@ async function loadProducts() {
    ADD TO CART
 ========================= */
 
-async function add(id) {
+async function addProductToCart(id) {
   try {
-
-    await api('/cart', {
+    await window.MC.api('/cart', {
       method: 'POST',
       body: JSON.stringify({
         productId: id,
@@ -168,24 +152,35 @@ async function add(id) {
       })
     });
 
-    toast('Product cart mein add ho gaya.', 'success');
+    window.MC.toast(
+      'Product cart mein add ho gaya.',
+      'success'
+    );
 
-    updateCartCount();
+    window.MC.updateCartCount();
 
-  } catch (e) {
+  } catch (error) {
+    const message =
+      String(error.message || '').toLowerCase();
 
     if (
-      e.message.toLowerCase().includes('login') ||
-      e.message.toLowerCase().includes('unauthorized')
+      message.includes('login') ||
+      message.includes('unauthorized') ||
+      message.includes('authentication')
     ) {
       location.href =
-        `${BASE}/frontend/login.html?next=` +
-        encodeURIComponent(location.pathname + location.search);
+        `${PRODUCTS_BASE}/frontend/login.html?next=` +
+        encodeURIComponent(
+          location.pathname + location.search
+        );
 
       return;
     }
 
-    toast(e.message, 'error');
+    window.MC.toast(
+      error.message || 'Cart update failed.',
+      'error'
+    );
   }
 }
 
@@ -194,9 +189,9 @@ async function add(id) {
    BUY NOW
 ========================= */
 
-function buy(id) {
+function buyProductNow(id) {
   location.href =
-    `${BASE}/frontend/checkout.html?buyNow=` +
+    `${PRODUCTS_BASE}/frontend/checkout.html?buyNow=` +
     encodeURIComponent(id) +
     '&qty=1';
 }
@@ -206,226 +201,238 @@ function buy(id) {
    SINGLE PRODUCT PAGE
 ========================= */
 
-async function product() {
+async function loadSingleProduct() {
+  const productBox = window.MC.$('#product');
+
+  if (!productBox) return;
 
   const id =
     new URLSearchParams(location.search).get('id');
 
-  if (!id) return;
+  if (!id) {
+    productBox.innerHTML =
+      '<div class="empty">Product not found.</div>';
+    return;
+  }
 
-  const d =
-    await api('/products/' + encodeURIComponent(id));
+  try {
+    const d = await window.MC.api(
+      '/products/' + encodeURIComponent(id)
+    );
 
-  const p = d.product;
+    const p = d.product;
 
-  $('#product').innerHTML = `
+    productBox.innerHTML = `
+      <div class="two">
 
-    <div class="two">
+        <div class="gallery">
 
-      <div class="gallery">
+          <div class="thumbs">
+            ${(p.images || []).map(im => `
+              <img
+                src="${window.MC.esc(im.url)}"
+                data-url="${window.MC.esc(im.url)}"
+                alt="${window.MC.esc(p.name)}"
+              >
+            `).join('')}
+          </div>
 
-        <div class="thumbs">
-
-          ${(p.images || [])
-            .map(
-              im => `
-                <img
-                  src="${esc(im.url)}"
-                  data-url="${esc(im.url)}"
-                  alt="${esc(p.name)}"
-                >
-              `
-            )
-            .join('')}
+          <img
+            class="mainimage"
+            id="mainImage"
+            src="${window.MC.esc(
+              p.images?.[0]?.url ||
+              'https://placehold.co/800x800?text=Memora'
+            )}"
+            alt="${window.MC.esc(p.name)}"
+          >
 
         </div>
 
-        <img
-          class="mainimage"
-          id="mainImage"
-          src="${esc(
-            p.images?.[0]?.url ||
-            'https://placehold.co/800x800?text=Memora'
-          )}"
-          alt="${esc(p.name)}"
-        >
+        <div>
 
-      </div>
-
-
-      <div>
-
-        <span class="pill">
-          ${esc(p.category?.name || 'Category')}
-        </span>
-
-        <h1>
-          ${esc(p.name)}
-        </h1>
-
-        <p>
-          ${esc(p.description)}
-        </p>
-
-        <div class="price">
-
-          ${money(p.sellingPrice)}
-
-          <span class="old">
-            ${money(p.originalPrice)}
+          <span class="pill">
+            ${window.MC.esc(p.category?.name || 'Category')}
           </span>
 
-        </div>
+          <h1>${window.MC.esc(p.name)}</h1>
 
-        <p>
-          ${
-            p.stock > 0
-              ? `Stock: ${p.stock}`
-              : 'OUT OF STOCK'
-          }
-        </p>
+          <p>${window.MC.esc(p.description)}</p>
 
-        <div class="field">
+          <div class="price">
+            ${window.MC.money(p.sellingPrice)}
 
-          <label>Quantity</label>
+            ${
+              Number(p.originalPrice) > Number(p.sellingPrice)
+                ? `<span class="old">${window.MC.money(p.originalPrice)}</span>`
+                : ''
+            }
+          </div>
 
-          <input
-            id="qty"
-            class="input"
-            type="number"
-            min="1"
-            max="${p.stock}"
-            value="1"
-            ${p.stock < 1 ? 'disabled' : ''}
-          >
+          <p>
+            ${p.stock > 0 ? `Stock: ${p.stock}` : 'OUT OF STOCK'}
+          </p>
 
-        </div>
+          <div class="field">
+            <label>Quantity</label>
 
-        <div class="actions">
+            <input
+              id="qty"
+              class="input"
+              type="number"
+              min="1"
+              max="${p.stock}"
+              value="1"
+              ${p.stock < 1 ? 'disabled' : ''}
+            >
+          </div>
 
-          <button
-            class="btn"
-            id="addBtn"
-            ${p.stock < 1 ? 'disabled' : ''}
-          >
-            Add to Cart
-          </button>
+          <div class="actions">
 
-          <button
-            class="btn secondary"
-            id="buyBtn"
-            ${p.stock < 1 ? 'disabled' : ''}
-          >
-            Buy Now
-          </button>
+            <button
+              class="btn"
+              id="addBtn"
+              type="button"
+              ${p.stock < 1 ? 'disabled' : ''}
+            >
+              Add to Cart
+            </button>
+
+            <button
+              class="btn secondary"
+              id="buyBtn"
+              type="button"
+              ${p.stock < 1 ? 'disabled' : ''}
+            >
+              Buy Now
+            </button>
+
+          </div>
 
         </div>
 
       </div>
-
-    </div>
-  `;
-
-
-  /* Thumbnail images */
-
-  $$('.thumbs img').forEach(img => {
-
-    img.onclick = () => {
-      $('#mainImage').src = img.dataset.url;
-    };
-
-  });
-
-
-  /* Full screen image */
-
-  $('#mainImage').onclick = () => {
-
-    const overlay =
-      document.createElement('div');
-
-    overlay.className = 'lightbox';
-
-    overlay.innerHTML = `
-      <img
-        src="${esc($('#mainImage').src)}"
-        alt="${esc(p.name)}"
-      >
-
-      <button class="btn">
-        Close
-      </button>
     `;
 
-    overlay.onclick = e => {
+    window.MC.$$('.thumbs img').forEach(img => {
+      img.onclick = () => {
+        window.MC.$('#mainImage').src = img.dataset.url;
+      };
+    });
 
-      if (
-        e.target === overlay ||
-        e.target.tagName === 'BUTTON'
-      ) {
-        overlay.remove();
-      }
+    const mainImage = window.MC.$('#mainImage');
 
-    };
+    if (mainImage) {
+      mainImage.onclick = () => {
+        const overlay = document.createElement('div');
 
-    document.body.appendChild(overlay);
-  };
+        overlay.className = 'lightbox';
 
+        overlay.innerHTML = `
+          <img
+            src="${window.MC.esc(mainImage.src)}"
+            alt="${window.MC.esc(p.name)}"
+          >
+          <button class="btn" type="button">Close</button>
+        `;
 
-  /* Add product to cart */
+        overlay.onclick = event => {
+          if (
+            event.target === overlay ||
+            event.target.tagName === 'BUTTON'
+          ) {
+            overlay.remove();
+          }
+        };
 
-  $('#addBtn').onclick = async () => {
-
-    try {
-
-      await api('/cart', {
-        method: 'POST',
-        body: JSON.stringify({
-          productId: p._id,
-          quantity: Number($('#qty').value)
-        })
-      });
-
-      toast(
-        'Product cart mein add ho gaya.',
-        'success'
-      );
-
-      updateCartCount();
-
-    } catch (e) {
-
-      if (
-        e.message.toLowerCase().includes('login') ||
-        e.message.toLowerCase().includes('unauthorized')
-      ) {
-        location.href =
-          `${BASE}/frontend/login.html?next=` +
-          encodeURIComponent(location.pathname + location.search);
-
-        return;
-      }
-
-      toast(e.message, 'error');
+        document.body.appendChild(overlay);
+      };
     }
 
-  };
+    const addBtn = window.MC.$('#addBtn');
 
+    if (addBtn) {
+      addBtn.onclick = async () => {
+        const qty =
+          Math.max(
+            1,
+            Number(window.MC.$('#qty')?.value || 1)
+          );
 
-  /* Buy now */
+        try {
+          await window.MC.api('/cart', {
+            method: 'POST',
+            body: JSON.stringify({
+              productId: p._id,
+              quantity: qty
+            })
+          });
 
-  $('#buyBtn').onclick = () => {
+          window.MC.toast(
+            'Product cart mein add ho gaya.',
+            'success'
+          );
 
-    location.href =
-      `${BASE}/frontend/checkout.html?buyNow=` +
-      encodeURIComponent(p._id) +
-      '&qty=' +
-      encodeURIComponent(
-        Number($('#qty').value)
-      );
+          window.MC.updateCartCount();
 
-  };
+        } catch (error) {
+          const message =
+            String(error.message || '').toLowerCase();
+
+          if (
+            message.includes('login') ||
+            message.includes('unauthorized') ||
+            message.includes('authentication')
+          ) {
+            location.href =
+              `${PRODUCTS_BASE}/frontend/login.html?next=` +
+              encodeURIComponent(
+                location.pathname + location.search
+              );
+
+            return;
+          }
+
+          window.MC.toast(
+            error.message || 'Cart update failed.',
+            'error'
+          );
+        }
+      };
+    }
+
+    const buyBtn = window.MC.$('#buyBtn');
+
+    if (buyBtn) {
+      buyBtn.onclick = () => {
+        const qty =
+          Math.max(
+            1,
+            Number(window.MC.$('#qty')?.value || 1)
+          );
+
+        location.href =
+          `${PRODUCTS_BASE}/frontend/checkout.html?buyNow=` +
+          encodeURIComponent(p._id) +
+          '&qty=' +
+          encodeURIComponent(qty);
+      };
+    }
+
+  } catch (error) {
+    console.error('Single product error:', error);
+
+    productBox.innerHTML = `
+      <div class="empty">
+        Product load nahi ho pa raha hai.
+      </div>
+    `;
+
+    window.MC.toast(
+      error.message || 'Product load failed.',
+      'error'
+    );
+  }
 }
 
 
@@ -433,40 +440,30 @@ async function product() {
    PAGE START
 ========================= */
 
-if ($('#productGrid')) {
-
+if (window.MC.$('#productGrid')) {
   loadProducts();
 
-  $('#filterForm')?.addEventListener(
-    'submit',
-    e => {
+  const filterForm =
+    window.MC.$('#filterForm');
 
-      e.preventDefault();
+  if (filterForm) {
+    filterForm.addEventListener(
+      'submit',
+      event => {
+        event.preventDefault();
 
-      const params =
-        new URLSearchParams(
-          new FormData(e.currentTarget)
-        );
+        const params =
+          new URLSearchParams(
+            new FormData(event.currentTarget)
+          );
 
-      location.search =
-        params.toString();
-
-    }
-  );
+        location.search = params.toString();
+      }
+    );
+  }
 }
 
 
-if ($('#product')) {
-
-  product().catch(e => {
-
-    console.error(e);
-
-    toast(
-      e.message || 'Product load failed.',
-      'error'
-    );
-
-  });
-
+if (window.MC.$('#product')) {
+  loadSingleProduct();
 }
