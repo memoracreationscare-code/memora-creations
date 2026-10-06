@@ -3,6 +3,7 @@ const CHECKOUT_BASE = '/memora-creations';
 let checkoutItems = [];
 let checkoutUser = null;
 let checkoutFromCart = false;
+let orderSubmitting = false;
 
 
 /* =========================
@@ -224,10 +225,38 @@ function getCheckoutAddress() {
 
 
 /* =========================
+   BUTTON LOADING
+========================= */
+
+function setCheckoutLoading(loading) {
+
+  const button =
+    document.querySelector(
+      '#checkoutForm button[type="submit"]'
+    );
+
+  if (!button) return;
+
+  button.disabled = loading;
+
+  button.textContent =
+    loading
+      ? 'Please wait...'
+      : 'Place Order / Pay';
+
+}
+
+
+/* =========================
    CASH ON DELIVERY
 ========================= */
 
 async function placeCodOrder() {
+
+  if (orderSubmitting) return;
+
+  orderSubmitting = true;
+  setCheckoutLoading(true);
 
   try {
 
@@ -252,6 +281,11 @@ async function placeCodOrder() {
       );
 
 
+    alert(
+      '✅ Order Confirmed Successfully!\n\nThank you for shopping with Memora Creations.'
+    );
+
+
     location.href =
       CHECKOUT_BASE +
       '/frontend/order-details.html?id=' +
@@ -261,6 +295,9 @@ async function placeCodOrder() {
 
 
   } catch (error) {
+
+    orderSubmitting = false;
+    setCheckoutLoading(false);
 
     window.MC.toast(
       error.message ||
@@ -278,6 +315,11 @@ async function placeCodOrder() {
 ========================= */
 
 async function placeOnlineOrder() {
+
+  if (orderSubmitting) return;
+
+  orderSubmitting = true;
+  setCheckoutLoading(true);
 
   try {
 
@@ -371,6 +413,11 @@ async function placeOnlineOrder() {
                   );
 
 
+                alert(
+                  '✅ Payment Successful!\n\nYour order has been confirmed.'
+                );
+
+
                 location.href =
                   CHECKOUT_BASE +
                   '/frontend/order-details.html?id=' +
@@ -380,6 +427,9 @@ async function placeOnlineOrder() {
 
 
               } catch (error) {
+
+                orderSubmitting = false;
+                setCheckoutLoading(false);
 
                 window.MC.toast(
                   error.message ||
@@ -411,6 +461,10 @@ async function placeOnlineOrder() {
           ).catch(() => {});
 
 
+          orderSubmitting = false;
+          setCheckoutLoading(false);
+
+
           window.MC.toast(
             'Payment failed. Please try again.',
             'error'
@@ -427,6 +481,9 @@ async function placeOnlineOrder() {
 
     script.onerror = () => {
 
+      orderSubmitting = false;
+      setCheckoutLoading(false);
+
       window.MC.toast(
         'Razorpay Checkout load nahi hua.',
         'error'
@@ -441,6 +498,9 @@ async function placeOnlineOrder() {
 
 
   } catch (error) {
+
+    orderSubmitting = false;
+    setCheckoutLoading(false);
 
     window.MC.toast(
       error.message ||
@@ -468,6 +528,11 @@ if (checkoutForm) {
     async event => {
 
       event.preventDefault();
+
+
+      if (orderSubmitting) {
+        return;
+      }
 
 
       if (
