@@ -15,9 +15,15 @@ async function api(path,options={}){
   });
 
   let data={};
-  try{data=await res.json()}catch{}
 
-  if(!res.ok) throw new Error(data.message||'Request failed.');
+  try{
+    data=await res.json();
+  }catch{}
+
+  if(!res.ok){
+    throw new Error(data.message||'Request failed.');
+  }
+
   return data;
 }
 
@@ -39,10 +45,15 @@ function esc(s){
 
 function toast(msg,type='message'){
   const el=document.createElement('div');
+
   el.className=`message ${type}`;
   el.textContent=msg;
+
   document.body.prepend(el);
-  setTimeout(()=>el.remove(),3500);
+
+  setTimeout(()=>{
+    el.remove();
+  },3500);
 }
 
 async function currentUser(){
@@ -54,96 +65,190 @@ async function currentUser(){
 }
 
 async function requireLogin(){
-  const u=await currentUser();
+  const user=await currentUser();
 
-  if(!u){
+  if(!user){
     location.href=
-      BASE+'/frontend/login.html?next='+
-      encodeURIComponent(location.pathname+location.search);
+      BASE+
+      '/frontend/login.html?next='+
+      encodeURIComponent(
+        location.pathname+location.search
+      );
+
     return null;
   }
 
-  return u;
+  return user;
 }
 
 function nav(){
   const el=$('#nav');
-  if(!el)return;
+
+  if(!el) return;
 
   el.innerHTML=`
-  <div class="container nav">
-    <a class="brand" href="${BASE}/frontend/index.html">
-      MEMORA CREATIONS
-    </a>
+    <div class="container nav">
 
-    <form class="search" id="globalSearch">
-      <input class="input"
-             placeholder="Search products..."
-             name="q">
-      <button class="btn">Search</button>
-    </form>
-
-    <div class="navlinks">
-      <a href="${BASE}/frontend/products.html">Products</a>
-      <a href="${BASE}/frontend/orders.html">Orders</a>
-      <a href="${BASE}/frontend/profile.html">Profile</a>
-      <a href="${BASE}/frontend/cart.html">
-        Cart (<span id="cartCount">0</span>)
+      <a
+        class="brand"
+        href="${BASE}/frontend/index.html"
+      >
+        MEMORA CREATIONS
       </a>
-      <button class="btn secondary" id="logoutBtn">
-        Logout
-      </button>
+
+      <form
+        class="search"
+        id="globalSearch"
+      >
+        <input
+          class="input"
+          placeholder="Search products..."
+          name="q"
+        >
+
+        <button
+          class="btn"
+          type="submit"
+        >
+          Search
+        </button>
+      </form>
+
+      <div class="navlinks">
+
+        <a href="${BASE}/frontend/index.html">
+          Home
+        </a>
+
+        <a href="${BASE}/frontend/products.html">
+          Products
+        </a>
+
+        <a href="${BASE}/frontend/orders.html">
+          Orders
+        </a>
+
+        <a href="${BASE}/frontend/profile.html">
+          Profile
+        </a>
+
+        <a href="${BASE}/frontend/cart.html">
+          Cart (<span id="cartCount">0</span>)
+        </a>
+
+        <button
+          class="btn secondary"
+          id="logoutBtn"
+          type="button"
+        >
+          Logout
+        </button>
+
+      </div>
+
     </div>
-  </div>`;
+  `;
 
-  $('#globalSearch').addEventListener('submit',e=>{
-    e.preventDefault();
+  const searchForm=$('#globalSearch');
 
-    location.href=
-      BASE+'/frontend/products.html?q='+
-      encodeURIComponent(
-        new FormData(e.currentTarget).get('q')||''
-      );
-  });
+  if(searchForm){
+    searchForm.addEventListener(
+      'submit',
+      event=>{
+        event.preventDefault();
 
-  $('#logoutBtn').addEventListener('click',async()=>{
-    await api('/auth/logout',{method:'POST'});
-    location.href=BASE+'/frontend/login.html';
-  });
+        const q=
+          new FormData(
+            event.currentTarget
+          ).get('q')||'';
+
+        location.href=
+          BASE+
+          '/frontend/products.html?q='+
+          encodeURIComponent(q);
+      }
+    );
+  }
+
+  const logoutButton=$('#logoutBtn');
+
+  if(logoutButton){
+    logoutButton.addEventListener(
+      'click',
+      async()=>{
+        try{
+          await api(
+            '/auth/logout',
+            {method:'POST'}
+          );
+        }catch{}
+
+        location.href=
+          BASE+
+          '/frontend/login.html';
+      }
+    );
+  }
 
   updateCartCount();
 }
 
 async function updateCartCount(){
   const el=$('#cartCount');
-  if(!el)return;
+
+  if(!el) return;
 
   try{
     const d=await api('/cart');
-    el.textContent=d.cart.items.reduce(
-      (s,i)=>s+i.quantity,0
-    );
+
+    el.textContent=
+      (d.cart?.items||[])
+        .reduce(
+          (sum,item)=>
+            sum+Number(item.quantity||0),
+          0
+        );
+
   }catch{
     el.textContent='0';
   }
 }
 
 function bottomNav(){
-  const b=$('#bottomNav');
+  const el=$('#bottomNav');
 
-  if(b)b.innerHTML=`
-    <a href="${BASE}/frontend/index.html">HOME</a>
-    <a href="${BASE}/frontend/products.html">CATEGORIES</a>
-    <a href="${BASE}/frontend/cart.html">CART</a>
-    <a href="${BASE}/frontend/orders.html">ORDERS</a>
-    <a href="${BASE}/frontend/profile.html">PROFILE</a>
+  if(!el) return;
+
+  el.innerHTML=`
+    <a href="${BASE}/frontend/index.html">
+      HOME
+    </a>
+
+    <a href="${BASE}/frontend/products.html">
+      PRODUCTS
+    </a>
+
+    <a href="${BASE}/frontend/cart.html">
+      CART
+    </a>
+
+    <a href="${BASE}/frontend/orders.html">
+      ORDERS
+    </a>
+
+    <a href="${BASE}/frontend/profile.html">
+      PROFILE
+    </a>
   `;
 }
 
-document.addEventListener('DOMContentLoaded',()=>{
-  nav();
-  bottomNav();
-});
+document.addEventListener(
+  'DOMContentLoaded',
+  ()=>{
+    nav();
+    bottomNav();
+  }
+);
 
 window.MC={
   api,
