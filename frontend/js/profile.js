@@ -1,6 +1,168 @@
-const PROFILE_BASE = '/memora-creations';
-
 let profileUser = null;
+
+
+/* =========================
+   FILL PROFILE
+========================= */
+
+function fillProfile(user) {
+
+  if (!user) return;
+
+  window.MC.$('#fullName').value =
+    user.fullName || '';
+
+  window.MC.$('#mobile').value =
+    user.mobile || '';
+
+  window.MC.$('#email').value =
+    user.email || '';
+
+
+  const addresses =
+    user.addresses || [];
+
+
+  renderAddresses(addresses);
+
+
+  /* DEFAULT ADDRESS AUTO FILL */
+
+  const defaultAddress =
+    addresses.find(
+      address => address.isDefault
+    ) ||
+    addresses[0];
+
+
+  if (defaultAddress) {
+
+    const form =
+      window.MC.$('#addressForm');
+
+    if (!form) return;
+
+
+    const label =
+      form.querySelector(
+        '[name="label"]'
+      );
+
+    const fullName =
+      form.querySelector(
+        '[name="fullName"]'
+      );
+
+    const mobile =
+      form.querySelector(
+        '[name="mobile"]'
+      );
+
+    const addressLine =
+      form.querySelector(
+        '[name="addressLine"]'
+      );
+
+    const pinCode =
+      form.querySelector(
+        '[name="pinCode"]'
+      );
+
+    const city =
+      form.querySelector(
+        '[name="city"]'
+      );
+
+    const state =
+      form.querySelector(
+        '[name="state"]'
+      );
+
+
+    if (label) {
+      label.value =
+        defaultAddress.label || 'Home';
+    }
+
+    if (fullName) {
+      fullName.value =
+        defaultAddress.fullName ||
+        user.fullName ||
+        '';
+    }
+
+    if (mobile) {
+      mobile.value =
+        defaultAddress.mobile ||
+        user.mobile ||
+        '';
+    }
+
+    if (addressLine) {
+      addressLine.value =
+        defaultAddress.addressLine || '';
+    }
+
+    if (pinCode) {
+      pinCode.value =
+        defaultAddress.pinCode || '';
+    }
+
+    if (city) {
+      city.value =
+        defaultAddress.city || '';
+    }
+
+    if (state) {
+      state.value =
+        defaultAddress.state || '';
+    }
+
+    const defaultCheckbox =
+      window.MC.$('#isDefault');
+
+    if (defaultCheckbox) {
+      defaultCheckbox.checked =
+        Boolean(
+          defaultAddress.isDefault
+        );
+    }
+
+  } else {
+
+    /* IF ADDRESS NOT FOUND */
+
+    const form =
+      window.MC.$('#addressForm');
+
+    if (form) {
+
+      const nameInput =
+        form.querySelector(
+          '[name="fullName"]'
+        );
+
+      const mobileInput =
+        form.querySelector(
+          '[name="mobile"]'
+        );
+
+
+      if (nameInput) {
+        nameInput.value =
+          user.fullName || '';
+      }
+
+      if (mobileInput) {
+        mobileInput.value =
+          user.mobile || '';
+      }
+
+    }
+
+  }
+
+}
 
 
 /* =========================
@@ -9,24 +171,27 @@ let profileUser = null;
 
 async function loadProfilePage() {
 
+  const data =
+    await window.MC.api(
+      '/auth/me'
+    );
+
+
   profileUser =
-    await window.MC.requireLogin();
-
-  if (!profileUser) return;
+    data.user;
 
 
-  window.MC.$('#fullName').value =
-    profileUser.fullName || '';
+  if (!profileUser) {
 
-  window.MC.$('#mobile').value =
-    profileUser.mobile || '';
+    location.href =
+      '/memora-creations/frontend/login.html';
 
-  window.MC.$('#email').value =
-    profileUser.email || '';
+    return;
+  }
 
 
-  renderAddresses(
-    profileUser.addresses || []
+  fillProfile(
+    profileUser
   );
 
 }
@@ -42,6 +207,9 @@ function renderAddresses(addresses) {
     window.MC.$('#addresses');
 
 
+  if (!box) return;
+
+
   box.innerHTML =
     addresses.length
 
@@ -54,34 +222,23 @@ function renderAddresses(addresses) {
 
             <div class="cardbody">
 
-              <div
-                style="
-                  display:flex;
-                  justify-content:space-between;
-                  gap:10px;
-                  align-items:center;
-                "
-              >
+              <div>
 
-                <div>
+                <b>
+                  ${window.MC.esc(
+                    address.label || 'Address'
+                  )}
+                </b>
 
-                  <b>
-                    ${window.MC.esc(
-                      address.label || 'Address'
-                    )}
-                  </b>
-
-                  ${
-                    address.isDefault
-                      ? `
-                        <span class="pill">
-                          Default
-                        </span>
-                      `
-                      : ''
-                  }
-
-                </div>
+                ${
+                  address.isDefault
+                    ? `
+                      <span class="pill">
+                        Default
+                      </span>
+                    `
+                    : ''
+                }
 
               </div>
 
@@ -167,8 +324,6 @@ function renderAddresses(addresses) {
         `;
 
 
-  /* EDIT */
-
   window.MC
     .$$('.edit-address')
     .forEach(button => {
@@ -178,21 +333,18 @@ function renderAddresses(addresses) {
         const address =
           addresses.find(
             item =>
-              item._id ===
-              button.dataset.id
+              String(item._id) ===
+              String(button.dataset.id)
           );
 
-        if (!address) return;
-
-
-        editAddress(address);
+        if (address) {
+          editAddress(address);
+        }
 
       };
 
     });
 
-
-  /* DELETE */
 
   window.MC
     .$$('.delete-address')
@@ -215,17 +367,13 @@ function renderAddresses(addresses) {
    SAVE PROFILE
 ========================= */
 
-const profileForm =
-  window.MC.$('#profileForm');
-
-
-if (profileForm) {
-
-  profileForm.addEventListener(
+window.MC.$('#profileForm')
+  ?.addEventListener(
     'submit',
     async event => {
 
       event.preventDefault();
+
 
       try {
 
@@ -249,6 +397,7 @@ if (profileForm) {
                   .trim()
 
             })
+
           }
         );
 
@@ -275,20 +424,13 @@ if (profileForm) {
     }
   );
 
-}
-
 
 /* =========================
    ADD ADDRESS
 ========================= */
 
-const addressForm =
-  window.MC.$('#addressForm');
-
-
-if (addressForm) {
-
-  addressForm.addEventListener(
+window.MC.$('#addressForm')
+  ?.addEventListener(
     'submit',
     async event => {
 
@@ -327,9 +469,6 @@ if (addressForm) {
         );
 
 
-        event.currentTarget.reset();
-
-
         await refreshProfile();
 
 
@@ -345,8 +484,6 @@ if (addressForm) {
 
     }
   );
-
-}
 
 
 /* =========================
@@ -366,7 +503,7 @@ async function editAddress(address) {
 
   const fullName =
     prompt(
-      'Full name',
+      'Full Name',
       address.fullName || ''
     );
 
@@ -435,7 +572,6 @@ async function editAddress(address) {
         method: 'PUT',
 
         body: JSON.stringify({
-
           label,
           fullName,
           mobile,
@@ -444,7 +580,6 @@ async function editAddress(address) {
           city,
           state,
           isDefault
-
         })
       }
     );
@@ -521,47 +656,24 @@ async function deleteAddress(id) {
 
 
 /* =========================
-   REFRESH PROFILE
+   REFRESH
 ========================= */
 
 async function refreshProfile() {
 
-  try {
-
-    const data =
-      await window.MC.api(
-        '/auth/me'
-      );
-
-
-    profileUser =
-      data.user;
-
-
-    window.MC.$('#fullName').value =
-      profileUser.fullName || '';
-
-    window.MC.$('#mobile').value =
-      profileUser.mobile || '';
-
-    window.MC.$('#email').value =
-      profileUser.email || '';
-
-
-    renderAddresses(
-      profileUser.addresses || []
+  const data =
+    await window.MC.api(
+      '/auth/me'
     );
 
 
-  } catch (error) {
+  profileUser =
+    data.user;
 
-    window.MC.toast(
-      error.message ||
-      'Profile refresh failed.',
-      'error'
-    );
 
-  }
+  fillProfile(
+    profileUser
+  );
 
 }
 
@@ -577,6 +689,7 @@ loadProfilePage().catch(
       'Profile load error:',
       error
     );
+
 
     window.MC.toast(
       error.message ||
