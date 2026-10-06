@@ -12,13 +12,12 @@ let adminOrders = [];
 
 
 /* =========================
-   PRINT SHIPPING LABEL
+   PRINT PACKAGING LABEL
 ========================= */
 
 function printShippingLabel(order) {
 
-  const address =
-    order.shippingAddress || {};
+  const address = order.shippingAddress || {};
 
   const customerName =
     order.customer?.fullName ||
@@ -32,60 +31,36 @@ function printShippingLabel(order) {
     address.mobile ||
     '';
 
-  const email =
-    order.customer?.email ||
-    order.user?.email ||
-    '';
-
   const paymentText =
     order.paymentMethod === 'COD'
-      ? `COD - ₹${Number(order.grandTotal || 0).toLocaleString('en-IN')}`
+      ? `COD ₹${Number(order.grandTotal || 0).toLocaleString('en-IN')}`
       : 'PREPAID';
 
-  const products =
-    (order.items || [])
-      .map((item, index) => `
-        <tr>
-          <td>${index + 1}</td>
+  const products = (order.items || [])
+    .map((item, index) => `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${window.MC.esc(item.name || '')}</td>
+        <td>${Number(item.quantity || 0)}</td>
+      </tr>
+    `)
+    .join('');
 
-          <td>
-            ${window.MC.esc(item.name || '')}
-            ${
-              item.productId
-                ? `<div class="small">${window.MC.esc(item.productId)}</div>`
-                : ''
-            }
-          </td>
+  const w = window.open(
+    '',
+    '_blank',
+    'width=700,height=900'
+  );
 
-          <td class="center">
-            ${Number(item.quantity || 0)}
-          </td>
-        </tr>
-      `)
-      .join('');
-
-
-  const labelWindow =
-    window.open(
-      '',
-      '_blank',
-      'width=700,height=900'
-    );
-
-
-  if (!labelWindow) {
-
+  if (!w) {
     window.MC.toast(
-      'Popup blocked. Please allow popups.',
+      'Please allow popups.',
       'error'
     );
-
     return;
   }
 
-
-  labelWindow.document.write(`
-
+  w.document.write(`
     <!doctype html>
 
     <html>
@@ -95,7 +70,7 @@ function printShippingLabel(order) {
       <meta charset="utf-8">
 
       <title>
-        Shipping Label - ${window.MC.esc(order.orderId || '')}
+        Label - ${window.MC.esc(order.orderId || '')}
       </title>
 
       <style>
@@ -110,47 +85,41 @@ function printShippingLabel(order) {
         }
 
         body {
-          margin: 0;
-          padding: 0;
           font-family: Arial, sans-serif;
+          margin: 0;
           color: #000;
-          background: #fff;
         }
 
         .label {
           width: 92mm;
           min-height: 140mm;
-          border: 2px solid #000;
-          padding: 4mm;
           margin: auto;
+          padding: 4mm;
+          border: 2px solid #000;
         }
 
         .brand {
           text-align: center;
           font-size: 20px;
           font-weight: 800;
-          letter-spacing: 1px;
+          padding-bottom: 8px;
           border-bottom: 2px solid #000;
-          padding-bottom: 7px;
-          margin-bottom: 8px;
         }
 
         .payment {
+          margin: 8px 0;
+          padding: 8px;
+          border: 2px solid #000;
           text-align: center;
           font-size: 20px;
           font-weight: 900;
-          padding: 8px;
-          border: 2px solid #000;
-          margin-bottom: 10px;
         }
 
         .section {
+          padding: 8px 0;
           border-bottom: 1px solid #000;
-          padding: 7px 0;
-        }
-
-        .section:last-child {
-          border-bottom: none;
+          line-height: 1.45;
+          font-size: 13px;
         }
 
         .title {
@@ -160,31 +129,14 @@ function printShippingLabel(order) {
           margin-bottom: 4px;
         }
 
-        .big {
+        .name {
           font-size: 16px;
           font-weight: 800;
-        }
-
-        .normal {
-          font-size: 13px;
-          line-height: 1.45;
-        }
-
-        .small {
-          font-size: 10px;
-          margin-top: 2px;
-        }
-
-        .order-id {
-          font-size: 14px;
-          font-weight: 800;
-          word-break: break-all;
         }
 
         table {
           width: 100%;
           border-collapse: collapse;
-          margin-top: 5px;
           font-size: 11px;
         }
 
@@ -192,22 +144,11 @@ function printShippingLabel(order) {
         td {
           border: 1px solid #000;
           padding: 5px;
-          text-align: left;
-        }
-
-        .center {
-          text-align: center;
         }
 
         .total {
-          font-size: 15px;
+          font-size: 16px;
           font-weight: 900;
-        }
-
-        .footer {
-          text-align: center;
-          font-size: 10px;
-          padding-top: 8px;
         }
 
         .no-print {
@@ -215,56 +156,33 @@ function printShippingLabel(order) {
           margin: 15px;
         }
 
-        .print-btn {
-          padding: 10px 20px;
-          font-size: 15px;
-          cursor: pointer;
-        }
-
         @media print {
-
           .no-print {
             display: none;
           }
-
-          .label {
-            border: 2px solid #000;
-          }
-
         }
 
       </style>
 
     </head>
 
-
     <body>
 
-
       <div class="no-print">
-
-        <button
-          class="print-btn"
-          onclick="window.print()"
-        >
+        <button onclick="window.print()">
           Print Label
         </button>
-
       </div>
 
-
       <div class="label">
-
 
         <div class="brand">
           MEMORA CREATIONS
         </div>
 
-
         <div class="payment">
           ${paymentText}
         </div>
-
 
         <div class="section">
 
@@ -272,22 +190,20 @@ function printShippingLabel(order) {
             Order ID
           </div>
 
-          <div class="order-id">
+          <b>
             ${window.MC.esc(order.orderId || '')}
-          </div>
+          </b>
 
-          <div class="small">
-            Order Date:
-            ${
-              order.createdAt
-                ? new Date(order.createdAt)
-                    .toLocaleString('en-IN')
-                : ''
-            }
-          </div>
+          <br>
+
+          ${
+            order.createdAt
+              ? new Date(order.createdAt)
+                  .toLocaleString('en-IN')
+              : ''
+          }
 
         </div>
-
 
         <div class="section">
 
@@ -295,46 +211,37 @@ function printShippingLabel(order) {
             Ship To
           </div>
 
-          <div class="big">
+          <div class="name">
             ${window.MC.esc(customerName)}
           </div>
 
-          <div class="normal">
+          ${window.MC.esc(address.addressLine || '')}
 
-            ${window.MC.esc(address.addressLine || '')}
+          <br>
 
-            <br>
+          ${window.MC.esc(address.city || '')}
 
-            ${window.MC.esc(address.city || '')}
+          ${
+            address.state
+              ? ', ' + window.MC.esc(address.state)
+              : ''
+          }
 
-            ${
-              address.state
-                ? ', ' + window.MC.esc(address.state)
-                : ''
-            }
+          <br>
 
-            <br>
+          <b>
+            PIN:
+            ${window.MC.esc(address.pinCode || '')}
+          </b>
 
-            <b>
-              PIN:
-              ${window.MC.esc(address.pinCode || '')}
-            </b>
+          <br>
 
-            <br>
-
-            Mobile:
-            <b>${window.MC.esc(mobile)}</b>
-
-            ${
-              email
-                ? `<br>Email: ${window.MC.esc(email)}`
-                : ''
-            }
-
-          </div>
+          Mobile:
+          <b>
+            ${window.MC.esc(mobile)}
+          </b>
 
         </div>
-
 
         <div class="section">
 
@@ -345,59 +252,36 @@ function printShippingLabel(order) {
           <table>
 
             <thead>
-
               <tr>
                 <th>#</th>
                 <th>Product</th>
-                <th class="center">Qty</th>
+                <th>Qty</th>
               </tr>
-
             </thead>
 
             <tbody>
-
-              ${
-                products ||
-                `
-                  <tr>
-                    <td colspan="3">
-                      No products
-                    </td>
-                  </tr>
-                `
-              }
-
+              ${products}
             </tbody>
 
           </table>
 
         </div>
 
+        <div class="section">
 
-        <div class="section normal">
-
-          <div>
-            Payment Method:
-            <b>
-              ${window.MC.esc(order.paymentMethod || '')}
-            </b>
-          </div>
-
-          <div>
-            Payment Status:
-            <b>
-              ${window.MC.esc(order.paymentStatus || '')}
-            </b>
-          </div>
-
-          <div>
-            Order Status:
-            <b>
-              ${window.MC.esc(order.orderStatus || '')}
-            </b>
-          </div>
+          Payment:
+          <b>
+            ${window.MC.esc(order.paymentMethod || '')}
+          </b>
 
           <br>
+
+          Payment Status:
+          <b>
+            ${window.MC.esc(order.paymentStatus || '')}
+          </b>
+
+          <br><br>
 
           <div class="total">
             Total:
@@ -407,33 +291,168 @@ function printShippingLabel(order) {
 
         </div>
 
-
-        <div class="footer">
-          Thank you for shopping with MEMORA CREATIONS
-        </div>
-
-
       </div>
 
-
       <script>
-
         setTimeout(function () {
           window.print();
         }, 500);
-
       <\/script>
-
 
     </body>
 
     </html>
-
   `);
 
+  w.document.close();
+}
 
-  labelWindow.document.close();
 
+/* =========================
+   CREATE SHIPMENT FORM
+========================= */
+
+function shipmentFormHtml(order) {
+
+  return `
+    <div
+      class="admin-card shipment-box"
+      style="margin-top:20px;"
+    >
+
+      <h3>
+        🚚 Create Shiprocket Shipment
+      </h3>
+
+      <p class="mini">
+        Customer, address, products, payment and order details
+        will be filled automatically.
+        You only need to enter package weight and size.
+      </p>
+
+      <form
+        class="shipment-form"
+        data-id="${order._id}"
+      >
+
+        <div class="formgrid">
+
+          <div class="field">
+
+            <label>
+              Weight (KG)
+            </label>
+
+            <input
+              class="input"
+              name="weight"
+              type="number"
+              step="0.01"
+              min="0.01"
+              placeholder="Example: 0.5"
+              required
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label>
+              Length (CM)
+            </label>
+
+            <input
+              class="input"
+              name="length"
+              type="number"
+              step="0.1"
+              min="0.1"
+              placeholder="Example: 30"
+              required
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label>
+              Width (CM)
+            </label>
+
+            <input
+              class="input"
+              name="width"
+              type="number"
+              step="0.1"
+              min="0.1"
+              placeholder="Example: 25"
+              required
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label>
+              Height (CM)
+            </label>
+
+            <input
+              class="input"
+              name="height"
+              type="number"
+              step="0.1"
+              min="0.1"
+              placeholder="Example: 8"
+              required
+            >
+
+          </div>
+
+
+          <div class="field full">
+
+            <label>
+              Pickup Location
+            </label>
+
+            <input
+              class="input"
+              name="pickupLocation"
+              value="Home"
+              required
+            >
+
+            <div class="mini">
+              Shiprocket me jo pickup location name hai,
+              wahi hona chahiye.
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <button
+          class="btn"
+          type="submit"
+        >
+          Create Shipment
+        </button>
+
+
+        <div
+          class="shipment-result"
+          style="margin-top:15px;"
+        ></div>
+
+      </form>
+
+    </div>
+  `;
 }
 
 
@@ -443,119 +462,106 @@ function printShippingLabel(order) {
 
 function orderDetailsHtml(order) {
 
-  const address =
-    order.shippingAddress || {};
+  const address = order.shippingAddress || {};
 
-
-  const items =
-    (order.items || [])
-      .map(item => `
+  const items = (order.items || [])
+    .map(item => `
+      <div
+        class="admin-card"
+        style="margin:10px 0;"
+      >
 
         <div
-          class="admin-card"
-          style="margin:10px 0;"
+          style="
+            display:flex;
+            gap:15px;
+            align-items:center;
+          "
         >
 
-          <div
-            style="
-              display:flex;
-              gap:15px;
-              align-items:center;
-            "
-          >
-
-            ${
-              item.imageUrl
-                ? `
-                  <img
-                    src="${window.MC.esc(item.imageUrl)}"
-                    width="70"
-                    height="70"
-                    style="
-                      object-fit:cover;
-                      border-radius:10px;
-                    "
-                  >
-                `
-                : ''
-            }
-
-
-            <div style="flex:1;">
-
-              <b>
-                ${window.MC.esc(item.name || '')}
-              </b>
-
-              <div class="mini">
-                Product ID:
-                ${window.MC.esc(item.productId || '')}
-              </div>
-
-              <div>
-                Qty:
-                ${Number(item.quantity || 0)}
-              </div>
-
-              <div>
-                Price:
-                ${window.MC.money(item.unitPrice)}
-              </div>
-
-            </div>
-
-
-            <b>
-              ${window.MC.money(item.lineTotal)}
-            </b>
-
-          </div>
-
-        </div>
-
-      `)
-      .join('');
-
-
-  const history =
-    (order.statusHistory || [])
-      .map(item => `
-
-        <div style="margin-bottom:10px;">
-
-          <b>
-            ${window.MC.esc(item.status || '')}
-          </b>
-
-          <div class="mini">
-
-            ${
-              item.changedAt
-                ? new Date(item.changedAt)
-                    .toLocaleString('en-IN')
-                : ''
-            }
-
-          </div>
-
           ${
-            item.note
+            item.imageUrl
               ? `
-                <div>
-                  ${window.MC.esc(item.note)}
-                </div>
+                <img
+                  src="${window.MC.esc(item.imageUrl)}"
+                  width="70"
+                  height="70"
+                  style="
+                    object-fit:cover;
+                    border-radius:10px;
+                  "
+                >
               `
               : ''
           }
 
+          <div style="flex:1;">
+
+            <b>
+              ${window.MC.esc(item.name || '')}
+            </b>
+
+            <div class="mini">
+              Product ID:
+              ${window.MC.esc(item.productId || '')}
+            </div>
+
+            <div>
+              Qty:
+              ${Number(item.quantity || 0)}
+            </div>
+
+            <div>
+              Price:
+              ${window.MC.money(item.unitPrice)}
+            </div>
+
+          </div>
+
+          <b>
+            ${window.MC.money(item.lineTotal)}
+          </b>
+
         </div>
 
-      `)
-      .join('');
+      </div>
+    `)
+    .join('');
+
+
+  const history = (order.statusHistory || [])
+    .map(item => `
+      <div style="margin-bottom:10px;">
+
+        <b>
+          ${window.MC.esc(item.status || '')}
+        </b>
+
+        <div class="mini">
+          ${
+            item.changedAt
+              ? new Date(item.changedAt)
+                  .toLocaleString('en-IN')
+              : ''
+          }
+        </div>
+
+        ${
+          item.note
+            ? `
+              <div>
+                ${window.MC.esc(item.note)}
+              </div>
+            `
+            : ''
+        }
+
+      </div>
+    `)
+    .join('');
 
 
   return `
-
     <div
       class="admin-card"
       style="margin:12px 0;"
@@ -569,16 +575,11 @@ function orderDetailsHtml(order) {
       <p>
 
         <b>Order ID:</b>
-
         ${window.MC.esc(order.orderId || '')}
 
-      </p>
-
-
-      <p>
+        <br>
 
         <b>Customer:</b>
-
         ${window.MC.esc(
           order.customer?.fullName ||
           order.user?.fullName ||
@@ -588,7 +589,6 @@ function orderDetailsHtml(order) {
         <br>
 
         <b>Mobile:</b>
-
         ${window.MC.esc(
           order.customer?.mobile ||
           order.user?.mobile ||
@@ -598,7 +598,6 @@ function orderDetailsHtml(order) {
         <br>
 
         <b>Email:</b>
-
         ${window.MC.esc(
           order.customer?.email ||
           order.user?.email ||
@@ -611,7 +610,6 @@ function orderDetailsHtml(order) {
       <h3>
         Delivery Address
       </h3>
-
 
       <p>
 
@@ -648,7 +646,6 @@ function orderDetailsHtml(order) {
         Products
       </h3>
 
-
       ${
         items ||
         '<p>No products found.</p>'
@@ -659,23 +656,19 @@ function orderDetailsHtml(order) {
         Payment & Total
       </h3>
 
-
       <p>
 
         <b>Payment Method:</b>
-
         ${window.MC.esc(order.paymentMethod || '')}
 
         <br>
 
         <b>Payment Status:</b>
-
         ${window.MC.esc(order.paymentStatus || '')}
 
         <br>
 
         <b>Order Status:</b>
-
         ${window.MC.esc(order.orderStatus || '')}
 
       </p>
@@ -716,11 +709,13 @@ function orderDetailsHtml(order) {
         Status History
       </h3>
 
-
       ${
         history ||
         '<p>No status history.</p>'
       }
+
+
+      ${shipmentFormHtml(order)}
 
 
       <div
@@ -735,11 +730,9 @@ function orderDetailsHtml(order) {
         <button
           class="btn print-label"
           type="button"
-          data-id="${order._id}"
         >
-          🖨 Print Shipping Label
+          🖨 Print Packaging Label
         </button>
-
 
         <button
           class="btn secondary close-details"
@@ -750,16 +743,149 @@ function orderDetailsHtml(order) {
 
       </div>
 
-
     </div>
-
   `;
+}
+
+
+/* =========================
+   SHIPMENT SUBMIT
+========================= */
+
+async function submitShipmentForm(
+  form,
+  order
+) {
+
+  const result =
+    form.querySelector(
+      '.shipment-result'
+    );
+
+  const submitButton =
+    form.querySelector(
+      'button[type="submit"]'
+    );
+
+
+  const body =
+    Object.fromEntries(
+      new FormData(form)
+    );
+
+
+  submitButton.disabled = true;
+  submitButton.textContent =
+    'Creating Shipment...';
+
+  result.innerHTML =
+    'Connecting to Shiprocket...';
+
+
+  try {
+
+    const data =
+      await window.MC.api(
+        '/admin/orders/' +
+        order._id +
+        '/create-shipment',
+        {
+          method: 'POST',
+          body: JSON.stringify(body)
+        }
+      );
+
+
+    const sr =
+      data.shiprocket || {};
+
+
+    result.innerHTML = `
+
+      <div class="message success">
+
+        ✅ Shipment created successfully.
+
+        <br><br>
+
+        ${
+          sr.order_id
+            ? `
+              <b>Shiprocket Order ID:</b>
+              ${window.MC.esc(sr.order_id)}
+              <br>
+            `
+            : ''
+        }
+
+        ${
+          sr.shipment_id
+            ? `
+              <b>Shipment ID:</b>
+              ${window.MC.esc(sr.shipment_id)}
+              <br>
+            `
+            : ''
+        }
+
+        ${
+          sr.status
+            ? `
+              <b>Status:</b>
+              ${window.MC.esc(sr.status)}
+            `
+            : ''
+        }
+
+      </div>
+
+    `;
+
+
+    window.MC.toast(
+      'Shipment created in Shiprocket.',
+      'success'
+    );
+
+
+  } catch (error) {
+
+    result.innerHTML = `
+
+      <div class="message error">
+
+        ❌
+        ${window.MC.esc(
+          error.message ||
+          'Shipment creation failed.'
+        )}
+
+      </div>
+
+    `;
+
+
+    window.MC.toast(
+      error.message ||
+      'Shipment creation failed.',
+      'error'
+    );
+
+
+  } finally {
+
+    submitButton.disabled = false;
+
+    submitButton.textContent =
+      'Create Shipment';
+
+  }
 
 }
 
 
 /* =========================
-   BIND BUTTONS
+   BIND ORDER BUTTONS
 ========================= */
 
 function bindOrderButtons() {
@@ -775,30 +901,28 @@ function bindOrderButtons() {
           const id =
             button.dataset.id;
 
-
           const order =
             adminOrders.find(
               item => item._id === id
             );
-
 
           const detailsRow =
             document.querySelector(
               `#details-${id}`
             );
 
-
-          if (!order || !detailsRow) return;
+          if (
+            !order ||
+            !detailsRow
+          ) {
+            return;
+          }
 
 
           detailsRow.innerHTML = `
-
             <td colspan="6">
-
               ${orderDetailsHtml(order)}
-
             </td>
-
           `;
 
 
@@ -811,8 +935,23 @@ function bindOrderButtons() {
             ?.addEventListener(
               'click',
               () => {
-
                 printShippingLabel(order);
+              }
+            );
+
+
+          detailsRow
+            .querySelector('.shipment-form')
+            ?.addEventListener(
+              'submit',
+              event => {
+
+                event.preventDefault();
+
+                submitShipmentForm(
+                  event.currentTarget,
+                  order
+                );
 
               }
             );
@@ -871,7 +1010,6 @@ function bindOrderButtons() {
 
           } catch (error) {
 
-
             window.MC.toast(
               error.message ||
               'Order update failed.',
@@ -899,7 +1037,6 @@ async function loadAdminOrders() {
 
   const admin =
     await window.requireAdmin();
-
 
   if (!admin) return;
 
@@ -929,15 +1066,11 @@ async function loadAdminOrders() {
     if (!adminOrders.length) {
 
       ordersBox.innerHTML = `
-
         <tr>
-
           <td colspan="6">
             No orders found.
           </td>
-
         </tr>
-
       `;
 
       return;
@@ -958,10 +1091,8 @@ async function loadAdminOrders() {
             <br>
 
             <span class="mini">
-
               ${new Date(order.createdAt)
                 .toLocaleString('en-IN')}
-
             </span>
 
             <br><br>
@@ -1042,21 +1173,16 @@ async function loadAdminOrders() {
 
               ${ADMIN_ORDER_STATUSES.map(
                 status => `
-
                   <option
                     value="${status}"
-
                     ${
                       status === order.orderStatus
                         ? 'selected'
                         : ''
                     }
                   >
-
                     ${status}
-
                   </option>
-
                 `
               ).join('')}
 
@@ -1110,9 +1236,7 @@ document
     event => {
 
       if (event.key === 'Enter') {
-
         loadAdminOrders();
-
       }
 
     }
