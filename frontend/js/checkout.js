@@ -114,7 +114,7 @@ async function initCheckout() {
 
     <div class="summaryline">
 
-      <span>Discount</span>
+      <span>You Save</span>
 
       <b>
         −${window.MC.money(
