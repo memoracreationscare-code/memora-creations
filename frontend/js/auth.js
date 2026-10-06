@@ -1,6 +1,166 @@
-const {api,$,toast}=window.MC;
-function bind(id,fn){const f=$(id);if(f)f.addEventListener('submit',fn)}
-bind('#loginForm',async e=>{e.preventDefault();const b=Object.fromEntries(new FormData(e.currentTarget));try{await api('/auth/login',{method:'POST',body:JSON.stringify(b)});location.href=new URLSearchParams(location.search).get('next')||'/frontend/index.html'}catch(err){toast(err.message,'error')}});
-bind('#signupForm',async e=>{e.preventDefault();const b=Object.fromEntries(new FormData(e.currentTarget));b.address={addressLine:b.addressLine,pinCode:b.pinCode,city:b.city,state:b.state};delete b.addressLine;delete b.pinCode;delete b.city;delete b.state;try{await api('/auth/register',{method:'POST',body:JSON.stringify(b)});location.href='/frontend/index.html'}catch(err){toast(err.message,'error')}});
-bind('#forgotForm',async e=>{e.preventDefault();const b=Object.fromEntries(new FormData(e.currentTarget));try{const d=await api('/auth/forgot-password',{method:'POST',body:JSON.stringify(b)});toast(d.message,'success')}catch(err){toast(err.message,'error')}});
-bind('#resetForm',async e=>{e.preventDefault();const b=Object.fromEntries(new FormData(e.currentTarget));b.token=new URLSearchParams(location.search).get('token');try{await api('/auth/reset-password',{method:'POST',body:JSON.stringify(b)});toast('Password reset successful.','success');setTimeout(()=>location.href='/frontend/login.html',800)}catch(err){toast(err.message,'error')}});
+function bindAuthForm(selector, handler) {
+  const form = window.MC.$(selector);
+
+  if (form) {
+    form.addEventListener('submit', handler);
+  }
+}
+
+
+/* =========================
+   LOGIN
+========================= */
+
+bindAuthForm('#loginForm', async event => {
+  event.preventDefault();
+
+  const body =
+    Object.fromEntries(
+      new FormData(event.currentTarget)
+    );
+
+  try {
+    await window.MC.api('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(body)
+    });
+
+    const next =
+      new URLSearchParams(location.search)
+        .get('next');
+
+    location.href =
+      next ||
+      '/memora-creations/frontend/index.html';
+
+  } catch (error) {
+    window.MC.toast(
+      error.message || 'Login failed.',
+      'error'
+    );
+  }
+});
+
+
+/* =========================
+   SIGNUP
+========================= */
+
+bindAuthForm('#signupForm', async event => {
+  event.preventDefault();
+
+  const body =
+    Object.fromEntries(
+      new FormData(event.currentTarget)
+    );
+
+  body.address = {
+    addressLine: body.addressLine,
+    pinCode: body.pinCode,
+    city: body.city,
+    state: body.state
+  };
+
+  delete body.addressLine;
+  delete body.pinCode;
+  delete body.city;
+  delete body.state;
+
+  try {
+    await window.MC.api('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(body)
+    });
+
+    location.href =
+      '/memora-creations/frontend/index.html';
+
+  } catch (error) {
+    window.MC.toast(
+      error.message || 'Account creation failed.',
+      'error'
+    );
+  }
+});
+
+
+/* =========================
+   FORGOT PASSWORD
+========================= */
+
+bindAuthForm('#forgotForm', async event => {
+  event.preventDefault();
+
+  const body =
+    Object.fromEntries(
+      new FormData(event.currentTarget)
+    );
+
+  try {
+    const data =
+      await window.MC.api(
+        '/auth/forgot-password',
+        {
+          method: 'POST',
+          body: JSON.stringify(body)
+        }
+      );
+
+    window.MC.toast(
+      data.message ||
+      'Password reset instructions sent.',
+      'success'
+    );
+
+  } catch (error) {
+    window.MC.toast(
+      error.message || 'Request failed.',
+      'error'
+    );
+  }
+});
+
+
+/* =========================
+   RESET PASSWORD
+========================= */
+
+bindAuthForm('#resetForm', async event => {
+  event.preventDefault();
+
+  const body =
+    Object.fromEntries(
+      new FormData(event.currentTarget)
+    );
+
+  body.token =
+    new URLSearchParams(location.search)
+      .get('token');
+
+  try {
+    await window.MC.api(
+      '/auth/reset-password',
+      {
+        method: 'POST',
+        body: JSON.stringify(body)
+      }
+    );
+
+    window.MC.toast(
+      'Password reset successful.',
+      'success'
+    );
+
+    setTimeout(() => {
+      location.href =
+        '/memora-creations/frontend/login.html';
+    }, 800);
+
+  } catch (error) {
+    window.MC.toast(
+      error.message ||
+      'Password reset failed.',
+      'error'
+    );
+  }
+});
