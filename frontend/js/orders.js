@@ -1,2 +1,218 @@
-const {api,$,money,esc,toast}=window.MC;
-async function loadOrders(){if(!await window.MC.requireLogin())return;const d=await api('/orders');$('#orders').innerHTML=d.orders.length?d.orders.map(o=>`<div class="orderrow"><div><b>${esc(o.orderId)}</b><div class="muted">${new Date(o.createdAt).toLocaleString('en-IN')}</div></div><div>${o.items.length} item(s)<br>${esc(o.paymentMethod)} / ${esc(o.paymentStatus)}</div><div><b>${money(o.grandTotal)}</b><br><span class="pill">${esc(o.orderStatus)}</span></div><div class="actions"><a class="btn secondary" href="/frontend/order-details.html?id=${o._id}">View / Track</a>${['Order Placed','Confirmed'].includes(o.orderStatus)?`<button class="btn danger cancel" data-id="${o._id}">Cancel</button>`:''}</div></div>`).join(''):`<div class="empty">No orders yet.</div>`;$$('.cancel').forEach(b=>b.onclick=async()=>{if(!confirm('Cancel this order?'))return;try{await api('/orders/'+b.dataset.id+'/cancel',{method:'PATCH'});loadOrders()}catch(e){toast(e.message,'error')}})}loadOrders().catch(e=>toast(e.message,'error'));
+const ORDERS_BASE = '/memora-creations';
+
+
+/* =========================
+   LOAD ORDERS
+========================= */
+
+async function loadOrdersPage() {
+
+  const user =
+    await window.MC.requireLogin();
+
+  if (!user) return;
+
+
+  try {
+
+    const data =
+      await window.MC.api('/orders');
+
+
+    const ordersBox =
+      window.MC.$('#orders');
+
+
+    const orders =
+      data.orders || [];
+
+
+    ordersBox.innerHTML =
+      orders.length
+
+        ? orders.map(order => `
+
+            <div class="orderrow">
+
+              <div>
+
+                <b>
+                  ${window.MC.esc(
+                    order.orderId
+                  )}
+                </b>
+
+                <div class="muted">
+
+                  ${new Date(
+                    order.createdAt
+                  ).toLocaleString('en-IN')}
+
+                </div>
+
+              </div>
+
+
+              <div>
+
+                ${order.items.length}
+                item(s)
+
+                <br>
+
+                ${window.MC.esc(
+                  order.paymentMethod
+                )}
+
+                /
+
+                ${window.MC.esc(
+                  order.paymentStatus
+                )}
+
+              </div>
+
+
+              <div>
+
+                <b>
+                  ${window.MC.money(
+                    order.grandTotal
+                  )}
+                </b>
+
+                <br>
+
+                <span class="pill">
+                  ${window.MC.esc(
+                    order.orderStatus
+                  )}
+                </span>
+
+              </div>
+
+
+              <div class="actions">
+
+                <a
+                  class="btn secondary"
+                  href="${ORDERS_BASE}/frontend/order-details.html?id=${encodeURIComponent(order._id)}"
+                >
+                  View / Track
+                </a>
+
+
+                ${
+                  ['Order Placed', 'Confirmed']
+                    .includes(order.orderStatus)
+
+                    ? `
+                      <button
+                        class="btn danger cancel-order"
+                        type="button"
+                        data-id="${order._id}"
+                      >
+                        Cancel
+                      </button>
+                    `
+
+                    : ''
+                }
+
+              </div>
+
+            </div>
+
+          `).join('')
+
+        : `
+            <div class="empty">
+              No orders yet.
+            </div>
+          `;
+
+
+    window.MC
+      .$$('.cancel-order')
+      .forEach(button => {
+
+        button.onclick = () =>
+          cancelOrder(
+            button.dataset.id
+          );
+
+      });
+
+
+  } catch (error) {
+
+    console.error(
+      'Orders load error:',
+      error
+    );
+
+    window.MC.toast(
+      error.message ||
+      'Orders load failed.',
+      'error'
+    );
+
+  }
+
+}
+
+
+/* =========================
+   CANCEL ORDER
+========================= */
+
+async function cancelOrder(id) {
+
+  const confirmed =
+    confirm(
+      'Are you sure you want to cancel this order?'
+    );
+
+
+  if (!confirmed) return;
+
+
+  try {
+
+    await window.MC.api(
+      '/orders/' +
+      encodeURIComponent(id) +
+      '/cancel',
+      {
+        method: 'PATCH'
+      }
+    );
+
+
+    window.MC.toast(
+      'Order cancelled successfully.',
+      'success'
+    );
+
+
+    await loadOrdersPage();
+
+
+  } catch (error) {
+
+    window.MC.toast(
+      error.message ||
+      'Order cancel failed.',
+      'error'
+    );
+
+  }
+
+}
+
+
+/* =========================
+   START
+========================= */
+
+loadOrdersPage();
