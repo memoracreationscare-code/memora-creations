@@ -1,1 +1,196 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Profile</title><link rel="stylesheet" href="/frontend/css/style.css"></head><body><header id="nav" class="topbar"></header><main class="container section"><div class="two"><form id="profileForm" class="form" style="margin:0"><h1>Profile</h1><div class="field"><label>Name</label><input id="fullName" class="input" required></div><div class="field"><label>Mobile</label><input id="mobile" class="input" disabled></div><div class="field"><label>Email</label><input id="email" class="input" type="email"></div><button class="btn">Save Profile</button></form><div><h2>Saved Addresses</h2><div id="addresses"></div><form id="addressForm" class="form" style="margin:16px 0"><h3>Add Address</h3><input class="input" name="label" placeholder="Home / Work"><br><br><input class="input" name="fullName" placeholder="Full name" required><br><br><input class="input" name="mobile" placeholder="Mobile" required><br><br><textarea class="input" name="addressLine" placeholder="Address" required></textarea><br><br><input class="input" name="pinCode" placeholder="PIN" required><br><br><input class="input" name="city" placeholder="City"><br><br><input class="input" name="state" placeholder="State"><br><br><label><input id="isDefault" type="checkbox" name="isDefault"> Make default</label><br><br><button class="btn">Save Address</button></form></div></div></main><script src="/frontend/js/app.js"></script><script src="/frontend/js/profile.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Profile - MEMORA CREATIONS</title>
+
+  <link
+    rel="stylesheet"
+    href="/memora-creations/frontend/css/style.css?v=5"
+  >
+</head>
+
+<body>
+
+  <header id="nav" class="topbar"></header>
+
+  <main class="container section">
+
+    <div class="two">
+
+      <!-- PROFILE -->
+      <form
+        id="profileForm"
+        class="form"
+        style="margin:0;"
+      >
+
+        <h1>My Profile</h1>
+
+        <div class="field">
+          <label>Full Name</label>
+
+          <input
+            id="fullName"
+            class="input"
+            required
+          >
+        </div>
+
+        <div class="field">
+          <label>Mobile Number</label>
+
+          <input
+            id="mobile"
+            class="input"
+            disabled
+          >
+        </div>
+
+        <div class="field">
+          <label>Email</label>
+
+          <input
+            id="email"
+            class="input"
+            type="email"
+          >
+        </div>
+
+        <button
+          class="btn"
+          type="submit"
+        >
+          Save Profile
+        </button>
+
+      </form>
+
+
+      <!-- ADDRESSES -->
+      <div>
+
+        <h2>Saved Addresses</h2>
+
+        <div id="addresses"></div>
+
+
+        <form
+          id="addressForm"
+          class="form"
+          style="margin:16px 0;"
+        >
+
+          <h3>Add New Address</h3>
+
+          <div class="field">
+            <label>Label</label>
+
+            <input
+              class="input"
+              name="label"
+              placeholder="Home / Work"
+            >
+          </div>
+
+          <div class="field">
+            <label>Full Name</label>
+
+            <input
+              class="input"
+              name="fullName"
+              required
+            >
+          </div>
+
+          <div class="field">
+            <label>Mobile</label>
+
+            <input
+              class="input"
+              name="mobile"
+              required
+              inputmode="numeric"
+              maxlength="10"
+            >
+          </div>
+
+          <div class="field">
+            <label>Address</label>
+
+            <textarea
+              class="input"
+              name="addressLine"
+              required
+            ></textarea>
+          </div>
+
+          <div class="field">
+            <label>PIN Code</label>
+
+            <input
+              class="input"
+              name="pinCode"
+              required
+              inputmode="numeric"
+              maxlength="6"
+            >
+          </div>
+
+          <div class="field">
+            <label>City</label>
+
+            <input
+              class="input"
+              name="city"
+            >
+          </div>
+
+          <div class="field">
+            <label>State</label>
+
+            <input
+              class="input"
+              name="state"
+            >
+          </div>
+
+          <div class="field">
+            <label>
+              <input
+                id="isDefault"
+                type="checkbox"
+                name="isDefault"
+              >
+              Make default address
+            </label>
+          </div>
+
+          <button
+            class="btn"
+            type="submit"
+          >
+            Save Address
+          </button>
+
+        </form>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <nav
+    id="bottomNav"
+    class="bottomnav"
+  ></nav>
+
+  <script src="/memora-creations/frontend/js/app.js?v=5"></script>
+  <script src="/memora-creations/frontend/js/profile.js?v=5"></script>
+
+</body>
+</html>
