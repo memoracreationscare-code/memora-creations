@@ -117,8 +117,9 @@ async function initCheckout() {
       <span>You Save</span>
 
       <b>
-        −${window.MC.money(
-          preview.discount
+        ${window.MC.money(
+  preview.discount
+)}
         )}
       </b>
 
