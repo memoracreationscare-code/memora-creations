@@ -1,1 +1,432 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MEMORA CREATIONS</title><link rel="stylesheet" href="css/style.css"></head><body><header id="nav" class="topbar"></header><main class="container"><section class="hero"><span class="pill">MEMORA CREATIONS</span><h1>Beautiful things, thoughtfully chosen.</h1><p>Browse our latest arrivals, featured products and best sellers.</p><a class="btn" href="products.html">Shop Now</a></section><section class="section"><div class="promo"><h2>Special Offers</h2><p>Discover products with current discounts while stocks last.</p><a class="btn" href="products.html?offers=true">Shop Offers</a></div></section><section class="section"><div class="sectionhead"><h2>Categories</h2><a href="products.html">Shop all</a></div><div id="categories" class="chips"></div></section><section class="section"><div class="sectionhead"><h2>Featured Products</h2><a href="products.html?featured=true">View all</a></div><div id="featured" class="grid"></div></section><section class="section"><div class="sectionhead"><h2>New Arrivals</h2><a href="products.html?newArrival=true">View all</a></div><div id="new" class="grid"></div></section><section class="section"><div class="sectionhead"><h2>Best Sellers</h2><a href="products.html?bestSeller=true">View all</a></div><div id="best" class="grid"></div></section><section class="section"><div class="sectionhead"><h2>Offers</h2><a href="products.html?offers=true">View all</a></div><div id="offers" class="grid"></div></section></main><footer class="footer">© MEMORA CREATIONS</footer><nav id="bottomNav" class="bottomnav"></nav><script src="js/app.js"></script><script>const {api,money,esc,toast}=window.MC;function card(p){return `<article class="card"><a href="product.html?id=${p._id}"><img class="productimg" src="${esc(p.images?.[0]?.url||'https://placehold.co/600x600?text=Memora')}" alt="${esc(p.name)}"><div class="cardbody"><h3>${esc(p.name)}</h3><div class="price">${money(p.sellingPrice)} <span class="old">${money(p.originalPrice)}</span></div></div></a></article>`}async function load(){const [cats,featured,newA,best,offers]=await Promise.all([api('/products/categories'),api('/products?featured=true&limit=8'),api('/products?newArrival=true&limit=8'),api('/products?bestSeller=true&limit=8'),api('/products?offers=true&limit=8')]);document.getElementById('categories').innerHTML=cats.categories.map(c=>`<a class="pill" href="products.html?category=${c._id}">${esc(c.name)}</a>`).join('');[['featured',featured],['new',newA],['best',best],['offers',offers]].forEach(([id,d])=>{document.getElementById(id).innerHTML=d.products.length?d.products.map(card).join(''):'<div class="empty">No products available yet.</div>'})}load().catch(e=>toast(e.message,'error'));</script></body></html>
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>MEMORA CREATIONS</title>
+
+  <link
+    rel="stylesheet"
+    href="/memora-creations/frontend/css/style.css"
+  >
+</head>
+
+<body>
+
+  <header id="nav" class="topbar"></header>
+
+  <main class="container">
+
+    <!-- HERO -->
+    <section class="hero">
+
+      <span class="pill">
+        MEMORA CREATIONS
+      </span>
+
+      <h1>
+        Beautiful things, thoughtfully chosen.
+      </h1>
+
+      <p>
+        Browse our latest arrivals,
+        featured products and best sellers.
+      </p>
+
+      <a
+        class="btn"
+        href="/memora-creations/frontend/products.html"
+      >
+        Shop Now
+      </a>
+
+    </section>
+
+
+    <!-- SPECIAL OFFERS -->
+    <section class="section">
+
+      <div class="promo">
+
+        <h2>Special Offers</h2>
+
+        <p>
+          Discover products with current
+          discounts while stocks last.
+        </p>
+
+        <a
+          class="btn"
+          href="/memora-creations/frontend/products.html?offers=true"
+        >
+          Shop Offers
+        </a>
+
+      </div>
+
+    </section>
+
+
+    <!-- CATEGORIES -->
+    <section class="section">
+
+      <div class="sectionhead">
+
+        <h2>Categories</h2>
+
+        <a
+          href="/memora-creations/frontend/products.html"
+        >
+          Shop all
+        </a>
+
+      </div>
+
+      <div
+        id="categories"
+        class="chips"
+      ></div>
+
+    </section>
+
+
+    <!-- LATEST PRODUCTS -->
+    <section class="section">
+
+      <div class="sectionhead">
+
+        <h2>Latest Products</h2>
+
+        <a
+          href="/memora-creations/frontend/products.html"
+        >
+          View all
+        </a>
+
+      </div>
+
+      <div
+        id="latest"
+        class="grid"
+      ></div>
+
+    </section>
+
+
+    <!-- FEATURED PRODUCTS -->
+    <section class="section">
+
+      <div class="sectionhead">
+
+        <h2>Featured Products</h2>
+
+        <a
+          href="/memora-creations/frontend/products.html?featured=true"
+        >
+          View all
+        </a>
+
+      </div>
+
+      <div
+        id="featured"
+        class="grid"
+      ></div>
+
+    </section>
+
+
+    <!-- NEW ARRIVALS -->
+    <section class="section">
+
+      <div class="sectionhead">
+
+        <h2>New Arrivals</h2>
+
+        <a
+          href="/memora-creations/frontend/products.html?newArrival=true"
+        >
+          View all
+        </a>
+
+      </div>
+
+      <div
+        id="new"
+        class="grid"
+      ></div>
+
+    </section>
+
+
+    <!-- BEST SELLERS -->
+    <section class="section">
+
+      <div class="sectionhead">
+
+        <h2>Best Sellers</h2>
+
+        <a
+          href="/memora-creations/frontend/products.html?bestSeller=true"
+        >
+          View all
+        </a>
+
+      </div>
+
+      <div
+        id="best"
+        class="grid"
+      ></div>
+
+    </section>
+
+
+    <!-- OFFERS -->
+    <section class="section">
+
+      <div class="sectionhead">
+
+        <h2>Offers</h2>
+
+        <a
+          href="/memora-creations/frontend/products.html?offers=true"
+        >
+          View all
+        </a>
+
+      </div>
+
+      <div
+        id="offers"
+        class="grid"
+      ></div>
+
+    </section>
+
+  </main>
+
+
+  <footer class="footer">
+    © MEMORA CREATIONS
+  </footer>
+
+
+  <nav
+    id="bottomNav"
+    class="bottomnav"
+  ></nav>
+
+
+  <script src="/memora-creations/frontend/js/app.js"></script>
+
+  <script>
+
+    const HOME_BASE = '/memora-creations';
+
+
+    function homeProductCard(product) {
+
+      return `
+        <article class="card">
+
+          <a
+            href="${HOME_BASE}/frontend/product.html?id=${encodeURIComponent(product._id)}"
+          >
+
+            <img
+              class="productimg"
+              src="${window.MC.esc(
+                product.images?.[0]?.url ||
+                'https://placehold.co/600x600?text=Memora'
+              )}"
+              alt="${window.MC.esc(product.name)}"
+            >
+
+            <div class="cardbody">
+
+              <span class="pill">
+                ${window.MC.esc(
+                  product.category?.name ||
+                  'Category'
+                )}
+              </span>
+
+              <h3>
+                ${window.MC.esc(product.name)}
+              </h3>
+
+              <div class="price">
+
+                ${window.MC.money(
+                  product.sellingPrice
+                )}
+
+                ${
+                  Number(product.originalPrice) >
+                  Number(product.sellingPrice)
+
+                    ? `
+                      <span class="old">
+                        ${window.MC.money(
+                          product.originalPrice
+                        )}
+                      </span>
+                    `
+
+                    : ''
+                }
+
+              </div>
+
+              <p class="muted">
+                ${
+                  product.stock > 0
+                    ? 'In stock'
+                    : 'Out of stock'
+                }
+              </p>
+
+            </div>
+
+          </a>
+
+        </article>
+      `;
+
+    }
+
+
+    async function loadHomePage() {
+
+      try {
+
+        const [
+          categories,
+          latest,
+          featured,
+          newArrivals,
+          bestSellers,
+          offers
+        ] = await Promise.all([
+
+          window.MC.api(
+            '/products/categories'
+          ),
+
+          window.MC.api(
+            '/products?limit=8'
+          ),
+
+          window.MC.api(
+            '/products?featured=true&limit=8'
+          ),
+
+          window.MC.api(
+            '/products?newArrival=true&limit=8'
+          ),
+
+          window.MC.api(
+            '/products?bestSeller=true&limit=8'
+          ),
+
+          window.MC.api(
+            '/products?offers=true&limit=8'
+          )
+
+        ]);
+
+
+        /* CATEGORIES */
+
+        const categoriesBox =
+          document.getElementById(
+            'categories'
+          );
+
+        categoriesBox.innerHTML =
+          (categories.categories || [])
+            .map(category => `
+
+              <a
+                class="pill"
+                href="${HOME_BASE}/frontend/products.html?category=${encodeURIComponent(category._id)}"
+              >
+                ${window.MC.esc(
+                  category.name
+                )}
+              </a>
+
+            `)
+            .join('');
+
+
+        /* PRODUCT SECTIONS */
+
+        const sections = [
+
+          ['latest', latest],
+
+          ['featured', featured],
+
+          ['new', newArrivals],
+
+          ['best', bestSellers],
+
+          ['offers', offers]
+
+        ];
+
+
+        sections.forEach(
+          ([id, data]) => {
+
+            const box =
+              document.getElementById(id);
+
+            const products =
+              data.products || [];
+
+            box.innerHTML =
+              products.length
+
+                ? products
+                    .map(homeProductCard)
+                    .join('')
+
+                : `
+                    <div class="empty">
+                      No products available yet.
+                    </div>
+                  `;
+
+          }
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          'Home page loading error:',
+          error
+        );
+
+        window.MC.toast(
+          error.message ||
+          'Home page products load failed.',
+          'error'
+        );
+
+      }
+
+    }
+
+
+    loadHomePage();
+
+  </script>
+
+</body>
+</html>
