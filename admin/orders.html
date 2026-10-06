@@ -1,1 +1,98 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin Orders</title><link rel="stylesheet" href="/admin/css/style.css"></head><body><nav class="adminnav"><div class="container"><b>MEMORA ADMIN</b><a href="/admin/dashboard.html">Dashboard</a><a href="/admin/products.html">Products</a><a href="/admin/orders.html">Orders</a><a href="/admin/users.html">Users</a></div></nav><main class="container adminmain"><h1>Orders</h1><div class="actions"><input id="search" class="input" placeholder="Search Order ID"><button id="searchBtn" class="btn">Search</button></div><br><div class="tablewrap"><table><thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Payment</th><th>Status</th><th>Update</th></tr></thead><tbody id="orders"></tbody></table></div></main><script src="/frontend/js/app.js"></script><script src="/admin/js/auth.js"></script><script src="/admin/js/orders.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Admin Orders - MEMORA CREATIONS</title>
+
+  <link
+    rel="stylesheet"
+    href="/memora-creations/admin/css/style.css?v=2"
+  >
+</head>
+
+<body>
+
+  <nav class="adminnav">
+    <div class="container">
+
+      <b>MEMORA ADMIN</b>
+
+      <a href="/memora-creations/admin/dashboard.html">
+        Dashboard
+      </a>
+
+      <a href="/memora-creations/admin/products.html">
+        Products
+      </a>
+
+      <a href="/memora-creations/admin/orders.html">
+        Orders
+      </a>
+
+      <a href="/memora-creations/admin/users.html">
+        Users
+      </a>
+
+      <button
+        id="logout"
+        class="btn secondary"
+        type="button"
+      >
+        Logout
+      </button>
+
+    </div>
+  </nav>
+
+  <main class="container adminmain">
+
+    <h1>Orders</h1>
+
+    <div class="actions">
+      <input
+        id="search"
+        class="input"
+        placeholder="Search Order ID"
+      >
+
+      <button
+        id="searchBtn"
+        class="btn"
+        type="button"
+      >
+        Search
+      </button>
+    </div>
+
+    <br>
+
+    <div class="tablewrap">
+      <table>
+
+        <thead>
+          <tr>
+            <th>Order</th>
+            <th>Customer</th>
+            <th>Total</th>
+            <th>Payment</th>
+            <th>Status</th>
+            <th>Update</th>
+          </tr>
+        </thead>
+
+        <tbody id="orders"></tbody>
+
+      </table>
+    </div>
+
+  </main>
+
+  <script src="/memora-creations/frontend/js/app.js?v=2"></script>
+  <script src="/memora-creations/admin/js/auth.js?v=2"></script>
+  <script src="/memora-creations/admin/js/orders.js?v=2"></script>
+
+</body>
+</html>
