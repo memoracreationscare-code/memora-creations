@@ -15,119 +15,137 @@ async function loadOrdersPage() {
     const orders = data.orders || [];
 
     ordersBox.innerHTML = orders.length
-      ? orders.map(order => `
+      ? orders.map(order => {
 
-        <div
-          class="card"
-          style="margin-bottom:16px;"
-        >
+          const firstItem = order.items?.[0];
 
-          <div
-            class="cardbody"
-            style="
-              display:grid;
-              grid-template-columns:1.4fr 1fr 1fr auto;
-              gap:20px;
-              align-items:center;
-            "
-          >
-
-            <div>
-
-              <div
-                style="
-                  font-weight:800;
-                  font-size:17px;
-                  margin-bottom:6px;
-                "
-              >
-                ${window.MC.esc(order.orderId)}
-              </div>
-
-              <div class="muted">
-                ${new Date(order.createdAt)
-                  .toLocaleString('en-IN')}
-              </div>
-
-            </div>
-
-
-            <div>
-
-              <div>
-                <b>${order.items.length}</b>
-                item(s)
-              </div>
-
-              <div class="muted">
-                ${
-                  order.paymentMethod === 'COD'
-                    ? 'Cash on Delivery'
-                    : 'Online Payment'
-                }
-              </div>
-
-              <div class="muted">
-                ${window.MC.esc(order.paymentStatus)}
-              </div>
-
-            </div>
-
-
-            <div>
-
-              <div
-                class="price"
-                style="margin-bottom:7px;"
-              >
-                ${window.MC.money(order.grandTotal)}
-              </div>
-
-              <span class="pill">
-                ${window.MC.esc(order.orderStatus)}
-              </span>
-
-            </div>
-
-
+          return `
             <div
-              class="actions"
-              style="
-                justify-content:flex-end;
-              "
+              class="card"
+              style="margin-bottom:16px;"
             >
 
-              <a
-                class="btn secondary"
-                href="${ORDERS_BASE}/frontend/order-details.html?id=${encodeURIComponent(order._id)}"
+              <div
+                class="cardbody"
+                style="
+                  display:grid;
+                  grid-template-columns:90px 1.4fr 1fr 1fr auto;
+                  gap:20px;
+                  align-items:center;
+                "
               >
-                View / Track
-              </a>
 
-              ${
-                ['Order Placed', 'Confirmed']
-                  .includes(order.orderStatus)
+                <div>
+                  <img
+                    src="${window.MC.esc(
+                      firstItem?.imageUrl ||
+                      'https://placehold.co/100x100?text=Memora'
+                    )}"
+                    alt="${window.MC.esc(
+                      firstItem?.name || 'Product'
+                    )}"
+                    style="
+                      width:80px;
+                      height:80px;
+                      object-fit:cover;
+                      border-radius:12px;
+                    "
+                  >
+                </div>
 
-                  ? `
-                    <button
-                      class="btn danger cancel-order"
-                      type="button"
-                      data-id="${order._id}"
-                    >
-                      Cancel
-                    </button>
-                  `
+                <div>
 
-                  : ''
-              }
+                  <div
+                    style="
+                      font-weight:800;
+                      font-size:17px;
+                      margin-bottom:6px;
+                    "
+                  >
+                    ${window.MC.esc(order.orderId)}
+                  </div>
+
+                  <div class="muted">
+                    ${new Date(order.createdAt)
+                      .toLocaleString('en-IN')}
+                  </div>
+
+                </div>
+
+                <div>
+
+                  <div>
+                    <b>${order.items.length}</b>
+                    item(s)
+                  </div>
+
+                  <div class="muted">
+                    ${
+                      order.paymentMethod === 'COD'
+                        ? 'Cash on Delivery'
+                        : 'Online Payment'
+                    }
+                  </div>
+
+                  <div class="muted">
+                    ${window.MC.esc(order.paymentStatus)}
+                  </div>
+
+                </div>
+
+                <div>
+
+                  <div
+                    class="price"
+                    style="margin-bottom:7px;"
+                  >
+                    ${window.MC.money(order.grandTotal)}
+                  </div>
+
+                  <span class="pill">
+                    ${window.MC.esc(order.orderStatus)}
+                  </span>
+
+                </div>
+
+                <div
+                  class="actions"
+                  style="
+                    justify-content:flex-end;
+                  "
+                >
+
+                  <a
+                    class="btn secondary"
+                    href="${ORDERS_BASE}/frontend/order-details.html?id=${encodeURIComponent(order._id)}"
+                  >
+                    View / Track
+                  </a>
+
+                  ${
+                    ['Order Placed', 'Confirmed']
+                      .includes(order.orderStatus)
+
+                      ? `
+                        <button
+                          class="btn danger cancel-order"
+                          type="button"
+                          data-id="${order._id}"
+                        >
+                          Cancel
+                        </button>
+                      `
+
+                      : ''
+                  }
+
+                </div>
+
+              </div>
 
             </div>
-
-          </div>
-
-        </div>
-
-      `).join('')
+          `;
+        }).join('')
 
       : `
         <div class="empty">
