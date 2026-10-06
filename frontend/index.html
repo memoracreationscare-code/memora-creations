@@ -32,8 +32,8 @@
       </h1>
 
       <p>
-        Browse our latest arrivals,
-        featured products and best sellers.
+        Discover beautiful home decor products
+        selected for your space.
       </p>
 
       <a
@@ -42,29 +42,6 @@
       >
         Shop Now
       </a>
-
-    </section>
-
-
-    <!-- SPECIAL OFFERS -->
-    <section class="section">
-
-      <div class="promo">
-
-        <h2>Special Offers</h2>
-
-        <p>
-          Discover products with current discounts while stocks last.
-        </p>
-
-        <a
-          class="btn"
-          href="/memora-creations/frontend/products.html?offers=true"
-        >
-          Shop Offers
-        </a>
-
-      </div>
 
     </section>
 
@@ -90,12 +67,12 @@
     </section>
 
 
-    <!-- LATEST PRODUCTS -->
+    <!-- ALL PRODUCTS -->
     <section class="section">
 
       <div class="sectionhead">
 
-        <h2>Latest Products</h2>
+        <h2>All Products</h2>
 
         <a href="/memora-creations/frontend/products.html">
           View all
@@ -104,99 +81,7 @@
       </div>
 
       <div
-        id="latest"
-        class="grid"
-      ></div>
-
-    </section>
-
-
-    <!-- FEATURED -->
-    <section class="section">
-
-      <div class="sectionhead">
-
-        <h2>Featured Products</h2>
-
-        <a
-          href="/memora-creations/frontend/products.html?featured=true"
-        >
-          View all
-        </a>
-
-      </div>
-
-      <div
-        id="featured"
-        class="grid"
-      ></div>
-
-    </section>
-
-
-    <!-- NEW ARRIVALS -->
-    <section class="section">
-
-      <div class="sectionhead">
-
-        <h2>New Arrivals</h2>
-
-        <a
-          href="/memora-creations/frontend/products.html?newArrival=true"
-        >
-          View all
-        </a>
-
-      </div>
-
-      <div
-        id="new"
-        class="grid"
-      ></div>
-
-    </section>
-
-
-    <!-- BEST SELLERS -->
-    <section class="section">
-
-      <div class="sectionhead">
-
-        <h2>Best Sellers</h2>
-
-        <a
-          href="/memora-creations/frontend/products.html?bestSeller=true"
-        >
-          View all
-        </a>
-
-      </div>
-
-      <div
-        id="best"
-        class="grid"
-      ></div>
-
-    </section>
-
-
-    <!-- OFFERS -->
-    <section class="section">
-
-      <div class="sectionhead">
-
-        <h2>Offers</h2>
-
-        <a
-          href="/memora-creations/frontend/products.html?offers=true"
-        >
-          View all
-        </a>
-
-      </div>
-
-      <div
-        id="offers"
+        id="allProducts"
         class="grid"
       ></div>
 
@@ -394,9 +279,7 @@
     function bindHomeButtons() {
 
       document
-        .querySelectorAll(
-          '.home-add-cart'
-        )
+        .querySelectorAll('.home-add-cart')
         .forEach(button => {
 
           button.onclick = () => {
@@ -409,9 +292,7 @@
 
 
       document
-        .querySelectorAll(
-          '.home-buy-now'
-        )
+        .querySelectorAll('.home-buy-now')
         .forEach(button => {
 
           button.onclick = () => {
@@ -431,11 +312,7 @@
 
         const [
           categories,
-          latest,
-          featured,
-          newArrivals,
-          bestSellers,
-          offers
+          products
         ] = await Promise.all([
 
           window.MC.api(
@@ -443,32 +320,16 @@
           ),
 
           window.MC.api(
-            '/products?limit=8'
-          ),
-
-          window.MC.api(
-            '/products?featured=true&limit=8'
-          ),
-
-          window.MC.api(
-            '/products?newArrival=true&limit=8'
-          ),
-
-          window.MC.api(
-            '/products?bestSeller=true&limit=8'
-          ),
-
-          window.MC.api(
-            '/products?offers=true&limit=8'
+            '/products?limit=24'
           )
 
         ]);
 
 
+        /* CATEGORIES */
+
         document
-          .getElementById(
-            'categories'
-          )
+          .getElementById('categories')
           .innerHTML =
             (categories.categories || [])
               .map(category => `
@@ -486,46 +347,26 @@
               .join('');
 
 
-        const sections = [
+        /* ALL PRODUCTS */
 
-          ['latest', latest],
-
-          ['featured', featured],
-
-          ['new', newArrivals],
-
-          ['best', bestSellers],
-
-          ['offers', offers]
-
-        ];
+        const productList =
+          products.products || [];
 
 
-        sections.forEach(
-          ([id, data]) => {
+        document
+          .getElementById('allProducts')
+          .innerHTML =
+            productList.length
 
-            const box =
-              document.getElementById(id);
+              ? productList
+                  .map(homeProductCard)
+                  .join('')
 
-            const products =
-              data.products || [];
-
-
-            box.innerHTML =
-              products.length
-
-                ? products
-                    .map(homeProductCard)
-                    .join('')
-
-                : `
-                    <div class="empty">
-                      No products available yet.
-                    </div>
-                  `;
-
-          }
-        );
+              : `
+                  <div class="empty">
+                    No products available yet.
+                  </div>
+                `;
 
 
         bindHomeButtons();
