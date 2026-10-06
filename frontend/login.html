@@ -1,1 +1,85 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Login - MEMORA CREATIONS</title><link rel="stylesheet" href="/frontend/css/style.css"></head><body><main class="container"><form id="loginForm" class="form"><h1>Login</h1><p class="muted">Mobile Number + Password</p><div class="field"><label>Mobile Number</label><input class="input" name="mobile" required inputmode="numeric" pattern="[6-9][0-9]{9}"></div><div class="field"><label>Password</label><input class="input" name="password" type="password" required></div><button class="btn">Login</button><p><a href="/frontend/signup.html">Create account</a> · <a href="/frontend/forgot-password.html">Forgot password?</a></p></form></main><script src="/frontend/js/app.js"></script><script src="/frontend/js/auth.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Login - MEMORA CREATIONS</title>
+
+  <link
+    rel="stylesheet"
+    href="/memora-creations/frontend/css/style.css"
+  >
+</head>
+
+<body>
+
+  <main class="container">
+
+    <form id="loginForm" class="form">
+
+      <h1>Login</h1>
+
+      <p class="muted">
+        Mobile Number + Password
+      </p>
+
+      <div class="field">
+
+        <label>Mobile Number</label>
+
+        <input
+          class="input"
+          name="mobile"
+          required
+          inputmode="numeric"
+          pattern="[6-9][0-9]{9}"
+          maxlength="10"
+          autocomplete="tel"
+        >
+
+      </div>
+
+      <div class="field">
+
+        <label>Password</label>
+
+        <input
+          class="input"
+          name="password"
+          type="password"
+          required
+          autocomplete="current-password"
+        >
+
+      </div>
+
+      <button
+        class="btn"
+        type="submit"
+      >
+        Login
+      </button>
+
+      <p>
+        <a href="/memora-creations/frontend/signup.html">
+          Create account
+        </a>
+
+        ·
+
+        <a href="/memora-creations/frontend/forgot-password.html">
+          Forgot password?
+        </a>
+      </p>
+
+    </form>
+
+  </main>
+
+  <script src="/memora-creations/frontend/js/app.js"></script>
+  <script src="/memora-creations/frontend/js/auth.js"></script>
+
+</body>
+</html>
