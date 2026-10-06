@@ -11,8 +11,7 @@ let checkoutFromCart = false;
 
 async function initCheckout() {
 
-  checkoutUser =
-    await window.MC.requireLogin();
+  checkoutUser = await window.MC.requireLogin();
 
   if (!checkoutUser) return;
 
@@ -42,10 +41,8 @@ async function initCheckout() {
     checkoutItems =
       (cartData.cart?.items || [])
         .map(item => ({
-          productId:
-            item.product._id,
-          quantity:
-            item.quantity
+          productId: item.product._id,
+          quantity: item.quantity
         }));
 
   }
@@ -118,8 +115,7 @@ async function initCheckout() {
 
       <b>
         ${window.MC.money(
-  preview.discount
-)}
+          preview.discount
         )}
       </b>
 
@@ -308,9 +304,7 @@ async function placeOnlineOrder() {
 
 
     const script =
-      document.createElement(
-        'script'
-      );
+      document.createElement('script');
 
 
     script.src =
