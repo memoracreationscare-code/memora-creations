@@ -17,6 +17,7 @@
 
   <header id="nav" class="topbar"></header>
 
+
   <main class="container">
 
     <!-- HERO -->
@@ -53,8 +54,7 @@
         <h2>Special Offers</h2>
 
         <p>
-          Discover products with current
-          discounts while stocks last.
+          Discover products with current discounts while stocks last.
         </p>
 
         <a
@@ -76,9 +76,7 @@
 
         <h2>Categories</h2>
 
-        <a
-          href="/memora-creations/frontend/products.html"
-        >
+        <a href="/memora-creations/frontend/products.html">
           Shop all
         </a>
 
@@ -99,9 +97,7 @@
 
         <h2>Latest Products</h2>
 
-        <a
-          href="/memora-creations/frontend/products.html"
-        >
+        <a href="/memora-creations/frontend/products.html">
           View all
         </a>
 
@@ -115,7 +111,7 @@
     </section>
 
 
-    <!-- FEATURED PRODUCTS -->
+    <!-- FEATURED -->
     <section class="section">
 
       <div class="sectionhead">
@@ -222,6 +218,7 @@
 
   <script src="/memora-creations/frontend/js/app.js"></script>
 
+
   <script>
 
     const HOME_BASE = '/memora-creations';
@@ -293,8 +290,137 @@
 
           </a>
 
+
+          <div class="cardbody actions">
+
+            <button
+              class="btn home-add-cart"
+              type="button"
+              data-id="${product._id}"
+              ${product.stock < 1 ? 'disabled' : ''}
+            >
+              Add to Cart
+            </button>
+
+
+            <button
+              class="btn secondary home-buy-now"
+              type="button"
+              data-id="${product._id}"
+              ${product.stock < 1 ? 'disabled' : ''}
+            >
+              Buy Now
+            </button>
+
+          </div>
+
         </article>
       `;
+
+    }
+
+
+    async function addHomeProductToCart(id) {
+
+      try {
+
+        await window.MC.api('/cart', {
+
+          method: 'POST',
+
+          body: JSON.stringify({
+            productId: id,
+            quantity: 1
+          })
+
+        });
+
+
+        window.MC.toast(
+          'Product cart mein add ho gaya.',
+          'success'
+        );
+
+
+        window.MC.updateCartCount();
+
+
+      } catch (error) {
+
+        const msg =
+          String(
+            error.message || ''
+          ).toLowerCase();
+
+
+        if (
+          msg.includes('login') ||
+          msg.includes('unauthorized') ||
+          msg.includes('authentication')
+        ) {
+
+          location.href =
+            HOME_BASE +
+            '/frontend/login.html?next=' +
+            encodeURIComponent(
+              location.pathname +
+              location.search
+            );
+
+          return;
+
+        }
+
+
+        window.MC.toast(
+          error.message ||
+          'Cart mein add nahi hua.',
+          'error'
+        );
+
+      }
+
+    }
+
+
+    function buyHomeProductNow(id) {
+
+      location.href =
+        `${HOME_BASE}/frontend/checkout.html?buyNow=${encodeURIComponent(id)}&qty=1`;
+
+    }
+
+
+    function bindHomeButtons() {
+
+      document
+        .querySelectorAll(
+          '.home-add-cart'
+        )
+        .forEach(button => {
+
+          button.onclick = () => {
+            addHomeProductToCart(
+              button.dataset.id
+            );
+          };
+
+        });
+
+
+      document
+        .querySelectorAll(
+          '.home-buy-now'
+        )
+        .forEach(button => {
+
+          button.onclick = () => {
+            buyHomeProductNow(
+              button.dataset.id
+            );
+          };
+
+        });
 
     }
 
@@ -339,31 +465,26 @@
         ]);
 
 
-        /* CATEGORIES */
-
-        const categoriesBox =
-          document.getElementById(
+        document
+          .getElementById(
             'categories'
-          );
+          )
+          .innerHTML =
+            (categories.categories || [])
+              .map(category => `
 
-        categoriesBox.innerHTML =
-          (categories.categories || [])
-            .map(category => `
+                <a
+                  class="pill"
+                  href="${HOME_BASE}/frontend/products.html?category=${encodeURIComponent(category._id)}"
+                >
+                  ${window.MC.esc(
+                    category.name
+                  )}
+                </a>
 
-              <a
-                class="pill"
-                href="${HOME_BASE}/frontend/products.html?category=${encodeURIComponent(category._id)}"
-              >
-                ${window.MC.esc(
-                  category.name
-                )}
-              </a>
+              `)
+              .join('');
 
-            `)
-            .join('');
-
-
-        /* PRODUCT SECTIONS */
 
         const sections = [
 
@@ -389,6 +510,7 @@
             const products =
               data.products || [];
 
+
             box.innerHTML =
               products.length
 
@@ -406,16 +528,20 @@
         );
 
 
+        bindHomeButtons();
+
+
       } catch (error) {
 
         console.error(
-          'Home page loading error:',
+          'Home page error:',
           error
         );
 
+
         window.MC.toast(
           error.message ||
-          'Home page products load failed.',
+          'Home page load failed.',
           'error'
         );
 
@@ -427,6 +553,7 @@
     loadHomePage();
 
   </script>
+
 
 </body>
 </html>
