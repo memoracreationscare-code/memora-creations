@@ -1,9 +1,58 @@
-function bindAuthForm(selector, handler) {
-  const form = window.MC.$(selector);
+function bindAuthForm(
+  selector,
+  handler
+) {
+
+  const form =
+    window.MC.$(
+      selector
+    );
+
 
   if (form) {
-    form.addEventListener('submit', handler);
+
+    form.addEventListener(
+      'submit',
+      handler
+    );
+
   }
+
+}
+
+
+/* =========================
+   SAFE TEXT
+========================= */
+
+function escapePopupText(
+  value
+) {
+
+  return String(
+    value ?? ''
+  )
+    .replaceAll(
+      '&',
+      '&amp;'
+    )
+    .replaceAll(
+      '<',
+      '&lt;'
+    )
+    .replaceAll(
+      '>',
+      '&gt;'
+    )
+    .replaceAll(
+      '"',
+      '&quot;'
+    )
+    .replaceAll(
+      "'",
+      '&#039;'
+    );
+
 }
 
 
@@ -20,12 +69,16 @@ function showLoginPopup({
 }) {
 
   document
-    .querySelector('#loginStatusPopup')
+    .querySelector(
+      '#loginStatusPopup'
+    )
     ?.remove();
 
 
   const overlay =
-    document.createElement('div');
+    document.createElement(
+      'div'
+    );
 
 
   overlay.id =
@@ -46,68 +99,87 @@ function showLoginPopup({
 
 
   const isSuccess =
-    type === 'success';
+    type ===
+    'success';
 
 
   overlay.innerHTML = `
 
-    <div style="
-      position:relative;
-      width:min(420px,92vw);
-      background:#fffaf6;
-      border:1px solid #eadfd5;
-      border-radius:26px;
-      padding:34px 26px 26px;
-      text-align:center;
-      box-shadow:0 25px 70px rgba(0,0,0,.28);
-      animation:loginPopupIn .22s ease;
-    ">
+    <div
+      style="
+        position:relative;
+        width:min(420px,92vw);
+        background:#fffaf6;
+        border:1px solid #eadfd5;
+        border-radius:26px;
+        padding:34px 26px 26px;
+        text-align:center;
+        box-shadow:0 25px 70px rgba(0,0,0,.28);
+        animation:loginPopupIn .22s ease;
+      "
+    >
 
-      <div style="
-        width:74px;
-        height:74px;
-        margin:0 auto 18px;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        border-radius:50%;
-        font-size:34px;
-        background:${
-          isSuccess
-            ? '#eaf8ef'
-            : '#feeceb'
-        };
-        color:${
-          isSuccess
-            ? '#147a43'
-            : '#b42318'
-        };
-      ">
+      <div
+        style="
+          width:74px;
+          height:74px;
+          margin:0 auto 18px;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          border-radius:50%;
+          font-size:34px;
+          background:${
+            isSuccess
+              ? '#eaf8ef'
+              : '#feeceb'
+          };
+          color:${
+            isSuccess
+              ? '#147a43'
+              : '#b42318'
+          };
+        "
+      >
+
         ${
           isSuccess
             ? '✓'
             : '!'
         }
+
       </div>
 
 
-      <h2 style="
-        margin:0 0 10px;
-        font-size:27px;
-        color:#2b1b12;
-      ">
-        ${escapePopupText(title)}
+      <h2
+        style="
+          margin:0 0 10px;
+          font-size:27px;
+          color:#2b1b12;
+        "
+      >
+
+        ${escapePopupText(
+          title
+        )}
+
       </h2>
 
 
-      <p style="
-        margin:0 auto 24px;
-        max-width:330px;
-        color:#756f69;
-        font-size:15px;
-        line-height:1.6;
-      ">
-        ${escapePopupText(message)}
+      <p
+        style="
+          margin:0 auto 24px;
+          max-width:330px;
+          color:#756f69;
+          font-size:15px;
+          line-height:1.6;
+        "
+      >
+
+        ${escapePopupText(
+          message
+        )}
+
       </p>
 
 
@@ -127,7 +199,11 @@ function showLoginPopup({
           box-shadow:0 10px 22px rgba(138,90,59,.22);
         "
       >
-        ${escapePopupText(buttonText)}
+
+        ${escapePopupText(
+          buttonText
+        )}
+
       </button>
 
     </div>
@@ -142,7 +218,9 @@ function showLoginPopup({
   ) {
 
     const style =
-      document.createElement('style');
+      document.createElement(
+        'style'
+      );
 
 
     style.id =
@@ -155,12 +233,16 @@ function showLoginPopup({
 
         from {
           opacity:0;
-          transform:scale(.92) translateY(10px);
+          transform:
+            scale(.92)
+            translateY(10px);
         }
 
         to {
           opacity:1;
-          transform:scale(1) translateY(0);
+          transform:
+            scale(1)
+            translateY(0);
         }
 
       }
@@ -180,20 +262,22 @@ function showLoginPopup({
   );
 
 
-  const closePopup = () => {
+  const closePopup =
+    () => {
 
-    overlay.remove();
+      overlay.remove();
 
-    if (
-      typeof onClose ===
-      'function'
-    ) {
 
-      onClose();
+      if (
+        typeof onClose ===
+        'function'
+      ) {
 
-    }
+        onClose();
 
-  };
+      }
+
+    };
 
 
   overlay
@@ -213,7 +297,8 @@ function showLoginPopup({
       event => {
 
         if (
-          event.target === overlay
+          event.target ===
+          overlay
         ) {
 
           closePopup();
@@ -229,24 +314,6 @@ function showLoginPopup({
 
 
 /* =========================
-   SAFE TEXT
-========================= */
-
-function escapePopupText(value) {
-
-  return String(
-    value ?? ''
-  )
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;');
-
-}
-
-
-/* =========================
    LOGIN
 ========================= */
 
@@ -257,16 +324,34 @@ bindAuthForm(
     event.preventDefault();
 
 
+    const form =
+      event.currentTarget;
+
+
+    if (
+      form.dataset.submitting ===
+      'true'
+    ) {
+
+      return;
+
+    }
+
+
     const submitButton =
-      event.currentTarget
-        .querySelector(
-          'button[type="submit"]'
-        );
+      form.querySelector(
+        'button[type="submit"]'
+      );
 
 
     const oldButtonText =
       submitButton
-        ?.innerHTML;
+        ?.innerHTML ||
+      'Login';
+
+
+    form.dataset.submitting =
+      'true';
 
 
     if (submitButton) {
@@ -284,7 +369,7 @@ bindAuthForm(
     const body =
       Object.fromEntries(
         new FormData(
-          event.currentTarget
+          form
         )
       );
 
@@ -314,6 +399,11 @@ bindAuthForm(
           .get('next');
 
 
+      const destination =
+        next ||
+        '/memora-creations/frontend/index.html';
+
+
       showLoginPopup({
 
         type:
@@ -332,8 +422,7 @@ bindAuthForm(
           () => {
 
             location.href =
-              next ||
-              '/memora-creations/frontend/index.html';
+              destination;
 
           }
 
@@ -350,17 +439,19 @@ bindAuthForm(
           ) {
 
             location.href =
-              next ||
-              '/memora-creations/frontend/index.html';
+              destination;
 
           }
 
         },
-        1800
+        3000
       );
 
 
     } catch (error) {
+
+      form.dataset.submitting =
+        'false';
 
 
       if (submitButton) {
@@ -370,8 +461,7 @@ bindAuthForm(
 
 
         submitButton.innerHTML =
-          oldButtonText ||
-          'Login';
+          oldButtonText;
 
       }
 
@@ -410,10 +500,52 @@ bindAuthForm(
     event.preventDefault();
 
 
+    const form =
+      event.currentTarget;
+
+
+    if (
+      form.dataset.submitting ===
+      'true'
+    ) {
+
+      return;
+
+    }
+
+
+    form.dataset.submitting =
+      'true';
+
+
+    const submitButton =
+      form.querySelector(
+        'button[type="submit"]'
+      );
+
+
+    const oldText =
+      submitButton
+        ?.innerHTML ||
+      'Create Account';
+
+
+    if (submitButton) {
+
+      submitButton.disabled =
+        true;
+
+
+      submitButton.innerHTML =
+        'Creating...';
+
+    }
+
+
     const body =
       Object.fromEntries(
         new FormData(
-          event.currentTarget
+          form
         )
       );
 
@@ -465,6 +597,22 @@ bindAuthForm(
 
     } catch (error) {
 
+      form.dataset.submitting =
+        'false';
+
+
+      if (submitButton) {
+
+        submitButton.disabled =
+          false;
+
+
+        submitButton.innerHTML =
+          oldText;
+
+      }
+
+
       window.MC.toast(
         error.message ||
         'Account creation failed.',
@@ -488,10 +636,52 @@ bindAuthForm(
     event.preventDefault();
 
 
+    const form =
+      event.currentTarget;
+
+
+    if (
+      form.dataset.submitting ===
+      'true'
+    ) {
+
+      return;
+
+    }
+
+
+    form.dataset.submitting =
+      'true';
+
+
+    const submitButton =
+      form.querySelector(
+        'button[type="submit"]'
+      );
+
+
+    const oldText =
+      submitButton
+        ?.innerHTML ||
+      'Submit';
+
+
+    if (submitButton) {
+
+      submitButton.disabled =
+        true;
+
+
+      submitButton.innerHTML =
+        'Please wait...';
+
+    }
+
+
     const body =
       Object.fromEntries(
         new FormData(
-          event.currentTarget
+          form
         )
       );
 
@@ -530,6 +720,23 @@ bindAuthForm(
         'error'
       );
 
+    } finally {
+
+      form.dataset.submitting =
+        'false';
+
+
+      if (submitButton) {
+
+        submitButton.disabled =
+          false;
+
+
+        submitButton.innerHTML =
+          oldText;
+
+      }
+
     }
 
   }
@@ -547,10 +754,52 @@ bindAuthForm(
     event.preventDefault();
 
 
+    const form =
+      event.currentTarget;
+
+
+    if (
+      form.dataset.submitting ===
+      'true'
+    ) {
+
+      return;
+
+    }
+
+
+    form.dataset.submitting =
+      'true';
+
+
+    const submitButton =
+      form.querySelector(
+        'button[type="submit"]'
+      );
+
+
+    const oldText =
+      submitButton
+        ?.innerHTML ||
+      'Reset Password';
+
+
+    if (submitButton) {
+
+      submitButton.disabled =
+        true;
+
+
+      submitButton.innerHTML =
+        'Resetting...';
+
+    }
+
+
     const body =
       Object.fromEntries(
         new FormData(
-          event.currentTarget
+          form
         )
       );
 
@@ -593,11 +842,27 @@ bindAuthForm(
             '/memora-creations/frontend/login.html';
 
         },
-        800
+        1200
       );
 
 
     } catch (error) {
+
+      form.dataset.submitting =
+        'false';
+
+
+      if (submitButton) {
+
+        submitButton.disabled =
+          false;
+
+
+        submitButton.innerHTML =
+          oldText;
+
+      }
+
 
       window.MC.toast(
         error.message ||
