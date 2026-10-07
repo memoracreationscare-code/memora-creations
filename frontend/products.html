@@ -1,42 +1,83 @@
 <!doctype html>
-<html>
+<html lang="en">
+
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Products | Memora Creations</title>
 
-  <link rel="stylesheet"
-        href="/memora-creations/frontend/css/style.css">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>
+    Products | MEMORA CREATIONS
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="/memora-creations/frontend/css/style.css?v=9"
+  >
 </head>
 
 <body>
 
-  <header id="nav" class="topbar"></header>
+  <header
+    id="nav"
+    class="topbar"
+  ></header>
 
-  <main class="container section">
 
-    <div class="sectionhead">
-      <h1>Products</h1>
-      <span id="resultCount" class="muted"></span>
+  <main
+    class="container section"
+  >
+
+    <div
+      class="sectionhead"
+    >
+
+      <h1>
+        Products
+      </h1>
+
+      <span
+        id="resultCount"
+        class="muted"
+      ></span>
+
     </div>
 
-    <form id="filterForm" class="actions">
+
+    <form
+      id="filterForm"
+      class="actions"
+    >
 
       <input
         class="input"
         name="q"
-        placeholder="Search products...">
+        type="search"
+        placeholder="Search products..."
+        autocomplete="off"
+      >
+
 
       <select
         class="select"
         id="categorySelect"
-        name="category">
+        name="category"
+      >
 
-        <option value="">All Categories</option>
+        <option value="">
+          All Categories
+        </option>
 
       </select>
 
-      <select class="select" name="sort">
+
+      <select
+        class="select"
+        name="sort"
+      >
 
         <option value="newest">
           Newest
@@ -52,24 +93,71 @@
 
       </select>
 
-      <button class="btn" type="submit">
+
+      <button
+        class="btn"
+        type="submit"
+      >
         Apply
       </button>
 
     </form>
 
+
     <div
       id="productGrid"
       class="grid"
-      style="margin-top:18px">
-    </div>
+      style="margin-top:18px;"
+    ></div>
 
   </main>
 
-  <nav id="bottomNav" class="bottomnav"></nav>
 
-  <script src="/memora-creations/frontend/js/app.js"></script>
-  <script src="/memora-creations/frontend/js/products.js"></script>
+  <nav
+    id="bottomNav"
+    class="bottomnav"
+  ></nav>
+
+
+  <!-- COMMON JS -->
+
+  <script
+    src="/memora-creations/frontend/js/app.js?v=9"
+  ></script>
+
+
+  <!-- SECURE PAGE START -->
+
+  <script>
+
+    (async function secureProductsPage() {
+
+      const user =
+        await window.MC.requireLogin();
+
+      if (!user) {
+        return;
+      }
+
+
+      const script =
+        document.createElement(
+          'script'
+        );
+
+
+      script.src =
+        '/memora-creations/frontend/js/products.js?v=9';
+
+
+      document.body.appendChild(
+        script
+      );
+
+    })();
+
+  </script>
 
 </body>
+
 </html>
