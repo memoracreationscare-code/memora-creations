@@ -3,19 +3,29 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Checkout - MEMORA CREATIONS</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>
+    Checkout - MEMORA CREATIONS
+  </title>
 
   <link
     rel="stylesheet"
-    href="/memora-creations/frontend/css/style.css"
+    href="/memora-creations/frontend/css/style.css?v=9"
   >
 </head>
 
 <body>
 
-  <header id="nav" class="topbar"></header>
+  <header
+    id="nav"
+    class="topbar"
+  ></header>
+
 
   <main
     id="checkout"
@@ -27,42 +37,72 @@
       <form
         id="checkoutForm"
         class="form"
-        style="margin:0"
+        style="margin:0;"
       >
 
-        <h1>Checkout</h1>
+        <h1>
+          Checkout
+        </h1>
+
 
         <div class="field">
-          <label>Full Name *</label>
+
+          <label>
+            Full Name *
+          </label>
+
           <input
             id="fullName"
             class="input"
             required
+            autocomplete="name"
           >
+
         </div>
 
+
         <div class="field">
-          <label>Mobile *</label>
+
+          <label>
+            Mobile *
+          </label>
+
           <input
             id="mobile"
             class="input"
+            type="tel"
             required
             inputmode="numeric"
+            pattern="[6-9][0-9]{9}"
             maxlength="10"
+            autocomplete="tel"
           >
+
         </div>
 
+
         <div class="field">
-          <label>Address *</label>
+
+          <label>
+            Address *
+          </label>
+
           <textarea
             id="addressLine"
             class="input"
             required
+            autocomplete="street-address"
           ></textarea>
+
         </div>
 
+
         <div class="field">
-          <label>PIN Code *</label>
+
+          <label>
+            PIN Code *
+          </label>
+
           <input
             id="pinCode"
             class="input"
@@ -70,61 +110,92 @@
             inputmode="numeric"
             pattern="[0-9]{6}"
             maxlength="6"
+            autocomplete="postal-code"
           >
+
         </div>
 
-        <div class="field">
-          <label>City</label>
-          <input
-            id="city"
-            class="input"
-          >
-        </div>
-
-        <div class="field">
-          <label>State</label>
-          <input
-            id="state"
-            class="input"
-          >
-        </div>
 
         <div class="field">
 
           <label>
+            City
+          </label>
+
+          <input
+            id="city"
+            class="input"
+            autocomplete="address-level2"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            State
+          </label>
+
+          <input
+            id="state"
+            class="input"
+            autocomplete="address-level1"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+
             <input
               type="radio"
               name="paymentMethod"
               value="COD"
               checked
             >
+
             Cash on Delivery
+
           </label>
+
 
           <br><br>
 
+
           <label>
+
             <input
               type="radio"
               name="paymentMethod"
               value="RAZORPAY"
             >
+
             Pay Online (Razorpay)
+
           </label>
 
         </div>
+
 
         <div class="field">
 
           <label>
+
             <input
               id="terms"
               type="checkbox"
+              required
             >
+
             I confirm the order details.
+
           </label>
 
         </div>
+
 
         <button
           class="btn"
@@ -152,8 +223,45 @@
   ></nav>
 
 
-  <script src="/memora-creations/frontend/js/app.js"></script>
-  <script src="/memora-creations/frontend/js/checkout.js"></script>
+  <!-- COMMON JS -->
+
+  <script
+    src="/memora-creations/frontend/js/app.js?v=9"
+  ></script>
+
+
+  <!-- SECURE CHECKOUT START -->
+
+  <script>
+
+    (async function secureCheckoutPage() {
+
+      const user =
+        await window.MC.requireLogin();
+
+      if (!user) {
+        return;
+      }
+
+
+      const script =
+        document.createElement(
+          'script'
+        );
+
+
+      script.src =
+        '/memora-creations/frontend/js/checkout.js?v=9';
+
+
+      document.body.appendChild(
+        script
+      );
+
+    })();
+
+  </script>
 
 </body>
+
 </html>
