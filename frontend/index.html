@@ -15,7 +15,7 @@
 
   <link
     rel="stylesheet"
-    href="/memora-creations/frontend/css/style.css?v=7"
+    href="/memora-creations/frontend/css/style.css?v=8"
   >
 
   <style>
@@ -36,11 +36,6 @@
       overflow-x:hidden;
     }
 
-
-    /* =====================================
-       PAGE BACKGROUND
-    ===================================== */
-
     .mc-login-page{
       position:relative;
       min-height:100vh;
@@ -57,7 +52,6 @@
           #f9efe0 100%
         );
     }
-
 
     .corner-circle{
       position:absolute;
@@ -88,11 +82,6 @@
       bottom:-260px;
       background:#ead7bd;
     }
-
-
-    /* =====================================
-       DECORATIVE LEAVES
-    ===================================== */
 
     .leaf-group{
       position:absolute;
@@ -166,51 +155,26 @@
       transform:rotate(59deg);
     }
 
-
-    /* =====================================
-       MAIN LOGIN CARD
-    ===================================== */
-
     .login-shell{
       position:relative;
       z-index:5;
-
       width:min(1090px,94vw);
       min-height:590px;
-
       display:grid;
       grid-template-columns:380px 1fr;
-
       background:#fffaf5;
-
-      border:
-        1px solid #ead8c6;
-
+      border:1px solid #ead8c6;
       border-radius:25px;
-
       overflow:hidden;
-
-      box-shadow:
-        0 28px 70px
-        rgba(73,42,22,.18);
+      box-shadow:0 28px 70px rgba(73,42,22,.18);
     }
-
-
-    /* =====================================
-       LEFT PANEL
-    ===================================== */
 
     .login-art{
       position:relative;
-
       min-height:590px;
-
       padding:30px 32px;
-
       overflow:hidden;
-
       color:white;
-
       background:
         radial-gradient(
           circle at 85% 12%,
@@ -230,24 +194,6 @@
           #3e1d0e 100%
         );
     }
-
-
-    .login-art::before{
-      content:"";
-      position:absolute;
-      inset:0;
-
-      background:
-        linear-gradient(
-          110deg,
-          transparent 0 25%,
-          rgba(255,255,255,.06) 37%,
-          transparent 50%
-        );
-
-      pointer-events:none;
-    }
-
 
     .brand-logo-icon{
       position:relative;
@@ -283,35 +229,21 @@
       color:#f4dfc7;
     }
 
-
     .brand-title{
       margin:0;
-
       text-align:center;
-
-      font-family:
-        Georgia,
-        "Times New Roman",
-        serif;
-
+      font-family:Georgia,"Times New Roman",serif;
       font-size:52px;
-
       line-height:.9;
-
       font-weight:700;
-
       color:#fff4e7;
-
       letter-spacing:-2px;
     }
-
 
     .brand-divider{
       width:78%;
       height:2px;
-
       margin:18px auto 12px;
-
       background:
         linear-gradient(
           90deg,
@@ -322,43 +254,25 @@
         );
     }
 
-
     .brand-subtitle{
       margin:0;
-
       text-align:center;
-
       font-size:12px;
-
       letter-spacing:.26em;
-
       color:#ead7c3;
-
       text-transform:uppercase;
     }
 
-
     .brand-quote{
       margin:26px auto 0;
-
       width:82%;
-
       text-align:center;
-
-      font-family:
-        "Brush Script MT",
-        "Segoe Script",
-        cursive;
-
+      font-family:"Brush Script MT","Segoe Script",cursive;
       font-size:25px;
-
       line-height:1.15;
-
       color:#fff0df;
-
       transform:rotate(-3deg);
     }
-
 
     .brand-small-heart{
       display:block;
@@ -367,33 +281,21 @@
       color:#f3c48f;
     }
 
-
-    /* =====================================
-       LEFT VISUAL / DESK SCENE
-    ===================================== */
-
     .scene{
       position:absolute;
-
       left:20px;
       right:20px;
       bottom:17px;
-
       height:250px;
     }
 
-
     .scene-table{
       position:absolute;
-
       left:-20px;
       right:-20px;
       bottom:8px;
-
       height:18px;
-
       border-radius:50%;
-
       background:
         linear-gradient(
           90deg,
@@ -402,26 +304,17 @@
           #8b4e29 70%,
           #3f2114
         );
-
-      box-shadow:
-        0 10px 20px
-        rgba(0,0,0,.35);
+      box-shadow:0 10px 20px rgba(0,0,0,.35);
     }
-
 
     .scene-frame{
       position:absolute;
-
       left:120px;
       bottom:35px;
-
       width:125px;
       height:140px;
-
       padding:10px;
-
       border-radius:4px;
-
       background:
         linear-gradient(
           135deg,
@@ -429,19 +322,13 @@
           #bd7745,
           #5b2d17
         );
-
-      box-shadow:
-        0 16px 25px
-        rgba(0,0,0,.3);
-
+      box-shadow:0 16px 25px rgba(0,0,0,.3);
       transform:rotate(-2deg);
     }
-
 
     .scene-photo{
       width:100%;
       height:100%;
-
       background:
         radial-gradient(
           circle at 50% 35%,
@@ -457,130 +344,69 @@
         );
     }
 
-
-    .scene-photo::after{
-      content:"";
-
-      display:block;
-
-      width:100%;
-      height:100%;
-
-      background:
-        linear-gradient(
-          145deg,
-          transparent 48%,
-          rgba(255,211,145,.32) 49% 52%,
-          transparent 53%
-        );
-    }
-
-
     .scene-mug{
       position:absolute;
-
       right:25px;
       bottom:30px;
-
       width:83px;
       height:105px;
-
-      border-radius:
-        8px 8px 22px 22px;
-
+      border-radius:8px 8px 22px 22px;
       background:#eee3d2;
-
-      box-shadow:
-        0 14px 25px
-        rgba(0,0,0,.27);
-
+      box-shadow:0 14px 25px rgba(0,0,0,.27);
       color:#4d2816;
-
       display:flex;
       align-items:center;
       justify-content:center;
-
       text-align:center;
-
-      font-family:
-        Georgia,
-        serif;
-
+      font-family:Georgia,serif;
       font-size:13px;
       font-style:italic;
-
       line-height:1.1;
     }
 
-
     .scene-mug::after{
       content:"";
-
       position:absolute;
-
       right:-27px;
       top:27px;
-
       width:30px;
       height:43px;
-
-      border:
-        7px solid #eee3d2;
-
+      border:7px solid #eee3d2;
       border-left:0;
-
-      border-radius:
-        0 25px 25px 0;
+      border-radius:0 25px 25px 0;
     }
-
 
     .plant-pot{
       position:absolute;
-
       left:35px;
       bottom:28px;
-
       width:66px;
       height:72px;
-
-      border-radius:
-        8px 8px 18px 18px;
-
+      border-radius:8px 8px 18px 18px;
       background:
         linear-gradient(
           135deg,
           #d3b08d,
           #795035
         );
-
-      box-shadow:
-        0 12px 22px
-        rgba(0,0,0,.25);
+      box-shadow:0 12px 22px rgba(0,0,0,.25);
     }
-
 
     .plant-leaf{
       position:absolute;
-
       left:62px;
       bottom:88px;
-
       width:30px;
       height:85px;
-
-      border-radius:
-        100% 0 100% 0;
-
+      border-radius:100% 0 100% 0;
       background:
         linear-gradient(
           180deg,
           #748935,
           #324719
         );
-
       transform-origin:bottom;
     }
-
 
     .plant-leaf.a{
       transform:rotate(-48deg);
@@ -601,22 +427,12 @@
       height:75px;
     }
 
-
-    /* =====================================
-       RIGHT LOGIN AREA
-    ===================================== */
-
     .login-side{
-      padding:
-        50px 62px 35px;
-
+      padding:50px 62px 35px;
       display:flex;
       align-items:center;
-
-      background:
-        rgba(255,250,245,.98);
+      background:rgba(255,250,245,.98);
     }
-
 
     .login-content{
       width:100%;
@@ -624,477 +440,190 @@
       margin:auto;
     }
 
-
     .welcome-row{
       display:flex;
       align-items:center;
       gap:15px;
     }
 
-
     .welcome-icon{
-      flex:0 0 auto;
-
       width:58px;
       height:58px;
-
       border-radius:50%;
-
       display:flex;
       align-items:center;
       justify-content:center;
-
       background:#f2dfca;
-
       color:#7b3f20;
     }
 
-
-    .welcome-icon svg{
-      width:30px;
-      height:30px;
-      fill:currentColor;
-    }
-
-
     .welcome-title{
       margin:0;
-
-      font-family:
-        Georgia,
-        "Times New Roman",
-        serif;
-
-      font-size:
-        clamp(42px,5vw,58px);
-
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:clamp(42px,5vw,58px);
       line-height:1;
-
       letter-spacing:-1.8px;
-
       color:#30180d;
     }
 
-
     .login-intro{
-      margin:
-        16px 0 0 73px;
-
+      margin:16px 0 0 73px;
       color:#82776f;
-
       font-size:17px;
-
       line-height:1.35;
     }
 
-
     .login-intro strong{
       display:block;
-
       margin-top:2px;
-
       color:#30221a;
-
       font-size:18px;
     }
-
 
     .title-underline{
       width:62px;
       height:4px;
-
-      margin:
-        16px 0 26px 73px;
-
+      margin:16px 0 26px 73px;
       border-radius:10px;
-
       background:#c48148;
     }
-
-
-    /* =====================================
-       FORM
-    ===================================== */
-
-    #loginForm{
-      margin:0;
-    }
-
 
     .login-field{
       margin-bottom:18px;
     }
 
-
     .input-shell{
       position:relative;
     }
 
-
     .login-input{
       width:100%;
       height:66px;
-
-      padding:
-        0 58px 0 60px;
-
-      border:
-        1px solid #dfcfc0;
-
+      padding:0 58px 0 60px;
+      border:1px solid #dfcfc0;
       border-radius:20px;
-
       outline:0;
-
       background:#fffdfa;
-
       color:#2c2019;
-
       font:inherit;
-
       font-size:16px;
-
-      transition:
-        border .2s,
-        box-shadow .2s,
-        background .2s;
     }
-
 
     .login-input:focus{
       border-color:#a76539;
-
-      box-shadow:
-        0 0 0 4px
-        rgba(167,101,57,.10);
-
-      background:#fff;
+      box-shadow:0 0 0 4px rgba(167,101,57,.10);
     }
-
-
-    .login-input::placeholder{
-      color:#988e87;
-    }
-
 
     .input-icon{
       position:absolute;
-
       left:20px;
       top:50%;
-
-      transform:
-        translateY(-50%);
-
-      width:27px;
-      height:27px;
-
-      display:flex;
-      align-items:center;
-      justify-content:center;
-
+      transform:translateY(-50%);
       color:#8e5030;
-
-      pointer-events:none;
     }
-
 
     .input-icon svg{
       width:22px;
       height:22px;
-
       stroke:currentColor;
-
       fill:none;
-
       stroke-width:1.8;
     }
-
 
     .password-toggle{
       position:absolute;
-
       right:16px;
       top:50%;
-
-      transform:
-        translateY(-50%);
-
+      transform:translateY(-50%);
       width:38px;
       height:38px;
-
-      padding:0;
-
       border:0;
-
       border-radius:50%;
-
       background:transparent;
-
       color:#8e5030;
-
       cursor:pointer;
-
-      display:flex;
-      align-items:center;
-      justify-content:center;
     }
-
-
-    .password-toggle:hover{
-      background:#f5e9de;
-    }
-
-
-    .password-toggle svg{
-      width:23px;
-      height:23px;
-
-      stroke:currentColor;
-
-      fill:none;
-
-      stroke-width:1.8;
-    }
-
-
-    /* Remove browser autofill blue/yellow */
-
-    .login-input:-webkit-autofill,
-    .login-input:-webkit-autofill:hover,
-    .login-input:-webkit-autofill:focus{
-      -webkit-text-fill-color:#2c2019;
-
-      -webkit-box-shadow:
-        0 0 0 1000px
-        #fffdfa inset;
-
-      transition:
-        background-color
-        9999s ease-in-out 0s;
-    }
-
-
-    /* =====================================
-       LOGIN BUTTON
-    ===================================== */
 
     .main-login-btn{
       width:100%;
       height:61px;
-
       margin-top:6px;
-
       border:0;
-
       border-radius:17px;
-
       cursor:pointer;
-
       background:
         linear-gradient(
           180deg,
           #a86336,
           #864521
         );
-
       color:white;
-
       font-size:18px;
-
       font-weight:700;
-
       display:flex;
       align-items:center;
       justify-content:center;
       gap:15px;
-
-      box-shadow:
-        0 10px 20px
-        rgba(111,57,29,.18);
-
-      transition:
-        transform .18s,
-        box-shadow .18s;
+      box-shadow:0 10px 20px rgba(111,57,29,.18);
     }
-
-
-    .main-login-btn:hover{
-      transform:
-        translateY(-1px);
-
-      box-shadow:
-        0 14px 28px
-        rgba(111,57,29,.25);
-    }
-
 
     .main-login-btn:disabled{
       opacity:.7;
       cursor:not-allowed;
     }
 
-
     .login-arrow{
       font-size:28px;
-      line-height:1;
-      font-weight:400;
     }
-
-
-    /* =====================================
-       LINKS
-    ===================================== */
 
     .login-links{
       margin-top:24px;
-
-      display:grid;
-
-      grid-template-columns:
-        1fr auto auto 1fr;
-
+      display:flex;
+      justify-content:center;
       align-items:center;
-
-      gap:18px;
-
-      font-size:15px;
+      gap:20px;
+      flex-wrap:wrap;
     }
-
-
-    .login-links-line{
-      height:1px;
-      background:#dacabb;
-    }
-
 
     .login-links a{
       color:#39261c;
       font-weight:600;
-      white-space:nowrap;
+      font-size:15px;
     }
-
-
-    .login-links a:hover{
-      color:#95552f;
-    }
-
-
-    .link-separator{
-      width:1px;
-      height:28px;
-      background:#dccdc0;
-    }
-
-
-    /* =====================================
-       SECURITY ROW
-    ===================================== */
 
     .security-row{
       margin-top:28px;
-
       display:flex;
       align-items:center;
       justify-content:center;
       gap:13px;
-
       color:#92542f;
-
       font-size:11px;
-
       letter-spacing:.27em;
-
       font-weight:700;
-
       text-transform:uppercase;
     }
 
-
-    .security-row::before,
-    .security-row::after{
-      content:"";
-
-      width:60px;
-      height:1px;
-
-      background:#d7c3b0;
-    }
-
-
-    .shield-icon{
-      width:23px;
-      height:23px;
-
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-
-
-    .shield-icon svg{
-      width:22px;
-      height:22px;
-
-      fill:none;
-
-      stroke:currentColor;
-
-      stroke-width:1.7;
-    }
-
-
-    /* =====================================
-       MOBILE RESPONSIVE
-    ===================================== */
-
     @media(max-width:900px){
-
-      .mc-login-page{
-        padding:
-          22px 14px;
-      }
-
 
       .login-shell{
         grid-template-columns:1fr;
         width:min(600px,96vw);
       }
 
-
       .login-art{
         min-height:300px;
-        padding:24px;
       }
-
-
-      .brand-title{
-        font-size:44px;
-      }
-
-
-      .brand-quote{
-        margin-top:16px;
-        font-size:21px;
-      }
-
 
       .scene{
         display:none;
       }
 
-
       .login-side{
-        padding:
-          34px 26px 32px;
-      }
-
-
-      .leaf-group.right{
-        display:none;
+        padding:34px 26px 32px;
       }
 
     }
-
 
     @media(max-width:600px){
 
@@ -1102,102 +631,21 @@
         display:none;
       }
 
-
-      .login-shell{
-        min-height:auto;
-        border-radius:23px;
-      }
-
-
       .login-side{
-        padding:
-          34px 20px 28px;
+        padding:34px 20px 28px;
       }
-
-
-      .welcome-row{
-        gap:12px;
-      }
-
-
-      .welcome-icon{
-        width:48px;
-        height:48px;
-      }
-
 
       .welcome-title{
         font-size:38px;
       }
 
-
-      .login-intro{
-        margin-left:0;
-        font-size:15px;
-      }
-
-
+      .login-intro,
       .title-underline{
         margin-left:0;
       }
 
-
       .login-input{
         height:60px;
-        border-radius:17px;
-      }
-
-
-      .main-login-btn{
-        height:58px;
-      }
-
-
-      .login-links{
-        grid-template-columns:
-          1fr auto 1fr;
-
-        gap:10px;
-
-        font-size:13px;
-      }
-
-
-      .login-links .link-separator{
-        display:none;
-      }
-
-
-      .login-links a:first-of-type{
-        grid-column:2;
-      }
-
-
-      .login-links a:last-of-type{
-        grid-column:2;
-      }
-
-
-      .login-links-line{
-        display:none;
-      }
-
-
-      .security-row{
-        letter-spacing:.15em;
-        gap:7px;
-        font-size:10px;
-      }
-
-
-      .security-row::before,
-      .security-row::after{
-        width:30px;
-      }
-
-
-      .leaf-group.left{
-        opacity:.3;
       }
 
     }
@@ -1208,269 +656,117 @@
 
 <body>
 
-
   <main class="mc-login-page">
 
+    <div class="corner-circle one"></div>
+    <div class="corner-circle two"></div>
+    <div class="corner-circle three"></div>
 
-    <!-- BACKGROUND DECORATION -->
-
-    <div
-      class="corner-circle one"
-    ></div>
-
-
-    <div
-      class="corner-circle two"
-    ></div>
-
-
-    <div
-      class="corner-circle three"
-    ></div>
-
-
-    <div
-      class="leaf-group left"
-    >
-
+    <div class="leaf-group left">
       <span class="branch"></span>
-
       <span class="leaf l1"></span>
       <span class="leaf l2"></span>
       <span class="leaf l3"></span>
       <span class="leaf l4"></span>
       <span class="leaf l5"></span>
-
     </div>
-
-
-    <div
-      class="leaf-group right"
-    >
-
-      <span class="branch"></span>
-
-      <span class="leaf l1"></span>
-      <span class="leaf l2"></span>
-      <span class="leaf l3"></span>
-      <span class="leaf l4"></span>
-      <span class="leaf l5"></span>
-
-    </div>
-
-
-
-    <!-- MAIN CARD -->
 
     <section class="login-shell">
 
-
-      <!-- =========================
-           LEFT SIDE
-      ========================== -->
-
       <aside class="login-art">
 
-
         <div class="brand-logo-icon">
-
-          <span
-            class="logo-frame-one"
-          ></span>
-
-          <span
-            class="logo-frame-two"
-          ></span>
-
-          <span
-            class="logo-heart"
-          >
-            ♥
-          </span>
-
+          <span class="logo-frame-one"></span>
+          <span class="logo-frame-two"></span>
+          <span class="logo-heart">♥</span>
         </div>
-
 
         <h2 class="brand-title">
           Memora
         </h2>
 
-
         <div class="brand-divider"></div>
-
 
         <p class="brand-subtitle">
           Creations
         </p>
 
-
-        <p class="brand-subtitle"
-           style="
-             margin-top:9px;
-             font-size:10px;
-           "
+        <p
+          class="brand-subtitle"
+          style="margin-top:9px;font-size:10px"
         >
           Photo Frames • Gifts • More
         </p>
 
-
         <div class="brand-quote">
-
           Capture Moments,
           <br>
-
           Create Memories
-
-          <span
-            class="brand-small-heart"
-          >
-            ♥
-          </span>
-
+          <span class="brand-small-heart">♥</span>
         </div>
-
-
-
-        <!-- VISUAL SCENE -->
 
         <div class="scene">
 
+          <span class="plant-leaf a"></span>
+          <span class="plant-leaf b"></span>
+          <span class="plant-leaf c"></span>
+          <span class="plant-leaf d"></span>
 
-          <span
-            class="plant-leaf a"
-          ></span>
+          <div class="plant-pot"></div>
 
-          <span
-            class="plant-leaf b"
-          ></span>
-
-          <span
-            class="plant-leaf c"
-          ></span>
-
-          <span
-            class="plant-leaf d"
-          ></span>
-
-          <div
-            class="plant-pot"
-          ></div>
-
-
-          <div
-            class="scene-frame"
-          >
-
-            <div
-              class="scene-photo"
-            ></div>
-
+          <div class="scene-frame">
+            <div class="scene-photo"></div>
           </div>
 
-
-          <div
-            class="scene-mug"
-          >
+          <div class="scene-mug">
             Good
             <br>
             Vibes
             <br>
-            Only
-            ♥
+            Only ♥
           </div>
 
-
-          <div
-            class="scene-table"
-          ></div>
+          <div class="scene-table"></div>
 
         </div>
-
 
       </aside>
 
 
-
-      <!-- =========================
-           RIGHT SIDE
-      ========================== -->
-
       <section class="login-side">
-
 
         <div class="login-content">
 
-
           <div class="welcome-row">
 
-
             <div class="welcome-icon">
-
-              <svg
-                viewBox="0 0 24 24"
-              >
-
-                <circle
-                  cx="12"
-                  cy="8"
-                  r="4"
-                ></circle>
-
-                <path
-                  d="M4 21c.5-5 3-7 8-7s7.5 2 8 7"
-                ></path>
-
-              </svg>
-
+              👤
             </div>
-
 
             <h1 class="welcome-title">
               Welcome Back
             </h1>
 
-
           </div>
 
-
-
           <p class="login-intro">
-
             Login to continue your journey with
-
             <strong>
               Memora Creations
             </strong>
-
           </p>
 
-
-          <div
-            class="title-underline"
-          ></div>
+          <div class="title-underline"></div>
 
 
-
-          <!-- LOGIN FORM -->
-
-          <form
-            id="loginForm"
-          >
-
-
-            <!-- MOBILE -->
+          <form id="loginForm">
 
             <div class="login-field">
 
               <div class="input-shell">
 
-
                 <span class="input-icon">
-
-                  <svg
-                    viewBox="0 0 24 24"
-                  >
-
+                  <svg viewBox="0 0 24 24">
                     <rect
                       x="7"
                       y="2"
@@ -1482,11 +778,8 @@
                     <path
                       d="M10 18h4"
                     ></path>
-
                   </svg>
-
                 </span>
-
 
                 <input
                   class="login-input"
@@ -1500,46 +793,18 @@
                   autocomplete="tel"
                 >
 
-
               </div>
 
             </div>
 
 
-
-            <!-- PASSWORD -->
-
             <div class="login-field">
 
               <div class="input-shell">
 
-
                 <span class="input-icon">
-
-                  <svg
-                    viewBox="0 0 24 24"
-                  >
-
-                    <rect
-                      x="5"
-                      y="10"
-                      width="14"
-                      height="11"
-                      rx="2"
-                    ></rect>
-
-                    <path
-                      d="M8 10V7a4 4 0 0 1 8 0v3"
-                    ></path>
-
-                    <path
-                      d="M12 14v3"
-                    ></path>
-
-                  </svg>
-
+                  🔒
                 </span>
-
 
                 <input
                   class="login-input"
@@ -1551,69 +816,35 @@
                   autocomplete="current-password"
                 >
 
-
                 <button
                   class="password-toggle"
                   id="togglePassword"
                   type="button"
                   aria-label="Show password"
                 >
-
-                  <svg
-                    viewBox="0 0 24 24"
-                  >
-
-                    <path
-                      d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"
-                    ></path>
-
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="3"
-                    ></circle>
-
-                  </svg>
-
+                  👁
                 </button>
-
 
               </div>
 
             </div>
 
 
-
-            <!-- LOGIN BUTTON -->
-
             <button
               class="main-login-btn"
               type="submit"
             >
-
               <span>
                 Login
               </span>
 
-              <span
-                class="login-arrow"
-              >
+              <span class="login-arrow">
                 →
               </span>
-
             </button>
 
 
-
-            <!-- LINKS -->
-
             <div class="login-links">
-
-
-              <span
-                class="login-links-line"
-              ></span>
-
 
               <a
                 href="/memora-creations/frontend/signup.html"
@@ -1621,48 +852,20 @@
                 Create account
               </a>
 
-
-              <span
-                class="link-separator"
-              ></span>
-
-
               <a
                 href="/memora-creations/frontend/forgot-password.html"
               >
                 Forgot password?
               </a>
 
-
             </div>
 
 
-
-            <!-- SECURITY -->
-
             <div class="security-row">
 
-
-              <span
-                class="shield-icon"
-              >
-
-                <svg
-                  viewBox="0 0 24 24"
-                >
-
-                  <path
-                    d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6l7-3Z"
-                  ></path>
-
-                  <path
-                    d="M9 12l2 2 4-4"
-                  ></path>
-
-                </svg>
-
+              <span>
+                🔒
               </span>
-
 
               <span>
                 Safe
@@ -1684,40 +887,27 @@
                 Always
               </span>
 
-
             </div>
-
 
           </form>
 
-
         </div>
-
 
       </section>
 
-
     </section>
-
 
   </main>
 
 
-
-  <!-- EXISTING WEBSITE JS -->
-
   <script
-    src="/memora-creations/frontend/js/app.js?v=7"
+    src="/memora-creations/frontend/js/app.js?v=8"
   ></script>
 
-
   <script
-    src="/memora-creations/frontend/js/auth.js?v=7"
+    src="/memora-creations/frontend/js/auth.js?v=8"
   ></script>
 
-
-
-  <!-- PASSWORD SHOW / HIDE -->
 
   <script>
 
@@ -1726,12 +916,10 @@
         'loginPassword'
       );
 
-
     const passwordToggle =
       document.getElementById(
         'togglePassword'
       );
-
 
     if (
       passwordInput &&
@@ -1747,20 +935,10 @@
               passwordInput.type ===
               'password';
 
-
             passwordInput.type =
               hidden
                 ? 'text'
                 : 'password';
-
-
-            passwordToggle
-              .setAttribute(
-                'aria-label',
-                hidden
-                  ? 'Hide password'
-                  : 'Show password'
-              );
 
           }
         );
@@ -1768,7 +946,6 @@
     }
 
   </script>
-
 
 </body>
 
