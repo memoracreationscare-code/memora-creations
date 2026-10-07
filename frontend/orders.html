@@ -3,35 +3,91 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>My Orders - MEMORA CREATIONS</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>
+    My Orders - MEMORA CREATIONS
+  </title>
 
   <link
     rel="stylesheet"
-    href="/memora-creations/frontend/css/style.css?v=4"
+    href="/memora-creations/frontend/css/style.css?v=9"
   >
 </head>
 
 <body>
 
-  <header id="nav" class="topbar"></header>
+  <header
+    id="nav"
+    class="topbar"
+  ></header>
 
-  <main class="container section">
 
-    <h1>My Orders</h1>
+  <main
+    class="container section"
+  >
 
-    <div id="orders"></div>
+    <h1>
+      My Orders
+    </h1>
+
+
+    <div
+      id="orders"
+    ></div>
 
   </main>
+
 
   <nav
     id="bottomNav"
     class="bottomnav"
   ></nav>
 
-  <script src="/memora-creations/frontend/js/app.js?v=4"></script>
-  <script src="/memora-creations/frontend/js/orders.js?v=4"></script>
+
+  <!-- COMMON JS -->
+
+  <script
+    src="/memora-creations/frontend/js/app.js?v=9"
+  ></script>
+
+
+  <!-- SECURE ORDERS START -->
+
+  <script>
+
+    (async function secureOrdersPage() {
+
+      const user =
+        await window.MC.requireLogin();
+
+      if (!user) {
+        return;
+      }
+
+
+      const script =
+        document.createElement(
+          'script'
+        );
+
+
+      script.src =
+        '/memora-creations/frontend/js/orders.js?v=9';
+
+
+      document.body.appendChild(
+        script
+      );
+
+    })();
+
+  </script>
 
 </body>
+
 </html>
