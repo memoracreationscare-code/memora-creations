@@ -5,6 +5,10 @@ let cachedToken = null;
 let tokenExpiresAt = 0;
 
 
+/* =========================
+   CONFIG
+========================= */
+
 function configured() {
   return Boolean(
     process.env.SHIPROCKET_EMAIL &&
@@ -12,6 +16,10 @@ function configured() {
   );
 }
 
+
+/* =========================
+   AUTH TOKEN
+========================= */
 
 async function getShiprocketToken() {
 
@@ -28,10 +36,12 @@ async function getShiprocketToken() {
     return cachedToken;
   }
 
+
   const response = await fetch(
     `${SHIPROCKET_BASE}/auth/login`,
     {
       method: 'POST',
+
       headers: {
         'Content-Type': 'application/json'
       },
@@ -46,8 +56,10 @@ async function getShiprocketToken() {
     }
   );
 
+
   const data =
     await response.json();
+
 
   if (!response.ok || !data.token) {
 
@@ -62,15 +74,21 @@ async function getShiprocketToken() {
     );
   }
 
+
   cachedToken = data.token;
 
   tokenExpiresAt =
     Date.now() +
     (8 * 60 * 60 * 1000);
 
+
   return cachedToken;
 }
 
+
+/* =========================
+   COMMON REQUEST
+========================= */
 
 async function shiprocketRequest(
   path,
@@ -79,6 +97,7 @@ async function shiprocketRequest(
 
   const token =
     await getShiprocketToken();
+
 
   const response = await fetch(
     `${SHIPROCKET_BASE}${path}`,
@@ -97,11 +116,13 @@ async function shiprocketRequest(
     }
   );
 
+
   let data = {};
 
   try {
     data = await response.json();
   } catch {}
+
 
   if (!response.ok) {
 
@@ -117,7 +138,239 @@ async function shiprocketRequest(
     );
   }
 
+
   return data;
+}
+
+
+/* =========================
+   PICKUP LOCATIONS
+========================= */
+
+async function getPickupLocations() {
+
+  return shiprocketRequest(
+    '/settings/company/pickup'
+  );
+}
+
+
+async function getPickupLocation(
+  pickupLocation = 'Home'
+) {
+
+  const data =
+    await getPickupLocations();
+
+
+  const locations =
+    data?.data?.shipping_address ||
+    [];
+
+
+  if (!locations.length) {
+
+    throw new Error(
+      'No Shiprocket pickup location found.'
+    );
+  }
+
+
+  const requested =
+    String(pickupLocation)
+      .trim()
+      .toLowerCase();
+
+
+  let location =
+    locations.find(item =>
+      String(
+        item.pickup_location || ''
+      )
+        .trim()
+        .toLowerCase() === requested
+    );
+
+
+  if (!location) {
+
+    location =
+      locations.find(
+        item =>
+          Number(
+            item.is_primary_location
+          ) === 1
+      );
+
+  }
+
+
+  if (!location) {
+    location = locations[0];
+  }
+
+
+  if (!location.pin_code) {
+
+    throw new Error(
+      'Pickup location PIN code not found.'
+    );
+  }
+
+
+  return location;
+}
+
+
+/* =========================
+   COURIER SERVICEABILITY
+========================= */
+
+async function checkCourierServiceability({
+  pickupLocation = 'Home',
+  deliveryPincode,
+  weight,
+  length,
+  width,
+  height,
+  cod = false,
+  declaredValue = 0
+}) {
+
+  const pickup =
+    await getPickupLocation(
+      pickupLocation
+    );
+
+
+  const pickupPincode =
+    String(
+      pickup.pin_code || ''
+    ).trim();
+
+
+  const destination =
+    String(
+      deliveryPincode || ''
+    ).trim();
+
+
+  if (!/^\d{6}$/.test(destination)) {
+
+    throw new Error(
+      'Valid customer delivery PIN code is required.'
+    );
+
+  }
+
+
+  const packageWeight =
+    Number(weight);
+
+
+  if (
+    !Number.isFinite(packageWeight) ||
+    packageWeight <= 0
+  ) {
+
+    throw new Error(
+      'Valid package weight is required.'
+    );
+
+  }
+
+
+  const params =
+    new URLSearchParams();
+
+
+  params.set(
+    'pickup_postcode',
+    pickupPincode
+  );
+
+  params.set(
+    'delivery_postcode',
+    destination
+  );
+
+  params.set(
+    'weight',
+    String(packageWeight)
+  );
+
+  params.set(
+    'cod',
+    cod ? '1' : '0'
+  );
+
+
+  if (Number(length) > 0) {
+
+    params.set(
+      'length',
+      String(Number(length))
+    );
+
+  }
+
+
+  if (Number(width) > 0) {
+
+    params.set(
+      'breadth',
+      String(Number(width))
+    );
+
+  }
+
+
+  if (Number(height) > 0) {
+
+    params.set(
+      'height',
+      String(Number(height))
+    );
+
+  }
+
+
+  if (Number(declaredValue) > 0) {
+
+    params.set(
+      'declared_value',
+      String(
+        Number(declaredValue)
+      )
+    );
+
+  }
+
+
+  const data =
+    await shiprocketRequest(
+      '/courier/serviceability/?' +
+      params.toString()
+    );
+
+
+  return {
+    pickupLocation:
+      pickup.pickup_location,
+
+    pickupPincode,
+
+    deliveryPincode:
+      destination,
+
+    couriers:
+      data?.data
+        ?.available_courier_companies ||
+      [],
+
+    raw:
+      data
+  };
 }
 
 
@@ -136,28 +389,38 @@ async function createShiprocketOrder(
   const customer =
     order.customer || {};
 
+
   const date =
-    new Date(order.createdAt || Date.now());
+    new Date(
+      order.createdAt ||
+      Date.now()
+    );
+
 
   const orderDate =
     date.getFullYear() +
     '-' +
-    String(date.getMonth() + 1)
-      .padStart(2, '0') +
+    String(
+      date.getMonth() + 1
+    ).padStart(2, '0') +
     '-' +
-    String(date.getDate())
-      .padStart(2, '0') +
+    String(
+      date.getDate()
+    ).padStart(2, '0') +
     ' ' +
-    String(date.getHours())
-      .padStart(2, '0') +
+    String(
+      date.getHours()
+    ).padStart(2, '0') +
     ':' +
-    String(date.getMinutes())
-      .padStart(2, '0');
+    String(
+      date.getMinutes()
+    ).padStart(2, '0');
 
 
   const orderItems =
-    (order.items || []).map(
-      item => ({
+    (order.items || [])
+      .map(item => ({
+
         name:
           item.name,
 
@@ -165,18 +428,22 @@ async function createShiprocketOrder(
           item.productId,
 
         units:
-          Number(item.quantity),
+          Number(
+            item.quantity
+          ),
 
         selling_price:
-          Number(item.unitPrice),
+          Number(
+            item.unitPrice
+          ),
 
         discount: 0,
 
         tax: 0,
 
         hsn: ''
-      })
-    );
+
+      }));
 
 
   const payload = {
@@ -213,7 +480,9 @@ async function createShiprocketOrder(
       address.city || '',
 
     billing_pincode:
-      String(address.pinCode || ''),
+      String(
+        address.pinCode || ''
+      ),
 
     billing_state:
       address.state || '',
@@ -253,23 +522,36 @@ async function createShiprocketOrder(
     transaction_charges: 0,
 
     total_discount:
-      Number(order.discount || 0),
+      Number(
+        order.discount || 0
+      ),
 
     sub_total:
-      Number(order.subtotal || 0),
+      Number(
+        order.subtotal || 0
+      ),
 
 
     length:
-      Number(packageData.length),
+      Number(
+        packageData.length
+      ),
 
     breadth:
-      Number(packageData.width),
+      Number(
+        packageData.width
+      ),
 
     height:
-      Number(packageData.height),
+      Number(
+        packageData.height
+      ),
 
     weight:
-      Number(packageData.weight)
+      Number(
+        packageData.weight
+      )
+
   };
 
 
@@ -277,8 +559,11 @@ async function createShiprocketOrder(
     '/orders/create/adhoc',
     {
       method: 'POST',
+
       body:
-        JSON.stringify(payload)
+        JSON.stringify(
+          payload
+        )
     }
   );
 }
@@ -293,8 +578,13 @@ async function getWalletBalance() {
   return shiprocketRequest(
     '/account/details/wallet-balance'
   );
+
 }
 
+
+/* =========================
+   EXPORTS
+========================= */
 
 module.exports = {
 
@@ -304,7 +594,14 @@ module.exports = {
 
   shiprocketRequest,
 
+  getPickupLocations,
+
+  getPickupLocation,
+
+  checkCourierServiceability,
+
   createShiprocketOrder,
 
   getWalletBalance
+
 };
