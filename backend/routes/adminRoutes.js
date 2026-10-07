@@ -155,6 +155,14 @@ router.put(
 );
 
 
+/* CHECK COURIER RATES */
+
+router.post(
+  '/orders/:id/check-couriers',
+  shiprocketController.checkCourierRates
+);
+
+
 /* CREATE SHIPROCKET SHIPMENT */
 
 router.post(
