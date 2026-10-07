@@ -13,7 +13,7 @@
 
   <link
     rel="stylesheet"
-    href="/memora-creations/frontend/css/style.css?v=4"
+    href="/memora-creations/frontend/css/style.css?v=5"
   >
 </head>
 
@@ -122,7 +122,7 @@
 
 
   <script
-    src="/memora-creations/frontend/js/app.js?v=4"
+    src="/memora-creations/frontend/js/app.js?v=5"
   ></script>
 
 
@@ -609,13 +609,24 @@
         );
 
 
-        window.MC.toast(
-          'Product cart mein add ho gaya.',
-          'success'
-        );
+        await window.MC.updateCartCount();
 
 
-        window.MC.updateCartCount();
+        if (
+          typeof window.MC.showCartPopup ===
+          'function'
+        ) {
+
+          window.MC.showCartPopup();
+
+        } else {
+
+          window.MC.toast(
+            'Product cart mein add ho gaya.',
+            'success'
+          );
+
+        }
 
 
       } catch (error) {
