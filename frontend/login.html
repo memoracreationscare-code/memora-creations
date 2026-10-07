@@ -15,7 +15,7 @@
 
   <link
     rel="stylesheet"
-    href="/memora-creations/frontend/css/style.css?v=8"
+    href="/memora-creations/frontend/css/style.css?v=9"
   >
 
   <style>
@@ -81,7 +81,10 @@
       width:220px;
       height:220px;
 
-      border:2px solid rgba(138,90,59,.18);
+      border:
+        2px solid
+        rgba(138,90,59,.18);
+
       border-radius:50%;
 
       pointer-events:none;
@@ -104,11 +107,14 @@
       width:min(1120px,100%);
 
       display:grid;
-      grid-template-columns:420px 1fr;
+
+      grid-template-columns:
+        420px 1fr;
 
       background:#fffaf6;
 
-      border:1px solid #eadfd5;
+      border:
+        1px solid #eadfd5;
 
       border-radius:28px;
 
@@ -119,6 +125,7 @@
         rgba(47,31,18,.14);
 
       position:relative;
+
       z-index:1;
     }
 
@@ -143,6 +150,7 @@
       color:#fff;
 
       display:flex;
+
       align-items:stretch;
 
       min-height:640px;
@@ -168,10 +176,13 @@
         rgba(255,255,255,.12);
 
       display:flex;
+
       flex-direction:column;
+
       justify-content:space-between;
 
       position:relative;
+
       overflow:hidden;
     }
 
@@ -200,6 +211,7 @@
 
     .brand-mark{
       position:relative;
+
       z-index:1;
     }
 
@@ -222,11 +234,14 @@
       margin-bottom:20px;
 
       font-size:28px;
+
       font-weight:800;
     }
 
 
     .brand-name{
+      margin:0;
+
       font-size:52px;
 
       line-height:.95;
@@ -234,8 +249,6 @@
       font-weight:800;
 
       letter-spacing:.01em;
-
-      margin:0;
 
       color:#fff9f5;
     }
@@ -273,25 +286,25 @@
 
 
     .brand-tagline{
+      margin:0 0 10px;
+
       font-size:20px;
 
       line-height:1.45;
 
       color:#fff3ea;
 
-      margin:0 0 10px;
-
       font-weight:600;
     }
 
 
     .brand-note{
+      margin:0;
+
       font-size:16px;
 
       color:
         rgba(255,244,236,.85);
-
-      margin:0;
     }
 
 
@@ -315,7 +328,6 @@
 
       left:0;
       right:0;
-
       bottom:16px;
 
       height:16px;
@@ -361,6 +373,7 @@
       content:"";
 
       position:absolute;
+
       inset:0;
 
       background:
@@ -498,20 +511,27 @@
 
     .leaf.l1{
       left:18px;
-      transform:rotate(-24deg);
+
+      transform:
+        rotate(-24deg);
     }
 
 
     .leaf.l2{
       left:33px;
+
       height:60px;
-      transform:rotate(-6deg);
+
+      transform:
+        rotate(-6deg);
     }
 
 
     .leaf.l3{
       left:49px;
-      transform:rotate(18deg);
+
+      transform:
+        rotate(18deg);
 
       border-radius:
         18px 18px 0 18px;
@@ -528,6 +548,7 @@
       display:flex;
 
       align-items:center;
+
       justify-content:center;
 
       background:#fffaf6;
@@ -536,6 +557,7 @@
 
     .login-form-wrap{
       width:100%;
+
       max-width:560px;
     }
 
@@ -551,6 +573,7 @@
       display:flex;
 
       align-items:center;
+
       justify-content:center;
 
       color:#8a5a3b;
@@ -619,11 +642,12 @@
 
 
     /* =========================
-       FORM
+       INPUTS
     ========================= */
 
     .field{
-      margin:0 0 18px;
+      margin:
+        0 0 18px;
     }
 
 
@@ -634,6 +658,7 @@
 
     .fieldbox .input{
       width:100%;
+
       height:62px;
 
       border:
@@ -686,6 +711,7 @@
       display:flex;
 
       align-items:center;
+
       justify-content:center;
     }
 
@@ -719,6 +745,7 @@
       display:flex;
 
       align-items:center;
+
       justify-content:center;
 
       cursor:pointer;
@@ -745,11 +772,12 @@
 
 
     /* =========================
-       LOGIN BUTTON
+       BUTTON
     ========================= */
 
     .login-btn{
       width:100%;
+
       height:62px;
 
       border:0;
@@ -774,6 +802,7 @@
       display:flex;
 
       align-items:center;
+
       justify-content:center;
 
       gap:12px;
@@ -804,6 +833,7 @@
 
     .login-btn:disabled{
       opacity:.7;
+
       cursor:not-allowed;
     }
 
@@ -822,16 +852,16 @@
     ========================= */
 
     .link-row{
-      margin:24px 0 18px;
+      margin:
+        24px 0 18px;
 
       display:flex;
 
       align-items:center;
+
       justify-content:center;
 
       gap:18px;
-
-      color:#5f5751;
 
       flex-wrap:wrap;
     }
@@ -877,6 +907,7 @@
       display:flex;
 
       align-items:center;
+
       justify-content:center;
 
       gap:12px;
@@ -900,6 +931,7 @@
       content:"";
 
       width:72px;
+
       height:1px;
 
       background:#dcc9b8;
@@ -913,6 +945,7 @@
       display:flex;
 
       align-items:center;
+
       justify-content:center;
 
       color:#8a5a3b;
@@ -933,7 +966,7 @@
        TABLET
     ========================= */
 
-    @media (max-width:980px){
+    @media(max-width:980px){
 
       .login-card{
         grid-template-columns:1fr;
@@ -941,6 +974,7 @@
 
       .login-left{
         min-height:auto;
+
         padding:20px;
       }
 
@@ -949,7 +983,8 @@
       }
 
       .login-right{
-        padding:28px 22px 32px;
+        padding:
+          28px 22px 32px;
       }
 
       .login-form-wrap h1{
@@ -963,7 +998,7 @@
        MOBILE
     ========================= */
 
-    @media (max-width:640px){
+    @media(max-width:640px){
 
       .login-page{
         padding:14px;
@@ -1037,7 +1072,7 @@
     <section class="login-card">
 
 
-      <!-- LEFT SIDE -->
+      <!-- LEFT -->
 
       <div class="login-left">
 
@@ -1105,12 +1140,11 @@
       </div>
 
 
-      <!-- RIGHT SIDE -->
+      <!-- RIGHT -->
 
       <div class="login-right">
 
         <div class="login-form-wrap">
-
 
           <div class="welcome-icon">
             👤
@@ -1136,12 +1170,10 @@
           <div class="title-line"></div>
 
 
-          <!-- LOGIN FORM -->
-
           <form id="loginForm">
 
 
-            <!-- MOBILE NUMBER -->
+            <!-- MOBILE -->
 
             <div class="field">
 
@@ -1275,7 +1307,7 @@
             </div>
 
 
-            <!-- LOGIN BUTTON -->
+            <!-- LOGIN -->
 
             <button
               class="login-btn"
@@ -1338,26 +1370,15 @@
 
               </span>
 
+              <span>Safe</span>
 
-              <span>
-                Safe
-              </span>
+              <span>•</span>
 
-              <span>
-                •
-              </span>
+              <span>Secure</span>
 
-              <span>
-                Secure
-              </span>
+              <span>•</span>
 
-              <span>
-                •
-              </span>
-
-              <span>
-                Always
-              </span>
+              <span>Always</span>
 
             </div>
 
@@ -1372,21 +1393,25 @@
   </main>
 
 
-  <!-- WEBSITE JS -->
+  <!-- COMMON JS -->
 
   <script
-    src="/memora-creations/frontend/js/app.js?v=8"
+    src="/memora-creations/frontend/js/app.js?v=9"
   ></script>
 
 
+  <!-- LOGIN JS -->
+
   <script
-    src="/memora-creations/frontend/js/auth.js?v=8"
+    src="/memora-creations/frontend/js/auth.js?v=9"
   ></script>
 
-
-  <!-- PASSWORD SHOW / HIDE -->
 
   <script>
+
+    /* =========================
+       PASSWORD SHOW / HIDE
+    ========================= */
 
     const togglePasswordBtn =
       document.getElementById(
@@ -1410,13 +1435,13 @@
           'click',
           function () {
 
-            const isPassword =
+            const hidden =
               loginPasswordInput.type ===
               'password';
 
 
             loginPasswordInput.type =
-              isPassword
+              hidden
                 ? 'text'
                 : 'password';
 
@@ -1424,7 +1449,7 @@
             togglePasswordBtn
               .setAttribute(
                 'aria-label',
-                isPassword
+                hidden
                   ? 'Hide password'
                   : 'Show password'
               );
@@ -1433,6 +1458,35 @@
         );
 
     }
+
+
+    /* =========================
+       ALREADY LOGGED IN
+    ========================= */
+
+    (async function redirectLoggedInUser() {
+
+      const user =
+        await window.MC.currentUser();
+
+
+      if (!user) {
+        return;
+      }
+
+
+      const next =
+        new URLSearchParams(
+          location.search
+        )
+          .get('next');
+
+
+      location.href =
+        next ||
+        '/memora-creations/frontend/index.html';
+
+    })();
 
   </script>
 
