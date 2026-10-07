@@ -36,30 +36,21 @@ async function getShiprocketToken() {
     return cachedToken;
   }
 
-
   const response = await fetch(
     `${SHIPROCKET_BASE}/auth/login`,
     {
       method: 'POST',
-
       headers: {
         'Content-Type': 'application/json'
       },
-
       body: JSON.stringify({
-        email:
-          process.env.SHIPROCKET_EMAIL,
-
-        password:
-          process.env.SHIPROCKET_PASSWORD
+        email: process.env.SHIPROCKET_EMAIL,
+        password: process.env.SHIPROCKET_PASSWORD
       })
     }
   );
 
-
-  const data =
-    await response.json();
-
+  const data = await response.json();
 
   if (!response.ok || !data.token) {
 
@@ -74,13 +65,11 @@ async function getShiprocketToken() {
     );
   }
 
-
   cachedToken = data.token;
 
   tokenExpiresAt =
     Date.now() +
     (8 * 60 * 60 * 1000);
-
 
   return cachedToken;
 }
@@ -97,7 +86,6 @@ async function shiprocketRequest(
 
   const token =
     await getShiprocketToken();
-
 
   const response = await fetch(
     `${SHIPROCKET_BASE}${path}`,
@@ -116,13 +104,11 @@ async function shiprocketRequest(
     }
   );
 
-
   let data = {};
 
   try {
     data = await response.json();
   } catch {}
-
 
   if (!response.ok) {
 
@@ -137,7 +123,6 @@ async function shiprocketRequest(
       'Shiprocket API request failed.'
     );
   }
-
 
   return data;
 }
@@ -162,11 +147,9 @@ async function getPickupLocation(
   const data =
     await getPickupLocations();
 
-
   const locations =
     data?.data?.shipping_address ||
     [];
-
 
   if (!locations.length) {
 
@@ -175,12 +158,10 @@ async function getPickupLocation(
     );
   }
 
-
   const requested =
     String(pickupLocation)
       .trim()
       .toLowerCase();
-
 
   let location =
     locations.find(item =>
@@ -190,7 +171,6 @@ async function getPickupLocation(
         .trim()
         .toLowerCase() === requested
     );
-
 
   if (!location) {
 
@@ -204,11 +184,9 @@ async function getPickupLocation(
 
   }
 
-
   if (!location) {
     location = locations[0];
   }
-
 
   if (!location.pin_code) {
 
@@ -216,7 +194,6 @@ async function getPickupLocation(
       'Pickup location PIN code not found.'
     );
   }
-
 
   return location;
 }
@@ -242,18 +219,15 @@ async function checkCourierServiceability({
       pickupLocation
     );
 
-
   const pickupPincode =
     String(
       pickup.pin_code || ''
     ).trim();
 
-
   const destination =
     String(
       deliveryPincode || ''
     ).trim();
-
 
   if (!/^\d{6}$/.test(destination)) {
 
@@ -263,10 +237,8 @@ async function checkCourierServiceability({
 
   }
 
-
   const packageWeight =
     Number(weight);
-
 
   if (
     !Number.isFinite(packageWeight) ||
@@ -279,10 +251,8 @@ async function checkCourierServiceability({
 
   }
 
-
   const params =
     new URLSearchParams();
-
 
   params.set(
     'pickup_postcode',
@@ -304,7 +274,6 @@ async function checkCourierServiceability({
     cod ? '1' : '0'
   );
 
-
   if (Number(length) > 0) {
 
     params.set(
@@ -313,7 +282,6 @@ async function checkCourierServiceability({
     );
 
   }
-
 
   if (Number(width) > 0) {
 
@@ -324,7 +292,6 @@ async function checkCourierServiceability({
 
   }
 
-
   if (Number(height) > 0) {
 
     params.set(
@@ -333,7 +300,6 @@ async function checkCourierServiceability({
     );
 
   }
-
 
   if (Number(declaredValue) > 0) {
 
@@ -346,13 +312,11 @@ async function checkCourierServiceability({
 
   }
 
-
   const data =
     await shiprocketRequest(
       '/courier/serviceability/?' +
       params.toString()
     );
-
 
   return {
     pickupLocation:
@@ -389,13 +353,11 @@ async function createShiprocketOrder(
   const customer =
     order.customer || {};
 
-
   const date =
     new Date(
       order.createdAt ||
       Date.now()
     );
-
 
   const orderDate =
     date.getFullYear() +
@@ -415,7 +377,6 @@ async function createShiprocketOrder(
     String(
       date.getMinutes()
     ).padStart(2, '0');
-
 
   const orderItems =
     (order.items || [])
@@ -438,13 +399,10 @@ async function createShiprocketOrder(
           ),
 
         discount: 0,
-
         tax: 0,
-
         hsn: ''
 
       }));
-
 
   const payload = {
 
@@ -460,7 +418,6 @@ async function createShiprocketOrder(
 
     comment:
       'Order from MEMORA CREATIONS',
-
 
     billing_customer_name:
       address.fullName ||
@@ -497,20 +454,16 @@ async function createShiprocketOrder(
       address.mobile ||
       customer.mobile,
 
-
     shipping_is_billing:
       true,
 
-
     order_items:
       orderItems,
-
 
     payment_method:
       order.paymentMethod === 'COD'
         ? 'COD'
         : 'Prepaid',
-
 
     shipping_charges:
       Number(
@@ -531,7 +484,6 @@ async function createShiprocketOrder(
         order.subtotal || 0
       ),
 
-
     length:
       Number(
         packageData.length
@@ -551,21 +503,99 @@ async function createShiprocketOrder(
       Number(
         packageData.weight
       )
-
   };
-
 
   return shiprocketRequest(
     '/orders/create/adhoc',
     {
       method: 'POST',
-
       body:
-        JSON.stringify(
-          payload
-        )
+        JSON.stringify(payload)
     }
   );
+}
+
+
+/* =========================
+   ASSIGN COURIER / AWB
+========================= */
+
+async function assignCourierAwb({
+  shipmentId,
+  courierCompanyId
+}) {
+
+  const shipment =
+    Number(shipmentId);
+
+  const courier =
+    Number(courierCompanyId);
+
+
+  if (
+    !Number.isFinite(shipment) ||
+    shipment <= 0
+  ) {
+
+    throw new Error(
+      'Valid Shiprocket shipment ID is required.'
+    );
+
+  }
+
+
+  if (
+    !Number.isFinite(courier) ||
+    courier <= 0
+  ) {
+
+    throw new Error(
+      'Please select a valid courier.'
+    );
+
+  }
+
+
+  const data =
+    await shiprocketRequest(
+      '/courier/assign/awb',
+      {
+        method: 'POST',
+
+        body:
+          JSON.stringify({
+            shipment_id:
+              shipment,
+
+            courier_id:
+              courier
+          })
+      }
+    );
+
+
+  const awbData =
+    data?.response?.data ||
+    data?.data ||
+    data;
+
+
+  return {
+    ...data,
+
+    awbCode:
+      awbData?.awb_code ||
+      awbData?.awb ||
+      '',
+
+    courierName:
+      awbData?.courier_name ||
+      '',
+
+    shipmentId:
+      awbData?.shipment_id ||
+      shipment
+  };
 }
 
 
@@ -601,6 +631,8 @@ module.exports = {
   checkCourierServiceability,
 
   createShiprocketOrder,
+
+  assignCourierAwb,
 
   getWalletBalance
 
