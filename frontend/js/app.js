@@ -46,8 +46,10 @@ async function api(
 
 
   try {
+
     data =
       await res.json();
+
   } catch {}
 
 
@@ -113,6 +115,17 @@ function toast(
   type = 'message'
 ) {
 
+  const old =
+    document.querySelector(
+      '.message'
+    );
+
+
+  if (old) {
+    old.remove();
+  }
+
+
   const el =
     document.createElement(
       'div'
@@ -134,7 +147,9 @@ function toast(
 
   setTimeout(
     () => {
+
       el.remove();
+
     },
     3500
   );
@@ -248,7 +263,9 @@ function showCartPopup() {
     ?.addEventListener(
       'click',
       () => {
+
         overlay.remove();
+
       }
     );
 
@@ -279,11 +296,13 @@ async function currentUser() {
 
   try {
 
-    return (
+    const data =
       await api(
         '/auth/me'
-      )
-    ).user;
+      );
+
+
+    return data.user || null;
 
   } catch {
 
@@ -325,16 +344,46 @@ async function requireLogin() {
 
 
 /* =========================
+   LOGOUT
+========================= */
+
+async function logoutUser() {
+
+  try {
+
+    await api(
+      '/auth/logout',
+      {
+        method:
+          'POST'
+      }
+    );
+
+  } catch {}
+
+
+  location.href =
+    BASE +
+    '/frontend/login.html';
+
+}
+
+
+/* =========================
    NAV
 ========================= */
 
-function nav() {
+async function nav() {
 
   const el =
     $('#nav');
 
 
   if (!el) return;
+
+
+  const user =
+    await currentUser();
 
 
   el.innerHTML = `
@@ -358,6 +407,7 @@ function nav() {
           class="input"
           placeholder="Search products..."
           name="q"
+          autocomplete="off"
         >
 
 
@@ -387,39 +437,56 @@ function nav() {
         </a>
 
 
-        <a
-          href="${BASE}/frontend/orders.html"
-        >
-          Orders
-        </a>
+        ${
+          user
+            ? `
+
+              <a
+                href="${BASE}/frontend/orders.html"
+              >
+                Orders
+              </a>
 
 
-        <a
-          href="${BASE}/frontend/profile.html"
-        >
-          Profile
-        </a>
+              <a
+                href="${BASE}/frontend/profile.html"
+              >
+                Profile
+              </a>
 
 
-        <a
-          href="${BASE}/frontend/cart.html"
-        >
-          Cart
-          (
-          <span id="cartCount">
-            0
-          </span>
-          )
-        </a>
+              <a
+                href="${BASE}/frontend/cart.html"
+              >
+                Cart
+                (
+                <span id="cartCount">
+                  0
+                </span>
+                )
+              </a>
 
 
-        <button
-          class="btn secondary"
-          id="logoutBtn"
-          type="button"
-        >
-          Logout
-        </button>
+              <button
+                class="btn secondary"
+                id="logoutBtn"
+                type="button"
+              >
+                Logout
+              </button>
+
+            `
+            : `
+
+              <a
+                class="btn secondary"
+                href="${BASE}/frontend/login.html"
+              >
+                Login
+              </a>
+
+            `
+        }
 
       </div>
 
@@ -427,6 +494,8 @@ function nav() {
 
   `;
 
+
+  /* SEARCH */
 
   const searchForm =
     $('#globalSearch');
@@ -442,11 +511,14 @@ function nav() {
 
 
         const q =
-          new FormData(
-            event.currentTarget
+          String(
+            new FormData(
+              event.currentTarget
+            )
+              .get('q') ||
+            ''
           )
-            .get('q') ||
-          '';
+            .trim();
 
 
         location.href =
@@ -460,6 +532,8 @@ function nav() {
   }
 
 
+  /* LOGOUT */
+
   const logoutButton =
     $('#logoutBtn');
 
@@ -468,32 +542,19 @@ function nav() {
 
     logoutButton.addEventListener(
       'click',
-      async () => {
-
-        try {
-
-          await api(
-            '/auth/logout',
-            {
-              method:
-                'POST'
-            }
-          );
-
-        } catch {}
-
-
-        location.href =
-          BASE +
-          '/frontend/login.html';
-
-      }
+      logoutUser
     );
 
   }
 
 
-  updateCartCount();
+  /* CART COUNT */
+
+  if (user) {
+
+    await updateCartCount();
+
+  }
 
 }
 
@@ -552,13 +613,17 @@ async function updateCartCount() {
    BOTTOM NAV
 ========================= */
 
-function bottomNav() {
+async function bottomNav() {
 
   const el =
     $('#bottomNav');
 
 
   if (!el) return;
+
+
+  const user =
+    await currentUser();
 
 
   el.innerHTML = `
@@ -569,29 +634,49 @@ function bottomNav() {
       HOME
     </a>
 
+
     <a
       href="${BASE}/frontend/products.html"
     >
       PRODUCTS
     </a>
 
-    <a
-      href="${BASE}/frontend/cart.html"
-    >
-      CART
-    </a>
 
-    <a
-      href="${BASE}/frontend/orders.html"
-    >
-      ORDERS
-    </a>
+    ${
+      user
+        ? `
 
-    <a
-      href="${BASE}/frontend/profile.html"
-    >
-      PROFILE
-    </a>
+          <a
+            href="${BASE}/frontend/cart.html"
+          >
+            CART
+          </a>
+
+
+          <a
+            href="${BASE}/frontend/orders.html"
+          >
+            ORDERS
+          </a>
+
+
+          <a
+            href="${BASE}/frontend/profile.html"
+          >
+            PROFILE
+          </a>
+
+        `
+        : `
+
+          <a
+            href="${BASE}/frontend/login.html"
+          >
+            LOGIN
+          </a>
+
+        `
+    }
 
   `;
 
@@ -604,11 +689,12 @@ function bottomNav() {
 
 document.addEventListener(
   'DOMContentLoaded',
-  () => {
+  async () => {
 
-    nav();
-
-    bottomNav();
+    await Promise.all([
+      nav(),
+      bottomNav()
+    ]);
 
   }
 );
@@ -638,6 +724,8 @@ window.MC = {
 
   requireLogin,
 
-  updateCartCount
+  updateCartCount,
+
+  logoutUser
 
 };
