@@ -15,7 +15,7 @@
 
   <link
     rel="stylesheet"
-    href="/memora-creations/frontend/css/style.css?v=9"
+    href="/memora-creations/frontend/css/style.css?v=10"
   >
 </head>
 
@@ -97,6 +97,21 @@
           type="submit"
         >
           Save Profile
+        </button>
+
+
+        <!-- LOGOUT BUTTON -->
+
+        <button
+          id="profileLogoutBtn"
+          class="btn danger"
+          type="button"
+          style="
+            width:100%;
+            margin-top:14px;
+          "
+        >
+          Logout
         </button>
 
       </form>
@@ -280,7 +295,7 @@
   <!-- COMMON JS -->
 
   <script
-    src="/memora-creations/frontend/js/app.js?v=9"
+    src="/memora-creations/frontend/js/app.js?v=10"
   ></script>
 
 
@@ -311,6 +326,37 @@
       document.body.appendChild(
         script
       );
+
+
+      const logoutButton =
+        document.getElementById(
+          'profileLogoutBtn'
+        );
+
+
+      if (logoutButton) {
+
+        logoutButton.addEventListener(
+          'click',
+          async () => {
+
+            const confirmLogout =
+              confirm(
+                'Kya aap logout karna chahte hain?'
+              );
+
+
+            if (!confirmLogout) {
+              return;
+            }
+
+
+            await window.MC.logoutUser();
+
+          }
+        );
+
+      }
 
     })();
 
