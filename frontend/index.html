@@ -3,24 +3,32 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
 
   <title>MEMORA CREATIONS</title>
 
   <link
     rel="stylesheet"
-    href="/memora-creations/frontend/css/style.css"
+    href="/memora-creations/frontend/css/style.css?v=4"
   >
 </head>
 
 <body>
 
-  <header id="nav" class="topbar"></header>
+  <header
+    id="nav"
+    class="topbar"
+  ></header>
 
 
   <main class="container">
 
     <!-- HERO -->
+
     <section class="hero">
 
       <span class="pill">
@@ -47,17 +55,23 @@
 
 
     <!-- CATEGORIES -->
+
     <section class="section">
 
       <div class="sectionhead">
 
-        <h2>Categories</h2>
+        <h2>
+          Categories
+        </h2>
 
-        <a href="/memora-creations/frontend/products.html">
+        <a
+          href="/memora-creations/frontend/products.html"
+        >
           Shop all
         </a>
 
       </div>
+
 
       <div
         id="categories"
@@ -68,17 +82,23 @@
 
 
     <!-- ALL PRODUCTS -->
+
     <section class="section">
 
       <div class="sectionhead">
 
-        <h2>All Products</h2>
+        <h2>
+          All Products
+        </h2>
 
-        <a href="/memora-creations/frontend/products.html">
+        <a
+          href="/memora-creations/frontend/products.html"
+        >
           View all
         </a>
 
       </div>
+
 
       <div
         id="allProducts"
@@ -101,21 +121,343 @@
   ></nav>
 
 
-  <script src="/memora-creations/frontend/js/app.js"></script>
+  <script
+    src="/memora-creations/frontend/js/app.js?v=4"
+  ></script>
 
 
   <script>
 
-    const HOME_BASE = '/memora-creations';
+    const HOME_BASE =
+      '/memora-creations';
+
+    let homeProducts = [];
 
 
-    function homeProductCard(product) {
+    /* =========================
+       CLOSE PRODUCT POPUP
+    ========================= */
+
+    function closeHomeProductPopup() {
+
+      document
+        .querySelector(
+          '#homeProductPopup'
+        )
+        ?.remove();
+
+
+      document.body.style.overflow =
+        '';
+
+    }
+
+
+    /* =========================
+       OPEN PRODUCT POPUP
+    ========================= */
+
+    function openHomeProductPopup(
+      product
+    ) {
+
+      closeHomeProductPopup();
+
+
+      const overlay =
+        document.createElement(
+          'div'
+        );
+
+
+      overlay.id =
+        'homeProductPopup';
+
+
+      overlay.className =
+        'product-popup-overlay';
+
+
+      const image =
+        product.images?.[0]?.url ||
+        'https://placehold.co/600x600?text=Memora';
+
+
+      overlay.innerHTML = `
+
+        <div class="product-popup">
+
+          <button
+            class="product-popup-close"
+            type="button"
+            aria-label="Close"
+          >
+            ×
+          </button>
+
+
+          <div
+            class="product-popup-imagebox"
+          >
+
+            <img
+              src="${window.MC.esc(image)}"
+              alt="${window.MC.esc(product.name)}"
+            >
+
+          </div>
+
+
+          <div
+            class="product-popup-info"
+          >
+
+            <span class="pill">
+
+              ${window.MC.esc(
+                product.category?.name ||
+                'Category'
+              )}
+
+            </span>
+
+
+            <h2>
+
+              ${window.MC.esc(
+                product.name || ''
+              )}
+
+            </h2>
+
+
+            <div
+              class="product-popup-price"
+            >
+
+              ${window.MC.money(
+                product.sellingPrice
+              )}
+
+              ${
+                Number(
+                  product.originalPrice
+                ) >
+                Number(
+                  product.sellingPrice
+                )
+
+                  ? `
+                    <span class="old">
+
+                      ${window.MC.money(
+                        product.originalPrice
+                      )}
+
+                    </span>
+                  `
+
+                  : ''
+              }
+
+            </div>
+
+
+            <p class="muted">
+
+              ${window.MC.esc(
+                product.description || ''
+              )}
+
+            </p>
+
+
+            <p>
+
+              ${
+                Number(
+                  product.stock
+                ) > 0
+
+                  ? `✅ In Stock (${Number(product.stock)})`
+
+                  : '❌ Out of Stock'
+              }
+
+            </p>
+
+
+            <div class="field">
+
+              <label>
+                Quantity
+              </label>
+
+              <input
+                class="input home-popup-qty"
+                type="number"
+                min="1"
+                max="${Number(product.stock || 1)}"
+                value="1"
+                ${
+                  Number(product.stock) < 1
+                    ? 'disabled'
+                    : ''
+                }
+              >
+
+            </div>
+
+
+            <div
+              class="product-popup-actions"
+            >
+
+              <button
+                class="btn home-popup-add"
+                type="button"
+                ${
+                  Number(product.stock) < 1
+                    ? 'disabled'
+                    : ''
+                }
+              >
+                Add to Cart
+              </button>
+
+
+              <button
+                class="btn secondary home-popup-order"
+                type="button"
+                ${
+                  Number(product.stock) < 1
+                    ? 'disabled'
+                    : ''
+                }
+              >
+                Order Now
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      `;
+
+
+      document.body.appendChild(
+        overlay
+      );
+
+
+      document.body.style.overflow =
+        'hidden';
+
+
+      overlay
+        .querySelector(
+          '.product-popup-close'
+        )
+        ?.addEventListener(
+          'click',
+          closeHomeProductPopup
+        );
+
+
+      overlay.addEventListener(
+        'click',
+        event => {
+
+          if (
+            event.target === overlay
+          ) {
+
+            closeHomeProductPopup();
+
+          }
+
+        }
+      );
+
+
+      overlay
+        .querySelector(
+          '.home-popup-add'
+        )
+        ?.addEventListener(
+          'click',
+          async () => {
+
+            const qty =
+              Math.max(
+                1,
+                Number(
+                  overlay
+                    .querySelector(
+                      '.home-popup-qty'
+                    )
+                    ?.value || 1
+                )
+              );
+
+
+            await addHomeProductToCart(
+              product._id,
+              qty
+            );
+
+          }
+        );
+
+
+      overlay
+        .querySelector(
+          '.home-popup-order'
+        )
+        ?.addEventListener(
+          'click',
+          () => {
+
+            const qty =
+              Math.max(
+                1,
+                Number(
+                  overlay
+                    .querySelector(
+                      '.home-popup-qty'
+                    )
+                    ?.value || 1
+                )
+              );
+
+
+            location.href =
+              `${HOME_BASE}/frontend/checkout.html?buyNow=${encodeURIComponent(product._id)}&qty=${encodeURIComponent(qty)}`;
+
+          }
+        );
+
+    }
+
+
+    /* =========================
+       PRODUCT CARD
+    ========================= */
+
+    function homeProductCard(
+      product
+    ) {
 
       return `
+
         <article class="card">
 
-          <a
-            href="${HOME_BASE}/frontend/product.html?id=${encodeURIComponent(product._id)}"
+          <button
+            class="product-card-open home-product-open"
+            type="button"
+            data-id="${product._id}"
           >
 
             <img
@@ -127,18 +469,27 @@
               alt="${window.MC.esc(product.name)}"
             >
 
+
             <div class="cardbody">
 
               <span class="pill">
+
                 ${window.MC.esc(
                   product.category?.name ||
                   'Category'
                 )}
+
               </span>
 
+
               <h3>
-                ${window.MC.esc(product.name)}
+
+                ${window.MC.esc(
+                  product.name
+                )}
+
               </h3>
+
 
               <div class="price">
 
@@ -147,14 +498,20 @@
                 )}
 
                 ${
-                  Number(product.originalPrice) >
-                  Number(product.sellingPrice)
+                  Number(
+                    product.originalPrice
+                  ) >
+                  Number(
+                    product.sellingPrice
+                  )
 
                     ? `
                       <span class="old">
+
                         ${window.MC.money(
                           product.originalPrice
                         )}
+
                       </span>
                     `
 
@@ -163,26 +520,35 @@
 
               </div>
 
+
               <p class="muted">
+
                 ${
                   product.stock > 0
                     ? 'In stock'
                     : 'Out of stock'
                 }
+
               </p>
 
             </div>
 
-          </a>
+          </button>
 
 
-          <div class="cardbody actions">
+          <div
+            class="cardbody actions"
+          >
 
             <button
               class="btn home-add-cart"
               type="button"
               data-id="${product._id}"
-              ${product.stock < 1 ? 'disabled' : ''}
+              ${
+                product.stock < 1
+                  ? 'disabled'
+                  : ''
+              }
             >
               Add to Cart
             </button>
@@ -192,33 +558,55 @@
               class="btn secondary home-buy-now"
               type="button"
               data-id="${product._id}"
-              ${product.stock < 1 ? 'disabled' : ''}
+              ${
+                product.stock < 1
+                  ? 'disabled'
+                  : ''
+              }
             >
-              Buy Now
+              Order Now
             </button>
 
           </div>
 
         </article>
+
       `;
 
     }
 
 
-    async function addHomeProductToCart(id) {
+    /* =========================
+       ADD TO CART
+    ========================= */
+
+    async function addHomeProductToCart(
+      id,
+      quantity = 1
+    ) {
 
       try {
 
-        await window.MC.api('/cart', {
+        await window.MC.api(
+          '/cart',
+          {
 
-          method: 'POST',
+            method:
+              'POST',
 
-          body: JSON.stringify({
-            productId: id,
-            quantity: 1
-          })
+            body:
+              JSON.stringify({
 
-        });
+                productId:
+                  id,
+
+                quantity:
+                  quantity
+
+              })
+
+          }
+        );
 
 
         window.MC.toast(
@@ -268,7 +656,13 @@
     }
 
 
-    function buyHomeProductNow(id) {
+    /* =========================
+       ORDER NOW
+    ========================= */
+
+    function buyHomeProductNow(
+      id
+    ) {
 
       location.href =
         `${HOME_BASE}/frontend/checkout.html?buyNow=${encodeURIComponent(id)}&qty=1`;
@@ -276,35 +670,85 @@
     }
 
 
+    /* =========================
+       BIND BUTTONS
+    ========================= */
+
     function bindHomeButtons() {
 
+
       document
-        .querySelectorAll('.home-add-cart')
+        .querySelectorAll(
+          '.home-product-open'
+        )
         .forEach(button => {
 
-          button.onclick = () => {
-            addHomeProductToCart(
-              button.dataset.id
-            );
-          };
+          button.onclick =
+            () => {
+
+              const product =
+                homeProducts.find(
+                  item =>
+                    item._id ===
+                    button.dataset.id
+                );
+
+
+              if (product) {
+
+                openHomeProductPopup(
+                  product
+                );
+
+              }
+
+            };
 
         });
 
 
       document
-        .querySelectorAll('.home-buy-now')
+        .querySelectorAll(
+          '.home-add-cart'
+        )
         .forEach(button => {
 
-          button.onclick = () => {
-            buyHomeProductNow(
-              button.dataset.id
-            );
-          };
+          button.onclick =
+            () => {
+
+              addHomeProductToCart(
+                button.dataset.id,
+                1
+              );
+
+            };
+
+        });
+
+
+      document
+        .querySelectorAll(
+          '.home-buy-now'
+        )
+        .forEach(button => {
+
+          button.onclick =
+            () => {
+
+              buyHomeProductNow(
+                button.dataset.id
+              );
+
+            };
 
         });
 
     }
 
+
+    /* =========================
+       LOAD HOME PAGE
+    ========================= */
 
     async function loadHomePage() {
 
@@ -313,24 +757,28 @@
         const [
           categories,
           products
-        ] = await Promise.all([
+        ] =
+          await Promise.all([
 
-          window.MC.api(
-            '/products/categories'
-          ),
+            window.MC.api(
+              '/products/categories'
+            ),
 
-          window.MC.api(
-            '/products?limit=24'
-          )
+            window.MC.api(
+              '/products?limit=24'
+            )
 
-        ]);
+          ]);
 
 
         /* CATEGORIES */
 
         document
-          .getElementById('categories')
+          .getElementById(
+            'categories'
+          )
           .innerHTML =
+
             (categories.categories || [])
               .map(category => `
 
@@ -338,28 +786,35 @@
                   class="pill"
                   href="${HOME_BASE}/frontend/products.html?category=${encodeURIComponent(category._id)}"
                 >
+
                   ${window.MC.esc(
                     category.name
                   )}
+
                 </a>
 
               `)
               .join('');
 
 
-        /* ALL PRODUCTS */
+        /* PRODUCTS */
 
-        const productList =
+        homeProducts =
           products.products || [];
 
 
         document
-          .getElementById('allProducts')
+          .getElementById(
+            'allProducts'
+          )
           .innerHTML =
-            productList.length
 
-              ? productList
-                  .map(homeProductCard)
+            homeProducts.length
+
+              ? homeProducts
+                  .map(
+                    homeProductCard
+                  )
                   .join('')
 
               : `
@@ -391,10 +846,15 @@
     }
 
 
+    /* =========================
+       START
+    ========================= */
+
     loadHomePage();
 
   </script>
 
 
 </body>
+
 </html>
