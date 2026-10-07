@@ -1,103 +1,240 @@
-const CART_BASE = '/memora-creations';
+const CART_BASE =
+  '/memora-creations';
+
+
+let cartUpdating =
+  false;
+
+
+/* =========================
+   LOAD CART
+========================= */
 
 async function loadCartPage() {
-  const user = await window.MC.requireLogin();
 
-  if (!user) return;
+  const user =
+    await window.MC.requireLogin();
+
+
+  if (!user) {
+    return;
+  }
+
+
+  const itemsBox =
+    window.MC.$(
+      '#cartItems'
+    );
+
+
+  const summaryBox =
+    window.MC.$(
+      '#summary'
+    );
+
+
+  if (
+    !itemsBox ||
+    !summaryBox
+  ) {
+
+    return;
+
+  }
+
 
   try {
-    const data = await window.MC.api('/cart');
 
-    const cart = data.cart;
+    const data =
+      await window.MC.api(
+        '/cart'
+      );
 
-    const itemsBox = window.MC.$('#cartItems');
-    const summaryBox = window.MC.$('#summary');
 
-    itemsBox.innerHTML = cart.items.length
-      ? cart.items.map(item => `
-          <div class="cartrow">
+    const cart =
+      data.cart || {
+        items: [],
+        subtotal: 0,
+        deliveryCharge: 0,
+        grandTotal: 0
+      };
 
-            <img
-              src="${window.MC.esc(
-                item.product.images?.[0]?.url ||
-                'https://placehold.co/120'
-              )}"
-              alt="${window.MC.esc(item.product.name)}"
-            >
 
-            <div>
+    const items =
+      cart.items || [];
 
-              <h3>
-                ${window.MC.esc(item.product.name)}
-              </h3>
 
-              <div>
-                ${window.MC.money(item.product.sellingPrice)}
-              </div>
+    /* =========================
+       ITEMS
+    ========================= */
 
-              <div class="qty">
+    itemsBox.innerHTML =
+      items.length
 
-                <button
-                  class="btn secondary cart-dec"
-                  type="button"
-                  data-id="${item.id}"
-                >
-                  −
-                </button>
+        ? items
+            .map(
+              item => {
 
-                <span>
-                  ${item.quantity}
-                </span>
+                const product =
+                  item.product || {};
 
-                <button
-                  class="btn secondary cart-inc"
-                  type="button"
-                  data-id="${item.id}"
-                  data-stock="${item.product.stock}"
-                >
-                  +
-                </button>
 
-              </div>
+                const stock =
+                  Math.max(
+                    0,
+                    Number(
+                      product.stock || 0
+                    )
+                  );
 
+
+                const quantity =
+                  Math.max(
+                    1,
+                    Number(
+                      item.quantity || 1
+                    )
+                  );
+
+
+                const image =
+                  product.images?.[0]?.url ||
+                  'https://placehold.co/120x120?text=Memora';
+
+
+                return `
+
+                  <div
+                    class="cartrow"
+                  >
+
+                    <img
+                      src="${window.MC.esc(image)}"
+                      alt="${window.MC.esc(product.name || 'Product')}"
+                    >
+
+
+                    <div>
+
+                      <h3>
+
+                        ${window.MC.esc(
+                          product.name ||
+                          'Product'
+                        )}
+
+                      </h3>
+
+
+                      <div>
+
+                        ${window.MC.money(
+                          product.sellingPrice
+                        )}
+
+                      </div>
+
+
+                      <div class="qty">
+
+                        <button
+                          class="btn secondary cart-dec"
+                          type="button"
+                          data-id="${item.id}"
+                          ${
+                            quantity <= 1
+                              ? 'disabled'
+                              : ''
+                          }
+                        >
+                          −
+                        </button>
+
+
+                        <span
+                          class="cart-qty-value"
+                        >
+                          ${quantity}
+                        </span>
+
+
+                        <button
+                          class="btn secondary cart-inc"
+                          type="button"
+                          data-id="${item.id}"
+                          data-stock="${stock}"
+                          ${
+                            stock < 1 ||
+                            quantity >= stock
+                              ? 'disabled'
+                              : ''
+                          }
+                        >
+                          +
+                        </button>
+
+                      </div>
+
+                    </div>
+
+
+                    <div>
+
+                      <b>
+
+                        ${window.MC.money(
+                          item.lineTotal
+                        )}
+
+                      </b>
+
+
+                      <br><br>
+
+
+                      <button
+                        class="btn danger cart-remove"
+                        type="button"
+                        data-id="${item.id}"
+                      >
+                        Remove
+                      </button>
+
+                    </div>
+
+                  </div>
+
+                `;
+
+              }
+            )
+            .join('')
+
+        : `
+
+            <div class="empty">
+              Your cart is empty.
             </div>
 
+          `;
 
-            <div>
 
-              <b>
-                ${window.MC.money(item.lineTotal)}
-              </b>
-
-              <br><br>
-
-              <button
-                class="btn danger cart-remove"
-                type="button"
-                data-id="${item.id}"
-              >
-                Remove
-              </button>
-
-            </div>
-
-          </div>
-        `).join('')
-      : `
-          <div class="empty">
-            Your cart is empty.
-          </div>
-        `;
-
+    /* =========================
+       SUMMARY
+    ========================= */
 
     summaryBox.innerHTML = `
 
       <div class="summaryline">
 
-        <span>Subtotal</span>
+        <span>
+          Subtotal
+        </span>
 
         <b>
-          ${window.MC.money(cart.subtotal)}
+          ${window.MC.money(
+            cart.subtotal
+          )}
         </b>
 
       </div>
@@ -105,21 +242,31 @@ async function loadCartPage() {
 
       <div class="summaryline">
 
-        <span>Delivery</span>
+        <span>
+          Delivery
+        </span>
 
         <b>
-          ${window.MC.money(cart.deliveryCharge)}
+          ${window.MC.money(
+            cart.deliveryCharge
+          )}
         </b>
 
       </div>
 
 
-      <div class="summaryline total">
+      <div
+        class="summaryline total"
+      >
 
-        <span>Total</span>
+        <span>
+          Total
+        </span>
 
         <b>
-          ${window.MC.money(cart.grandTotal)}
+          ${window.MC.money(
+            cart.grandTotal
+          )}
         </b>
 
       </div>
@@ -129,53 +276,123 @@ async function loadCartPage() {
         class="btn"
         id="checkoutBtn"
         type="button"
-        ${cart.items.length ? '' : 'disabled'}
+        ${
+          items.length
+            ? ''
+            : 'disabled'
+        }
       >
         Proceed to Checkout
       </button>
+
     `;
 
 
-    window.MC.$$('.cart-dec').forEach(button => {
-      button.onclick = () =>
-        changeCartQuantity(
-          button.dataset.id,
-          -1
-        );
-    });
+    /* =========================
+       MINUS BUTTON
+    ========================= */
+
+    window.MC
+      .$$(
+        '.cart-dec'
+      )
+      .forEach(
+        button => {
+
+          button.onclick =
+            async () => {
+
+              await changeCartQuantity(
+                button.dataset.id,
+                -1
+              );
+
+            };
+
+        }
+      );
 
 
-    window.MC.$$('.cart-inc').forEach(button => {
-      button.onclick = () =>
-        changeCartQuantity(
-          button.dataset.id,
-          1,
-          Number(button.dataset.stock)
-        );
-    });
+    /* =========================
+       PLUS BUTTON
+    ========================= */
+
+    window.MC
+      .$$(
+        '.cart-inc'
+      )
+      .forEach(
+        button => {
+
+          button.onclick =
+            async () => {
+
+              await changeCartQuantity(
+                button.dataset.id,
+                1,
+                Number(
+                  button.dataset.stock ||
+                  0
+                )
+              );
+
+            };
+
+        }
+      );
 
 
-    window.MC.$$('.cart-remove').forEach(button => {
-      button.onclick = () =>
-        removeCartItem(
-          button.dataset.id
-        );
-    });
+    /* =========================
+       REMOVE BUTTON
+    ========================= */
 
+    window.MC
+      .$$(
+        '.cart-remove'
+      )
+      .forEach(
+        button => {
+
+          button.onclick =
+            async () => {
+
+              await removeCartItem(
+                button.dataset.id
+              );
+
+            };
+
+        }
+      );
+
+
+    /* =========================
+       CHECKOUT BUTTON
+    ========================= */
 
     const checkoutBtn =
-      window.MC.$('#checkoutBtn');
+      window.MC.$(
+        '#checkoutBtn'
+      );
+
 
     if (checkoutBtn) {
-      checkoutBtn.onclick = () => {
-        location.href =
-          CART_BASE +
-          '/frontend/checkout.html';
-      };
+
+      checkoutBtn.onclick =
+        () => {
+
+          location.href =
+            CART_BASE +
+            '/frontend/checkout.html';
+
+        };
+
     }
 
 
-    window.MC.updateCartCount();
+    await window.MC
+      .updateCartCount();
+
 
   } catch (error) {
 
@@ -184,46 +401,88 @@ async function loadCartPage() {
       error
     );
 
+
+    itemsBox.innerHTML = `
+
+      <div class="empty">
+        Cart load nahi ho pa raha hai.
+      </div>
+
+    `;
+
+
+    summaryBox.innerHTML =
+      '';
+
+
     window.MC.toast(
-      error.message || 'Cart load failed.',
+      error.message ||
+      'Cart load failed.',
       'error'
     );
 
   }
+
 }
 
+
+/* =========================
+   CHANGE QUANTITY
+========================= */
 
 async function changeCartQuantity(
   id,
   delta,
-  stock
+  stock = 0
 ) {
 
-  const button =
-    document.querySelector(
-      `[data-id="${id}"]`
-    );
-
-  const quantityBox =
-    button?.parentElement
-      ?.querySelector('span');
-
-  const currentQty =
-    Number(
-      quantityBox?.textContent || 1
-    );
-
-  const newQty =
-    currentQty + delta;
-
-
-  if (newQty < 1) {
+  if (cartUpdating) {
     return;
   }
 
 
+  const button =
+    document.querySelector(
+      `.cart-dec[data-id="${CSS.escape(id)}"], .cart-inc[data-id="${CSS.escape(id)}"]`
+    );
+
+
+  const cartRow =
+    button?.closest(
+      '.cartrow'
+    );
+
+
+  const quantityBox =
+    cartRow?.querySelector(
+      '.cart-qty-value'
+    );
+
+
+  const currentQty =
+    Math.max(
+      1,
+      Number(
+        quantityBox?.textContent ||
+        1
+      )
+    );
+
+
+  const newQty =
+    currentQty +
+    Number(delta || 0);
+
+
+  if (newQty < 1) {
+
+    return;
+
+  }
+
+
   if (
-    stock &&
+    stock > 0 &&
     newQty > stock
   ) {
 
@@ -232,24 +491,40 @@ async function changeCartQuantity(
       'error'
     );
 
+
     return;
+
   }
+
+
+  cartUpdating =
+    true;
 
 
   try {
 
     await window.MC.api(
-      '/cart/' + encodeURIComponent(id),
+      '/cart/' +
+      encodeURIComponent(id),
       {
-        method: 'PUT',
-        body: JSON.stringify({
-          quantity: newQty
-        })
+
+        method:
+          'PUT',
+
+        body:
+          JSON.stringify({
+
+            quantity:
+              newQty
+
+          })
+
       }
     );
 
 
     await loadCartPage();
+
 
   } catch (error) {
 
@@ -259,18 +534,44 @@ async function changeCartQuantity(
       'error'
     );
 
+
+  } finally {
+
+    cartUpdating =
+      false;
+
   }
+
 }
 
 
-async function removeCartItem(id) {
+/* =========================
+   REMOVE ITEM
+========================= */
+
+async function removeCartItem(
+  id
+) {
+
+  if (cartUpdating) {
+    return;
+  }
+
+
+  cartUpdating =
+    true;
+
 
   try {
 
     await window.MC.api(
-      '/cart/' + encodeURIComponent(id),
+      '/cart/' +
+      encodeURIComponent(id),
       {
-        method: 'DELETE'
+
+        method:
+          'DELETE'
+
       }
     );
 
@@ -283,6 +584,7 @@ async function removeCartItem(id) {
 
     await loadCartPage();
 
+
   } catch (error) {
 
     window.MC.toast(
@@ -291,11 +593,26 @@ async function removeCartItem(id) {
       'error'
     );
 
+
+  } finally {
+
+    cartUpdating =
+      false;
+
   }
+
 }
 
 
-if (window.MC.$('#cartItems')) {
+/* =========================
+   START
+========================= */
+
+if (
+  window.MC.$(
+    '#cartItems'
+  )
+) {
 
   loadCartPage();
 
