@@ -1,5 +1,34 @@
 let profileUser = null;
 
+let profileSaving = false;
+let addressSaving = false;
+
+
+/* =========================
+   HELPERS
+========================= */
+
+function isValidMobile(value) {
+
+  return /^[6-9][0-9]{9}$/
+    .test(
+      String(value || '')
+        .trim()
+    );
+
+}
+
+
+function isValidPin(value) {
+
+  return /^[0-9]{6}$/
+    .test(
+      String(value || '')
+        .trim()
+    );
+
+}
+
 
 /* =========================
    FILL PROFILE
@@ -7,156 +36,273 @@ let profileUser = null;
 
 function fillProfile(user) {
 
-  if (!user) return;
+  if (!user) {
+    return;
+  }
 
-  window.MC.$('#fullName').value =
-    user.fullName || '';
 
-  window.MC.$('#mobile').value =
-    user.mobile || '';
+  const fullNameInput =
+    window.MC.$(
+      '#fullName'
+    );
 
-  window.MC.$('#email').value =
-    user.email || '';
+
+  const mobileInput =
+    window.MC.$(
+      '#mobile'
+    );
+
+
+  const emailInput =
+    window.MC.$(
+      '#email'
+    );
+
+
+  if (fullNameInput) {
+
+    fullNameInput.value =
+      user.fullName || '';
+
+  }
+
+
+  if (mobileInput) {
+
+    mobileInput.value =
+      user.mobile || '';
+
+  }
+
+
+  if (emailInput) {
+
+    emailInput.value =
+      user.email || '';
+
+  }
 
 
   const addresses =
-    user.addresses || [];
+    Array.isArray(
+      user.addresses
+    )
+
+      ? user.addresses
+
+      : [];
 
 
-  renderAddresses(addresses);
+  renderAddresses(
+    addresses
+  );
 
-
-  /* DEFAULT ADDRESS AUTO FILL */
 
   const defaultAddress =
     addresses.find(
-      address => address.isDefault
+      address =>
+        address.isDefault
     ) ||
     addresses[0];
 
 
+  const form =
+    window.MC.$(
+      '#addressForm'
+    );
+
+
+  if (!form) {
+    return;
+  }
+
+
+  const labelInput =
+    form.querySelector(
+      '[name="label"]'
+    );
+
+
+  const addressNameInput =
+    form.querySelector(
+      '[name="fullName"]'
+    );
+
+
+  const addressMobileInput =
+    form.querySelector(
+      '[name="mobile"]'
+    );
+
+
+  const addressLineInput =
+    form.querySelector(
+      '[name="addressLine"]'
+    );
+
+
+  const pinCodeInput =
+    form.querySelector(
+      '[name="pinCode"]'
+    );
+
+
+  const cityInput =
+    form.querySelector(
+      '[name="city"]'
+    );
+
+
+  const stateInput =
+    form.querySelector(
+      '[name="state"]'
+    );
+
+
+  const defaultCheckbox =
+    window.MC.$(
+      '#isDefault'
+    );
+
+
   if (defaultAddress) {
 
-    const form =
-      window.MC.$('#addressForm');
+    if (labelInput) {
 
-    if (!form) return;
+      labelInput.value =
+        defaultAddress.label ||
+        'Home';
 
-
-    const label =
-      form.querySelector(
-        '[name="label"]'
-      );
-
-    const fullName =
-      form.querySelector(
-        '[name="fullName"]'
-      );
-
-    const mobile =
-      form.querySelector(
-        '[name="mobile"]'
-      );
-
-    const addressLine =
-      form.querySelector(
-        '[name="addressLine"]'
-      );
-
-    const pinCode =
-      form.querySelector(
-        '[name="pinCode"]'
-      );
-
-    const city =
-      form.querySelector(
-        '[name="city"]'
-      );
-
-    const state =
-      form.querySelector(
-        '[name="state"]'
-      );
-
-
-    if (label) {
-      label.value =
-        defaultAddress.label || 'Home';
     }
 
-    if (fullName) {
-      fullName.value =
+
+    if (addressNameInput) {
+
+      addressNameInput.value =
         defaultAddress.fullName ||
         user.fullName ||
         '';
+
     }
 
-    if (mobile) {
-      mobile.value =
+
+    if (addressMobileInput) {
+
+      addressMobileInput.value =
         defaultAddress.mobile ||
         user.mobile ||
         '';
+
     }
 
-    if (addressLine) {
-      addressLine.value =
-        defaultAddress.addressLine || '';
+
+    if (addressLineInput) {
+
+      addressLineInput.value =
+        defaultAddress.addressLine ||
+        '';
+
     }
 
-    if (pinCode) {
-      pinCode.value =
-        defaultAddress.pinCode || '';
+
+    if (pinCodeInput) {
+
+      pinCodeInput.value =
+        defaultAddress.pinCode ||
+        '';
+
     }
 
-    if (city) {
-      city.value =
-        defaultAddress.city || '';
+
+    if (cityInput) {
+
+      cityInput.value =
+        defaultAddress.city ||
+        '';
+
     }
 
-    if (state) {
-      state.value =
-        defaultAddress.state || '';
+
+    if (stateInput) {
+
+      stateInput.value =
+        defaultAddress.state ||
+        '';
+
     }
 
-    const defaultCheckbox =
-      window.MC.$('#isDefault');
 
     if (defaultCheckbox) {
+
       defaultCheckbox.checked =
         Boolean(
           defaultAddress.isDefault
         );
+
     }
 
   } else {
 
-    /* IF ADDRESS NOT FOUND */
+    if (labelInput) {
 
-    const form =
-      window.MC.$('#addressForm');
+      labelInput.value =
+        '';
 
-    if (form) {
-
-      const nameInput =
-        form.querySelector(
-          '[name="fullName"]'
-        );
-
-      const mobileInput =
-        form.querySelector(
-          '[name="mobile"]'
-        );
+    }
 
 
-      if (nameInput) {
-        nameInput.value =
-          user.fullName || '';
-      }
+    if (addressNameInput) {
 
-      if (mobileInput) {
-        mobileInput.value =
-          user.mobile || '';
-      }
+      addressNameInput.value =
+        user.fullName || '';
+
+    }
+
+
+    if (addressMobileInput) {
+
+      addressMobileInput.value =
+        user.mobile || '';
+
+    }
+
+
+    if (addressLineInput) {
+
+      addressLineInput.value =
+        '';
+
+    }
+
+
+    if (pinCodeInput) {
+
+      pinCodeInput.value =
+        '';
+
+    }
+
+
+    if (cityInput) {
+
+      cityInput.value =
+        '';
+
+    }
+
+
+    if (stateInput) {
+
+      stateInput.value =
+        '';
+
+    }
+
+
+    if (defaultCheckbox) {
+
+      defaultCheckbox.checked =
+        false;
 
     }
 
@@ -171,23 +317,18 @@ function fillProfile(user) {
 
 async function loadProfilePage() {
 
-  const data =
-    await window.MC.api(
-      '/auth/me'
-    );
+  const user =
+    await window.MC
+      .requireLogin();
+
+
+  if (!user) {
+    return;
+  }
 
 
   profileUser =
-    data.user;
-
-
-  if (!profileUser) {
-
-    location.href =
-      '/memora-creations/frontend/login.html';
-
-    return;
-  }
+    user;
 
 
   fillProfile(
@@ -201,164 +342,221 @@ async function loadProfilePage() {
    RENDER ADDRESSES
 ========================= */
 
-function renderAddresses(addresses) {
+function renderAddresses(
+  addresses
+) {
 
   const box =
-    window.MC.$('#addresses');
+    window.MC.$(
+      '#addresses'
+    );
 
 
-  if (!box) return;
+  if (!box) {
+    return;
+  }
 
 
   box.innerHTML =
     addresses.length
 
-      ? addresses.map(address => `
+      ? addresses
+          .map(
+            address => `
 
-          <div
-            class="card"
-            style="margin-bottom:12px;"
-          >
+              <div
+                class="card"
+                style="
+                  margin-bottom:12px;
+                "
+              >
 
-            <div class="cardbody">
+                <div
+                  class="cardbody"
+                >
 
-              <div>
+                  <div>
 
-                <b>
-                  ${window.MC.esc(
-                    address.label || 'Address'
-                  )}
-                </b>
+                    <b>
 
-                ${
-                  address.isDefault
-                    ? `
-                      <span class="pill">
-                        Default
-                      </span>
-                    `
-                    : ''
-                }
+                      ${window.MC.esc(
+                        address.label ||
+                        'Address'
+                      )}
+
+                    </b>
+
+
+                    ${
+                      address.isDefault
+
+                        ? `
+
+                          <span class="pill">
+                            Default
+                          </span>
+
+                        `
+
+                        : ''
+                    }
+
+                  </div>
+
+
+                  <p>
+
+                    <b>
+
+                      ${window.MC.esc(
+                        address.fullName ||
+                        ''
+                      )}
+
+                    </b>
+
+                    <br>
+
+                    ${window.MC.esc(
+                      address.addressLine ||
+                      ''
+                    )}
+
+                    <br>
+
+                    ${window.MC.esc(
+                      address.city ||
+                      ''
+                    )}
+
+                    ${
+                      address.city &&
+                      address.state
+
+                        ? ', '
+
+                        : ''
+                    }
+
+                    ${window.MC.esc(
+                      address.state ||
+                      ''
+                    )}
+
+                    <br>
+
+                    PIN:
+                    ${window.MC.esc(
+                      address.pinCode ||
+                      ''
+                    )}
+
+                    <br>
+
+                    Mobile:
+                    ${window.MC.esc(
+                      address.mobile ||
+                      ''
+                    )}
+
+                  </p>
+
+
+                  <div
+                    class="actions"
+                  >
+
+                    <button
+                      class="btn secondary edit-address"
+                      type="button"
+                      data-id="${address._id}"
+                    >
+                      Edit
+                    </button>
+
+
+                    <button
+                      class="btn danger delete-address"
+                      type="button"
+                      data-id="${address._id}"
+                    >
+                      Delete
+                    </button>
+
+                  </div>
+
+                </div>
 
               </div>
 
-
-              <p>
-
-                <b>
-                  ${window.MC.esc(
-                    address.fullName
-                  )}
-                </b>
-
-                <br>
-
-                ${window.MC.esc(
-                  address.addressLine
-                )}
-
-                <br>
-
-                ${window.MC.esc(
-                  address.city || ''
-                )}
-
-                ${
-                  address.city &&
-                  address.state
-                    ? ', '
-                    : ''
-                }
-
-                ${window.MC.esc(
-                  address.state || ''
-                )}
-
-                <br>
-
-                PIN:
-                ${window.MC.esc(
-                  address.pinCode
-                )}
-
-                <br>
-
-                Mobile:
-                ${window.MC.esc(
-                  address.mobile
-                )}
-
-              </p>
-
-
-              <div class="actions">
-
-                <button
-                  class="btn secondary edit-address"
-                  type="button"
-                  data-id="${address._id}"
-                >
-                  Edit
-                </button>
-
-                <button
-                  class="btn danger delete-address"
-                  type="button"
-                  data-id="${address._id}"
-                >
-                  Delete
-                </button>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        `).join('')
+            `
+          )
+          .join('')
 
       : `
+
           <div class="empty">
             No saved addresses.
           </div>
+
         `;
 
 
   window.MC
-    .$$('.edit-address')
-    .forEach(button => {
+    .$$(
+      '.edit-address'
+    )
+    .forEach(
+      button => {
 
-      button.onclick = () => {
+        button.onclick =
+          async () => {
 
-        const address =
-          addresses.find(
-            item =>
-              String(item._id) ===
-              String(button.dataset.id)
-          );
+            const address =
+              addresses.find(
+                item =>
+                  String(
+                    item._id
+                  ) ===
+                  String(
+                    button.dataset.id
+                  )
+              );
 
-        if (address) {
-          editAddress(address);
-        }
 
-      };
+            if (address) {
 
-    });
+              await editAddress(
+                address
+              );
+
+            }
+
+          };
+
+      }
+    );
 
 
   window.MC
-    .$$('.delete-address')
-    .forEach(button => {
+    .$$(
+      '.delete-address'
+    )
+    .forEach(
+      button => {
 
-      button.onclick = () => {
+        button.onclick =
+          async () => {
 
-        deleteAddress(
-          button.dataset.id
-        );
+            await deleteAddress(
+              button.dataset.id,
+              button
+            );
 
-      };
+          };
 
-    });
+      }
+    );
 
 }
 
@@ -367,12 +565,81 @@ function renderAddresses(addresses) {
    SAVE PROFILE
 ========================= */
 
-window.MC.$('#profileForm')
-  ?.addEventListener(
+const profileForm =
+  window.MC.$(
+    '#profileForm'
+  );
+
+
+if (profileForm) {
+
+  profileForm.addEventListener(
     'submit',
     async event => {
 
       event.preventDefault();
+
+
+      if (profileSaving) {
+        return;
+      }
+
+
+      const submitButton =
+        event.currentTarget
+          .querySelector(
+            'button[type="submit"]'
+          );
+
+
+      const oldText =
+        submitButton
+          ?.textContent ||
+        'Save Profile';
+
+
+      const fullName =
+        window.MC
+          .$('#fullName')
+          ?.value
+          .trim() ||
+        '';
+
+
+      const email =
+        window.MC
+          .$('#email')
+          ?.value
+          .trim() ||
+        '';
+
+
+      if (!fullName) {
+
+        window.MC.toast(
+          'Full Name required hai.',
+          'error'
+        );
+
+        return;
+
+      }
+
+
+      profileSaving =
+        true;
+
+
+      if (submitButton) {
+
+        submitButton.disabled =
+          true;
+
+
+        submitButton.textContent =
+          'Saving...';
+
+      }
 
 
       try {
@@ -380,23 +647,17 @@ window.MC.$('#profileForm')
         await window.MC.api(
           '/profile',
           {
-            method: 'PUT',
 
-            body: JSON.stringify({
+            method:
+              'PUT',
 
-              fullName:
-                window.MC
-                  .$('#fullName')
-                  .value
-                  .trim(),
+            body:
+              JSON.stringify({
 
-              email:
-                window.MC
-                  .$('#email')
-                  .value
-                  .trim()
+                fullName,
+                email
 
-            })
+              })
 
           }
         );
@@ -419,36 +680,198 @@ window.MC.$('#profileForm')
           'error'
         );
 
+
+      } finally {
+
+        profileSaving =
+          false;
+
+
+        if (submitButton) {
+
+          submitButton.disabled =
+            false;
+
+
+          submitButton.textContent =
+            oldText;
+
+        }
+
       }
 
     }
   );
+
+}
 
 
 /* =========================
    ADD ADDRESS
 ========================= */
 
-window.MC.$('#addressForm')
-  ?.addEventListener(
+const addressForm =
+  window.MC.$(
+    '#addressForm'
+  );
+
+
+if (addressForm) {
+
+  addressForm.addEventListener(
     'submit',
     async event => {
 
       event.preventDefault();
 
 
+      if (addressSaving) {
+        return;
+      }
+
+
+      const form =
+        event.currentTarget;
+
+
+      const submitButton =
+        form.querySelector(
+          'button[type="submit"]'
+        );
+
+
+      const oldText =
+        submitButton
+          ?.textContent ||
+        'Save Address';
+
+
       const body =
         Object.fromEntries(
           new FormData(
-            event.currentTarget
+            form
           )
         );
 
 
+      body.fullName =
+        String(
+          body.fullName || ''
+        )
+          .trim();
+
+
+      body.mobile =
+        String(
+          body.mobile || ''
+        )
+          .trim();
+
+
+      body.addressLine =
+        String(
+          body.addressLine || ''
+        )
+          .trim();
+
+
+      body.pinCode =
+        String(
+          body.pinCode || ''
+        )
+          .trim();
+
+
+      body.city =
+        String(
+          body.city || ''
+        )
+          .trim();
+
+
+      body.state =
+        String(
+          body.state || ''
+        )
+          .trim();
+
+
+      body.label =
+        String(
+          body.label || ''
+        )
+          .trim();
+
+
       body.isDefault =
-        window.MC
-          .$('#isDefault')
-          .checked;
+        Boolean(
+          window.MC
+            .$('#isDefault')
+            ?.checked
+        );
+
+
+      if (
+        !body.fullName ||
+        !body.addressLine
+      ) {
+
+        window.MC.toast(
+          'Name aur address required hai.',
+          'error'
+        );
+
+        return;
+
+      }
+
+
+      if (
+        !isValidMobile(
+          body.mobile
+        )
+      ) {
+
+        window.MC.toast(
+          'Valid 10 digit mobile number dalo.',
+          'error'
+        );
+
+        return;
+
+      }
+
+
+      if (
+        !isValidPin(
+          body.pinCode
+        )
+      ) {
+
+        window.MC.toast(
+          'Valid 6 digit PIN Code dalo.',
+          'error'
+        );
+
+        return;
+
+      }
+
+
+      addressSaving =
+        true;
+
+
+      if (submitButton) {
+
+        submitButton.disabled =
+          true;
+
+
+        submitButton.textContent =
+          'Saving...';
+
+      }
 
 
       try {
@@ -456,9 +879,15 @@ window.MC.$('#addressForm')
         await window.MC.api(
           '/profile/addresses',
           {
-            method: 'POST',
+
+            method:
+              'POST',
+
             body:
-              JSON.stringify(body)
+              JSON.stringify(
+                body
+              )
+
           }
         );
 
@@ -467,6 +896,9 @@ window.MC.$('#addressForm')
           'Address saved successfully.',
           'success'
         );
+
+
+        form.reset();
 
 
         await refreshProfile();
@@ -480,79 +912,175 @@ window.MC.$('#addressForm')
           'error'
         );
 
+
+      } finally {
+
+        addressSaving =
+          false;
+
+
+        if (submitButton) {
+
+          submitButton.disabled =
+            false;
+
+
+          submitButton.textContent =
+            oldText;
+
+        }
+
       }
 
     }
   );
+
+}
 
 
 /* =========================
    EDIT ADDRESS
 ========================= */
 
-async function editAddress(address) {
+async function editAddress(
+  address
+) {
 
   const label =
     prompt(
       'Label',
-      address.label || 'Home'
+      address.label ||
+      'Home'
     );
 
-  if (label === null) return;
+
+  if (label === null) {
+    return;
+  }
 
 
   const fullName =
     prompt(
       'Full Name',
-      address.fullName || ''
+      address.fullName ||
+      ''
     );
 
-  if (fullName === null) return;
+
+  if (fullName === null) {
+    return;
+  }
 
 
   const mobile =
     prompt(
       'Mobile',
-      address.mobile || ''
+      address.mobile ||
+      ''
     );
 
-  if (mobile === null) return;
+
+  if (mobile === null) {
+    return;
+  }
 
 
   const addressLine =
     prompt(
       'Address',
-      address.addressLine || ''
+      address.addressLine ||
+      ''
     );
 
-  if (addressLine === null) return;
+
+  if (addressLine === null) {
+    return;
+  }
 
 
   const pinCode =
     prompt(
       'PIN Code',
-      address.pinCode || ''
+      address.pinCode ||
+      ''
     );
 
-  if (pinCode === null) return;
+
+  if (pinCode === null) {
+    return;
+  }
 
 
   const city =
     prompt(
       'City',
-      address.city || ''
+      address.city ||
+      ''
     );
 
-  if (city === null) return;
+
+  if (city === null) {
+    return;
+  }
 
 
   const state =
     prompt(
       'State',
-      address.state || ''
+      address.state ||
+      ''
     );
 
-  if (state === null) return;
+
+  if (state === null) {
+    return;
+  }
+
+
+  const cleanMobile =
+    String(
+      mobile
+    )
+      .trim();
+
+
+  const cleanPin =
+    String(
+      pinCode
+    )
+      .trim();
+
+
+  if (
+    !isValidMobile(
+      cleanMobile
+    )
+  ) {
+
+    window.MC.toast(
+      'Valid 10 digit mobile number dalo.',
+      'error'
+    );
+
+    return;
+
+  }
+
+
+  if (
+    !isValidPin(
+      cleanPin
+    )
+  ) {
+
+    window.MC.toast(
+      'Valid 6 digit PIN Code dalo.',
+      'error'
+    );
+
+    return;
+
+  }
 
 
   const isDefault =
@@ -569,18 +1097,40 @@ async function editAddress(address) {
         address._id
       ),
       {
-        method: 'PUT',
 
-        body: JSON.stringify({
-          label,
-          fullName,
-          mobile,
-          addressLine,
-          pinCode,
-          city,
-          state,
-          isDefault
-        })
+        method:
+          'PUT',
+
+        body:
+          JSON.stringify({
+
+            label:
+              String(label).trim(),
+
+            fullName:
+              String(fullName).trim(),
+
+            mobile:
+              cleanMobile,
+
+            addressLine:
+              String(
+                addressLine
+              ).trim(),
+
+            pinCode:
+              cleanPin,
+
+            city:
+              String(city).trim(),
+
+            state:
+              String(state).trim(),
+
+            isDefault
+
+          })
+
       }
     );
 
@@ -611,7 +1161,10 @@ async function editAddress(address) {
    DELETE ADDRESS
 ========================= */
 
-async function deleteAddress(id) {
+async function deleteAddress(
+  id,
+  button = null
+) {
 
   const confirmed =
     confirm(
@@ -619,7 +1172,27 @@ async function deleteAddress(id) {
     );
 
 
-  if (!confirmed) return;
+  if (!confirmed) {
+    return;
+  }
+
+
+  const oldText =
+    button
+      ?.textContent ||
+    'Delete';
+
+
+  if (button) {
+
+    button.disabled =
+      true;
+
+
+    button.textContent =
+      'Deleting...';
+
+  }
 
 
   try {
@@ -628,7 +1201,10 @@ async function deleteAddress(id) {
       '/profile/addresses/' +
       encodeURIComponent(id),
       {
-        method: 'DELETE'
+
+        method:
+          'DELETE'
+
       }
     );
 
@@ -650,13 +1226,25 @@ async function deleteAddress(id) {
       'error'
     );
 
+
+    if (button) {
+
+      button.disabled =
+        false;
+
+
+      button.textContent =
+        oldText;
+
+    }
+
   }
 
 }
 
 
 /* =========================
-   REFRESH
+   REFRESH PROFILE
 ========================= */
 
 async function refreshProfile() {
@@ -668,7 +1256,17 @@ async function refreshProfile() {
 
 
   profileUser =
-    data.user;
+    data.user || null;
+
+
+  if (!profileUser) {
+
+    location.href =
+      '/memora-creations/frontend/login.html';
+
+    return;
+
+  }
 
 
   fillProfile(
@@ -682,20 +1280,21 @@ async function refreshProfile() {
    START
 ========================= */
 
-loadProfilePage().catch(
-  error => {
+loadProfilePage()
+  .catch(
+    error => {
 
-    console.error(
-      'Profile load error:',
-      error
-    );
+      console.error(
+        'Profile load error:',
+        error
+      );
 
 
-    window.MC.toast(
-      error.message ||
-      'Profile load failed.',
-      'error'
-    );
+      window.MC.toast(
+        error.message ||
+        'Profile load failed.',
+        'error'
+      );
 
-  }
-);
+    }
+  );
