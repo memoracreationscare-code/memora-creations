@@ -36,15 +36,16 @@ function printShippingLabel(order) {
       ? `COD ₹${Number(order.grandTotal || 0).toLocaleString('en-IN')}`
       : 'PREPAID';
 
-  const products = (order.items || [])
-    .map((item, index) => `
-      <tr>
-        <td>${index + 1}</td>
-        <td>${window.MC.esc(item.name || '')}</td>
-        <td>${Number(item.quantity || 0)}</td>
-      </tr>
-    `)
-    .join('');
+  const products =
+    (order.items || [])
+      .map((item, index) => `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${window.MC.esc(item.name || '')}</td>
+          <td>${Number(item.quantity || 0)}</td>
+        </tr>
+      `)
+      .join('');
 
   const w = window.open(
     '',
@@ -62,11 +63,9 @@ function printShippingLabel(order) {
 
   w.document.write(`
     <!doctype html>
-
     <html>
 
     <head>
-
       <meta charset="utf-8">
 
       <title>
@@ -163,7 +162,6 @@ function printShippingLabel(order) {
         }
 
       </style>
-
     </head>
 
     <body>
@@ -268,12 +266,16 @@ function printShippingLabel(order) {
         <div class="section">
 
           Payment:
-          <b>${window.MC.esc(order.paymentMethod || '')}</b>
+          <b>
+            ${window.MC.esc(order.paymentMethod || '')}
+          </b>
 
           <br>
 
           Payment Status:
-          <b>${window.MC.esc(order.paymentStatus || '')}</b>
+          <b>
+            ${window.MC.esc(order.paymentStatus || '')}
+          </b>
 
           <br><br>
 
@@ -293,6 +295,7 @@ function printShippingLabel(order) {
       <\/script>
 
     </body>
+
     </html>
   `);
 
@@ -317,11 +320,9 @@ function shipmentFormHtml(order) {
       </h3>
 
       <p class="mini">
-        Customer name, mobile, address, PIN, products,
-        payment and order details automatic rahenge.
-        Sirf package ka weight aur size bharo.
+        Customer, address, PIN, products aur payment details
+        automatic rahengi. Sirf package ka weight aur size bharo.
       </p>
-
 
       <form
         class="shipment-form"
@@ -446,7 +447,7 @@ function shipmentFormHtml(order) {
             type="submit"
             disabled
           >
-            Create Shipment
+            Create Shipment + AWB
           </button>
 
         </div>
@@ -483,39 +484,32 @@ async function checkCourierRates(
     return;
   }
 
-
   const result =
     form.querySelector(
       '.courier-results'
     );
-
 
   const checkButton =
     form.querySelector(
       '.check-couriers'
     );
 
-
   const createButton =
     form.querySelector(
       '.create-shipment'
     );
-
 
   const body =
     Object.fromEntries(
       new FormData(form)
     );
 
-
   checkButton.disabled = true;
 
   checkButton.textContent =
     'Checking Couriers...';
 
-
   createButton.disabled = true;
-
 
   result.innerHTML =
     'Shiprocket se courier rates check ho rahe hain...';
@@ -550,7 +544,7 @@ async function checkCourierRates(
 
       result.innerHTML = `
         <div class="message error">
-          ❌ Is PIN code ke liye abhi koi courier available nahi mila.
+          ❌ Is route ke liye koi courier available nahi mila.
         </div>
       `;
 
@@ -604,6 +598,7 @@ async function checkCourierRates(
                   ' days'
                 : ''
             );
+
 
           return `
 
@@ -732,7 +727,7 @@ async function checkCourierRates(
 
 
 /* =========================
-   CREATE SHIPMENT
+   CREATE SHIPMENT + AWB
 ========================= */
 
 async function submitShipmentForm(
@@ -763,6 +758,28 @@ async function submitShipmentForm(
     );
 
 
+  if (!body.courierCompanyId) {
+
+    window.MC.toast(
+      'Please select a courier first.',
+      'error'
+    );
+
+    return;
+  }
+
+
+  const confirmed =
+    confirm(
+      'Create real Shiprocket shipment and generate AWB?'
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
   submitButton.disabled = true;
 
   submitButton.textContent =
@@ -770,7 +787,7 @@ async function submitShipmentForm(
 
 
   result.innerHTML =
-    'Connecting to Shiprocket...';
+    'Creating shipment and generating AWB...';
 
 
   try {
@@ -790,14 +807,18 @@ async function submitShipmentForm(
 
 
     const sr =
-      data.shiprocket || {};
+      data.shiprocketOrder || {};
+
+
+    const awb =
+      data.awb || {};
 
 
     result.innerHTML = `
 
       <div class="message success">
 
-        ✅ Shiprocket order created successfully.
+        ✅ Shipment created successfully.
 
         <br><br>
 
@@ -822,12 +843,43 @@ async function submitShipmentForm(
         }
 
         ${
-          sr.status
+          awb.courierName
             ? `
-              <b>Status:</b>
-              ${window.MC.esc(sr.status)}
+              <b>Courier:</b>
+              ${window.MC.esc(
+                awb.courierName
+              )}
+              <br>
             `
             : ''
+        }
+
+        ${
+          awb.awbCode
+            ? `
+              <b>AWB / Tracking Number:</b>
+              ${window.MC.esc(
+                awb.awbCode
+              )}
+              <br>
+            `
+            : ''
+        }
+
+        <br>
+
+        ${
+          awb.awbCode
+            ? `
+              <b>
+                ✅ Tracking number generated successfully.
+              </b>
+            `
+            : `
+              <b>
+                ⚠️ Shipment created but AWB number was not returned.
+              </b>
+            `
         }
 
       </div>
@@ -836,7 +888,9 @@ async function submitShipmentForm(
 
 
     window.MC.toast(
-      'Shiprocket order created.',
+      awb.awbCode
+        ? 'Shipment and AWB created successfully.'
+        : 'Shipment created.',
       'success'
     );
 
@@ -870,7 +924,7 @@ async function submitShipmentForm(
     submitButton.disabled = false;
 
     submitButton.textContent =
-      'Create Shipment';
+      'Create Shipment + AWB';
 
   }
 
