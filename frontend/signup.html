@@ -3,13 +3,19 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Create Account - MEMORA CREATIONS</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>
+    Create Account - MEMORA CREATIONS
+  </title>
 
   <link
     rel="stylesheet"
-    href="/memora-creations/frontend/css/style.css"
+    href="/memora-creations/frontend/css/style.css?v=9"
   >
 </head>
 
@@ -17,45 +23,74 @@
 
   <main class="container">
 
-    <form id="signupForm" class="form">
+    <form
+      id="signupForm"
+      class="form"
+    >
 
-      <h1>Create Account</h1>
+      <h1>
+        Create Account
+      </h1>
+
 
       <div class="field">
-        <label>Full Name *</label>
+
+        <label>
+          Full Name *
+        </label>
+
         <input
           class="input"
           name="fullName"
           required
           autocomplete="name"
         >
+
       </div>
 
+
       <div class="field">
-        <label>Mobile Number *</label>
+
+        <label>
+          Mobile Number *
+        </label>
+
         <input
           class="input"
           name="mobile"
+          type="tel"
           required
           inputmode="numeric"
           pattern="[6-9][0-9]{9}"
           maxlength="10"
           autocomplete="tel"
         >
+
       </div>
 
+
       <div class="field">
-        <label>Email</label>
+
+        <label>
+          Email
+        </label>
+
         <input
           class="input"
           name="email"
           type="email"
           autocomplete="email"
         >
+
       </div>
 
+
       <div class="field">
-        <label>Password *</label>
+
+        <label>
+          Password *
+        </label>
+
         <input
           class="input"
           name="password"
@@ -64,20 +99,32 @@
           required
           autocomplete="new-password"
         >
+
       </div>
 
+
       <div class="field">
-        <label>Address *</label>
+
+        <label>
+          Address *
+        </label>
+
         <textarea
           class="input"
           name="addressLine"
           required
           autocomplete="street-address"
         ></textarea>
+
       </div>
 
+
       <div class="field">
-        <label>PIN Code *</label>
+
+        <label>
+          PIN Code *
+        </label>
+
         <input
           class="input"
           name="pinCode"
@@ -87,25 +134,39 @@
           maxlength="6"
           autocomplete="postal-code"
         >
+
       </div>
 
+
       <div class="field">
-        <label>City</label>
+
+        <label>
+          City
+        </label>
+
         <input
           class="input"
           name="city"
           autocomplete="address-level2"
         >
+
       </div>
 
+
       <div class="field">
-        <label>State</label>
+
+        <label>
+          State
+        </label>
+
         <input
           class="input"
           name="state"
           autocomplete="address-level1"
         >
+
       </div>
+
 
       <button
         class="btn"
@@ -114,18 +175,52 @@
         Create Account
       </button>
 
+
       <p>
-        <a href="/memora-creations/frontend/login.html">
+
+        <a
+          href="/memora-creations/frontend/login.html"
+        >
           Already have an account?
         </a>
+
       </p>
 
     </form>
 
   </main>
 
-  <script src="/memora-creations/frontend/js/app.js"></script>
-  <script src="/memora-creations/frontend/js/auth.js"></script>
+
+  <script
+    src="/memora-creations/frontend/js/app.js?v=9"
+  ></script>
+
+
+  <script
+    src="/memora-creations/frontend/js/auth.js?v=9"
+  ></script>
+
+
+  <script>
+
+    (async function redirectLoggedInUser() {
+
+      const user =
+        await window.MC.currentUser();
+
+
+      if (!user) {
+        return;
+      }
+
+
+      location.href =
+        '/memora-creations/frontend/index.html';
+
+    })();
+
+  </script>
 
 </body>
+
 </html>
