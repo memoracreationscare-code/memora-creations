@@ -495,8 +495,6 @@ async function nav() {
   `;
 
 
-  /* SEARCH */
-
   const searchForm =
     $('#globalSearch');
 
@@ -532,8 +530,6 @@ async function nav() {
   }
 
 
-  /* LOGOUT */
-
   const logoutButton =
     $('#logoutBtn');
 
@@ -547,8 +543,6 @@ async function nav() {
 
   }
 
-
-  /* CART COUNT */
 
   if (user) {
 
@@ -626,19 +620,116 @@ async function bottomNav() {
     await currentUser();
 
 
+  document.body.classList.add(
+    'has-bottomnav'
+  );
+
+
+  const path =
+    location.pathname
+      .toLowerCase();
+
+
+  const active =
+    page =>
+      path.includes(page);
+
+
   el.innerHTML = `
 
     <a
       href="${BASE}/frontend/index.html"
+      class="${
+        active(
+          '/frontend/index.html'
+        )
+          ? 'active'
+          : ''
+      }"
     >
-      HOME
+
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path
+          d="M3 10.5L12 3l9 7.5"
+        ></path>
+
+        <path
+          d="M5 9.5V20h14V9.5"
+        ></path>
+      </svg>
+
+      <span>
+        Home
+      </span>
+
     </a>
 
 
     <a
       href="${BASE}/frontend/products.html"
+      class="${
+        active(
+          '/frontend/products.html'
+        )
+          ? 'active'
+          : ''
+      }"
     >
-      PRODUCTS
+
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+
+        <rect
+          x="3"
+          y="3"
+          width="7"
+          height="7"
+          rx="1"
+        ></rect>
+
+        <rect
+          x="14"
+          y="3"
+          width="7"
+          height="7"
+          rx="1"
+        ></rect>
+
+        <rect
+          x="3"
+          y="14"
+          width="7"
+          height="7"
+          rx="1"
+        ></rect>
+
+        <rect
+          x="14"
+          y="14"
+          width="7"
+          height="7"
+          rx="1"
+        ></rect>
+
+      </svg>
+
+      <span>
+        Products
+      </span>
+
     </a>
 
 
@@ -648,22 +739,138 @@ async function bottomNav() {
 
           <a
             href="${BASE}/frontend/cart.html"
+            class="${
+              active(
+                '/frontend/cart.html'
+              )
+                ? 'active'
+                : ''
+            }"
           >
-            CART
+
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+
+              <circle
+                cx="9"
+                cy="20"
+                r="1"
+              ></circle>
+
+              <circle
+                cx="18"
+                cy="20"
+                r="1"
+              ></circle>
+
+              <path
+                d="M3 4h2l2 11h11l2-8H7"
+              ></path>
+
+            </svg>
+
+            <span>
+              Cart
+            </span>
+
           </a>
 
 
           <a
             href="${BASE}/frontend/orders.html"
+            class="${
+              active(
+                '/frontend/orders.html'
+              )
+                ? 'active'
+                : ''
+            }"
           >
-            ORDERS
+
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+
+              <path
+                d="M8 6h13"
+              ></path>
+
+              <path
+                d="M8 12h13"
+              ></path>
+
+              <path
+                d="M8 18h13"
+              ></path>
+
+              <path
+                d="M3 6h.01"
+              ></path>
+
+              <path
+                d="M3 12h.01"
+              ></path>
+
+              <path
+                d="M3 18h.01"
+              ></path>
+
+            </svg>
+
+            <span>
+              Orders
+            </span>
+
           </a>
 
 
           <a
             href="${BASE}/frontend/profile.html"
+            class="${
+              active(
+                '/frontend/profile.html'
+              )
+                ? 'active'
+                : ''
+            }"
           >
-            PROFILE
+
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+
+              <circle
+                cx="12"
+                cy="8"
+                r="4"
+              ></circle>
+
+              <path
+                d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"
+              ></path>
+
+            </svg>
+
+            <span>
+              Profile
+            </span>
+
           </a>
 
         `
@@ -671,8 +878,40 @@ async function bottomNav() {
 
           <a
             href="${BASE}/frontend/login.html"
+            class="${
+              active(
+                '/frontend/login.html'
+              )
+                ? 'active'
+                : ''
+            }"
           >
-            LOGIN
+
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+
+              <circle
+                cx="12"
+                cy="8"
+                r="4"
+              ></circle>
+
+              <path
+                d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"
+              ></path>
+
+            </svg>
+
+            <span>
+              Login
+            </span>
+
           </a>
 
         `
