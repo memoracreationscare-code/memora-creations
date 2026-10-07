@@ -1,1 +1,87 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin Users</title><link rel="stylesheet" href="/admin/css/style.css"></head><body><nav class="adminnav"><div class="container"><b>MEMORA ADMIN</b><a href="/admin/dashboard.html">Dashboard</a><a href="/admin/products.html">Products</a><a href="/admin/orders.html">Orders</a><a href="/admin/users.html">Users</a></div></nav><main class="container adminmain"><h1>Customers</h1><div class="tablewrap"><table><thead><tr><th>Name</th><th>Mobile</th><th>Email</th><th>Status</th><th>Action</th></tr></thead><tbody id="users"></tbody></table></div></main><script src="/frontend/js/app.js"></script><script src="/admin/js/auth.js"></script><script src="/admin/js/users.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Admin Users - MEMORA CREATIONS</title>
+
+  <link
+    rel="stylesheet"
+    href="/memora-creations/admin/css/style.css?v=3"
+  >
+</head>
+
+<body>
+
+  <nav class="adminnav">
+
+    <div class="container">
+
+      <b>MEMORA ADMIN</b>
+
+      <a href="/memora-creations/admin/dashboard.html">
+        Dashboard
+      </a>
+
+      <a href="/memora-creations/admin/products.html">
+        Products
+      </a>
+
+      <a href="/memora-creations/admin/orders.html">
+        Orders
+      </a>
+
+      <a href="/memora-creations/admin/users.html">
+        Users
+      </a>
+
+      <button
+        id="logout"
+        class="btn secondary"
+        type="button"
+      >
+        Logout
+      </button>
+
+    </div>
+
+  </nav>
+
+
+  <main class="container adminmain">
+
+    <h1>Customers</h1>
+
+    <div class="tablewrap">
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>Name</th>
+            <th>Mobile</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+
+        </thead>
+
+        <tbody id="users"></tbody>
+
+      </table>
+
+    </div>
+
+  </main>
+
+
+  <script src="/memora-creations/frontend/js/app.js?v=3"></script>
+  <script src="/memora-creations/admin/js/auth.js?v=3"></script>
+  <script src="/memora-creations/admin/js/users.js?v=3"></script>
+
+</body>
+</html>
