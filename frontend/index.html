@@ -13,7 +13,7 @@
 
   <link
     rel="stylesheet"
-    href="/memora-creations/frontend/css/style.css?v=5"
+    href="/memora-creations/frontend/css/style.css?v=9"
   >
 </head>
 
@@ -122,7 +122,7 @@
 
 
   <script
-    src="/memora-creations/frontend/js/app.js?v=5"
+    src="/memora-creations/frontend/js/app.js?v=9"
   ></script>
 
 
@@ -133,6 +133,10 @@
 
     let homeProducts = [];
 
+
+    /* =========================
+       CLOSE PRODUCT POPUP
+    ========================= */
 
     function closeHomeProductPopup() {
 
@@ -147,6 +151,10 @@
 
     }
 
+
+    /* =========================
+       OPEN PRODUCT POPUP
+    ========================= */
 
     function openHomeProductPopup(
       product
@@ -411,6 +419,10 @@
     }
 
 
+    /* =========================
+       PRODUCT CARD
+    ========================= */
+
     function homeProductCard(
       product
     ) {
@@ -535,6 +547,10 @@
     }
 
 
+    /* =========================
+       ADD TO CART
+    ========================= */
+
     async function addHomeProductToCart(
       id,
       quantity = 1
@@ -617,6 +633,10 @@
     }
 
 
+    /* =========================
+       ORDER NOW
+    ========================= */
+
     function buyHomeProductNow(
       id
     ) {
@@ -626,6 +646,10 @@
 
     }
 
+
+    /* =========================
+       BIND BUTTONS
+    ========================= */
 
     function bindHomeButtons() {
 
@@ -694,6 +718,10 @@
 
     }
 
+
+    /* =========================
+       LOAD HOME PAGE
+    ========================= */
 
     async function loadHomePage() {
 
@@ -780,7 +808,23 @@
 
     }
 
-    loadHomePage();
+
+    /* =========================
+       SECURE START
+    ========================= */
+
+    (async function startHomePage() {
+
+      const user =
+        await window.MC.requireLogin();
+
+      if (!user) {
+        return;
+      }
+
+      await loadHomePage();
+
+    })();
 
   </script>
 
