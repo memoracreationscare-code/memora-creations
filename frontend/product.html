@@ -13,7 +13,7 @@
 
   <link
     rel="stylesheet"
-    href="/memora-creations/frontend/css/style.css?v=2"
+    href="/memora-creations/frontend/css/style.css?v=9"
   >
 </head>
 
@@ -38,12 +38,36 @@
 
 
   <script
-    src="/memora-creations/frontend/js/app.js?v=2"
+    src="/memora-creations/frontend/js/app.js?v=9"
   ></script>
 
-  <script
-    src="/memora-creations/frontend/js/products.js?v=2"
-  ></script>
+
+  <script>
+
+    (async function secureProductPage() {
+
+      const user =
+        await window.MC.requireLogin();
+
+      if (!user) {
+        return;
+      }
+
+      const script =
+        document.createElement(
+          'script'
+        );
+
+      script.src =
+        '/memora-creations/frontend/js/products.js?v=9';
+
+      document.body.appendChild(
+        script
+      );
+
+    })();
+
+  </script>
 
 </body>
 
