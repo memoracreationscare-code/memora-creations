@@ -2,20 +2,19 @@ const { Order } = require('../models');
 
 const {
   createShiprocketOrder,
-  checkCourierServiceability
+  checkCourierServiceability,
+  assignCourierAwb
 } = require('../services/shiprocketService');
 
 
 async function getOrder(req) {
 
-  const order =
-    await Order.findById(req.params.id)
-      .populate(
-        'user',
-        'fullName mobile email'
-      );
+  return Order.findById(req.params.id)
+    .populate(
+      'user',
+      'fullName mobile email'
+    );
 
-  return order;
 }
 
 
@@ -85,12 +84,6 @@ async function checkCourierRates(req, res) {
     }
 
 
-    const deliveryPincode =
-      String(
-        order.shippingAddress?.pinCode || ''
-      );
-
-
     const result =
       await checkCourierServiceability({
 
@@ -98,7 +91,11 @@ async function checkCourierRates(req, res) {
           req.body.pickupLocation ||
           'Home',
 
-        deliveryPincode,
+        deliveryPincode:
+          String(
+            order.shippingAddress?.pinCode ||
+            ''
+          ),
 
         weight,
         length,
@@ -109,7 +106,9 @@ async function checkCourierRates(req, res) {
           order.paymentMethod === 'COD',
 
         declaredValue:
-          Number(order.grandTotal || 0)
+          Number(
+            order.grandTotal || 0
+          )
 
       });
 
@@ -140,16 +139,7 @@ async function checkCourierRates(req, res) {
             item.estimated_delivery_days,
 
           rating:
-            item.rating,
-
-          cod:
-            item.cod,
-
-          pickupAvailability:
-            item.pickup_availability,
-
-          deliveryPerformance:
-            item.delivery_performance
+            item.rating
 
         }));
 
@@ -161,7 +151,7 @@ async function checkCourierRates(req, res) {
       message:
         couriers.length
           ? 'Courier options found.'
-          : 'No courier available for this route.',
+          : 'No courier available.',
 
       pickupLocation:
         result.pickupLocation,
@@ -201,7 +191,7 @@ async function checkCourierRates(req, res) {
 
 
 /* =========================
-   CREATE SHIPMENT
+   CREATE SHIPMENT + AWB
 ========================= */
 
 async function createShipment(req, res) {
@@ -245,6 +235,9 @@ async function createShipment(req, res) {
     const height =
       Number(req.body.height);
 
+    const courierCompanyId =
+      Number(req.body.courierCompanyId);
+
 
     if (
       !weight ||
@@ -266,7 +259,21 @@ async function createShipment(req, res) {
     }
 
 
-    const shiprocket =
+    if (
+      !courierCompanyId ||
+      courierCompanyId <= 0
+    ) {
+
+      return res.status(400).json({
+        success: false,
+        message:
+          'Please select a courier first.'
+      });
+
+    }
+
+
+    const shiprocketOrder =
       await createShiprocketOrder(
         order,
         {
@@ -282,14 +289,46 @@ async function createShipment(req, res) {
       );
 
 
+    const shipmentId =
+      Number(
+        shiprocketOrder.shipment_id
+      );
+
+
+    if (
+      !shipmentId ||
+      shipmentId <= 0
+    ) {
+
+      return res.status(500).json({
+        success: false,
+        message:
+          'Shiprocket shipment ID not received.'
+      });
+
+    }
+
+
+    const awb =
+      await assignCourierAwb({
+
+        shipmentId,
+
+        courierCompanyId
+
+      });
+
+
     return res.json({
 
       success: true,
 
       message:
-        'Shipment created successfully in Shiprocket.',
+        'Shipment created and AWB generated successfully.',
 
-      shiprocket
+      shiprocketOrder,
+
+      awb
 
     });
 
@@ -297,7 +336,7 @@ async function createShipment(req, res) {
   } catch (error) {
 
     console.error(
-      'Create Shiprocket shipment error:',
+      'Create shipment/AWB error:',
       error
     );
 
