@@ -237,9 +237,7 @@ function printShippingLabel(order) {
           <br>
 
           Mobile:
-          <b>
-            ${window.MC.esc(mobile)}
-          </b>
+          <b>${window.MC.esc(mobile)}</b>
 
         </div>
 
@@ -270,23 +268,18 @@ function printShippingLabel(order) {
         <div class="section">
 
           Payment:
-          <b>
-            ${window.MC.esc(order.paymentMethod || '')}
-          </b>
+          <b>${window.MC.esc(order.paymentMethod || '')}</b>
 
           <br>
 
           Payment Status:
-          <b>
-            ${window.MC.esc(order.paymentStatus || '')}
-          </b>
+          <b>${window.MC.esc(order.paymentStatus || '')}</b>
 
           <br><br>
 
           <div class="total">
             Total:
-            ₹${Number(order.grandTotal || 0)
-              .toLocaleString('en-IN')}
+            ₹${Number(order.grandTotal || 0).toLocaleString('en-IN')}
           </div>
 
         </div>
@@ -300,7 +293,6 @@ function printShippingLabel(order) {
       <\/script>
 
     </body>
-
     </html>
   `);
 
@@ -309,7 +301,7 @@ function printShippingLabel(order) {
 
 
 /* =========================
-   CREATE SHIPMENT FORM
+   SHIPMENT FORM
 ========================= */
 
 function shipmentFormHtml(order) {
@@ -321,14 +313,15 @@ function shipmentFormHtml(order) {
     >
 
       <h3>
-        🚚 Create Shiprocket Shipment
+        🚚 Shiprocket Shipping
       </h3>
 
       <p class="mini">
-        Customer, address, products, payment and order details
-        will be filled automatically.
-        You only need to enter package weight and size.
+        Customer name, mobile, address, PIN, products,
+        payment and order details automatic rahenge.
+        Sirf package ka weight aur size bharo.
       </p>
+
 
       <form
         class="shipment-form"
@@ -426,22 +419,43 @@ function shipmentFormHtml(order) {
               required
             >
 
-            <div class="mini">
-              Shiprocket me jo pickup location name hai,
-              wahi hona chahiye.
-            </div>
-
           </div>
 
         </div>
 
 
-        <button
-          class="btn"
-          type="submit"
+        <div
+          style="
+            display:flex;
+            gap:10px;
+            flex-wrap:wrap;
+            margin-top:15px;
+          "
         >
-          Create Shipment
-        </button>
+
+          <button
+            class="btn secondary check-couriers"
+            type="button"
+          >
+            🔍 Check Courier Rates
+          </button>
+
+
+          <button
+            class="btn create-shipment"
+            type="submit"
+            disabled
+          >
+            Create Shipment
+          </button>
+
+        </div>
+
+
+        <div
+          class="courier-results"
+          style="margin-top:15px;"
+        ></div>
 
 
         <div
@@ -457,111 +471,529 @@ function shipmentFormHtml(order) {
 
 
 /* =========================
-   ORDER DETAILS
+   CHECK COURIER RATES
 ========================= */
 
-function orderDetailsHtml(order) {
+async function checkCourierRates(
+  form,
+  order
+) {
 
-  const address = order.shippingAddress || {};
+  if (!form.reportValidity()) {
+    return;
+  }
 
-  const items = (order.items || [])
-    .map(item => `
-      <div
-        class="admin-card"
-        style="margin:10px 0;"
-      >
 
-        <div
-          style="
-            display:flex;
-            gap:15px;
-            align-items:center;
-          "
-        >
+  const result =
+    form.querySelector(
+      '.courier-results'
+    );
 
-          ${
-            item.imageUrl
-              ? `
-                <img
-                  src="${window.MC.esc(item.imageUrl)}"
-                  width="70"
-                  height="70"
-                  style="
-                    object-fit:cover;
-                    border-radius:10px;
-                  "
-                >
-              `
-              : ''
-          }
 
-          <div style="flex:1;">
+  const checkButton =
+    form.querySelector(
+      '.check-couriers'
+    );
 
-            <b>
-              ${window.MC.esc(item.name || '')}
-            </b>
 
-            <div class="mini">
-              Product ID:
-              ${window.MC.esc(item.productId || '')}
-            </div>
+  const createButton =
+    form.querySelector(
+      '.create-shipment'
+    );
 
-            <div>
-              Qty:
-              ${Number(item.quantity || 0)}
-            </div>
 
-            <div>
-              Price:
-              ${window.MC.money(item.unitPrice)}
-            </div>
+  const body =
+    Object.fromEntries(
+      new FormData(form)
+    );
 
-          </div>
 
-          <b>
-            ${window.MC.money(item.lineTotal)}
-          </b>
+  checkButton.disabled = true;
 
+  checkButton.textContent =
+    'Checking Couriers...';
+
+
+  createButton.disabled = true;
+
+
+  result.innerHTML =
+    'Shiprocket se courier rates check ho rahe hain...';
+
+
+  try {
+
+    const data =
+      await window.MC.api(
+        '/admin/orders/' +
+        order._id +
+        '/check-couriers',
+        {
+          method: 'POST',
+
+          body:
+            JSON.stringify(body)
+        }
+      );
+
+
+    const couriers =
+      (data.couriers || [])
+        .sort(
+          (a, b) =>
+            Number(a.rate || 0) -
+            Number(b.rate || 0)
+        );
+
+
+    if (!couriers.length) {
+
+      result.innerHTML = `
+        <div class="message error">
+          ❌ Is PIN code ke liye abhi koi courier available nahi mila.
         </div>
+      `;
 
-      </div>
-    `)
-    .join('');
+      return;
+    }
 
 
-  const history = (order.statusHistory || [])
-    .map(item => `
-      <div style="margin-bottom:10px;">
+    result.innerHTML = `
 
+      <div class="message success">
+
+        ✅ Courier available
+
+        <br>
+
+        Pickup PIN:
         <b>
-          ${window.MC.esc(item.status || '')}
+          ${window.MC.esc(
+            data.pickupPincode || ''
+          )}
         </b>
 
-        <div class="mini">
-          ${
-            item.changedAt
-              ? new Date(item.changedAt)
-                  .toLocaleString('en-IN')
-              : ''
-          }
-        </div>
+        →
+
+        Delivery PIN:
+        <b>
+          ${window.MC.esc(
+            data.deliveryPincode || ''
+          )}
+        </b>
+
+      </div>
+
+
+      <div style="margin-top:12px;">
+
+        ${couriers.map((courier, index) => {
+
+          const rate =
+            Number(
+              courier.rate ||
+              courier.freightCharge ||
+              0
+            );
+
+          const delivery =
+            courier.etd ||
+            (
+              courier.estimatedDeliveryDays
+                ? courier.estimatedDeliveryDays +
+                  ' days'
+                : ''
+            );
+
+          return `
+
+            <label
+              class="admin-card"
+              style="
+                display:block;
+                margin:10px 0;
+                cursor:pointer;
+              "
+            >
+
+              <input
+                type="radio"
+                name="courierCompanyId"
+                value="${window.MC.esc(
+                  courier.courierCompanyId || ''
+                )}"
+                ${index === 0 ? 'checked' : ''}
+              >
+
+              <b>
+                ${window.MC.esc(
+                  courier.courierName ||
+                  'Courier'
+                )}
+              </b>
+
+              <br>
+
+              Shipping Charge:
+              <b>
+                ${window.MC.money(rate)}
+              </b>
+
+              ${
+                courier.codCharges
+                  ? `
+                    <br>
+                    COD Charge:
+                    ${window.MC.money(
+                      courier.codCharges
+                    )}
+                  `
+                  : ''
+              }
+
+              ${
+                delivery
+                  ? `
+                    <br>
+                    Estimated Delivery:
+                    ${window.MC.esc(
+                      delivery
+                    )}
+                  `
+                  : ''
+              }
+
+              ${
+                courier.rating
+                  ? `
+                    <br>
+                    Rating:
+                    ${window.MC.esc(
+                      courier.rating
+                    )}
+                  `
+                  : ''
+              }
+
+            </label>
+
+          `;
+
+        }).join('')}
+
+      </div>
+
+    `;
+
+
+    createButton.disabled = false;
+
+
+    window.MC.toast(
+      'Courier rates loaded.',
+      'success'
+    );
+
+
+  } catch (error) {
+
+    result.innerHTML = `
+
+      <div class="message error">
+
+        ❌
+        ${window.MC.esc(
+          error.message ||
+          'Courier rate check failed.'
+        )}
+
+      </div>
+
+    `;
+
+
+    window.MC.toast(
+      error.message ||
+      'Courier rate check failed.',
+      'error'
+    );
+
+
+  } finally {
+
+    checkButton.disabled = false;
+
+    checkButton.textContent =
+      '🔍 Check Courier Rates';
+
+  }
+
+}
+
+
+/* =========================
+   CREATE SHIPMENT
+========================= */
+
+async function submitShipmentForm(
+  form,
+  order
+) {
+
+  if (!form.reportValidity()) {
+    return;
+  }
+
+
+  const result =
+    form.querySelector(
+      '.shipment-result'
+    );
+
+
+  const submitButton =
+    form.querySelector(
+      '.create-shipment'
+    );
+
+
+  const body =
+    Object.fromEntries(
+      new FormData(form)
+    );
+
+
+  submitButton.disabled = true;
+
+  submitButton.textContent =
+    'Creating Shipment...';
+
+
+  result.innerHTML =
+    'Connecting to Shiprocket...';
+
+
+  try {
+
+    const data =
+      await window.MC.api(
+        '/admin/orders/' +
+        order._id +
+        '/create-shipment',
+        {
+          method: 'POST',
+
+          body:
+            JSON.stringify(body)
+        }
+      );
+
+
+    const sr =
+      data.shiprocket || {};
+
+
+    result.innerHTML = `
+
+      <div class="message success">
+
+        ✅ Shiprocket order created successfully.
+
+        <br><br>
 
         ${
-          item.note
+          sr.order_id
             ? `
-              <div>
-                ${window.MC.esc(item.note)}
-              </div>
+              <b>Shiprocket Order ID:</b>
+              ${window.MC.esc(sr.order_id)}
+              <br>
+            `
+            : ''
+        }
+
+        ${
+          sr.shipment_id
+            ? `
+              <b>Shipment ID:</b>
+              ${window.MC.esc(sr.shipment_id)}
+              <br>
+            `
+            : ''
+        }
+
+        ${
+          sr.status
+            ? `
+              <b>Status:</b>
+              ${window.MC.esc(sr.status)}
             `
             : ''
         }
 
       </div>
-    `)
-    .join('');
+
+    `;
+
+
+    window.MC.toast(
+      'Shiprocket order created.',
+      'success'
+    );
+
+
+  } catch (error) {
+
+    result.innerHTML = `
+
+      <div class="message error">
+
+        ❌
+        ${window.MC.esc(
+          error.message ||
+          'Shipment creation failed.'
+        )}
+
+      </div>
+
+    `;
+
+
+    window.MC.toast(
+      error.message ||
+      'Shipment creation failed.',
+      'error'
+    );
+
+
+  } finally {
+
+    submitButton.disabled = false;
+
+    submitButton.textContent =
+      'Create Shipment';
+
+  }
+
+}
+
+
+/* =========================
+   ORDER DETAILS
+========================= */
+
+function orderDetailsHtml(order) {
+
+  const address =
+    order.shippingAddress || {};
+
+
+  const items =
+    (order.items || [])
+      .map(item => `
+
+        <div
+          class="admin-card"
+          style="margin:10px 0;"
+        >
+
+          <div
+            style="
+              display:flex;
+              gap:15px;
+              align-items:center;
+            "
+          >
+
+            ${
+              item.imageUrl
+                ? `
+                  <img
+                    src="${window.MC.esc(item.imageUrl)}"
+                    width="70"
+                    height="70"
+                    style="
+                      object-fit:cover;
+                      border-radius:10px;
+                    "
+                  >
+                `
+                : ''
+            }
+
+            <div style="flex:1;">
+
+              <b>
+                ${window.MC.esc(item.name || '')}
+              </b>
+
+              <div class="mini">
+                Product ID:
+                ${window.MC.esc(item.productId || '')}
+              </div>
+
+              <div>
+                Qty:
+                ${Number(item.quantity || 0)}
+              </div>
+
+              <div>
+                Price:
+                ${window.MC.money(item.unitPrice)}
+              </div>
+
+            </div>
+
+            <b>
+              ${window.MC.money(item.lineTotal)}
+            </b>
+
+          </div>
+
+        </div>
+
+      `)
+      .join('');
+
+
+  const history =
+    (order.statusHistory || [])
+      .map(item => `
+
+        <div style="margin-bottom:10px;">
+
+          <b>
+            ${window.MC.esc(item.status || '')}
+          </b>
+
+          <div class="mini">
+
+            ${
+              item.changedAt
+                ? new Date(item.changedAt)
+                    .toLocaleString('en-IN')
+                : ''
+            }
+
+          </div>
+
+          ${
+            item.note
+              ? `
+                <div>
+                  ${window.MC.esc(item.note)}
+                </div>
+              `
+              : ''
+          }
+
+        </div>
+
+      `)
+      .join('');
 
 
   return `
+
     <div
       class="admin-card"
       style="margin:12px 0;"
@@ -625,7 +1057,8 @@ function orderDetailsHtml(order) {
 
         ${
           address.state
-            ? ', ' + window.MC.esc(address.state)
+            ? ', ' +
+              window.MC.esc(address.state)
             : ''
         }
 
@@ -734,6 +1167,7 @@ function orderDetailsHtml(order) {
           🖨 Print Packaging Label
         </button>
 
+
         <button
           class="btn secondary close-details"
           type="button"
@@ -744,148 +1178,13 @@ function orderDetailsHtml(order) {
       </div>
 
     </div>
+
   `;
 }
 
 
 /* =========================
-   SHIPMENT SUBMIT
-========================= */
-
-async function submitShipmentForm(
-  form,
-  order
-) {
-
-  const result =
-    form.querySelector(
-      '.shipment-result'
-    );
-
-  const submitButton =
-    form.querySelector(
-      'button[type="submit"]'
-    );
-
-
-  const body =
-    Object.fromEntries(
-      new FormData(form)
-    );
-
-
-  submitButton.disabled = true;
-  submitButton.textContent =
-    'Creating Shipment...';
-
-  result.innerHTML =
-    'Connecting to Shiprocket...';
-
-
-  try {
-
-    const data =
-      await window.MC.api(
-        '/admin/orders/' +
-        order._id +
-        '/create-shipment',
-        {
-          method: 'POST',
-          body: JSON.stringify(body)
-        }
-      );
-
-
-    const sr =
-      data.shiprocket || {};
-
-
-    result.innerHTML = `
-
-      <div class="message success">
-
-        ✅ Shipment created successfully.
-
-        <br><br>
-
-        ${
-          sr.order_id
-            ? `
-              <b>Shiprocket Order ID:</b>
-              ${window.MC.esc(sr.order_id)}
-              <br>
-            `
-            : ''
-        }
-
-        ${
-          sr.shipment_id
-            ? `
-              <b>Shipment ID:</b>
-              ${window.MC.esc(sr.shipment_id)}
-              <br>
-            `
-            : ''
-        }
-
-        ${
-          sr.status
-            ? `
-              <b>Status:</b>
-              ${window.MC.esc(sr.status)}
-            `
-            : ''
-        }
-
-      </div>
-
-    `;
-
-
-    window.MC.toast(
-      'Shipment created in Shiprocket.',
-      'success'
-    );
-
-
-  } catch (error) {
-
-    result.innerHTML = `
-
-      <div class="message error">
-
-        ❌
-        ${window.MC.esc(
-          error.message ||
-          'Shipment creation failed.'
-        )}
-
-      </div>
-
-    `;
-
-
-    window.MC.toast(
-      error.message ||
-      'Shipment creation failed.',
-      'error'
-    );
-
-
-  } finally {
-
-    submitButton.disabled = false;
-
-    submitButton.textContent =
-      'Create Shipment';
-
-  }
-
-}
-
-
-/* =========================
-   BIND ORDER BUTTONS
+   BIND BUTTONS
 ========================= */
 
 function bindOrderButtons() {
@@ -901,20 +1200,20 @@ function bindOrderButtons() {
           const id =
             button.dataset.id;
 
+
           const order =
             adminOrders.find(
               item => item._id === id
             );
+
 
           const detailsRow =
             document.querySelector(
               `#details-${id}`
             );
 
-          if (
-            !order ||
-            !detailsRow
-          ) {
+
+          if (!order || !detailsRow) {
             return;
           }
 
@@ -930,6 +1229,12 @@ function bindOrderButtons() {
             'table-row';
 
 
+          const form =
+            detailsRow.querySelector(
+              '.shipment-form'
+            );
+
+
           detailsRow
             .querySelector('.print-label')
             ?.addEventListener(
@@ -940,8 +1245,24 @@ function bindOrderButtons() {
             );
 
 
-          detailsRow
-            .querySelector('.shipment-form')
+          form
+            ?.querySelector(
+              '.check-couriers'
+            )
+            ?.addEventListener(
+              'click',
+              () => {
+
+                checkCourierRates(
+                  form,
+                  order
+                );
+
+              }
+            );
+
+
+          form
             ?.addEventListener(
               'submit',
               event => {
@@ -991,10 +1312,11 @@ function bindOrderButtons() {
               {
                 method: 'PUT',
 
-                body: JSON.stringify({
-                  orderStatus:
-                    select.value
-                })
+                body:
+                  JSON.stringify({
+                    orderStatus:
+                      select.value
+                  })
               }
             );
 
@@ -1037,6 +1359,7 @@ async function loadAdminOrders() {
 
   const admin =
     await window.requireAdmin();
+
 
   if (!admin) return;
 
