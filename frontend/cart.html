@@ -3,27 +3,45 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Your Cart - MEMORA CREATIONS</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>
+    Your Cart - MEMORA CREATIONS
+  </title>
 
   <link
     rel="stylesheet"
-    href="/memora-creations/frontend/css/style.css"
+    href="/memora-creations/frontend/css/style.css?v=9"
   >
 </head>
 
 <body>
 
-  <header id="nav" class="topbar"></header>
+  <header
+    id="nav"
+    class="topbar"
+  ></header>
 
-  <main class="container section">
 
-    <h1>Your Cart</h1>
+  <main
+    class="container section"
+  >
+
+    <h1>
+      Your Cart
+    </h1>
+
 
     <div class="two">
 
-      <div id="cartItems"></div>
+      <div
+        id="cartItems"
+      ></div>
+
 
       <aside
         id="summary"
@@ -34,13 +52,52 @@
 
   </main>
 
+
   <nav
     id="bottomNav"
     class="bottomnav"
   ></nav>
 
-  <script src="/memora-creations/frontend/js/app.js"></script>
-  <script src="/memora-creations/frontend/js/cart.js"></script>
+
+  <!-- COMMON JS -->
+
+  <script
+    src="/memora-creations/frontend/js/app.js?v=9"
+  ></script>
+
+
+  <!-- SECURE CART START -->
+
+  <script>
+
+    (async function secureCartPage() {
+
+      const user =
+        await window.MC.requireLogin();
+
+      if (!user) {
+        return;
+      }
+
+
+      const script =
+        document.createElement(
+          'script'
+        );
+
+
+      script.src =
+        '/memora-creations/frontend/js/cart.js?v=9';
+
+
+      document.body.appendChild(
+        script
+      );
+
+    })();
+
+  </script>
 
 </body>
+
 </html>
