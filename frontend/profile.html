@@ -3,23 +3,38 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Profile - MEMORA CREATIONS</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>
+    Profile - MEMORA CREATIONS
+  </title>
 
   <link
     rel="stylesheet"
-    href="/memora-creations/frontend/css/style.css?v=6"
+    href="/memora-creations/frontend/css/style.css?v=9"
   >
 </head>
 
 <body>
 
-  <header id="nav" class="topbar"></header>
+  <header
+    id="nav"
+    class="topbar"
+  ></header>
 
-  <main class="container section">
+
+  <main
+    class="container section"
+  >
 
     <div class="two">
+
+
+      <!-- PROFILE FORM -->
 
       <form
         id="profileForm"
@@ -27,37 +42,55 @@
         style="margin:0;"
       >
 
-        <h1>My Profile</h1>
+        <h1>
+          My Profile
+        </h1>
+
 
         <div class="field">
-          <label>Full Name</label>
+
+          <label>
+            Full Name
+          </label>
 
           <input
             id="fullName"
             class="input"
             required
           >
+
         </div>
 
+
         <div class="field">
-          <label>Mobile Number</label>
+
+          <label>
+            Mobile Number
+          </label>
 
           <input
             id="mobile"
             class="input"
             disabled
           >
+
         </div>
 
+
         <div class="field">
-          <label>Email</label>
+
+          <label>
+            Email
+          </label>
 
           <input
             id="email"
             class="input"
             type="email"
           >
+
         </div>
+
 
         <button
           class="btn"
@@ -69,11 +102,18 @@
       </form>
 
 
+      <!-- ADDRESS SECTION -->
+
       <div>
 
-        <h2>Saved Addresses</h2>
+        <h2>
+          Saved Addresses
+        </h2>
 
-        <div id="addresses"></div>
+
+        <div
+          id="addresses"
+        ></div>
 
 
         <form
@@ -82,90 +122,138 @@
           style="margin:16px 0;"
         >
 
-          <h3>Add New Address</h3>
+          <h3>
+            Add New Address
+          </h3>
+
 
           <div class="field">
-            <label>Label</label>
+
+            <label>
+              Label
+            </label>
 
             <input
               class="input"
               name="label"
               placeholder="Home / Work"
             >
+
           </div>
 
+
           <div class="field">
-            <label>Full Name</label>
+
+            <label>
+              Full Name
+            </label>
 
             <input
               class="input"
               name="fullName"
               required
             >
+
           </div>
 
+
           <div class="field">
-            <label>Mobile</label>
+
+            <label>
+              Mobile
+            </label>
 
             <input
               class="input"
               name="mobile"
+              type="tel"
               required
               inputmode="numeric"
+              pattern="[6-9][0-9]{9}"
               maxlength="10"
+              autocomplete="tel"
             >
+
           </div>
 
+
           <div class="field">
-            <label>Address</label>
+
+            <label>
+              Address
+            </label>
 
             <textarea
               class="input"
               name="addressLine"
               required
             ></textarea>
+
           </div>
 
+
           <div class="field">
-            <label>PIN Code</label>
+
+            <label>
+              PIN Code
+            </label>
 
             <input
               class="input"
               name="pinCode"
               required
               inputmode="numeric"
+              pattern="[0-9]{6}"
               maxlength="6"
             >
+
           </div>
 
+
           <div class="field">
-            <label>City</label>
+
+            <label>
+              City
+            </label>
 
             <input
               class="input"
               name="city"
             >
+
           </div>
 
+
           <div class="field">
-            <label>State</label>
+
+            <label>
+              State
+            </label>
 
             <input
               class="input"
               name="state"
             >
+
           </div>
 
+
           <div class="field">
+
             <label>
+
               <input
                 id="isDefault"
                 type="checkbox"
                 name="isDefault"
               >
+
               Make default address
+
             </label>
+
           </div>
+
 
           <button
             class="btn"
@@ -182,13 +270,52 @@
 
   </main>
 
+
   <nav
     id="bottomNav"
     class="bottomnav"
   ></nav>
 
-  <script src="/memora-creations/frontend/js/app.js?v=6"></script>
-  <script src="/memora-creations/frontend/js/profile.js?v=6"></script>
+
+  <!-- COMMON JS -->
+
+  <script
+    src="/memora-creations/frontend/js/app.js?v=9"
+  ></script>
+
+
+  <!-- SECURE PROFILE START -->
+
+  <script>
+
+    (async function secureProfilePage() {
+
+      const user =
+        await window.MC.requireLogin();
+
+      if (!user) {
+        return;
+      }
+
+
+      const script =
+        document.createElement(
+          'script'
+        );
+
+
+      script.src =
+        '/memora-creations/frontend/js/profile.js?v=9';
+
+
+      document.body.appendChild(
+        script
+      );
+
+    })();
+
+  </script>
 
 </body>
+
 </html>
