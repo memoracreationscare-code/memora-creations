@@ -92,11 +92,9 @@ function openProductPopup(product) {
 
               ? `
                 <span class="old">
-
                   ${window.MC.money(
                     product.originalPrice
                   )}
-
                 </span>
               `
 
@@ -351,9 +349,7 @@ async function loadProducts() {
                   : ''
               }
             >
-
               ${window.MC.esc(c.name)}
-
             </option>
 
           `)
@@ -569,11 +565,9 @@ async function loadProducts() {
 
 
     grid.innerHTML = `
-
       <div class="empty">
         Products load nahi ho pa rahe hain.
       </div>
-
     `;
 
 
@@ -621,13 +615,24 @@ async function addProductToCart(
     );
 
 
-    window.MC.toast(
-      'Product cart mein add ho gaya.',
-      'success'
-    );
-
-
     window.MC.updateCartCount();
+
+
+    if (
+      typeof window.MC.showCartPopup ===
+      'function'
+    ) {
+
+      window.MC.showCartPopup();
+
+    } else {
+
+      window.MC.toast(
+        'Product cart mein add ho gaya.',
+        'success'
+      );
+
+    }
 
 
   } catch (error) {
