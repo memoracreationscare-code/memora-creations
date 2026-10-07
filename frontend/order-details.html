@@ -3,32 +3,78 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Order Details - MEMORA CREATIONS</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>
+    Order Details - MEMORA CREATIONS
+  </title>
 
   <link
     rel="stylesheet"
-    href="/memora-creations/frontend/css/style.css"
+    href="/memora-creations/frontend/css/style.css?v=9"
   >
 </head>
 
 <body>
 
-  <header id="nav" class="topbar"></header>
+  <header
+    id="nav"
+    class="topbar"
+  ></header>
+
 
   <main
     id="order"
     class="container section"
   ></main>
 
+
   <nav
     id="bottomNav"
     class="bottomnav"
   ></nav>
 
-  <script src="/memora-creations/frontend/js/app.js"></script>
-  <script src="/memora-creations/frontend/js/order-details.js"></script>
+
+  <script
+    src="/memora-creations/frontend/js/app.js?v=9"
+  ></script>
+
+
+  <script>
+
+    (async function secureOrderDetailsPage() {
+
+      const user =
+        await window.MC.requireLogin();
+
+
+      if (!user) {
+        return;
+      }
+
+
+      const script =
+        document.createElement(
+          'script'
+        );
+
+
+      script.src =
+        '/memora-creations/frontend/js/order-details.js?v=9';
+
+
+      document.body.appendChild(
+        script
+      );
+
+    })();
+
+  </script>
 
 </body>
+
 </html>
