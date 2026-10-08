@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
   <meta charset="utf-8">
 
   <meta
@@ -9,15 +10,769 @@
     content="width=device-width, initial-scale=1"
   >
 
-  <title>Product - MEMORA CREATIONS</title>
+  <title>
+    Product | MEMORA CREATIONS
+  </title>
 
   <link
     rel="stylesheet"
-    href="/memora-creations/frontend/css/style.css?v=9"
+    href="/memora-creations/frontend/css/style.css?v=13"
   >
+
+
+  <style>
+
+    /* =========================
+       PRODUCT PAGE
+    ========================= */
+
+    .product-page{
+      padding:
+        28px 0 60px;
+    }
+
+
+    /* BREADCRUMB */
+
+    .product-breadcrumb{
+      display:flex;
+
+      align-items:center;
+
+      gap:8px;
+
+      margin-bottom:20px;
+
+      color:#8a817a;
+
+      font-size:13px;
+
+      font-weight:600;
+    }
+
+
+    .product-breadcrumb a{
+      color:#8a5a3b;
+
+      font-weight:800;
+    }
+
+
+    /* =========================
+       MAIN PRODUCT BOX
+    ========================= */
+
+    #product > .two{
+      display:grid;
+
+      grid-template-columns:
+        minmax(0,1.1fr)
+        minmax(340px,.9fr);
+
+      gap:42px;
+
+      align-items:start;
+
+      padding:28px;
+
+      border:
+        1px solid #e8ddd3;
+
+      border-radius:28px;
+
+      background:#fff;
+
+      box-shadow:
+        0 18px 45px
+        rgba(61,39,23,.07);
+    }
+
+
+    /* =========================
+       GALLERY
+    ========================= */
+
+    #product .gallery{
+      display:grid;
+
+      grid-template-columns:
+        82px minmax(0,1fr);
+
+      gap:14px;
+
+      position:sticky;
+
+      top:90px;
+    }
+
+
+    #product .thumbs{
+      display:flex;
+
+      flex-direction:column;
+
+      gap:10px;
+    }
+
+
+    #product .thumbs img{
+      width:78px;
+      height:78px;
+
+      margin:0;
+
+      object-fit:cover;
+
+      border-radius:13px;
+
+      border:
+        2px solid transparent;
+
+      background:#f5f1ed;
+
+      cursor:pointer;
+
+      transition:
+        border-color .18s ease,
+        transform .18s ease;
+    }
+
+
+    #product .thumbs img:hover{
+      border-color:#b7835d;
+
+      transform:scale(1.03);
+    }
+
+
+    #product .mainimage{
+      width:100%;
+
+      aspect-ratio:1/1;
+
+      max-height:none;
+
+      object-fit:contain;
+
+      background:
+        linear-gradient(
+          145deg,
+          #f8f5f2,
+          #f2ece7
+        );
+
+      border-radius:22px;
+
+      border:
+        1px solid #eee4dc;
+
+      padding:16px;
+    }
+
+
+    /* =========================
+       PRODUCT INFORMATION
+    ========================= */
+
+    #product > .two > div:last-child{
+      padding:
+        12px 4px;
+    }
+
+
+    #product .pill{
+      display:inline-flex;
+
+      align-items:center;
+
+      padding:
+        7px 11px;
+
+      border-radius:999px;
+
+      background:#f3e6da;
+
+      color:#8a5a3b;
+
+      font-size:11px;
+
+      font-weight:900;
+
+      letter-spacing:.08em;
+
+      text-transform:uppercase;
+    }
+
+
+    #product h1{
+      margin:
+        18px 0 15px;
+
+      color:#2b1b12;
+
+      font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+      font-size:
+        clamp(34px,4vw,52px);
+
+      line-height:1.05;
+
+      letter-spacing:-.025em;
+    }
+
+
+    #product h1 + p{
+      margin:
+        0 0 22px;
+
+      color:#756b64;
+
+      font-size:15px;
+
+      line-height:1.75;
+    }
+
+
+    #product .price{
+      margin:
+        20px 0;
+
+      padding:
+        18px 0;
+
+      border-top:
+        1px solid #eee4dc;
+
+      border-bottom:
+        1px solid #eee4dc;
+
+      color:#2a1b12;
+
+      font-size:30px;
+
+      font-weight:900;
+    }
+
+
+    #product .price .old{
+      margin-left:9px;
+
+      color:#aaa09a;
+
+      font-size:16px;
+
+      font-weight:600;
+
+      text-decoration:line-through;
+    }
+
+
+    /* STOCK */
+
+    #product .price + p{
+      display:inline-flex;
+
+      align-items:center;
+
+      padding:
+        8px 12px;
+
+      border-radius:999px;
+
+      background:#edf8f1;
+
+      color:#267247;
+
+      font-size:13px;
+
+      font-weight:800;
+    }
+
+
+    /* =========================
+       QUANTITY
+    ========================= */
+
+    #product .field{
+      margin:
+        23px 0;
+    }
+
+
+    #product .field label{
+      display:block;
+
+      margin-bottom:8px;
+
+      color:#47372d;
+
+      font-size:13px;
+
+      font-weight:800;
+    }
+
+
+    #product #qty{
+      width:120px;
+
+      min-height:52px;
+
+      padding:
+        0 14px;
+
+      border:
+        1px solid #dfd3ca;
+
+      border-radius:14px;
+
+      background:#fffdfa;
+
+      font-size:16px;
+
+      font-weight:700;
+    }
+
+
+    /* =========================
+       BUTTONS
+    ========================= */
+
+    #product .actions{
+      display:grid;
+
+      grid-template-columns:
+        1fr 1fr;
+
+      gap:11px;
+
+      margin-top:20px;
+    }
+
+
+    #product .actions .btn{
+      min-height:56px;
+
+      border-radius:14px;
+
+      font-size:15px;
+
+      font-weight:800;
+    }
+
+
+    #product #addBtn{
+      background:
+        linear-gradient(
+          180deg,
+          #9b613c,
+          #7e492a
+        );
+
+      box-shadow:
+        0 12px 22px
+        rgba(138,90,59,.20);
+    }
+
+
+    #product #buyBtn{
+      border:
+        1px solid #dfd2c7;
+
+      background:#f6eee7;
+
+      color:#39271d;
+    }
+
+
+    /* =========================
+       BENEFITS
+    ========================= */
+
+    .product-benefits{
+      display:grid;
+
+      grid-template-columns:
+        repeat(3,1fr);
+
+      gap:12px;
+
+      margin-top:24px;
+    }
+
+
+    .product-benefit{
+      padding:15px;
+
+      border:
+        1px solid #e8ddd3;
+
+      border-radius:17px;
+
+      background:#fff;
+
+      display:flex;
+
+      gap:11px;
+
+      align-items:center;
+    }
+
+
+    .benefit-icon{
+      width:42px;
+      height:42px;
+
+      flex-shrink:0;
+
+      border-radius:12px;
+
+      display:flex;
+
+      align-items:center;
+
+      justify-content:center;
+
+      background:#f4e7dc;
+
+      color:#8a5a3b;
+
+      font-size:20px;
+    }
+
+
+    .product-benefit strong{
+      display:block;
+
+      margin-bottom:2px;
+
+      color:#36261d;
+
+      font-size:12px;
+    }
+
+
+    .product-benefit span{
+      display:block;
+
+      color:#81776f;
+
+      font-size:10px;
+
+      line-height:1.4;
+    }
+
+
+    /* =========================
+       CUSTOMER CARE
+    ========================= */
+
+    .product-support{
+      margin-top:30px;
+
+      padding:28px;
+
+      border-radius:24px;
+
+      display:grid;
+
+      grid-template-columns:
+        1fr auto;
+
+      gap:20px;
+
+      align-items:center;
+
+      background:
+        linear-gradient(
+          135deg,
+          #302016,
+          #74482d
+        );
+
+      color:#fff;
+    }
+
+
+    .product-support small{
+      display:block;
+
+      margin-bottom:6px;
+
+      color:#e7cbb4;
+
+      font-size:10px;
+
+      font-weight:900;
+
+      letter-spacing:.17em;
+
+      text-transform:uppercase;
+    }
+
+
+    .product-support h2{
+      margin:
+        0 0 7px;
+
+      font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+      font-size:28px;
+    }
+
+
+    .product-support p{
+      margin:0;
+
+      color:#e4d8cf;
+
+      font-size:13px;
+    }
+
+
+    .support-buttons{
+      display:flex;
+
+      gap:10px;
+
+      flex-wrap:wrap;
+    }
+
+
+    .support-button{
+      padding:
+        12px 16px;
+
+      border:
+        1px solid
+        rgba(255,255,255,.18);
+
+      border-radius:13px;
+
+      background:
+        rgba(255,255,255,.10);
+
+      color:#fff;
+
+      font-size:12px;
+
+      font-weight:800;
+    }
+
+
+    /* =========================
+       FOOTER
+    ========================= */
+
+    .product-footer{
+      margin-top:40px;
+
+      padding:
+        28px 15px 105px;
+
+      background:#21160f;
+
+      color:#bfb2aa;
+
+      text-align:center;
+
+      font-size:12px;
+    }
+
+
+    .product-footer strong{
+      display:block;
+
+      margin-bottom:7px;
+
+      color:#fff;
+
+      font-size:15px;
+
+      letter-spacing:.08em;
+    }
+
+
+    /* =========================
+       TABLET
+    ========================= */
+
+    @media(max-width:900px){
+
+      #product > .two{
+        grid-template-columns:1fr;
+
+        gap:26px;
+      }
+
+
+      #product .gallery{
+        position:static;
+      }
+
+
+      .product-benefits{
+        grid-template-columns:1fr 1fr;
+      }
+
+
+      .product-support{
+        grid-template-columns:1fr;
+      }
+
+    }
+
+
+    /* =========================
+       MOBILE
+    ========================= */
+
+    @media(max-width:640px){
+
+      .product-page{
+        padding:
+          14px 0 35px;
+      }
+
+
+      .product-breadcrumb{
+        font-size:11px;
+
+        margin-bottom:12px;
+      }
+
+
+      #product > .two{
+        padding:14px;
+
+        border-radius:20px;
+
+        gap:20px;
+      }
+
+
+      #product .gallery{
+        grid-template-columns:1fr;
+      }
+
+
+      #product .thumbs{
+        order:2;
+
+        flex-direction:row;
+
+        overflow-x:auto;
+
+        padding-bottom:3px;
+      }
+
+
+      #product .thumbs img{
+        width:64px;
+        height:64px;
+
+        flex-shrink:0;
+      }
+
+
+      #product .mainimage{
+        order:1;
+
+        border-radius:17px;
+
+        padding:10px;
+      }
+
+
+      #product > .two > div:last-child{
+        padding:3px;
+      }
+
+
+      #product h1{
+        margin:
+          14px 0 12px;
+
+        font-size:
+          clamp(30px,9vw,40px);
+      }
+
+
+      #product h1 + p{
+        font-size:14px;
+
+        line-height:1.65;
+      }
+
+
+      #product .price{
+        font-size:25px;
+      }
+
+
+      #product .actions{
+        grid-template-columns:1fr;
+      }
+
+
+      #product .actions .btn{
+        width:100%;
+      }
+
+
+      .product-benefits{
+        grid-template-columns:
+          repeat(2,minmax(0,1fr));
+
+        gap:8px;
+      }
+
+
+      .product-benefit{
+        padding:11px;
+
+        flex-direction:column;
+
+        align-items:flex-start;
+      }
+
+
+      .product-support{
+        padding:22px;
+
+        border-radius:20px;
+      }
+
+
+      .support-buttons{
+        display:grid;
+
+        grid-template-columns:1fr;
+
+        width:100%;
+      }
+
+
+      .support-button{
+        text-align:center;
+      }
+
+    }
+
+  </style>
+
 </head>
 
+
 <body>
+
+
+  <!-- NAV -->
 
   <header
     id="nav"
@@ -25,11 +780,178 @@
   ></header>
 
 
-  <main
-    id="product"
-    class="container section"
-  ></main>
+  <main class="container product-page">
 
+
+    <!-- BREADCRUMB -->
+
+    <div class="product-breadcrumb">
+
+      <a
+        href="/memora-creations/frontend/index.html"
+      >
+        Home
+      </a>
+
+      <span>›</span>
+
+      <a
+        href="/memora-creations/frontend/products.html"
+      >
+        Products
+      </a>
+
+      <span>›</span>
+
+      <span>
+        Product Details
+      </span>
+
+    </div>
+
+
+    <!-- PRODUCT GENERATED BY products.js -->
+
+    <section id="product">
+
+      <div class="empty">
+        Loading product...
+      </div>
+
+    </section>
+
+
+    <!-- BENEFITS -->
+
+    <section class="product-benefits">
+
+      <div class="product-benefit">
+
+        <div class="benefit-icon">
+          ✓
+        </div>
+
+        <div>
+
+          <strong>
+            Quality Checked
+          </strong>
+
+          <span>
+            Carefully selected products
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div class="product-benefit">
+
+        <div class="benefit-icon">
+          🔒
+        </div>
+
+        <div>
+
+          <strong>
+            Secure Shopping
+          </strong>
+
+          <span>
+            Safe checkout experience
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div class="product-benefit">
+
+        <div class="benefit-icon">
+          💬
+        </div>
+
+        <div>
+
+          <strong>
+            Customer Support
+          </strong>
+
+          <span>
+            Help whenever you need
+          </span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- CUSTOMER SUPPORT -->
+
+    <section class="product-support">
+
+      <div>
+
+        <small>
+          MEMORA CUSTOMER CARE
+        </small>
+
+        <h2>
+          Need help with this product?
+        </h2>
+
+        <p>
+          Product, order ya payment se related
+          help ke liye humse contact karein.
+        </p>
+
+      </div>
+
+
+      <div class="support-buttons">
+
+        <a
+          class="support-button"
+          href="https://wa.me/917054242294?text=Namaste%20Memora%20Creations%2C%20mujhe%20ek%20product%20ke%20baare%20me%20help%20chahiye."
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          💬 WhatsApp
+        </a>
+
+
+        <a
+          class="support-button"
+          href="mailto:memoracreations.care@gmail.com?subject=Product%20Support%20-%20Memora%20Creations"
+        >
+          ✉️ Email Support
+        </a>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- FOOTER -->
+
+  <footer class="product-footer">
+
+    <strong>
+      MEMORA CREATIONS
+    </strong>
+
+    Beautiful Decor • Thoughtful Gifts • Memorable Spaces
+
+  </footer>
+
+
+  <!-- MOBILE NAV -->
 
   <nav
     id="bottomNav"
@@ -37,37 +959,18 @@
   ></nav>
 
 
+  <!-- COMMON JS -->
+
   <script
-    src="/memora-creations/frontend/js/app.js?v=9"
+    src="/memora-creations/frontend/js/app.js?v=10"
   ></script>
 
 
-  <script>
+  <!-- PRODUCT JS -->
 
-    (async function secureProductPage() {
-
-      const user =
-        await window.MC.requireLogin();
-
-      if (!user) {
-        return;
-      }
-
-      const script =
-        document.createElement(
-          'script'
-        );
-
-      script.src =
-        '/memora-creations/frontend/js/products.js?v=9';
-
-      document.body.appendChild(
-        script
-      );
-
-    })();
-
-  </script>
+  <script
+    src="/memora-creations/frontend/js/products.js?v=10"
+  ></script>
 
 </body>
 
