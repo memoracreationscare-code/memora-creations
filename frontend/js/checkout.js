@@ -800,14 +800,14 @@ async function placeCodOrder() {
         'Thank you for shopping with Memora Creations. Your order has been confirmed.',
 
       buttonText:
-        'View Order',
+        'Continue',
 
       onContinue:
         () => {
 
           location.href =
             CHECKOUT_BASE +
-            '/frontend/order-details.html?id=' +
+            '/frontend/order-success.html?id=' +
             encodeURIComponent(
               data.order._id
             );
@@ -1010,14 +1010,14 @@ async function placeOnlineOrder() {
                   'Your payment was successful and your order has been confirmed.',
 
                 buttonText:
-                  'View Order',
+                  'Continue',
 
                 onContinue:
                   () => {
 
                     location.href =
                       CHECKOUT_BASE +
-                      '/frontend/order-details.html?id=' +
+                      '/frontend/order-success.html?id=' +
                       encodeURIComponent(
                         verified.order._id
                       );
