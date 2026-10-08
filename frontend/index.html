@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
   <meta charset="utf-8">
 
   <meta
@@ -9,15 +10,1487 @@
     content="width=device-width, initial-scale=1"
   >
 
-  <title>MEMORA CREATIONS</title>
+  <title>MEMORA CREATIONS - Make Your Space Special</title>
 
   <link
     rel="stylesheet"
-    href="/memora-creations/frontend/css/style.css?v=12"
+    href="/memora-creations/frontend/css/style.css?v=13"
   >
+
+
+  <style>
+
+    /* =========================
+       HOME PAGE
+    ========================= */
+
+    .home-announcement{
+      background:#2d1d14;
+      color:#fff7f1;
+
+      text-align:center;
+
+      padding:9px 15px;
+
+      font-size:12px;
+      font-weight:700;
+
+      letter-spacing:.08em;
+    }
+
+
+    /* =========================
+       HERO
+    ========================= */
+
+    .home-hero{
+      margin:24px 0 38px;
+
+      min-height:520px;
+
+      border-radius:30px;
+
+      overflow:hidden;
+
+      position:relative;
+
+      display:grid;
+
+      grid-template-columns:
+        1.15fr .85fr;
+
+      background:
+        linear-gradient(
+          135deg,
+          #f5eadf,
+          #fffaf5
+        );
+
+      border:
+        1px solid #eadfd5;
+
+      box-shadow:
+        0 22px 55px
+        rgba(61,39,23,.08);
+    }
+
+
+    .hero-copy{
+      padding:
+        clamp(42px,6vw,78px);
+
+      display:flex;
+
+      flex-direction:column;
+
+      justify-content:center;
+
+      position:relative;
+
+      z-index:2;
+    }
+
+
+    .hero-kicker{
+      display:inline-flex;
+
+      align-items:center;
+
+      gap:9px;
+
+      margin-bottom:20px;
+
+      color:#9b613c;
+
+      font-size:12px;
+
+      font-weight:900;
+
+      letter-spacing:.22em;
+
+      text-transform:uppercase;
+    }
+
+
+    .hero-kicker::before{
+      content:"";
+
+      width:34px;
+      height:2px;
+
+      background:#b7835d;
+    }
+
+
+    .home-hero h1{
+      margin:0;
+
+      max-width:650px;
+
+      color:#281a12;
+
+      font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+      font-size:
+        clamp(54px,7vw,92px);
+
+      line-height:.92;
+
+      letter-spacing:-.045em;
+    }
+
+
+    .home-hero h1 span{
+      color:#9b613c;
+    }
+
+
+    .hero-description{
+      max-width:560px;
+
+      margin:25px 0 30px;
+
+      color:#71675f;
+
+      font-size:18px;
+
+      line-height:1.65;
+    }
+
+
+    .hero-actions{
+      display:flex;
+
+      gap:12px;
+
+      flex-wrap:wrap;
+    }
+
+
+    .hero-primary,
+    .hero-secondary{
+      min-height:56px;
+
+      padding:0 26px;
+
+      border-radius:999px;
+
+      display:inline-flex;
+
+      align-items:center;
+
+      justify-content:center;
+
+      gap:9px;
+
+      font-weight:800;
+
+      transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+    }
+
+
+    .hero-primary{
+      background:
+        linear-gradient(
+          180deg,
+          #9b613c,
+          #7e492a
+        );
+
+      color:#fff;
+
+      box-shadow:
+        0 13px 26px
+        rgba(138,90,59,.24);
+    }
+
+
+    .hero-secondary{
+      background:#fff;
+
+      border:
+        1px solid #dfd0c3;
+
+      color:#37261c;
+    }
+
+
+    .hero-primary:hover,
+    .hero-secondary:hover{
+      transform:translateY(-2px);
+    }
+
+
+    /* HERO VISUAL */
+
+    .hero-visual{
+      position:relative;
+
+      min-height:520px;
+
+      background:
+        radial-gradient(
+          circle at center,
+          #f3ddc8,
+          #e7c7aa
+        );
+
+      overflow:hidden;
+    }
+
+
+    .hero-visual::before{
+      content:"";
+
+      position:absolute;
+
+      width:350px;
+      height:350px;
+
+      border-radius:50%;
+
+      border:
+        1px solid
+        rgba(102,62,34,.14);
+
+      right:-80px;
+      top:-70px;
+    }
+
+
+    .hero-visual::after{
+      content:"";
+
+      position:absolute;
+
+      width:220px;
+      height:220px;
+
+      border-radius:50%;
+
+      background:
+        rgba(255,255,255,.22);
+
+      left:-65px;
+      bottom:-50px;
+    }
+
+
+    .decor-scene{
+      position:absolute;
+
+      inset:0;
+
+      display:flex;
+
+      align-items:center;
+
+      justify-content:center;
+    }
+
+
+    .decor-frame-large{
+      width:230px;
+      height:285px;
+
+      background:
+        linear-gradient(
+          145deg,
+          #f3cfae,
+          #9c6743
+        );
+
+      border:
+        18px solid #7b4c2c;
+
+      border-radius:10px;
+
+      box-shadow:
+        0 28px 50px
+        rgba(74,40,20,.24);
+
+      transform:
+        rotate(-4deg);
+
+      position:relative;
+    }
+
+
+    .decor-frame-large::before{
+      content:"";
+
+      position:absolute;
+
+      inset:16px;
+
+      background:
+        linear-gradient(
+          160deg,
+          #f9e6d5,
+          #d6a67f
+        );
+    }
+
+
+    .decor-vase-home{
+      position:absolute;
+
+      right:56px;
+      bottom:72px;
+
+      width:105px;
+      height:155px;
+
+      border-radius:
+        46px 46px 28px 28px;
+
+      background:#f6eee7;
+
+      box-shadow:
+        0 20px 30px
+        rgba(82,48,24,.15);
+    }
+
+
+    .decor-vase-home::before{
+      content:"";
+
+      position:absolute;
+
+      width:28px;
+      height:130px;
+
+      left:38px;
+      top:-95px;
+
+      background:
+        linear-gradient(
+          #728f50,
+          #3b5d2b
+        );
+
+      border-radius:
+        100% 0 100% 0;
+
+      transform:rotate(-18deg);
+    }
+
+
+    .decor-vase-home::after{
+      content:"";
+
+      position:absolute;
+
+      width:25px;
+      height:110px;
+
+      left:52px;
+      top:-80px;
+
+      background:
+        linear-gradient(
+          #819d5d,
+          #426331
+        );
+
+      border-radius:
+        0 100% 0 100%;
+
+      transform:rotate(28deg);
+    }
+
+
+    .decor-candle-home{
+      position:absolute;
+
+      left:55px;
+      bottom:82px;
+
+      width:68px;
+      height:100px;
+
+      border-radius:15px;
+
+      background:#fff6ea;
+
+      box-shadow:
+        0 18px 28px
+        rgba(82,48,24,.13);
+    }
+
+
+    .decor-candle-home::before{
+      content:"";
+
+      position:absolute;
+
+      width:14px;
+      height:23px;
+
+      left:27px;
+      top:-22px;
+
+      border-radius:
+        50% 50% 45% 45%;
+
+      background:
+        linear-gradient(
+          #ffd477,
+          #eb7c2d
+        );
+    }
+
+
+    /* =========================
+       TRUST STRIP
+    ========================= */
+
+    .trust-strip{
+      display:grid;
+
+      grid-template-columns:
+        repeat(4,1fr);
+
+      gap:12px;
+
+      margin-bottom:50px;
+    }
+
+
+    .trust-item{
+      min-height:104px;
+
+      padding:17px;
+
+      border:
+        1px solid #e8ddd3;
+
+      border-radius:19px;
+
+      background:#fff;
+
+      display:flex;
+
+      align-items:center;
+
+      gap:13px;
+
+      box-shadow:
+        0 8px 24px
+        rgba(61,39,23,.045);
+    }
+
+
+    .trust-icon{
+      width:47px;
+      height:47px;
+
+      border-radius:14px;
+
+      flex-shrink:0;
+
+      display:flex;
+
+      align-items:center;
+
+      justify-content:center;
+
+      background:#f5e9dd;
+
+      color:#8a5a3b;
+    }
+
+
+    .trust-icon svg{
+      width:24px;
+      height:24px;
+
+      stroke:currentColor;
+    }
+
+
+    .trust-text strong{
+      display:block;
+
+      margin-bottom:4px;
+
+      color:#33241b;
+
+      font-size:14px;
+    }
+
+
+    .trust-text span{
+      display:block;
+
+      color:#81776f;
+
+      font-size:12px;
+
+      line-height:1.4;
+    }
+
+
+    /* =========================
+       SECTION HEADING
+    ========================= */
+
+    .premium-section{
+      padding:32px 0 54px;
+    }
+
+
+    .premium-heading{
+      margin-bottom:24px;
+    }
+
+
+    .premium-eyebrow{
+      margin-bottom:8px;
+
+      color:#9b613c;
+
+      font-size:11px;
+
+      font-weight:900;
+
+      letter-spacing:.22em;
+
+      text-transform:uppercase;
+    }
+
+
+    .premium-title-row{
+      display:flex;
+
+      align-items:flex-end;
+
+      justify-content:space-between;
+
+      gap:20px;
+    }
+
+
+    .premium-title-row h2{
+      margin:0;
+
+      font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+      font-size:
+        clamp(34px,4vw,50px);
+
+      line-height:1;
+
+      color:#2b1b12;
+    }
+
+
+    .view-all-link{
+      color:#8a5a3b;
+
+      font-weight:800;
+
+      font-size:14px;
+
+      white-space:nowrap;
+    }
+
+
+    /* =========================
+       CATEGORY
+    ========================= */
+
+    .home-category-grid{
+      display:grid;
+
+      grid-template-columns:
+        repeat(3,1fr);
+
+      gap:16px;
+    }
+
+
+    .home-category-card{
+      min-height:210px;
+
+      border-radius:24px;
+
+      border:
+        1px solid #e7dbd0;
+
+      background:
+        linear-gradient(
+          145deg,
+          #fff,
+          #f8f0e8
+        );
+
+      padding:24px;
+
+      position:relative;
+
+      overflow:hidden;
+
+      display:flex;
+
+      flex-direction:column;
+
+      justify-content:space-between;
+
+      box-shadow:
+        0 12px 30px
+        rgba(61,39,23,.055);
+
+      transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+    }
+
+
+    .home-category-card:hover{
+      transform:
+        translateY(-4px);
+
+      box-shadow:
+        0 18px 38px
+        rgba(61,39,23,.10);
+    }
+
+
+    .home-category-card::after{
+      content:"";
+
+      position:absolute;
+
+      width:150px;
+      height:150px;
+
+      right:-35px;
+      bottom:-35px;
+
+      border-radius:50%;
+
+      background:
+        rgba(183,131,93,.12);
+    }
+
+
+    .home-category-icon{
+      width:72px;
+      height:72px;
+
+      border-radius:21px;
+
+      display:flex;
+
+      align-items:center;
+
+      justify-content:center;
+
+      background:#f4e5d7;
+
+      font-size:35px;
+
+      position:relative;
+
+      z-index:1;
+    }
+
+
+    .home-category-name{
+      position:relative;
+
+      z-index:1;
+
+      margin-top:32px;
+
+      color:#2f2118;
+
+      font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+      font-size:23px;
+
+      font-weight:700;
+    }
+
+
+    .category-arrow{
+      margin-top:8px;
+
+      position:relative;
+
+      z-index:1;
+
+      color:#8a5a3b;
+
+      font-size:13px;
+
+      font-weight:800;
+    }
+
+
+    /* =========================
+       PRODUCT GRID
+    ========================= */
+
+    .home-products-grid{
+      display:grid;
+
+      grid-template-columns:
+        repeat(4,minmax(0,1fr));
+
+      gap:18px;
+    }
+
+
+    .home-product-card{
+      overflow:hidden;
+
+      background:#fff;
+
+      border:
+        1px solid #e8dfd8;
+
+      border-radius:22px;
+
+      box-shadow:
+        0 9px 25px
+        rgba(46,31,20,.05);
+
+      transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+    }
+
+
+    .home-product-card:hover{
+      transform:
+        translateY(-4px);
+
+      box-shadow:
+        0 18px 38px
+        rgba(46,31,20,.11);
+    }
+
+
+    .home-product-image-wrap{
+      position:relative;
+
+      background:#f6f3ef;
+
+      overflow:hidden;
+
+      aspect-ratio:1/1;
+    }
+
+
+    .home-product-image{
+      width:100%;
+      height:100%;
+
+      object-fit:cover;
+
+      display:block;
+
+      transition:
+        transform .3s ease;
+    }
+
+
+    .home-product-card:hover
+    .home-product-image{
+      transform:scale(1.035);
+    }
+
+
+    .discount-badge{
+      position:absolute;
+
+      left:11px;
+      top:11px;
+
+      padding:6px 9px;
+
+      border-radius:999px;
+
+      background:#2f2118;
+
+      color:#fff;
+
+      font-size:11px;
+
+      font-weight:800;
+    }
+
+
+    .stock-badge{
+      position:absolute;
+
+      right:11px;
+      top:11px;
+
+      width:10px;
+      height:10px;
+
+      border-radius:50%;
+
+      background:#2da560;
+
+      box-shadow:
+        0 0 0 4px
+        rgba(45,165,96,.14);
+    }
+
+
+    .stock-badge.out{
+      background:#c84d44;
+
+      box-shadow:
+        0 0 0 4px
+        rgba(200,77,68,.14);
+    }
+
+
+    .home-product-content{
+      padding:15px;
+    }
+
+
+    .product-category-label{
+      margin-bottom:7px;
+
+      color:#9b613c;
+
+      font-size:10px;
+
+      font-weight:900;
+
+      letter-spacing:.12em;
+
+      text-transform:uppercase;
+    }
+
+
+    .home-product-title{
+      margin:0 0 10px;
+
+      min-height:42px;
+
+      color:#302219;
+
+      font-size:15px;
+
+      line-height:1.4;
+
+      font-weight:800;
+    }
+
+
+    .product-price-row{
+      display:flex;
+
+      align-items:baseline;
+
+      gap:8px;
+
+      flex-wrap:wrap;
+    }
+
+
+    .current-price{
+      color:#241912;
+
+      font-size:19px;
+
+      font-weight:900;
+    }
+
+
+    .old-price{
+      color:#9d9690;
+
+      font-size:13px;
+
+      text-decoration:line-through;
+    }
+
+
+    .home-product-actions{
+      padding:
+        0 15px 15px;
+
+      display:grid;
+
+      grid-template-columns:1fr 1fr;
+
+      gap:8px;
+    }
+
+
+    .home-product-actions .btn{
+      padding:
+        11px 8px;
+
+      font-size:12px;
+
+      border-radius:11px;
+    }
+
+
+    /* =========================
+       CUSTOMER CARE
+    ========================= */
+
+    .home-care{
+      margin:28px 0 60px;
+
+      border-radius:28px;
+
+      overflow:hidden;
+
+      display:grid;
+
+      grid-template-columns:
+        1fr 1fr;
+
+      border:
+        1px solid #e3d5c8;
+
+      background:
+        linear-gradient(
+          135deg,
+          #302016,
+          #74482d
+        );
+
+      color:#fff;
+
+      box-shadow:
+        0 22px 50px
+        rgba(54,31,16,.15);
+    }
+
+
+    .care-copy-home{
+      padding:
+        clamp(30px,5vw,55px);
+    }
+
+
+    .care-copy-home small{
+      display:block;
+
+      margin-bottom:10px;
+
+      color:#e5c7ad;
+
+      font-weight:900;
+
+      letter-spacing:.20em;
+    }
+
+
+    .care-copy-home h2{
+      margin:0 0 13px;
+
+      font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+      font-size:
+        clamp(34px,4vw,52px);
+
+      line-height:1;
+    }
+
+
+    .care-copy-home p{
+      margin:0;
+
+      max-width:500px;
+
+      color:#eadfd7;
+
+      line-height:1.65;
+    }
+
+
+    .care-actions-home{
+      padding:30px;
+
+      display:flex;
+
+      flex-direction:column;
+
+      justify-content:center;
+
+      gap:12px;
+
+      background:
+        rgba(255,255,255,.06);
+    }
+
+
+    .care-action{
+      padding:16px;
+
+      border:
+        1px solid
+        rgba(255,255,255,.17);
+
+      border-radius:16px;
+
+      display:flex;
+
+      align-items:center;
+
+      gap:13px;
+
+      background:
+        rgba(255,255,255,.08);
+
+      color:#fff;
+    }
+
+
+    .care-action-icon{
+      width:44px;
+      height:44px;
+
+      border-radius:13px;
+
+      background:
+        rgba(255,255,255,.12);
+
+      display:flex;
+
+      align-items:center;
+
+      justify-content:center;
+
+      font-size:21px;
+
+      flex-shrink:0;
+    }
+
+
+    .care-action strong{
+      display:block;
+
+      margin-bottom:3px;
+    }
+
+
+    .care-action span{
+      display:block;
+
+      color:#e4d7cf;
+
+      font-size:13px;
+    }
+
+
+    /* =========================
+       FOOTER
+    ========================= */
+
+    .premium-footer{
+      background:#21160f;
+
+      color:#e9dfd8;
+
+      padding:
+        48px 0 110px;
+
+      margin-top:25px;
+    }
+
+
+    .footer-grid{
+      display:grid;
+
+      grid-template-columns:
+        1.3fr 1fr 1fr;
+
+      gap:35px;
+    }
+
+
+    .footer-brand{
+      color:#fff;
+
+      font-size:20px;
+
+      font-weight:900;
+
+      letter-spacing:.08em;
+    }
+
+
+    .footer-text{
+      max-width:400px;
+
+      margin-top:12px;
+
+      color:#bfb3aa;
+
+      font-size:14px;
+
+      line-height:1.7;
+    }
+
+
+    .footer-title{
+      margin-bottom:14px;
+
+      color:#fff;
+
+      font-size:14px;
+
+      font-weight:800;
+    }
+
+
+    .footer-links{
+      display:flex;
+
+      flex-direction:column;
+
+      gap:10px;
+
+      color:#cbbfb7;
+
+      font-size:14px;
+    }
+
+
+    .footer-bottom{
+      margin-top:35px;
+
+      padding-top:20px;
+
+      border-top:
+        1px solid
+        rgba(255,255,255,.10);
+
+      color:#938980;
+
+      font-size:12px;
+
+      text-align:center;
+    }
+
+
+    /* =========================
+       MOBILE
+    ========================= */
+
+    @media(max-width:900px){
+
+      .home-hero{
+        grid-template-columns:1fr;
+      }
+
+
+      .hero-visual{
+        min-height:360px;
+      }
+
+
+      .trust-strip{
+        grid-template-columns:
+          repeat(2,1fr);
+      }
+
+
+      .home-products-grid{
+        grid-template-columns:
+          repeat(2,minmax(0,1fr));
+      }
+
+
+      .home-care{
+        grid-template-columns:1fr;
+      }
+
+    }
+
+
+    @media(max-width:640px){
+
+      .home-announcement{
+        font-size:10px;
+
+        padding:8px 10px;
+      }
+
+
+      .home-hero{
+        margin:
+          10px 0 24px;
+
+        border-radius:22px;
+      }
+
+
+      .hero-copy{
+        padding:
+          42px 21px 36px;
+      }
+
+
+      .home-hero h1{
+        font-size:
+          clamp(47px,14vw,62px);
+      }
+
+
+      .hero-description{
+        margin:
+          21px 0 25px;
+
+        font-size:16px;
+      }
+
+
+      .hero-actions{
+        display:grid;
+
+        grid-template-columns:
+          1fr 1fr;
+      }
+
+
+      .hero-primary,
+      .hero-secondary{
+        min-height:52px;
+
+        padding:
+          0 13px;
+
+        font-size:14px;
+      }
+
+
+      .hero-visual{
+        min-height:305px;
+      }
+
+
+      .decor-frame-large{
+        width:165px;
+        height:205px;
+
+        border-width:13px;
+      }
+
+
+      .decor-vase-home{
+        right:28px;
+
+        width:75px;
+        height:110px;
+      }
+
+
+      .decor-candle-home{
+        left:25px;
+
+        width:50px;
+        height:74px;
+      }
+
+
+      .trust-strip{
+        grid-template-columns:
+          repeat(2,minmax(0,1fr));
+
+        gap:9px;
+
+        margin-bottom:35px;
+      }
+
+
+      .trust-item{
+        min-height:100px;
+
+        padding:11px;
+
+        align-items:flex-start;
+
+        flex-direction:column;
+      }
+
+
+      .trust-icon{
+        width:39px;
+        height:39px;
+      }
+
+
+      .trust-text strong{
+        font-size:12px;
+      }
+
+
+      .trust-text span{
+        font-size:10px;
+      }
+
+
+      .premium-section{
+        padding:
+          24px 0 38px;
+      }
+
+
+      .premium-title-row h2{
+        font-size:32px;
+      }
+
+
+      .home-category-grid{
+        grid-template-columns:
+          repeat(2,minmax(0,1fr));
+
+        gap:11px;
+      }
+
+
+      .home-category-card{
+        min-height:165px;
+
+        padding:17px;
+
+        border-radius:19px;
+      }
+
+
+      .home-category-icon{
+        width:58px;
+        height:58px;
+
+        font-size:29px;
+      }
+
+
+      .home-category-name{
+        margin-top:20px;
+
+        font-size:17px;
+      }
+
+
+      .home-products-grid{
+        gap:10px;
+      }
+
+
+      .home-product-card{
+        border-radius:16px;
+      }
+
+
+      .home-product-content{
+        padding:11px;
+      }
+
+
+      .home-product-title{
+        min-height:38px;
+
+        font-size:13px;
+      }
+
+
+      .current-price{
+        font-size:16px;
+      }
+
+
+      .old-price{
+        font-size:11px;
+      }
+
+
+      .home-product-actions{
+        padding:
+          0 10px 10px;
+
+        grid-template-columns:1fr;
+
+        gap:6px;
+      }
+
+
+      .home-product-actions .btn{
+        font-size:11px;
+      }
+
+
+      .home-care{
+        margin:
+          20px 0 40px;
+
+        border-radius:22px;
+      }
+
+
+      .care-actions-home{
+        padding:20px;
+      }
+
+
+      .footer-grid{
+        grid-template-columns:1fr;
+
+        gap:28px;
+      }
+
+
+      .premium-footer{
+        padding-top:38px;
+      }
+
+    }
+
+
+    @media(max-width:380px){
+
+      .home-products-grid{
+        grid-template-columns:1fr;
+      }
+
+    }
+
+  </style>
+
 </head>
 
+
 <body>
+
+
+  <!-- ANNOUNCEMENT -->
+
+  <div class="home-announcement">
+    ✨ Welcome to MEMORA CREATIONS — Beautiful Decor • Thoughtful Gifts • Memorable Spaces
+  </div>
+
+
+  <!-- NAV -->
 
   <header
     id="nav"
@@ -27,64 +1500,245 @@
 
   <main class="container">
 
+
     <!-- =========================
          HERO
     ========================== -->
 
-    <section class="hero premium-hero">
+    <section class="home-hero">
 
-      <div class="hero-eyebrow">
-        MEMORA CREATIONS
+      <div class="hero-copy">
+
+        <div class="hero-kicker">
+          MEMORA CREATIONS
+        </div>
+
+
+        <h1>
+
+          Make Your
+          <br>
+
+          Space
+
+          <span>
+            Special.
+          </span>
+
+        </h1>
+
+
+        <p class="hero-description">
+
+          Beautiful home decor, photo frames
+          and thoughtfully selected products
+          designed to make every corner feel
+          personal.
+
+        </p>
+
+
+        <div class="hero-actions">
+
+          <a
+            class="hero-primary"
+            href="/memora-creations/frontend/products.html"
+          >
+            Shop Collection
+            →
+          </a>
+
+
+          <a
+            class="hero-secondary"
+            href="#homeCategories"
+          >
+            Explore Categories
+          </a>
+
+        </div>
+
       </div>
 
-      <h1>
-        Make Your
-        <br>
-        Space
-        <span class="hero-highlight">
-          Special.
-        </span>
-      </h1>
 
-      <p>
-        Beautiful home decor and photo frames
-        designed to make everyday spaces feel
-        more personal.
-      </p>
+      <div class="hero-visual">
 
-      <a
-        class="btn hero-btn"
-        href="/memora-creations/frontend/products.html"
-      >
-        Shop Now
-      </a>
+        <div class="decor-scene">
+
+          <div class="decor-candle-home"></div>
+
+          <div class="decor-frame-large"></div>
+
+          <div class="decor-vase-home"></div>
+
+        </div>
+
+      </div>
 
     </section>
 
 
     <!-- =========================
-         PREMIUM CATEGORIES
+         TRUST
     ========================== -->
 
-    <section class="section category-section">
+    <section class="trust-strip">
 
-      <div class="category-heading">
 
-        <div class="category-eyebrow">
+      <div class="trust-item">
+
+        <div class="trust-icon">
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke-width="1.8"
+          >
+            <path d="M12 3l7 3v5c0 4.6-2.8 8.7-7 10-4.2-1.3-7-5.4-7-10V6l7-3Z"></path>
+            <path d="M9.5 12l1.6 1.6 3.6-3.6"></path>
+          </svg>
+
+        </div>
+
+        <div class="trust-text">
+
+          <strong>
+            Secure Shopping
+          </strong>
+
+          <span>
+            Safe account & checkout
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div class="trust-item">
+
+        <div class="trust-icon">
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke-width="1.8"
+          >
+            <path d="M4 7h16v12H4z"></path>
+            <path d="M8 7V5h8v2"></path>
+            <path d="M4 12h16"></path>
+          </svg>
+
+        </div>
+
+        <div class="trust-text">
+
+          <strong>
+            Quality Products
+          </strong>
+
+          <span>
+            Carefully selected items
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div class="trust-item">
+
+        <div class="trust-icon">
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke-width="1.8"
+          >
+            <path d="M3 6h12v11H3z"></path>
+            <path d="M15 10h3l3 3v4h-6"></path>
+            <circle cx="7" cy="19" r="2"></circle>
+            <circle cx="18" cy="19" r="2"></circle>
+          </svg>
+
+        </div>
+
+        <div class="trust-text">
+
+          <strong>
+            Easy Ordering
+          </strong>
+
+          <span>
+            Simple checkout experience
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div class="trust-item">
+
+        <div class="trust-icon">
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke-width="1.8"
+          >
+            <path d="M4 13v-2a8 8 0 0 1 16 0v2"></path>
+            <path d="M4 13h3v5H5a1 1 0 0 1-1-1v-4Z"></path>
+            <path d="M20 13h-3v5h2a1 1 0 0 0 1-1v-4Z"></path>
+          </svg>
+
+        </div>
+
+        <div class="trust-text">
+
+          <strong>
+            Customer Support
+          </strong>
+
+          <span>
+            WhatsApp & email assistance
+          </span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         CATEGORIES
+    ========================== -->
+
+    <section
+      id="homeCategories"
+      class="premium-section"
+    >
+
+      <div class="premium-heading">
+
+        <div class="premium-eyebrow">
           EXPLORE
         </div>
 
-        <div class="category-title-row">
+
+        <div class="premium-title-row">
 
           <h2>
             Shop by Category
           </h2>
 
+
           <a
-            class="category-shop-all"
+            class="view-all-link"
             href="/memora-creations/frontend/products.html"
           >
-            Shop all
+            Shop all →
           </a>
 
         </div>
@@ -94,53 +1748,255 @@
 
       <div
         id="categories"
-        class="category-grid"
+        class="home-category-grid"
       ></div>
 
     </section>
 
 
     <!-- =========================
-         ALL PRODUCTS
+         PRODUCTS
     ========================== -->
 
-    <section class="section">
+    <section class="premium-section">
 
-      <div class="sectionhead">
+      <div class="premium-heading">
 
-        <h2>
-          All Products
-        </h2>
+        <div class="premium-eyebrow">
+          DISCOVER
+        </div>
 
-        <a
-          href="/memora-creations/frontend/products.html"
-        >
-          View all
-        </a>
+
+        <div class="premium-title-row">
+
+          <h2>
+            Our Collection
+          </h2>
+
+
+          <a
+            class="view-all-link"
+            href="/memora-creations/frontend/products.html"
+          >
+            View all →
+          </a>
+
+        </div>
 
       </div>
 
 
       <div
         id="allProducts"
-        class="grid"
+        class="home-products-grid"
       ></div>
+
+    </section>
+
+
+    <!-- =========================
+         CUSTOMER CARE
+    ========================== -->
+
+    <section class="home-care">
+
+      <div class="care-copy-home">
+
+        <small>
+          WE'RE HERE TO HELP
+        </small>
+
+
+        <h2>
+          Need Assistance?
+        </h2>
+
+
+        <p>
+
+          Order, payment, delivery, login
+          ya password se related kisi bhi
+          help ke liye Memora Creations
+          Customer Care se contact karein.
+
+        </p>
+
+      </div>
+
+
+      <div class="care-actions-home">
+
+
+        <a
+          class="care-action"
+          href="https://wa.me/917054242294?text=Namaste%20Memora%20Creations%2C%20mujhe%20customer%20support%20chahiye."
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+
+          <div class="care-action-icon">
+            💬
+          </div>
+
+
+          <div>
+
+            <strong>
+              WhatsApp Support
+            </strong>
+
+            <span>
+              +91 70542 42294
+            </span>
+
+          </div>
+
+        </a>
+
+
+        <a
+          class="care-action"
+          href="mailto:memoracreations.care@gmail.com?subject=Memora%20Creations%20Customer%20Support"
+        >
+
+          <div class="care-action-icon">
+            ✉️
+          </div>
+
+
+          <div>
+
+            <strong>
+              Email Support
+            </strong>
+
+            <span>
+              memoracreations.care@gmail.com
+            </span>
+
+          </div>
+
+        </a>
+
+      </div>
 
     </section>
 
   </main>
 
 
-  <footer class="footer">
-    © MEMORA CREATIONS
+  <!-- =========================
+       FOOTER
+  ========================== -->
+
+  <footer class="premium-footer">
+
+    <div class="container">
+
+      <div class="footer-grid">
+
+
+        <div>
+
+          <div class="footer-brand">
+            MEMORA CREATIONS
+          </div>
+
+          <p class="footer-text">
+
+            Beautiful home decor and memorable
+            creations selected to make your
+            everyday spaces feel more special.
+
+          </p>
+
+        </div>
+
+
+        <div>
+
+          <div class="footer-title">
+            Quick Links
+          </div>
+
+          <div class="footer-links">
+
+            <a
+              href="/memora-creations/frontend/index.html"
+            >
+              Home
+            </a>
+
+            <a
+              href="/memora-creations/frontend/products.html"
+            >
+              Products
+            </a>
+
+            <a
+              href="/memora-creations/frontend/orders.html"
+            >
+              My Orders
+            </a>
+
+            <a
+              href="/memora-creations/frontend/profile.html"
+            >
+              My Profile
+            </a>
+
+          </div>
+
+        </div>
+
+
+        <div>
+
+          <div class="footer-title">
+            Customer Care
+          </div>
+
+          <div class="footer-links">
+
+            <a
+              href="https://wa.me/917054242294"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              WhatsApp: +91 70542 42294
+            </a>
+
+            <a
+              href="mailto:memoracreations.care@gmail.com"
+            >
+              memoracreations.care@gmail.com
+            </a>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="footer-bottom">
+        © MEMORA CREATIONS • All Rights Reserved
+      </div>
+
+    </div>
+
   </footer>
 
+
+  <!-- MOBILE BOTTOM NAV -->
 
   <nav
     id="bottomNav"
     class="bottomnav"
   ></nav>
 
+
+  <!-- COMMON JS -->
 
   <script
     src="/memora-creations/frontend/js/app.js?v=10"
@@ -152,7 +2008,343 @@
     const HOME_BASE =
       '/memora-creations';
 
-    let homeProducts = [];
+
+    let homeProducts =
+      [];
+
+
+    /* =========================
+       CATEGORY ICON
+    ========================= */
+
+    function getCategoryIcon(
+      categoryName
+    ) {
+
+      const name =
+        String(
+          categoryName || ''
+        )
+          .toUpperCase();
+
+
+      if (
+        name.includes('HOME')
+      ) {
+        return '🏠';
+      }
+
+
+      if (
+        name.includes('PHOTO')
+      ) {
+        return '🖼️';
+      }
+
+
+      if (
+        name.includes('WALL')
+      ) {
+        return '✨';
+      }
+
+
+      if (
+        name.includes('GIFT')
+      ) {
+        return '🎁';
+      }
+
+
+      if (
+        name.includes('CANDLE')
+      ) {
+        return '🕯️';
+      }
+
+
+      if (
+        name.includes('VASE')
+      ) {
+        return '🏺';
+      }
+
+
+      return '✨';
+
+    }
+
+
+    /* =========================
+       CATEGORY CARD
+    ========================= */
+
+    function homeCategoryCard(
+      category
+    ) {
+
+      return `
+
+        <a
+          class="home-category-card"
+          href="${HOME_BASE}/frontend/products.html?category=${encodeURIComponent(
+            category._id
+          )}"
+        >
+
+          <div class="home-category-icon">
+            ${getCategoryIcon(
+              category.name
+            )}
+          </div>
+
+
+          <div>
+
+            <div class="home-category-name">
+
+              ${window.MC.esc(
+                category.name
+              )}
+
+            </div>
+
+            <div class="category-arrow">
+              Explore Collection →
+            </div>
+
+          </div>
+
+        </a>
+
+      `;
+
+    }
+
+
+    /* =========================
+       DISCOUNT
+    ========================= */
+
+    function getDiscount(
+      product
+    ) {
+
+      const original =
+        Number(
+          product.originalPrice ||
+          0
+        );
+
+
+      const selling =
+        Number(
+          product.sellingPrice ||
+          0
+        );
+
+
+      if (
+        original <= 0 ||
+        selling >= original
+      ) {
+
+        return 0;
+
+      }
+
+
+      return Math.round(
+        (
+          (
+            original -
+            selling
+          ) /
+          original
+        ) *
+        100
+      );
+
+    }
+
+
+    /* =========================
+       PRODUCT CARD
+    ========================= */
+
+    function homeProductCard(
+      product
+    ) {
+
+      const image =
+        product.images?.[0]?.url ||
+        'https://placehold.co/600x600?text=Memora';
+
+
+      const discount =
+        getDiscount(
+          product
+        );
+
+
+      return `
+
+        <article class="home-product-card">
+
+          <button
+            class="product-card-open home-product-open"
+            type="button"
+            data-id="${product._id}"
+            style="
+              display:block;
+              width:100%;
+              border:0;
+              padding:0;
+              background:none;
+              text-align:left;
+              cursor:pointer;
+            "
+          >
+
+            <div class="home-product-image-wrap">
+
+              <img
+                class="home-product-image"
+                src="${window.MC.esc(image)}"
+                alt="${window.MC.esc(
+                  product.name || ''
+                )}"
+              >
+
+
+              ${
+                discount > 0
+
+                  ? `
+                    <span class="discount-badge">
+                      ${discount}% OFF
+                    </span>
+                  `
+
+                  : ''
+              }
+
+
+              <span
+                class="stock-badge ${
+                  Number(
+                    product.stock
+                  ) > 0
+                    ? ''
+                    : 'out'
+                }"
+              ></span>
+
+            </div>
+
+
+            <div class="home-product-content">
+
+              <div class="product-category-label">
+
+                ${window.MC.esc(
+                  product.category?.name ||
+                  'Collection'
+                )}
+
+              </div>
+
+
+              <h3 class="home-product-title">
+
+                ${window.MC.esc(
+                  product.name || ''
+                )}
+
+              </h3>
+
+
+              <div class="product-price-row">
+
+                <span class="current-price">
+
+                  ${window.MC.money(
+                    product.sellingPrice
+                  )}
+
+                </span>
+
+
+                ${
+                  Number(
+                    product.originalPrice
+                  ) >
+                  Number(
+                    product.sellingPrice
+                  )
+
+                    ? `
+                      <span class="old-price">
+
+                        ${window.MC.money(
+                          product.originalPrice
+                        )}
+
+                      </span>
+                    `
+
+                    : ''
+                }
+
+              </div>
+
+            </div>
+
+          </button>
+
+
+          <div class="home-product-actions">
+
+            <button
+              class="btn home-add-cart"
+              type="button"
+              data-id="${product._id}"
+
+              ${
+                Number(
+                  product.stock
+                ) < 1
+                  ? 'disabled'
+                  : ''
+              }
+            >
+              Add to Cart
+            </button>
+
+
+            <button
+              class="btn secondary home-buy-now"
+              type="button"
+              data-id="${product._id}"
+
+              ${
+                Number(
+                  product.stock
+                ) < 1
+                  ? 'disabled'
+                  : ''
+              }
+            >
+              Order Now
+            </button>
+
+          </div>
+
+        </article>
+
+      `;
+
+    }
 
 
     /* =========================
@@ -167,6 +2359,7 @@
         )
         ?.remove();
 
+
       document.body.style.overflow =
         '';
 
@@ -174,7 +2367,7 @@
 
 
     /* =========================
-       OPEN PRODUCT POPUP
+       PRODUCT POPUP
     ========================= */
 
     function openHomeProductPopup(
@@ -183,16 +2376,20 @@
 
       closeHomeProductPopup();
 
+
       const overlay =
         document.createElement(
           'div'
         );
 
+
       overlay.id =
         'homeProductPopup';
 
+
       overlay.className =
         'product-popup-overlay';
+
 
       const image =
         product.images?.[0]?.url ||
@@ -212,29 +2409,25 @@
           </button>
 
 
-          <div
-            class="product-popup-imagebox"
-          >
+          <div class="product-popup-imagebox">
 
             <img
               src="${window.MC.esc(image)}"
               alt="${window.MC.esc(
-                product.name
+                product.name || ''
               )}"
             >
 
           </div>
 
 
-          <div
-            class="product-popup-info"
-          >
+          <div class="product-popup-info">
 
             <span class="pill">
 
               ${window.MC.esc(
                 product.category?.name ||
-                'Category'
+                'Collection'
               )}
 
             </span>
@@ -249,13 +2442,12 @@
             </h2>
 
 
-            <div
-              class="product-popup-price"
-            >
+            <div class="product-popup-price">
 
               ${window.MC.money(
                 product.sellingPrice
               )}
+
 
               ${
                 Number(
@@ -284,7 +2476,8 @@
             <p class="muted">
 
               ${window.MC.esc(
-                product.description || ''
+                product.description ||
+                ''
               )}
 
             </p>
@@ -313,12 +2506,14 @@
                 Quantity
               </label>
 
+
               <input
                 class="input home-popup-qty"
                 type="number"
                 min="1"
                 max="${Number(
-                  product.stock || 1
+                  product.stock ||
+                  1
                 )}"
                 value="1"
 
@@ -334,9 +2529,7 @@
             </div>
 
 
-            <div
-              class="product-popup-actions"
-            >
+            <div class="product-popup-actions">
 
               <button
                 class="btn home-popup-add"
@@ -429,7 +2622,8 @@
                     .querySelector(
                       '.home-popup-qty'
                     )
-                    ?.value || 1
+                    ?.value ||
+                  1
                 )
               );
 
@@ -459,17 +2653,16 @@
                     .querySelector(
                       '.home-popup-qty'
                     )
-                    ?.value || 1
+                    ?.value ||
+                  1
                 )
               );
 
 
-            location.href =
-              `${HOME_BASE}/frontend/checkout.html?buyNow=${encodeURIComponent(
-                product._id
-              )}&qty=${encodeURIComponent(
-                qty
-              )}`;
+            buyHomeProductNow(
+              product._id,
+              qty
+            );
 
           }
         );
@@ -478,148 +2671,7 @@
 
 
     /* =========================
-       PRODUCT CARD
-    ========================= */
-
-    function homeProductCard(
-      product
-    ) {
-
-      return `
-
-        <article class="card">
-
-          <button
-            class="product-card-open home-product-open"
-            type="button"
-            data-id="${product._id}"
-          >
-
-            <img
-              class="productimg"
-
-              src="${window.MC.esc(
-                product.images?.[0]?.url ||
-                'https://placehold.co/600x600?text=Memora'
-              )}"
-
-              alt="${window.MC.esc(
-                product.name
-              )}"
-            >
-
-
-            <div class="cardbody">
-
-              <span class="pill">
-
-                ${window.MC.esc(
-                  product.category?.name ||
-                  'Category'
-                )}
-
-              </span>
-
-
-              <h3>
-
-                ${window.MC.esc(
-                  product.name
-                )}
-
-              </h3>
-
-
-              <div class="price">
-
-                ${window.MC.money(
-                  product.sellingPrice
-                )}
-
-
-                ${
-                  Number(
-                    product.originalPrice
-                  ) >
-                  Number(
-                    product.sellingPrice
-                  )
-
-                    ? `
-                      <span class="old">
-
-                        ${window.MC.money(
-                          product.originalPrice
-                        )}
-
-                      </span>
-                    `
-
-                    : ''
-                }
-
-              </div>
-
-
-              <p class="muted">
-
-                ${
-                  product.stock > 0
-                    ? 'In stock'
-                    : 'Out of stock'
-                }
-
-              </p>
-
-            </div>
-
-          </button>
-
-
-          <div
-            class="cardbody actions"
-          >
-
-            <button
-              class="btn home-add-cart"
-              type="button"
-              data-id="${product._id}"
-
-              ${
-                product.stock < 1
-                  ? 'disabled'
-                  : ''
-              }
-            >
-              Add to Cart
-            </button>
-
-
-            <button
-              class="btn secondary home-buy-now"
-              type="button"
-              data-id="${product._id}"
-
-              ${
-                product.stock < 1
-                  ? 'disabled'
-                  : ''
-              }
-            >
-              Order Now
-            </button>
-
-          </div>
-
-        </article>
-
-      `;
-
-    }
-
-
-    /* =========================
-       ADD TO CART
+       ADD CART
     ========================= */
 
     async function addHomeProductToCart(
@@ -654,35 +2706,29 @@
         await window.MC.updateCartCount();
 
 
-        if (
-          typeof window.MC.showCartPopup ===
-          'function'
-        ) {
+        window.MC.showCartPopup();
 
-          window.MC.showCartPopup();
-
-        } else {
-
-          window.MC.toast(
-            'Product cart mein add ho gaya.',
-            'success'
-          );
-
-        }
 
       } catch (error) {
 
-        const msg =
+        const message =
           String(
-            error.message || ''
+            error.message ||
+            ''
           )
             .toLowerCase();
 
 
         if (
-          msg.includes('login') ||
-          msg.includes('unauthorized') ||
-          msg.includes('authentication')
+          message.includes(
+            'login'
+          ) ||
+          message.includes(
+            'unauthorized'
+          ) ||
+          message.includes(
+            'authentication'
+          )
         ) {
 
           location.href =
@@ -693,6 +2739,7 @@
               location.search
             );
 
+
           return;
 
         }
@@ -700,7 +2747,7 @@
 
         window.MC.toast(
           error.message ||
-          'Cart mein add nahi hua.',
+          'Product cart mein add nahi hua.',
           'error'
         );
 
@@ -710,233 +2757,113 @@
 
 
     /* =========================
-       ORDER NOW
+       BUY NOW
     ========================= */
 
     function buyHomeProductNow(
-      id
+      id,
+      quantity = 1
     ) {
 
       location.href =
         `${HOME_BASE}/frontend/checkout.html?buyNow=${encodeURIComponent(
           id
-        )}&qty=1`;
+        )}&qty=${encodeURIComponent(
+          quantity
+        )}`;
 
     }
 
 
     /* =========================
-       BIND PRODUCT BUTTONS
+       BUTTONS
     ========================= */
 
     function bindHomeButtons() {
+
 
       document
         .querySelectorAll(
           '.home-product-open'
         )
-        .forEach(button => {
+        .forEach(
+          button => {
 
-          button.onclick =
-            () => {
+            button.onclick =
+              () => {
 
-              const product =
-                homeProducts.find(
-                  item =>
-                    item._id ===
-                    button.dataset.id
-                );
+                const product =
+                  homeProducts.find(
+                    item =>
+                      String(
+                        item._id
+                      ) ===
+                      String(
+                        button.dataset.id
+                      )
+                  );
 
 
-              if (product) {
+                if (product) {
 
-                openHomeProductPopup(
-                  product
-                );
+                  openHomeProductPopup(
+                    product
+                  );
 
-              }
+                }
 
-            };
+              };
 
-        });
+          }
+        );
 
 
       document
         .querySelectorAll(
           '.home-add-cart'
         )
-        .forEach(button => {
+        .forEach(
+          button => {
 
-          button.onclick =
-            () => {
+            button.onclick =
+              () => {
 
-              addHomeProductToCart(
-                button.dataset.id,
-                1
-              );
+                addHomeProductToCart(
+                  button.dataset.id,
+                  1
+                );
 
-            };
+              };
 
-        });
+          }
+        );
 
 
       document
         .querySelectorAll(
           '.home-buy-now'
         )
-        .forEach(button => {
+        .forEach(
+          button => {
 
-          button.onclick =
-            () => {
+            button.onclick =
+              () => {
 
-              buyHomeProductNow(
-                button.dataset.id
-              );
+                buyHomeProductNow(
+                  button.dataset.id,
+                  1
+                );
 
-            };
+              };
 
-        });
-
-    }
-
-
-    /* =========================
-       CATEGORY ICON
-    ========================= */
-
-    function getCategoryIcon(
-      categoryName
-    ) {
-
-      const name =
-        String(
-          categoryName || ''
-        )
-          .toUpperCase();
-
-
-      if (
-        name.includes(
-          'HOME'
-        )
-      ) {
-
-        return '🏠';
-
-      }
-
-
-      if (
-        name.includes(
-          'PHOTO'
-        )
-      ) {
-
-        return '🖼️';
-
-      }
-
-
-      if (
-        name.includes(
-          'WALL'
-        )
-      ) {
-
-        return '✨';
-
-      }
-
-
-      if (
-        name.includes(
-          'GIFT'
-        )
-      ) {
-
-        return '🎁';
-
-      }
-
-
-      if (
-        name.includes(
-          'CANDLE'
-        )
-      ) {
-
-        return '🕯️';
-
-      }
-
-
-      if (
-        name.includes(
-          'VASE'
-        )
-      ) {
-
-        return '🏺';
-
-      }
-
-
-      return '✨';
-
-    }
-
-
-    /* =========================
-       CATEGORY CARD
-    ========================= */
-
-    function homeCategoryCard(
-      category
-    ) {
-
-      const icon =
-        getCategoryIcon(
-          category.name
+          }
         );
 
-
-      return `
-
-        <a
-          class="category-card"
-
-          href="${HOME_BASE}/frontend/products.html?category=${encodeURIComponent(
-            category._id
-          )}"
-        >
-
-          <div
-            class="category-icon"
-            aria-hidden="true"
-          >
-            ${icon}
-          </div>
-
-
-          <div
-            class="category-name"
-          >
-
-            ${window.MC.esc(
-              category.name
-            )}
-
-          </div>
-
-        </a>
-
-      `;
-
     }
 
 
     /* =========================
-       LOAD HOME PAGE
+       LOAD
     ========================= */
 
     async function loadHomePage() {
@@ -944,8 +2871,8 @@
       try {
 
         const [
-          categories,
-          products
+          categoriesData,
+          productsData
         ] =
           await Promise.all([
 
@@ -960,67 +2887,64 @@
           ]);
 
 
-        /* =====================
-           CATEGORIES
-        ===================== */
-
-        const categoryList =
-          categories.categories ||
+        const categories =
+          categoriesData.categories ||
           [];
 
 
-        document
-          .getElementById(
+        const categoryBox =
+          document.getElementById(
             'categories'
-          )
-          .innerHTML =
-
-            categoryList.length
-
-              ? categoryList
-                  .map(
-                    homeCategoryCard
-                  )
-                  .join('')
-
-              : `
-                  <div class="empty">
-                    No categories available.
-                  </div>
-                `;
+          );
 
 
-        /* =====================
-           PRODUCTS
-        ===================== */
+        categoryBox.innerHTML =
+
+          categories.length
+
+            ? categories
+                .map(
+                  homeCategoryCard
+                )
+                .join('')
+
+            : `
+                <div class="empty">
+                  No categories available.
+                </div>
+              `;
+
 
         homeProducts =
-          products.products ||
+          productsData.products ||
           [];
 
 
-        document
-          .getElementById(
+        const productBox =
+          document.getElementById(
             'allProducts'
-          )
-          .innerHTML =
+          );
 
-            homeProducts.length
 
-              ? homeProducts
-                  .map(
-                    homeProductCard
-                  )
-                  .join('')
+        productBox.innerHTML =
 
-              : `
-                  <div class="empty">
-                    No products available yet.
-                  </div>
-                `;
+          homeProducts.length
+
+            ? homeProducts
+                .map(
+                  homeProductCard
+                )
+                .join('')
+
+            : `
+                <div class="empty">
+                  Products coming soon.
+                </div>
+              `;
 
 
         bindHomeButtons();
+
 
       } catch (error) {
 
@@ -1042,26 +2966,12 @@
 
 
     /* =========================
-       SECURE START
+       START
     ========================= */
 
-    (async function startHomePage() {
-
-      const user =
-        await window.MC.requireLogin();
-
-
-      if (!user) {
-        return;
-      }
-
-
-      await loadHomePage();
-
-    })();
+    loadHomePage();
 
   </script>
-
 
 </body>
 
