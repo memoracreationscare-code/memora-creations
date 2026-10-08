@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>
+    Order Successful | MEMORA CREATIONS
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="/memora-creations/frontend/css/style.css?v=13"
+  >
+
+  <link
+    rel="stylesheet"
+    href="/memora-creations/frontend/css/order-success.css?v=1"
+  >
+
+</head>
+
+
+<body class="order-success-body">
+
+  <header
+    id="nav"
+    class="topbar"
+  ></header>
+
+
+  <div
+    class="success-watermark"
+    aria-hidden="true"
+  >
+    MEMORA CREATIONS
+  </div>
+
+
+  <main
+    id="orderSuccess"
+    class="container order-success-page"
+  >
+
+    <div class="success-loading">
+      Loading order confirmation...
+    </div>
+
+  </main>
+
+
+  <nav
+    id="bottomNav"
+    class="bottomnav"
+  ></nav>
+
+
+  <script
+    src="/memora-creations/frontend/js/app.js?v=10"
+  ></script>
+
+
+  <script>
+
+    (async function secureSuccessPage() {
+
+      const user =
+        await window.MC.requireLogin();
+
+
+      if (!user) {
+        return;
+      }
+
+
+      const script =
+        document.createElement(
+          'script'
+        );
+
+
+      script.src =
+        '/memora-creations/frontend/js/order-success.js?v=1';
+
+
+      document.body.appendChild(
+        script
+      );
+
+    })();
+
+  </script>
+
+</body>
+
+</html>
