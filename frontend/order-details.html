@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
   <meta charset="utf-8">
 
   <meta
@@ -10,16 +11,26 @@
   >
 
   <title>
-    Order Details - MEMORA CREATIONS
+    Order Details | MEMORA CREATIONS
   </title>
+
 
   <link
     rel="stylesheet"
-    href="/memora-creations/frontend/css/style.css?v=9"
+    href="/memora-creations/frontend/css/style.css?v=13"
   >
+
+
+  <link
+    rel="stylesheet"
+    href="/memora-creations/frontend/css/order-details.css?v=1"
+  >
+
 </head>
 
-<body>
+
+<body class="order-details-body">
+
 
   <header
     id="nav"
@@ -27,10 +38,99 @@
   ></header>
 
 
-  <main
-    id="order"
-    class="container section"
-  ></main>
+  <div
+    class="order-details-watermark"
+    aria-hidden="true"
+  >
+    MEMORA CREATIONS
+  </div>
+
+
+  <main class="container order-details-page">
+
+
+    <div class="order-details-breadcrumb">
+
+      <a
+        href="/memora-creations/frontend/orders.html"
+      >
+        ← My Orders
+      </a>
+
+      <span>
+        Order Details
+      </span>
+
+    </div>
+
+
+    <section
+      id="order"
+      class="order-details-container"
+    >
+
+      <div class="order-details-loading">
+        Loading order details...
+      </div>
+
+    </section>
+
+
+    <section class="order-details-support">
+
+      <div>
+
+        <small>
+          MEMORA CUSTOMER CARE
+        </small>
+
+        <h2>
+          Need help with this order?
+        </h2>
+
+        <p>
+          Order tracking, payment ya delivery
+          se related help ke liye humse contact karein.
+        </p>
+
+      </div>
+
+
+      <div class="order-details-support-actions">
+
+        <a
+          href="https://wa.me/917054242294?text=Namaste%20Memora%20Creations%2C%20mujhe%20mere%20order%20ke%20baare%20me%20help%20chahiye."
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          💬 WhatsApp
+        </a>
+
+
+        <a
+          href="mailto:memoracreations.care@gmail.com?subject=Order%20Support%20-%20Memora%20Creations"
+        >
+          ✉️ Email Support
+        </a>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <footer class="order-details-footer">
+
+    <strong>
+      MEMORA CREATIONS
+    </strong>
+
+    <p>
+      Beautiful Decor • Thoughtful Gifts • Memorable Spaces
+    </p>
+
+  </footer>
 
 
   <nav
@@ -40,7 +140,7 @@
 
 
   <script
-    src="/memora-creations/frontend/js/app.js?v=9"
+    src="/memora-creations/frontend/js/app.js?v=10"
   ></script>
 
 
@@ -64,7 +164,7 @@
 
 
       script.src =
-        '/memora-creations/frontend/js/order-details.js?v=9';
+        '/memora-creations/frontend/js/order-details.js?v=11';
 
 
       document.body.appendChild(
