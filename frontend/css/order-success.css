@@ -1,0 +1,391 @@
+.order-success-body{
+  min-height:100vh;
+  position:relative;
+  background:
+    linear-gradient(
+      180deg,
+      #faf8f5,
+      #fffdfb
+    );
+}
+
+
+.success-watermark{
+  position:fixed;
+  left:50%;
+  top:55%;
+
+  transform:
+    translate(-50%,-50%)
+    rotate(-22deg);
+
+  width:100%;
+
+  text-align:center;
+  white-space:nowrap;
+
+  color:
+    rgba(138,90,59,.035);
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(55px,10vw,145px);
+
+  font-weight:900;
+  letter-spacing:.12em;
+
+  pointer-events:none;
+  user-select:none;
+
+  z-index:0;
+}
+
+
+.order-success-page{
+  position:relative;
+  z-index:1;
+
+  padding:
+    45px 0 70px;
+}
+
+
+.success-loading{
+  padding:70px 20px;
+
+  border:
+    1px solid #e7dbd1;
+
+  border-radius:24px;
+
+  background:#fff;
+
+  text-align:center;
+
+  color:#7d7169;
+}
+
+
+.success-card{
+  width:
+    min(760px,100%);
+
+  margin:auto;
+
+  padding:
+    clamp(28px,5vw,50px);
+
+  border:
+    1px solid #e5d9cf;
+
+  border-radius:30px;
+
+  background:
+    rgba(255,255,255,.97);
+
+  text-align:center;
+
+  box-shadow:
+    0 22px 60px
+    rgba(61,39,23,.10);
+}
+
+
+.success-icon{
+  width:92px;
+  height:92px;
+
+  margin:
+    0 auto 22px;
+
+  border-radius:50%;
+
+  display:flex;
+
+  align-items:center;
+  justify-content:center;
+
+  background:#eaf8ef;
+
+  color:#147a43;
+
+  font-size:44px;
+  font-weight:900;
+
+  box-shadow:
+    0 0 0 10px
+    rgba(20,122,67,.06);
+}
+
+
+.success-eyebrow{
+  margin-bottom:9px;
+
+  color:#9b613c;
+
+  font-size:10px;
+  font-weight:900;
+
+  letter-spacing:.22em;
+}
+
+
+.success-card h1{
+  margin:
+    0 0 13px;
+
+  color:#2b1b12;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(38px,6vw,58px);
+
+  line-height:1;
+}
+
+
+.success-message{
+  max-width:560px;
+
+  margin:
+    0 auto 27px;
+
+  color:#756b64;
+
+  font-size:15px;
+
+  line-height:1.65;
+}
+
+
+.success-order-box{
+  margin:
+    0 auto 28px;
+
+  padding:18px;
+
+  border:
+    1px solid #eadfd5;
+
+  border-radius:18px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #fffaf6,
+      #f8f1eb
+    );
+
+  text-align:left;
+}
+
+
+.success-info-row{
+  display:flex;
+
+  justify-content:space-between;
+
+  gap:15px;
+
+  padding:
+    9px 0;
+
+  border-bottom:
+    1px solid #eee3da;
+
+  color:#756b64;
+
+  font-size:12px;
+}
+
+
+.success-info-row:last-child{
+  border-bottom:0;
+}
+
+
+.success-info-row strong{
+  color:#34241b;
+
+  text-align:right;
+}
+
+
+.success-total{
+  font-size:15px;
+}
+
+
+.success-total strong{
+  color:#8a5a3b;
+
+  font-size:19px;
+}
+
+
+.success-actions{
+  display:grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:10px;
+}
+
+
+.success-btn{
+  min-height:50px;
+
+  padding:
+    0 18px;
+
+  border-radius:13px;
+
+  display:flex;
+
+  align-items:center;
+  justify-content:center;
+
+  font-size:12px;
+  font-weight:900;
+}
+
+
+.success-btn.primary{
+  background:
+    linear-gradient(
+      180deg,
+      #9b613c,
+      #7e492a
+    );
+
+  color:#fff;
+}
+
+
+.success-btn.secondary{
+  border:
+    1px solid #e0d4ca;
+
+  background:#f5eee8;
+
+  color:#3b2a20;
+}
+
+
+.success-shop{
+  grid-column:
+    1 / -1;
+
+  background:#2c1e16;
+
+  color:#fff;
+}
+
+
+.success-note{
+  margin-top:23px;
+
+  padding-top:19px;
+
+  border-top:
+    1px solid #eee3da;
+
+  color:#887c74;
+
+  font-size:11px;
+
+  line-height:1.6;
+}
+
+
+.success-error{
+  width:
+    min(650px,100%);
+
+  margin:auto;
+
+  padding:55px 20px;
+
+  border:
+    1px solid #e7dbd1;
+
+  border-radius:24px;
+
+  background:#fff;
+
+  text-align:center;
+}
+
+
+.success-error h2{
+  margin:
+    0 0 10px;
+
+  color:#302119;
+}
+
+
+.success-error p{
+  color:#7d7169;
+}
+
+
+@media(max-width:600px){
+
+  .order-success-page{
+    padding:
+      22px 0 110px;
+  }
+
+
+  .success-card{
+    padding:
+      29px 17px;
+
+    border-radius:22px;
+  }
+
+
+  .success-icon{
+    width:76px;
+    height:76px;
+
+    font-size:36px;
+  }
+
+
+  .success-card h1{
+    font-size:39px;
+  }
+
+
+  .success-message{
+    font-size:13px;
+  }
+
+
+  .success-actions{
+    grid-template-columns:1fr;
+  }
+
+
+  .success-shop{
+    grid-column:auto;
+  }
+
+
+  .success-watermark{
+    font-size:
+      clamp(42px,15vw,80px);
+  }
+
+}
