@@ -1,7 +1,9 @@
 const PRODUCTS_BASE =
   '/memora-creations';
 
-let productListCache = [];
+
+let productListCache =
+  [];
 
 
 /* =========================
@@ -16,19 +18,27 @@ function safeQuantity(
   const maxStock =
     Math.max(
       0,
-      Number(stock || 0)
+      Number(
+        stock || 0
+      )
     );
 
 
-  if (maxStock < 1) {
+  if (
+    maxStock < 1
+  ) {
+
     return 0;
+
   }
 
 
   const quantity =
     Math.max(
       1,
-      Number(value || 1)
+      Number(
+        value || 1
+      )
     );
 
 
@@ -41,7 +51,53 @@ function safeQuantity(
 
 
 /* =========================
-   CLOSE PRODUCT POPUP
+   DISCOUNT
+========================= */
+
+function productDiscount(
+  product
+) {
+
+  const original =
+    Number(
+      product.originalPrice ||
+      0
+    );
+
+
+  const selling =
+    Number(
+      product.sellingPrice ||
+      0
+    );
+
+
+  if (
+    original <= 0 ||
+    selling >= original
+  ) {
+
+    return 0;
+
+  }
+
+
+  return Math.round(
+    (
+      (
+        original -
+        selling
+      ) /
+      original
+    ) *
+    100
+  );
+
+}
+
+
+/* =========================
+   CLOSE POPUP
 ========================= */
 
 function closeProductPopup() {
@@ -60,7 +116,7 @@ function closeProductPopup() {
 
 
 /* =========================
-   OPEN PRODUCT POPUP
+   QUICK VIEW
 ========================= */
 
 function openProductPopup(
@@ -111,27 +167,27 @@ function openProductPopup(
       </button>
 
 
-      <div
-        class="product-popup-imagebox"
-      >
+      <div class="product-popup-imagebox">
 
         <img
-          src="${window.MC.esc(image)}"
-          alt="${window.MC.esc(product.name || '')}"
+          src="${window.MC.esc(
+            image
+          )}"
+          alt="${window.MC.esc(
+            product.name || ''
+          )}"
         >
 
       </div>
 
 
-      <div
-        class="product-popup-info"
-      >
+      <div class="product-popup-info">
 
         <span class="pill">
 
           ${window.MC.esc(
             product.category?.name ||
-            'Category'
+            'Collection'
           )}
 
         </span>
@@ -146,13 +202,12 @@ function openProductPopup(
         </h2>
 
 
-        <div
-          class="product-popup-price"
-        >
+        <div class="product-popup-price">
 
           ${window.MC.money(
             product.sellingPrice
           )}
+
 
           ${
             Number(
@@ -181,7 +236,8 @@ function openProductPopup(
         <p class="muted">
 
           ${window.MC.esc(
-            product.description || ''
+            product.description ||
+            ''
           )}
 
         </p>
@@ -191,7 +247,9 @@ function openProductPopup(
 
           ${
             stock > 0
+
               ? `✅ In Stock (${stock})`
+
               : '❌ Out of Stock'
           }
 
@@ -204,12 +262,17 @@ function openProductPopup(
             Quantity
           </label>
 
+
           <input
             class="input popup-qty"
             type="number"
             min="1"
-            max="${Math.max(stock, 1)}"
+            max="${Math.max(
+              stock,
+              1
+            )}"
             value="1"
+
             ${
               stock < 1
                 ? 'disabled'
@@ -220,13 +283,12 @@ function openProductPopup(
         </div>
 
 
-        <div
-          class="product-popup-actions"
-        >
+        <div class="product-popup-actions">
 
           <button
             class="btn popup-add-cart"
             type="button"
+
             ${
               stock < 1
                 ? 'disabled'
@@ -240,6 +302,7 @@ function openProductPopup(
           <button
             class="btn secondary popup-order-now"
             type="button"
+
             ${
               stock < 1
                 ? 'disabled'
@@ -267,8 +330,6 @@ function openProductPopup(
     'hidden';
 
 
-  /* CLOSE BUTTON */
-
   overlay
     .querySelector(
       '.product-popup-close'
@@ -278,8 +339,6 @@ function openProductPopup(
       closeProductPopup
     );
 
-
-  /* OUTSIDE CLICK */
 
   overlay.addEventListener(
     'click',
@@ -297,8 +356,6 @@ function openProductPopup(
     }
   );
 
-
-  /* ESCAPE KEY */
 
   const escapeHandler =
     event => {
@@ -328,8 +385,6 @@ function openProductPopup(
   );
 
 
-  /* ADD TO CART */
-
   overlay
     .querySelector(
       '.popup-add-cart'
@@ -340,17 +395,24 @@ function openProductPopup(
 
         const qty =
           safeQuantity(
+
             overlay
               .querySelector(
                 '.popup-qty'
               )
               ?.value,
+
             stock
+
           );
 
 
-        if (qty < 1) {
+        if (
+          qty < 1
+        ) {
+
           return;
+
         }
 
 
@@ -363,8 +425,6 @@ function openProductPopup(
     );
 
 
-  /* ORDER NOW */
-
   overlay
     .querySelector(
       '.popup-order-now'
@@ -375,22 +435,33 @@ function openProductPopup(
 
         const qty =
           safeQuantity(
+
             overlay
               .querySelector(
                 '.popup-qty'
               )
               ?.value,
+
             stock
+
           );
 
 
-        if (qty < 1) {
+        if (
+          qty < 1
+        ) {
+
           return;
+
         }
 
 
         location.href =
-          `${PRODUCTS_BASE}/frontend/checkout.html?buyNow=${encodeURIComponent(product._id)}&qty=${encodeURIComponent(qty)}`;
+          `${PRODUCTS_BASE}/frontend/checkout.html?buyNow=${encodeURIComponent(
+            product._id
+          )}&qty=${encodeURIComponent(
+            qty
+          )}`;
 
       }
     );
@@ -399,7 +470,205 @@ function openProductPopup(
 
 
 /* =========================
-   LOAD ALL PRODUCTS
+   PRODUCT CARD
+========================= */
+
+function productCard(
+  product
+) {
+
+  const stock =
+    Math.max(
+      0,
+      Number(
+        product.stock || 0
+      )
+    );
+
+
+  const discount =
+    productDiscount(
+      product
+    );
+
+
+  const image =
+    product.images?.[0]?.url ||
+    'https://placehold.co/600x600?text=Memora';
+
+
+  return `
+
+    <article class="premium-product-card">
+
+      <button
+        class="premium-product-open product-card-open"
+        type="button"
+        data-id="${window.MC.esc(
+          product._id
+        )}"
+      >
+
+        <div class="premium-image-wrap">
+
+          <img
+            class="premium-product-img"
+            src="${window.MC.esc(
+              image
+            )}"
+            alt="${window.MC.esc(
+              product.name || ''
+            )}"
+          >
+
+
+          ${
+            discount > 0
+
+              ? `
+                <span class="discount-badge">
+                  ${discount}% OFF
+                </span>
+              `
+
+              : ''
+          }
+
+
+          <span
+            class="stock-dot ${
+              stock > 0
+                ? ''
+                : 'out'
+            }"
+          ></span>
+
+        </div>
+
+
+        <div class="premium-card-content">
+
+          <div class="premium-category">
+
+            ${window.MC.esc(
+              product.category?.name ||
+              'Collection'
+            )}
+
+          </div>
+
+
+          <h3 class="premium-product-title">
+
+            ${window.MC.esc(
+              product.name || ''
+            )}
+
+          </h3>
+
+
+          <div class="premium-price-row">
+
+            <span class="premium-price">
+
+              ${window.MC.money(
+                product.sellingPrice
+              )}
+
+            </span>
+
+
+            ${
+              Number(
+                product.originalPrice
+              ) >
+              Number(
+                product.sellingPrice
+              )
+
+                ? `
+                  <span class="premium-old-price">
+
+                    ${window.MC.money(
+                      product.originalPrice
+                    )}
+
+                  </span>
+                `
+
+                : ''
+            }
+
+          </div>
+
+
+          <div
+            class="stock-text ${
+              stock > 0
+                ? ''
+                : 'out'
+            }"
+          >
+
+            ${
+              stock > 0
+                ? `In stock (${stock})`
+                : 'Out of stock'
+            }
+
+          </div>
+
+        </div>
+
+      </button>
+
+
+      <div class="premium-card-actions">
+
+        <button
+          class="btn add"
+          type="button"
+          data-id="${window.MC.esc(
+            product._id
+          )}"
+
+          ${
+            stock < 1
+              ? 'disabled'
+              : ''
+          }
+        >
+          Add to Cart
+        </button>
+
+
+        <button
+          class="btn secondary buy"
+          type="button"
+          data-id="${window.MC.esc(
+            product._id
+          )}"
+
+          ${
+            stock < 1
+              ? 'disabled'
+              : ''
+          }
+        >
+          Order Now
+        </button>
+
+      </div>
+
+    </article>
+
+  `;
+
+}
+
+
+/* =========================
+   LOAD PRODUCTS
 ========================= */
 
 async function loadProducts() {
@@ -442,7 +711,8 @@ async function loadProducts() {
 
 
     productListCache =
-      data.products || [];
+      data.products ||
+      [];
 
 
     /* CATEGORY */
@@ -453,7 +723,9 @@ async function loadProducts() {
       );
 
 
-    if (categorySelect) {
+    if (
+      categorySelect
+    ) {
 
       categorySelect.innerHTML =
         '<option value="">All Categories</option>' +
@@ -466,7 +738,10 @@ async function loadProducts() {
             category => `
 
               <option
-                value="${window.MC.esc(category._id)}"
+                value="${window.MC.esc(
+                  category._id
+                )}"
+
                 ${
                   params.get(
                     'category'
@@ -476,7 +751,6 @@ async function loadProducts() {
                   )
 
                     ? 'selected'
-
                     : ''
                 }
               >
@@ -494,7 +768,7 @@ async function loadProducts() {
     }
 
 
-    /* SEARCH VALUE */
+    /* SEARCH */
 
     const searchInput =
       window.MC.$(
@@ -502,16 +776,20 @@ async function loadProducts() {
       );
 
 
-    if (searchInput) {
+    if (
+      searchInput
+    ) {
 
       searchInput.value =
-        params.get('q') ||
+        params.get(
+          'q'
+        ) ||
         '';
 
     }
 
 
-    /* SORT VALUE */
+    /* SORT */
 
     const sortSelect =
       window.MC.$(
@@ -519,16 +797,20 @@ async function loadProducts() {
       );
 
 
-    if (sortSelect) {
+    if (
+      sortSelect
+    ) {
 
       sortSelect.value =
-        params.get('sort') ||
+        params.get(
+          'sort'
+        ) ||
         'newest';
 
     }
 
 
-    /* RESULT COUNT */
+    /* COUNT */
 
     const resultCount =
       window.MC.$(
@@ -536,7 +818,9 @@ async function loadProducts() {
       );
 
 
-    if (resultCount) {
+    if (
+      resultCount
+    ) {
 
       const total =
         data.pagination?.total ??
@@ -553,243 +837,40 @@ async function loadProducts() {
     }
 
 
-    /* PRODUCT GRID */
+    /* GRID */
 
     grid.innerHTML =
+
       productListCache.length
 
         ? productListCache
             .map(
-              product => {
-
-                const stock =
-                  Math.max(
-                    0,
-                    Number(
-                      product.stock ||
-                      0
-                    )
-                  );
-
-
-                return `
-
-                  <article class="card">
-
-                    <button
-                      class="product-card-open"
-                      type="button"
-                      data-id="${product._id}"
-                    >
-
-                      <img
-                        class="productimg"
-                        src="${window.MC.esc(
-                          product.images?.[0]?.url ||
-                          'https://placehold.co/600x600?text=Memora'
-                        )}"
-                        alt="${window.MC.esc(
-                          product.name || ''
-                        )}"
-                      >
-
-
-                      <div
-                        class="cardbody"
-                      >
-
-                        <span class="pill">
-
-                          ${window.MC.esc(
-                            product.category?.name ||
-                            'Category'
-                          )}
-
-                        </span>
-
-
-                        <h3>
-
-                          ${window.MC.esc(
-                            product.name || ''
-                          )}
-
-                        </h3>
-
-
-                        <div class="price">
-
-                          ${window.MC.money(
-                            product.sellingPrice
-                          )}
-
-                          ${
-                            Number(
-                              product.originalPrice
-                            ) >
-                            Number(
-                              product.sellingPrice
-                            )
-
-                              ? `
-                                <span class="old">
-
-                                  ${window.MC.money(
-                                    product.originalPrice
-                                  )}
-
-                                </span>
-                              `
-
-                              : ''
-                          }
-
-                        </div>
-
-
-                        <p class="muted">
-
-                          ${
-                            stock > 0
-                              ? `In stock (${stock})`
-                              : 'Out of stock'
-                          }
-
-                        </p>
-
-                      </div>
-
-                    </button>
-
-
-                    <div
-                      class="cardbody actions"
-                    >
-
-                      <button
-                        class="btn add"
-                        type="button"
-                        data-id="${product._id}"
-                        ${
-                          stock < 1
-                            ? 'disabled'
-                            : ''
-                        }
-                      >
-                        Add to Cart
-                      </button>
-
-
-                      <button
-                        class="btn secondary buy"
-                        type="button"
-                        data-id="${product._id}"
-                        ${
-                          stock < 1
-                            ? 'disabled'
-                            : ''
-                        }
-                      >
-                        Order Now
-                      </button>
-
-                    </div>
-
-                  </article>
-
-                `;
-
-              }
+              productCard
             )
             .join('')
 
         : `
 
-            <div class="empty">
-              No products found.
+            <div class="products-empty">
+
+              <div class="products-empty-icon">
+                🛍️
+              </div>
+
+              <strong>
+                No products found
+              </strong>
+
+              <span>
+                Search ya filter change karke dobara try karein.
+              </span>
+
             </div>
 
           `;
 
 
-    /* OPEN PRODUCT */
-
-    window.MC
-      .$$(
-        '.product-card-open'
-      )
-      .forEach(
-        button => {
-
-          button.onclick =
-            () => {
-
-              const product =
-                productListCache
-                  .find(
-                    item =>
-                      String(
-                        item._id
-                      ) ===
-                      String(
-                        button.dataset.id
-                      )
-                  );
-
-
-              if (product) {
-
-                openProductPopup(
-                  product
-                );
-
-              }
-
-            };
-
-        }
-      );
-
-
-    /* ADD TO CART */
-
-    window.MC
-      .$$('.add')
-      .forEach(
-        button => {
-
-          button.onclick =
-            async () => {
-
-              await addProductToCart(
-                button.dataset.id,
-                1
-              );
-
-            };
-
-        }
-      );
-
-
-    /* BUY NOW */
-
-    window.MC
-      .$$('.buy')
-      .forEach(
-        button => {
-
-          button.onclick =
-            () => {
-
-              buyProductNow(
-                button.dataset.id
-              );
-
-            };
-
-        }
-      );
+    bindProductButtons();
 
 
   } catch (error) {
@@ -802,8 +883,20 @@ async function loadProducts() {
 
     grid.innerHTML = `
 
-      <div class="empty">
-        Products load nahi ho pa rahe hain.
+      <div class="products-empty">
+
+        <div class="products-empty-icon">
+          ⚠️
+        </div>
+
+        <strong>
+          Products load nahi ho pa rahe hain
+        </strong>
+
+        <span>
+          Please thodi der baad dobara try karein.
+        </span>
+
       </div>
 
     `;
@@ -816,6 +909,95 @@ async function loadProducts() {
     );
 
   }
+
+}
+
+
+/* =========================
+   BIND PRODUCT BUTTONS
+========================= */
+
+function bindProductButtons() {
+
+
+  window.MC
+    .$$(
+      '.product-card-open'
+    )
+    .forEach(
+      button => {
+
+        button.onclick =
+          () => {
+
+            const product =
+              productListCache
+                .find(
+                  item =>
+                    String(
+                      item._id
+                    ) ===
+                    String(
+                      button.dataset.id
+                    )
+                );
+
+
+            if (
+              product
+            ) {
+
+              openProductPopup(
+                product
+              );
+
+            }
+
+          };
+
+      }
+    );
+
+
+  window.MC
+    .$$(
+      '.add'
+    )
+    .forEach(
+      button => {
+
+        button.onclick =
+          async () => {
+
+            await addProductToCart(
+              button.dataset.id,
+              1
+            );
+
+          };
+
+      }
+    );
+
+
+  window.MC
+    .$$(
+      '.buy'
+    )
+    .forEach(
+      button => {
+
+        button.onclick =
+          () => {
+
+            buyProductNow(
+              button.dataset.id
+            );
+
+          };
+
+      }
+    );
 
 }
 
@@ -924,7 +1106,7 @@ async function addProductToCart(
 
 
 /* =========================
-   ORDER NOW
+   BUY NOW
 ========================= */
 
 function buyProductNow(
@@ -942,7 +1124,7 @@ function buyProductNow(
 
 
 /* =========================
-   LOAD SINGLE PRODUCT
+   SINGLE PRODUCT PAGE
 ========================= */
 
 async function loadSingleProduct() {
@@ -986,7 +1168,9 @@ async function loadSingleProduct() {
     const data =
       await window.MC.api(
         '/products/' +
-        encodeURIComponent(id)
+        encodeURIComponent(
+          id
+        )
       );
 
 
@@ -1020,7 +1204,8 @@ async function loadSingleProduct() {
 
 
     const images =
-      product.images || [];
+      product.images ||
+      [];
 
 
     productBox.innerHTML = `
@@ -1039,9 +1224,15 @@ async function loadSingleProduct() {
                       image => `
 
                         <img
-                          src="${window.MC.esc(image.url)}"
-                          data-url="${window.MC.esc(image.url)}"
-                          alt="${window.MC.esc(product.name || '')}"
+                          src="${window.MC.esc(
+                            image.url
+                          )}"
+                          data-url="${window.MC.esc(
+                            image.url
+                          )}"
+                          alt="${window.MC.esc(
+                            product.name || ''
+                          )}"
                         >
 
                       `
@@ -1106,6 +1297,7 @@ async function loadSingleProduct() {
               product.sellingPrice
             )}
 
+
             ${
               Number(
                 product.originalPrice
@@ -1134,7 +1326,9 @@ async function loadSingleProduct() {
 
             ${
               stock > 0
+
                 ? `✅ In Stock (${stock})`
+
                 : '❌ OUT OF STOCK'
             }
 
@@ -1147,13 +1341,18 @@ async function loadSingleProduct() {
               Quantity
             </label>
 
+
             <input
               id="qty"
               class="input"
               type="number"
               min="1"
-              max="${Math.max(stock, 1)}"
+              max="${Math.max(
+                stock,
+                1
+              )}"
               value="1"
+
               ${
                 stock < 1
                   ? 'disabled'
@@ -1170,6 +1369,7 @@ async function loadSingleProduct() {
               class="btn"
               id="addBtn"
               type="button"
+
               ${
                 stock < 1
                   ? 'disabled'
@@ -1184,6 +1384,7 @@ async function loadSingleProduct() {
               class="btn secondary"
               id="buyBtn"
               type="button"
+
               ${
                 stock < 1
                   ? 'disabled'
@@ -1202,10 +1403,10 @@ async function loadSingleProduct() {
     `;
 
 
-    /* IMAGE THUMBNAILS */
-
     window.MC
-      .$$('.thumbs img')
+      .$$(
+        '.thumbs img'
+      )
       .forEach(
         image => {
 
@@ -1218,7 +1419,9 @@ async function loadSingleProduct() {
                 );
 
 
-              if (mainImage) {
+              if (
+                mainImage
+              ) {
 
                 mainImage.src =
                   image.dataset.url;
@@ -1231,30 +1434,37 @@ async function loadSingleProduct() {
       );
 
 
-    /* ADD */
-
     const addBtn =
       window.MC.$(
         '#addBtn'
       );
 
 
-    if (addBtn) {
+    if (
+      addBtn
+    ) {
 
       addBtn.onclick =
         async () => {
 
           const qty =
             safeQuantity(
+
               window.MC.$(
                 '#qty'
               )?.value,
+
               stock
+
             );
 
 
-          if (qty < 1) {
+          if (
+            qty < 1
+          ) {
+
             return;
+
           }
 
 
@@ -1268,35 +1478,46 @@ async function loadSingleProduct() {
     }
 
 
-    /* BUY */
-
     const buyBtn =
       window.MC.$(
         '#buyBtn'
       );
 
 
-    if (buyBtn) {
+    if (
+      buyBtn
+    ) {
 
       buyBtn.onclick =
         () => {
 
           const qty =
             safeQuantity(
+
               window.MC.$(
                 '#qty'
               )?.value,
+
               stock
+
             );
 
 
-          if (qty < 1) {
+          if (
+            qty < 1
+          ) {
+
             return;
+
           }
 
 
           location.href =
-            `${PRODUCTS_BASE}/frontend/checkout.html?buyNow=${encodeURIComponent(product._id)}&qty=${encodeURIComponent(qty)}`;
+            `${PRODUCTS_BASE}/frontend/checkout.html?buyNow=${encodeURIComponent(
+              product._id
+            )}&qty=${encodeURIComponent(
+              qty
+            )}`;
 
         };
 
@@ -1332,7 +1553,7 @@ async function loadSingleProduct() {
 
 
 /* =========================
-   PRODUCT LIST PAGE START
+   PRODUCT LIST START
 ========================= */
 
 if (
@@ -1347,7 +1568,9 @@ if (
     );
 
 
-  if (filterForm) {
+  if (
+    filterForm
+  ) {
 
     filterForm.addEventListener(
       'submit',
@@ -1422,7 +1645,7 @@ if (
 
 
 /* =========================
-   SINGLE PRODUCT PAGE START
+   SINGLE PRODUCT START
 ========================= */
 
 if (
