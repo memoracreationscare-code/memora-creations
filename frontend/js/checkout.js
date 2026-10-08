@@ -9,7 +9,158 @@ let orderSubmitting = false;
 
 
 /* =========================
-   HELPERS
+   POPUP
+========================= */
+
+function showCheckoutSuccess({
+  title,
+  message,
+  buttonText = 'View Order',
+  onContinue
+}) {
+
+  document
+    .querySelector(
+      '#checkoutSuccessPopup'
+    )
+    ?.remove();
+
+
+  const overlay =
+    document.createElement(
+      'div'
+    );
+
+
+  overlay.id =
+    'checkoutSuccessPopup';
+
+
+  overlay.style.cssText = `
+    position:fixed;
+    inset:0;
+    z-index:9999;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:rgba(24,15,10,.68);
+    backdrop-filter:blur(6px);
+  `;
+
+
+  overlay.innerHTML = `
+
+    <div
+      style="
+        width:min(430px,94vw);
+        padding:34px 26px 26px;
+        border-radius:26px;
+        background:#fffaf6;
+        border:1px solid #eadfd5;
+        text-align:center;
+        box-shadow:0 25px 70px rgba(0,0,0,.28);
+      "
+    >
+
+      <div
+        style="
+          width:76px;
+          height:76px;
+          margin:0 auto 18px;
+          border-radius:50%;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          background:#eaf8ef;
+          color:#147a43;
+          font-size:36px;
+          font-weight:900;
+        "
+      >
+        ✓
+      </div>
+
+
+      <h2
+        style="
+          margin:0 0 10px;
+          color:#2b1b12;
+          font-size:27px;
+        "
+      >
+        ${window.MC.esc(title)}
+      </h2>
+
+
+      <p
+        style="
+          margin:0 auto 24px;
+          max-width:340px;
+          color:#756f69;
+          font-size:14px;
+          line-height:1.6;
+        "
+      >
+        ${window.MC.esc(message)}
+      </p>
+
+
+      <button
+        id="checkoutSuccessContinue"
+        type="button"
+        style="
+          width:100%;
+          min-height:52px;
+          border:0;
+          border-radius:999px;
+          background:linear-gradient(180deg,#9b613c,#7e492a);
+          color:#fff;
+          font-size:15px;
+          font-weight:900;
+          cursor:pointer;
+        "
+      >
+        ${window.MC.esc(buttonText)}
+      </button>
+
+    </div>
+
+  `;
+
+
+  document.body.appendChild(
+    overlay
+  );
+
+
+  overlay
+    .querySelector(
+      '#checkoutSuccessContinue'
+    )
+    ?.addEventListener(
+      'click',
+      () => {
+
+        overlay.remove();
+
+        if (
+          typeof onContinue ===
+          'function'
+        ) {
+
+          onContinue();
+
+        }
+
+      }
+    );
+
+}
+
+
+/* =========================
+   VALIDATION
 ========================= */
 
 function isValidCheckoutMobile(
@@ -18,8 +169,9 @@ function isValidCheckoutMobile(
 
   return /^[6-9][0-9]{9}$/
     .test(
-      String(value || '')
-        .trim()
+      String(
+        value || ''
+      ).trim()
     );
 
 }
@@ -31,15 +183,16 @@ function isValidCheckoutPin(
 
   return /^[0-9]{6}$/
     .test(
-      String(value || '')
-        .trim()
+      String(
+        value || ''
+      ).trim()
     );
 
 }
 
 
 /* =========================
-   GET ADDRESS
+   ADDRESS
 ========================= */
 
 function getCheckoutAddress() {
@@ -47,66 +200,33 @@ function getCheckoutAddress() {
   return {
 
     fullName:
-      window.MC.$(
-        '#fullName'
-      )
-        ?.value
-        .trim() ||
-      '',
-
+      window.MC.$('#fullName')
+        ?.value.trim() || '',
 
     mobile:
-      window.MC.$(
-        '#mobile'
-      )
-        ?.value
-        .trim() ||
-      '',
-
+      window.MC.$('#mobile')
+        ?.value.trim() || '',
 
     addressLine:
-      window.MC.$(
-        '#addressLine'
-      )
-        ?.value
-        .trim() ||
-      '',
-
+      window.MC.$('#addressLine')
+        ?.value.trim() || '',
 
     pinCode:
-      window.MC.$(
-        '#pinCode'
-      )
-        ?.value
-        .trim() ||
-      '',
-
+      window.MC.$('#pinCode')
+        ?.value.trim() || '',
 
     city:
-      window.MC.$(
-        '#city'
-      )
-        ?.value
-        .trim() ||
-      '',
-
+      window.MC.$('#city')
+        ?.value.trim() || '',
 
     state:
-      window.MC.$(
-        '#state'
-      )
-        ?.value
-        .trim() ||
-      ''
+      window.MC.$('#state')
+        ?.value.trim() || ''
 
   };
 
 }
 
-
-/* =========================
-   VALIDATE ADDRESS
-========================= */
 
 function validateCheckoutAddress() {
 
@@ -176,7 +296,7 @@ function validateCheckoutAddress() {
 
 
 /* =========================
-   BUTTON LOADING
+   LOADING
 ========================= */
 
 function setCheckoutLoading(
@@ -198,64 +318,56 @@ function setCheckoutLoading(
     loading;
 
 
-  button.textContent =
+  button.innerHTML =
     loading
+
       ? 'Please wait...'
-      : 'Place Order / Pay';
+
+      : 'Place Order / Pay <span>→</span>';
 
 }
 
 
 /* =========================
-   LOAD RAZORPAY SCRIPT
+   RAZORPAY
 ========================= */
 
 function loadRazorpayScript() {
 
   return new Promise(
-    (
-      resolve,
-      reject
-    ) => {
+    (resolve,reject) => {
 
-      if (
-        window.Razorpay
-      ) {
+      if (window.Razorpay) {
 
         resolve();
-
         return;
 
       }
 
 
-      const existingScript =
+      const existing =
         document.querySelector(
           'script[data-razorpay-checkout="true"]'
         );
 
 
-      if (existingScript) {
+      if (existing) {
 
-        existingScript.addEventListener(
+        existing.addEventListener(
           'load',
-          () => resolve(),
-          {
-            once: true
-          }
+          resolve,
+          { once:true }
         );
 
 
-        existingScript.addEventListener(
+        existing.addEventListener(
           'error',
           () => reject(
             new Error(
               'Razorpay Checkout load nahi hua.'
             )
           ),
-          {
-            once: true
-          }
+          { once:true }
         );
 
 
@@ -280,7 +392,7 @@ function loadRazorpayScript() {
 
 
       script.onload =
-        () => resolve();
+        resolve;
 
 
       script.onerror =
@@ -302,14 +414,13 @@ function loadRazorpayScript() {
 
 
 /* =========================
-   INIT CHECKOUT
+   INIT
 ========================= */
 
 async function initCheckout() {
 
   checkoutUser =
-    await window.MC
-      .requireLogin();
+    await window.MC.requireLogin();
 
 
   if (!checkoutUser) {
@@ -318,15 +429,11 @@ async function initCheckout() {
 
 
   const checkoutBox =
-    window.MC.$(
-      '#checkout'
-    );
+    window.MC.$('#checkout');
 
 
   const summaryBox =
-    window.MC.$(
-      '#summary'
-    );
+    window.MC.$('#summary');
 
 
   if (
@@ -346,9 +453,7 @@ async function initCheckout() {
 
 
   const buyNowId =
-    params.get(
-      'buyNow'
-    );
+    params.get('buyNow');
 
 
   if (buyNowId) {
@@ -357,28 +462,22 @@ async function initCheckout() {
       false;
 
 
-    const requestedQty =
-      Math.max(
-        1,
-        Number(
-          params.get(
-            'qty'
-          ) || 1
+    checkoutItems = [{
+
+      productId:
+        buyNowId,
+
+      quantity:
+        Math.max(
+          1,
+          Number(
+            params.get('qty') ||
+            1
+          )
         )
-      );
 
+    }];
 
-    checkoutItems = [
-
-      {
-        productId:
-          buyNowId,
-
-        quantity:
-          requestedQty
-      }
-
-    ];
 
   } else {
 
@@ -434,23 +533,17 @@ async function initCheckout() {
 
     `;
 
-
     return;
 
   }
 
-
-  /* =========================
-     ORDER PREVIEW
-  ========================= */
 
   const preview =
     await window.MC.api(
       '/orders/preview',
       {
 
-        method:
-          'POST',
+        method:'POST',
 
         body:
           JSON.stringify({
@@ -474,9 +567,7 @@ async function initCheckout() {
         .map(
           item => `
 
-            <div
-              class="summaryline"
-            >
+            <div class="summaryline">
 
               <span>
 
@@ -485,8 +576,7 @@ async function initCheckout() {
                   'Product'
                 )}
 
-                ×
-                ${Number(
+                × ${Number(
                   item.quantity ||
                   1
                 )}
@@ -510,58 +600,46 @@ async function initCheckout() {
     }
 
 
-    <div
-      class="summaryline"
-    >
+    <div class="summaryline">
 
       <span>
         Delivery
       </span>
 
       <b>
-
         ${window.MC.money(
           preview.deliveryCharge
         )}
-
       </b>
 
     </div>
 
 
-    <div
-      class="summaryline"
-    >
+    <div class="summaryline">
 
       <span>
         You Save
       </span>
 
       <b>
-
         ${window.MC.money(
           preview.discount
         )}
-
       </b>
 
     </div>
 
 
-    <div
-      class="summaryline total"
-    >
+    <div class="summaryline total">
 
       <span>
         Total
       </span>
 
       <b>
-
         ${window.MC.money(
           preview.grandTotal
         )}
-
       </b>
 
     </div>
@@ -569,17 +647,11 @@ async function initCheckout() {
   `;
 
 
-  /* =========================
-     AUTO FILL ADDRESS
-  ========================= */
-
   const addresses =
     Array.isArray(
       checkoutUser.addresses
     )
-
       ? checkoutUser.addresses
-
       : [];
 
 
@@ -593,48 +665,43 @@ async function initCheckout() {
 
   if (defaultAddress) {
 
-    const fields = [
+    [
       'fullName',
       'mobile',
       'addressLine',
       'pinCode',
       'city',
       'state'
-    ];
+    ]
+      .forEach(
+        field => {
+
+          const input =
+            window.MC.$(
+              '#' + field
+            );
 
 
-    fields.forEach(
-      field => {
+          if (input) {
 
-        const input =
-          window.MC.$(
-            '#' + field
-          );
+            input.value =
+              defaultAddress[field] ||
+              '';
 
-
-        if (input) {
-
-          input.value =
-            defaultAddress[field] ||
-            '';
+          }
 
         }
+      );
 
-      }
-    );
 
   } else {
 
     const fullNameInput =
-      window.MC.$(
-        '#fullName'
-      );
+      window.MC.$('#fullName');
 
 
     const mobileInput =
-      window.MC.$(
-        '#mobile'
-      );
+      window.MC.$('#mobile');
 
 
     if (fullNameInput) {
@@ -660,7 +727,7 @@ async function initCheckout() {
 
 
 /* =========================
-   CASH ON DELIVERY
+   COD
 ========================= */
 
 async function placeCodOrder() {
@@ -683,9 +750,7 @@ async function placeCodOrder() {
     true;
 
 
-  setCheckoutLoading(
-    true
-  );
+  setCheckoutLoading(true);
 
 
   try {
@@ -695,8 +760,7 @@ async function placeCodOrder() {
         '/orders/cod',
         {
 
-          method:
-            'POST',
+          method:'POST',
 
           body:
             JSON.stringify({
@@ -727,17 +791,30 @@ async function placeCodOrder() {
     }
 
 
-    alert(
-      '✅ Order Confirmed Successfully!\n\nThank you for shopping with Memora Creations.'
-    );
+    showCheckoutSuccess({
 
+      title:
+        'Order Placed Successfully',
 
-    location.href =
-      CHECKOUT_BASE +
-      '/frontend/order-details.html?id=' +
-      encodeURIComponent(
-        data.order._id
-      );
+      message:
+        'Thank you for shopping with Memora Creations. Your order has been confirmed.',
+
+      buttonText:
+        'View Order',
+
+      onContinue:
+        () => {
+
+          location.href =
+            CHECKOUT_BASE +
+            '/frontend/order-details.html?id=' +
+            encodeURIComponent(
+              data.order._id
+            );
+
+        }
+
+    });
 
 
   } catch (error) {
@@ -746,9 +823,7 @@ async function placeCodOrder() {
       false;
 
 
-    setCheckoutLoading(
-      false
-    );
+    setCheckoutLoading(false);
 
 
     window.MC.toast(
@@ -786,9 +861,7 @@ async function placeOnlineOrder() {
     true;
 
 
-  setCheckoutLoading(
-    true
-  );
+  setCheckoutLoading(true);
 
 
   try {
@@ -798,8 +871,7 @@ async function placeOnlineOrder() {
         '/payment/create-order',
         {
 
-          method:
-            'POST',
+          method:'POST',
 
           body:
             JSON.stringify({
@@ -840,27 +912,21 @@ async function placeOnlineOrder() {
         key:
           data.keyId,
 
-
         amount:
           data.amount,
-
 
         currency:
           data.currency ||
           'INR',
 
-
         name:
           'MEMORA CREATIONS',
-
 
         description:
           'E-commerce Order',
 
-
         order_id:
           data.razorpayOrderId,
-
 
         prefill: {
 
@@ -868,11 +934,9 @@ async function placeOnlineOrder() {
             checkoutUser.fullName ||
             '',
 
-
           email:
             checkoutUser.email ||
             '',
-
 
           contact:
             checkoutUser.mobile ||
@@ -880,14 +944,9 @@ async function placeOnlineOrder() {
 
         },
 
-
         theme: {
-
-          color:
-            '#8a5a3b'
-
+          color:'#8a5a3b'
         },
-
 
         modal: {
 
@@ -897,7 +956,6 @@ async function placeOnlineOrder() {
               orderSubmitting =
                 false;
 
-
               setCheckoutLoading(
                 false
               );
@@ -905,7 +963,6 @@ async function placeOnlineOrder() {
             }
 
         },
-
 
         handler:
           async response => {
@@ -917,8 +974,7 @@ async function placeOnlineOrder() {
                   '/payment/verify',
                   {
 
-                    method:
-                      'POST',
+                    method:'POST',
 
                     body:
                       JSON.stringify({
@@ -945,17 +1001,30 @@ async function placeOnlineOrder() {
               }
 
 
-              alert(
-                '✅ Payment Successful!\n\nYour order has been confirmed.'
-              );
+              showCheckoutSuccess({
 
+                title:
+                  'Payment Successful',
 
-              location.href =
-                CHECKOUT_BASE +
-                '/frontend/order-details.html?id=' +
-                encodeURIComponent(
-                  verified.order._id
-                );
+                message:
+                  'Your payment was successful and your order has been confirmed.',
+
+                buttonText:
+                  'View Order',
+
+                onContinue:
+                  () => {
+
+                    location.href =
+                      CHECKOUT_BASE +
+                      '/frontend/order-details.html?id=' +
+                      encodeURIComponent(
+                        verified.order._id
+                      );
+
+                  }
+
+              });
 
 
             } catch (error) {
@@ -990,8 +1059,7 @@ async function placeOnlineOrder() {
           '/payment/fail',
           {
 
-            method:
-              'POST',
+            method:'POST',
 
             body:
               JSON.stringify({
@@ -1059,7 +1127,7 @@ async function placeOnlineOrder() {
 
 
 /* =========================
-   FORM SUBMIT
+   SUBMIT
 ========================= */
 
 const checkoutForm =
@@ -1090,7 +1158,6 @@ if (checkoutForm) {
         event.currentTarget
           .reportValidity();
 
-
         return;
 
       }
@@ -1102,15 +1169,12 @@ if (checkoutForm) {
         );
 
 
-      if (
-        !terms?.checked
-      ) {
+      if (!terms?.checked) {
 
         window.MC.toast(
           'Please accept order confirmation.',
           'error'
         );
-
 
         return;
 
