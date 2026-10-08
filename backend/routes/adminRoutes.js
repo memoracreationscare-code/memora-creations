@@ -1,7 +1,14 @@
-const router = require('express').Router();
+const router =
+  require('express').Router();
 
-const c = require('../controllers/adminController');
-const { requireAdmin } = require('../middleware/auth');
+const c =
+  require('../controllers/adminController');
+
+const {
+  requireAdmin
+} =
+  require('../middleware/auth');
+
 
 const cloudinaryController =
   require('../controllers/cloudinaryController');
@@ -10,69 +17,94 @@ const shiprocketController =
   require('../controllers/shiprocketController');
 
 const {
-  configured: shiprocketConfigured,
+  configured:
+    shiprocketConfigured,
+
   getShiprocketToken
-} = require('../services/shiprocketService');
+} =
+  require('../services/shiprocketService');
 
 
 /* =========================
    ADMIN AUTH
 ========================= */
 
-router.post('/login', c.login);
-router.post('/logout', c.logout);
+router.post(
+  '/login',
+  c.login
+);
+
+router.post(
+  '/logout',
+  c.logout
+);
 
 
 /* =========================
    ADMIN LOGIN REQUIRED
 ========================= */
 
-router.use(requireAdmin);
+router.use(
+  requireAdmin
+);
 
 
 /* =========================
    SHIPROCKET TEST
 ========================= */
 
-router.get('/shiprocket/test', async (req, res) => {
+router.get(
+  '/shiprocket/test',
+  async (req, res) => {
 
-  try {
+    try {
 
-    if (!shiprocketConfigured()) {
+      if (
+        !shiprocketConfigured()
+      ) {
 
-      return res.status(500).json({
-        success: false,
+        return res
+          .status(500)
+          .json({
+            success: false,
+            message:
+              'Shiprocket credentials are not configured.'
+          });
+
+      }
+
+
+      await getShiprocketToken();
+
+
+      return res.json({
+        success: true,
         message:
-          'Shiprocket credentials are not configured.'
+          'Shiprocket connected successfully.'
       });
+
+
+    } catch (error) {
+
+      console.error(
+        'Shiprocket connection test failed:',
+        error
+      );
+
+
+      return res
+        .status(500)
+        .json({
+          success: false,
+          message:
+            error.message ||
+            'Shiprocket connection failed.'
+        });
 
     }
 
-    await getShiprocketToken();
-
-    return res.json({
-      success: true,
-      message:
-        'Shiprocket connected successfully.'
-    });
-
-  } catch (error) {
-
-    console.error(
-      'Shiprocket connection test failed:',
-      error
-    );
-
-    return res.status(500).json({
-      success: false,
-      message:
-        error.message ||
-        'Shiprocket connection failed.'
-    });
-
   }
-
-});
+);
 
 
 /* =========================
@@ -180,10 +212,12 @@ router.get(
   c.listUsers
 );
 
+
 router.get(
   '/users/:id/orders',
   c.userOrders
 );
+
 
 router.patch(
   '/users/:id/toggle',
@@ -191,4 +225,15 @@ router.patch(
 );
 
 
-module.exports = router;
+/* =========================
+   ADMIN RESET USER PASSWORD
+========================= */
+
+router.patch(
+  '/users/:id/password',
+  c.resetUserPassword
+);
+
+
+module.exports =
+  router;
