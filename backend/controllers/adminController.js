@@ -131,12 +131,10 @@ const login =
       return ok(
         res,
         {
-
           message:
             'Admin login successful.',
 
           admin: {
-
             id:
               admin._id,
 
@@ -148,9 +146,7 @@ const login =
 
             role:
               admin.role
-
           }
-
         }
       );
 
@@ -228,50 +224,37 @@ const dashboard =
           }),
 
           Order.aggregate([
-
             {
               $match: {
-
                 $or: [
-
                   {
                     paymentStatus:
                       'SUCCESS'
                   },
-
                   {
                     paymentMethod:
                       'COD',
-
                     orderStatus:
                       'Delivered'
                   }
-
                 ]
-
               }
             },
-
             {
               $group: {
-
                 _id:
                   null,
-
                 total: {
                   $sum:
                     '$grandTotal'
                 }
-
               }
             }
-
           ]),
 
           Order.countDocuments({
             paymentMethod:
               'RAZORPAY',
-
             paymentStatus:
               'SUCCESS'
           }),
@@ -308,7 +291,6 @@ const dashboard =
           Product.countDocuments({
             isActive:
               true,
-
             stock: {
               $lte:
                 5
@@ -326,35 +308,21 @@ const dashboard =
       return ok(
         res,
         {
-
           dashboard: {
-
             totalOrders,
-
             todayOrders,
-
             totalSales:
               sales[0]?.total ||
               0,
-
             onlinePayments,
-
             codOrders,
-
             pendingOrders,
-
             deliveredOrders,
-
             cancelledOrders,
-
             totalProducts,
-
             lowStockProducts,
-
             totalCustomers
-
           }
-
         }
       );
 
@@ -423,35 +391,28 @@ const createProduct =
           b.name,
           180
         ) ||
-
         !cleanString(
           b.description,
           5000
         ) ||
-
         !b.category ||
-
         !nonNegativeNumber(
           b.originalPrice
         ) ||
-
         !nonNegativeNumber(
           b.sellingPrice
         ) ||
-
         Number(
           b.sellingPrice
         ) >
         Number(
           b.originalPrice
         ) ||
-
         !Number.isInteger(
           Number(
             b.stock
           )
         ) ||
-
         Number(
           b.stock
         ) < 0
@@ -499,12 +460,10 @@ const createProduct =
         !mongoose.isValidObjectId(
           b.category
         ) ||
-
         !(
           await Category.findOne({
             _id:
               b.category,
-
             isActive:
               true
           })
@@ -553,9 +512,9 @@ const createProduct =
             )
               ? b.keywords
                   .map(
-                    x =>
+                    item =>
                       cleanString(
-                        x,
+                        item,
                         50
                       )
                         .toLowerCase()
@@ -631,13 +590,13 @@ const updateProduct =
   asyncHandler(
     async (req, res) => {
 
-      const p =
+      const product =
         await Product.findById(
           req.params.id
         );
 
 
-      if (!p) {
+      if (!product) {
 
         throw error(
           404,
@@ -647,7 +606,7 @@ const updateProduct =
       }
 
 
-      const b =
+      const body =
         req.body;
 
 
@@ -669,12 +628,12 @@ const updateProduct =
           key => {
 
             if (
-              b[key] !==
+              body[key] !==
               undefined
             ) {
 
-              p[key] =
-                b[key];
+              product[key] =
+                body[key];
 
             }
 
@@ -683,13 +642,13 @@ const updateProduct =
 
 
       if (
-        b.name !==
+        body.name !==
         undefined
       ) {
 
         const slug =
           slugify(
-            b.name
+            body.name
           );
 
 
@@ -705,14 +664,11 @@ const updateProduct =
 
         const duplicate =
           await Product.findOne({
-
             slug,
-
             _id: {
               $ne:
-                p._id
+                product._id
             }
-
           });
 
 
@@ -726,31 +682,27 @@ const updateProduct =
         }
 
 
-        p.slug =
+        product.slug =
           slug;
 
       }
 
 
       if (
-        b.category !==
+        body.category !==
         undefined
       ) {
 
         if (
           !mongoose.isValidObjectId(
-            b.category
+            body.category
           ) ||
-
           !(
             await Category.findOne({
-
               _id:
-                b.category,
-
+                body.category,
               isActive:
                 true
-
             })
           )
         ) {
@@ -766,10 +718,9 @@ const updateProduct =
 
 
       if (
-        p.sellingPrice >
-        p.originalPrice ||
-
-        p.stock < 0
+        product.sellingPrice >
+        product.originalPrice ||
+        product.stock < 0
       ) {
 
         throw error(
@@ -780,14 +731,13 @@ const updateProduct =
       }
 
 
-      await p.save();
+      await product.save();
 
 
       return ok(
         res,
         {
-          product:
-            p
+          product
         }
       );
 
@@ -803,13 +753,13 @@ const deleteProduct =
   asyncHandler(
     async (req, res) => {
 
-      const p =
+      const product =
         await Product.findById(
           req.params.id
         );
 
 
-      if (!p) {
+      if (!product) {
 
         throw error(
           404,
@@ -819,11 +769,11 @@ const deleteProduct =
       }
 
 
-      p.isActive =
+      product.isActive =
         false;
 
 
-      await p.save();
+      await product.save();
 
 
       return ok(
@@ -874,19 +824,14 @@ const createCategory =
 
       if (
         await Category.findOne({
-
           $or: [
-
             {
               name
             },
-
             {
               slug
             }
-
           ]
-
         })
       ) {
 
@@ -984,24 +929,18 @@ const updateCategory =
 
       if (
         await Category.findOne({
-
           $or: [
-
             {
               name
             },
-
             {
               slug
             }
-
           ],
-
           _id: {
             $ne:
               category._id
           }
-
         })
       ) {
 
@@ -1106,16 +1045,13 @@ const listOrders =
       ) {
 
         filter.orderId = {
-
           $regex:
             cleanString(
               req.query.search,
               50
             ),
-
           $options:
             'i'
-
         };
 
       }
@@ -1180,7 +1116,6 @@ const updateOrder =
 
 
       const allowed = [
-
         'Order Placed',
         'Confirmed',
         'Packed',
@@ -1188,7 +1123,6 @@ const updateOrder =
         'Out for Delivery',
         'Delivered',
         'Cancelled'
-
       ];
 
 
@@ -1209,7 +1143,6 @@ const updateOrder =
       if (
         order.orderStatus ===
         'Cancelled' &&
-
         status !==
         'Cancelled'
       ) {
@@ -1225,10 +1158,8 @@ const updateOrder =
       if (
         status ===
         'Cancelled' &&
-
         order.paymentMethod ===
         'RAZORPAY' &&
-
         order.paymentStatus ===
         'SUCCESS'
       ) {
@@ -1244,7 +1175,6 @@ const updateOrder =
       if (
         status ===
         'Cancelled' &&
-
         order.orderStatus ===
         'Delivered'
       ) {
@@ -1284,16 +1214,13 @@ const updateOrder =
 
 
             order.statusHistory.push({
-
               status,
-
               note:
                 cleanString(
                   req.body.note,
                   300
                 ) ||
                 'Status updated by admin.'
-
             });
 
 
@@ -1334,9 +1261,11 @@ const listUsers =
         await User
           .find()
           .select(
-            '-passwordHash'
+            '-passwordHash -passwordResetTokenHash -passwordResetExpiresAt'
           )
           .sort({
+            passwordResetRequestedAt:
+              -1,
             createdAt:
               -1
           })
@@ -1529,6 +1458,12 @@ const resetUserPassword =
 
       user.passwordResetExpiresAt =
         undefined;
+
+
+      /* REQUEST CLEAR */
+
+      user.passwordResetRequestedAt =
+        null;
 
 
       await user.save();
