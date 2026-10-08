@@ -5,26 +5,32 @@ let addressSaving = false;
 
 
 /* =========================
-   HELPERS
+   VALIDATION
 ========================= */
 
-function isValidMobile(value) {
+function isValidMobile(
+  value
+) {
 
   return /^[6-9][0-9]{9}$/
     .test(
-      String(value || '')
-        .trim()
+      String(
+        value || ''
+      ).trim()
     );
 
 }
 
 
-function isValidPin(value) {
+function isValidPin(
+  value
+) {
 
   return /^[0-9]{6}$/
     .test(
-      String(value || '')
-        .trim()
+      String(
+        value || ''
+      ).trim()
     );
 
 }
@@ -34,51 +40,56 @@ function isValidPin(value) {
    FILL PROFILE
 ========================= */
 
-function fillProfile(user) {
+function fillProfile(
+  user
+) {
 
   if (!user) {
     return;
   }
 
 
-  const fullNameInput =
+  const fullName =
     window.MC.$(
       '#fullName'
     );
 
 
-  const mobileInput =
+  const mobile =
     window.MC.$(
       '#mobile'
     );
 
 
-  const emailInput =
+  const email =
     window.MC.$(
       '#email'
     );
 
 
-  if (fullNameInput) {
+  if (fullName) {
 
-    fullNameInput.value =
-      user.fullName || '';
-
-  }
-
-
-  if (mobileInput) {
-
-    mobileInput.value =
-      user.mobile || '';
+    fullName.value =
+      user.fullName ||
+      '';
 
   }
 
 
-  if (emailInput) {
+  if (mobile) {
 
-    emailInput.value =
-      user.email || '';
+    mobile.value =
+      user.mobile ||
+      '';
+
+  }
+
+
+  if (email) {
+
+    email.value =
+      user.email ||
+      '';
 
   }
 
@@ -87,9 +98,7 @@ function fillProfile(user) {
     Array.isArray(
       user.addresses
     )
-
       ? user.addresses
-
       : [];
 
 
@@ -98,13 +107,16 @@ function fillProfile(user) {
   );
 
 
-  const defaultAddress =
-    addresses.find(
-      address =>
-        address.isDefault
-    ) ||
-    addresses[0];
+  resetAddressForm();
 
+}
+
+
+/* =========================
+   RESET NEW ADDRESS FORM
+========================= */
+
+function resetAddressForm() {
 
   const form =
     window.MC.$(
@@ -117,194 +129,35 @@ function fillProfile(user) {
   }
 
 
-  const labelInput =
-    form.querySelector(
-      '[name="label"]'
-    );
+  form.reset();
 
 
-  const addressNameInput =
+  const nameInput =
     form.querySelector(
       '[name="fullName"]'
     );
 
 
-  const addressMobileInput =
+  const mobileInput =
     form.querySelector(
       '[name="mobile"]'
     );
 
 
-  const addressLineInput =
-    form.querySelector(
-      '[name="addressLine"]'
-    );
+  if (nameInput) {
 
+    nameInput.value =
+      profileUser?.fullName ||
+      '';
 
-  const pinCodeInput =
-    form.querySelector(
-      '[name="pinCode"]'
-    );
+  }
 
 
-  const cityInput =
-    form.querySelector(
-      '[name="city"]'
-    );
+  if (mobileInput) {
 
-
-  const stateInput =
-    form.querySelector(
-      '[name="state"]'
-    );
-
-
-  const defaultCheckbox =
-    window.MC.$(
-      '#isDefault'
-    );
-
-
-  if (defaultAddress) {
-
-    if (labelInput) {
-
-      labelInput.value =
-        defaultAddress.label ||
-        'Home';
-
-    }
-
-
-    if (addressNameInput) {
-
-      addressNameInput.value =
-        defaultAddress.fullName ||
-        user.fullName ||
-        '';
-
-    }
-
-
-    if (addressMobileInput) {
-
-      addressMobileInput.value =
-        defaultAddress.mobile ||
-        user.mobile ||
-        '';
-
-    }
-
-
-    if (addressLineInput) {
-
-      addressLineInput.value =
-        defaultAddress.addressLine ||
-        '';
-
-    }
-
-
-    if (pinCodeInput) {
-
-      pinCodeInput.value =
-        defaultAddress.pinCode ||
-        '';
-
-    }
-
-
-    if (cityInput) {
-
-      cityInput.value =
-        defaultAddress.city ||
-        '';
-
-    }
-
-
-    if (stateInput) {
-
-      stateInput.value =
-        defaultAddress.state ||
-        '';
-
-    }
-
-
-    if (defaultCheckbox) {
-
-      defaultCheckbox.checked =
-        Boolean(
-          defaultAddress.isDefault
-        );
-
-    }
-
-  } else {
-
-    if (labelInput) {
-
-      labelInput.value =
-        '';
-
-    }
-
-
-    if (addressNameInput) {
-
-      addressNameInput.value =
-        user.fullName || '';
-
-    }
-
-
-    if (addressMobileInput) {
-
-      addressMobileInput.value =
-        user.mobile || '';
-
-    }
-
-
-    if (addressLineInput) {
-
-      addressLineInput.value =
-        '';
-
-    }
-
-
-    if (pinCodeInput) {
-
-      pinCodeInput.value =
-        '';
-
-    }
-
-
-    if (cityInput) {
-
-      cityInput.value =
-        '';
-
-    }
-
-
-    if (stateInput) {
-
-      stateInput.value =
-        '';
-
-    }
-
-
-    if (defaultCheckbox) {
-
-      defaultCheckbox.checked =
-        false;
-
-    }
+    mobileInput.value =
+      profileUser?.mobile ||
+      '';
 
   }
 
@@ -312,14 +165,13 @@ function fillProfile(user) {
 
 
 /* =========================
-   LOAD PROFILE
+   LOAD
 ========================= */
 
 async function loadProfilePage() {
 
   const user =
-    await window.MC
-      .requireLogin();
+    await window.MC.requireLogin();
 
 
   if (!user) {
@@ -339,7 +191,7 @@ async function loadProfilePage() {
 
 
 /* =========================
-   RENDER ADDRESSES
+   ADDRESSES
 ========================= */
 
 function renderAddresses(
@@ -358,136 +210,125 @@ function renderAddresses(
 
 
   box.innerHTML =
+
     addresses.length
 
       ? addresses
           .map(
             address => `
 
-              <div
-                class="card"
-                style="
-                  margin-bottom:12px;
-                "
-              >
+              <article class="saved-address-card">
 
-                <div
-                  class="cardbody"
-                >
+                <div class="saved-address-top">
 
-                  <div>
+                  <div class="saved-address-title">
 
-                    <b>
-
-                      ${window.MC.esc(
-                        address.label ||
-                        'Address'
-                      )}
-
-                    </b>
-
-
-                    ${
-                      address.isDefault
-
-                        ? `
-
-                          <span class="pill">
-                            Default
-                          </span>
-
-                        `
-
-                        : ''
-                    }
+                    ${window.MC.esc(
+                      address.label ||
+                      'Address'
+                    )}
 
                   </div>
 
 
-                  <p>
+                  ${
+                    address.isDefault
 
-                    <b>
+                      ? `
+                        <span class="default-badge">
+                          DEFAULT
+                        </span>
+                      `
 
-                      ${window.MC.esc(
-                        address.fullName ||
-                        ''
-                      )}
-
-                    </b>
-
-                    <br>
-
-                    ${window.MC.esc(
-                      address.addressLine ||
-                      ''
-                    )}
-
-                    <br>
-
-                    ${window.MC.esc(
-                      address.city ||
-                      ''
-                    )}
-
-                    ${
-                      address.city &&
-                      address.state
-
-                        ? ', '
-
-                        : ''
-                    }
-
-                    ${window.MC.esc(
-                      address.state ||
-                      ''
-                    )}
-
-                    <br>
-
-                    PIN:
-                    ${window.MC.esc(
-                      address.pinCode ||
-                      ''
-                    )}
-
-                    <br>
-
-                    Mobile:
-                    ${window.MC.esc(
-                      address.mobile ||
-                      ''
-                    )}
-
-                  </p>
-
-
-                  <div
-                    class="actions"
-                  >
-
-                    <button
-                      class="btn secondary edit-address"
-                      type="button"
-                      data-id="${address._id}"
-                    >
-                      Edit
-                    </button>
-
-
-                    <button
-                      class="btn danger delete-address"
-                      type="button"
-                      data-id="${address._id}"
-                    >
-                      Delete
-                    </button>
-
-                  </div>
+                      : ''
+                  }
 
                 </div>
 
-              </div>
+
+                <p>
+
+                  <strong>
+
+                    ${window.MC.esc(
+                      address.fullName ||
+                      ''
+                    )}
+
+                  </strong>
+
+                  <br>
+
+                  ${window.MC.esc(
+                    address.addressLine ||
+                    ''
+                  )}
+
+                  <br>
+
+                  ${window.MC.esc(
+                    address.city ||
+                    ''
+                  )}
+
+                  ${
+                    address.city &&
+                    address.state
+
+                      ? ', '
+                      : ''
+                  }
+
+                  ${window.MC.esc(
+                    address.state ||
+                    ''
+                  )}
+
+                  <br>
+
+                  PIN:
+                  ${window.MC.esc(
+                    address.pinCode ||
+                    ''
+                  )}
+
+                  <br>
+
+                  Mobile:
+                  ${window.MC.esc(
+                    address.mobile ||
+                    ''
+                  )}
+
+                </p>
+
+
+                <div class="saved-address-actions">
+
+                  <button
+                    class="edit-address"
+                    type="button"
+                    data-id="${window.MC.esc(
+                      address._id
+                    )}"
+                  >
+                    Edit Address
+                  </button>
+
+
+                  <button
+                    class="delete-address"
+                    type="button"
+                    data-id="${window.MC.esc(
+                      address._id
+                    )}"
+                  >
+                    Delete
+                  </button>
+
+                </div>
+
+              </article>
 
             `
           )
@@ -495,7 +336,7 @@ function renderAddresses(
 
       : `
 
-          <div class="empty">
+          <div class="profile-empty">
             No saved addresses.
           </div>
 
@@ -510,7 +351,7 @@ function renderAddresses(
       button => {
 
         button.onclick =
-          async () => {
+          () => {
 
             const address =
               addresses.find(
@@ -526,7 +367,7 @@ function renderAddresses(
 
             if (address) {
 
-              await editAddress(
+              openEditAddressDialog(
                 address
               );
 
@@ -585,17 +426,11 @@ if (profileForm) {
       }
 
 
-      const submitButton =
+      const button =
         event.currentTarget
           .querySelector(
             'button[type="submit"]'
           );
-
-
-      const oldText =
-        submitButton
-          ?.textContent ||
-        'Save Profile';
 
 
       const fullName =
@@ -630,13 +465,13 @@ if (profileForm) {
         true;
 
 
-      if (submitButton) {
+      if (button) {
 
-        submitButton.disabled =
+        button.disabled =
           true;
 
 
-        submitButton.textContent =
+        button.textContent =
           'Saving...';
 
       }
@@ -687,14 +522,14 @@ if (profileForm) {
           false;
 
 
-        if (submitButton) {
+        if (button) {
 
-          submitButton.disabled =
+          button.disabled =
             false;
 
 
-          submitButton.textContent =
-            oldText;
+          button.textContent =
+            'Save Profile';
 
         }
 
@@ -734,16 +569,10 @@ if (addressForm) {
         event.currentTarget;
 
 
-      const submitButton =
+      const button =
         form.querySelector(
           'button[type="submit"]'
         );
-
-
-      const oldText =
-        submitButton
-          ?.textContent ||
-        'Save Address';
 
 
       const body =
@@ -754,53 +583,46 @@ if (addressForm) {
         );
 
 
+      body.label =
+        String(
+          body.label || ''
+        ).trim();
+
+
       body.fullName =
         String(
           body.fullName || ''
-        )
-          .trim();
+        ).trim();
 
 
       body.mobile =
         String(
           body.mobile || ''
-        )
-          .trim();
+        ).trim();
 
 
       body.addressLine =
         String(
           body.addressLine || ''
-        )
-          .trim();
+        ).trim();
 
 
       body.pinCode =
         String(
           body.pinCode || ''
-        )
-          .trim();
+        ).trim();
 
 
       body.city =
         String(
           body.city || ''
-        )
-          .trim();
+        ).trim();
 
 
       body.state =
         String(
           body.state || ''
-        )
-          .trim();
-
-
-      body.label =
-        String(
-          body.label || ''
-        )
-          .trim();
+        ).trim();
 
 
       body.isDefault =
@@ -862,13 +684,13 @@ if (addressForm) {
         true;
 
 
-      if (submitButton) {
+      if (button) {
 
-        submitButton.disabled =
+        button.disabled =
           true;
 
 
-        submitButton.textContent =
+        button.textContent =
           'Saving...';
 
       }
@@ -898,9 +720,6 @@ if (addressForm) {
         );
 
 
-        form.reset();
-
-
         await refreshProfile();
 
 
@@ -919,14 +738,14 @@ if (addressForm) {
           false;
 
 
-        if (submitButton) {
+        if (button) {
 
-          submitButton.disabled =
+          button.disabled =
             false;
 
 
-          submitButton.textContent =
-            oldText;
+          button.textContent =
+            'Save Address';
 
         }
 
@@ -939,220 +758,447 @@ if (addressForm) {
 
 
 /* =========================
-   EDIT ADDRESS
+   EDIT ADDRESS DIALOG
 ========================= */
 
-async function editAddress(
+function openEditAddressDialog(
   address
 ) {
 
-  const label =
-    prompt(
-      'Label',
-      address.label ||
-      'Home'
-    );
-
-
-  if (label === null) {
-    return;
-  }
-
-
-  const fullName =
-    prompt(
-      'Full Name',
-      address.fullName ||
-      ''
-    );
-
-
-  if (fullName === null) {
-    return;
-  }
-
-
-  const mobile =
-    prompt(
-      'Mobile',
-      address.mobile ||
-      ''
-    );
-
-
-  if (mobile === null) {
-    return;
-  }
-
-
-  const addressLine =
-    prompt(
-      'Address',
-      address.addressLine ||
-      ''
-    );
-
-
-  if (addressLine === null) {
-    return;
-  }
-
-
-  const pinCode =
-    prompt(
-      'PIN Code',
-      address.pinCode ||
-      ''
-    );
-
-
-  if (pinCode === null) {
-    return;
-  }
-
-
-  const city =
-    prompt(
-      'City',
-      address.city ||
-      ''
-    );
-
-
-  if (city === null) {
-    return;
-  }
-
-
-  const state =
-    prompt(
-      'State',
-      address.state ||
-      ''
-    );
-
-
-  if (state === null) {
-    return;
-  }
-
-
-  const cleanMobile =
-    String(
-      mobile
+  document
+    .querySelector(
+      '#editAddressDialog'
     )
-      .trim();
+    ?.remove();
 
 
-  const cleanPin =
-    String(
-      pinCode
-    )
-      .trim();
-
-
-  if (
-    !isValidMobile(
-      cleanMobile
-    )
-  ) {
-
-    window.MC.toast(
-      'Valid 10 digit mobile number dalo.',
-      'error'
-    );
-
-    return;
-
-  }
-
-
-  if (
-    !isValidPin(
-      cleanPin
-    )
-  ) {
-
-    window.MC.toast(
-      'Valid 6 digit PIN Code dalo.',
-      'error'
-    );
-
-    return;
-
-  }
-
-
-  const isDefault =
-    confirm(
-      'Make this the default address?'
+  const overlay =
+    document.createElement(
+      'div'
     );
 
 
-  try {
+  overlay.id =
+    'editAddressDialog';
 
-    await window.MC.api(
-      '/profile/addresses/' +
-      encodeURIComponent(
-        address._id
-      ),
-      {
 
-        method:
-          'PUT',
+  overlay.className =
+    'profile-dialog-overlay';
 
-        body:
-          JSON.stringify({
 
-            label:
-              String(label).trim(),
+  overlay.innerHTML = `
 
-            fullName:
-              String(fullName).trim(),
+    <form
+      class="profile-dialog"
+      id="editAddressForm"
+    >
 
-            mobile:
-              cleanMobile,
+      <h2>
+        Edit Address
+      </h2>
 
-            addressLine:
-              String(
-                addressLine
-              ).trim(),
 
-            pinCode:
-              cleanPin,
+      <div class="address-grid">
 
-            city:
-              String(city).trim(),
+        <div class="profile-field">
 
-            state:
-              String(state).trim(),
+          <label>
+            Label
+          </label>
 
-            isDefault
+          <input
+            class="profile-input"
+            name="label"
+            value="${window.MC.esc(
+              address.label ||
+              ''
+            )}"
+          >
 
-          })
+        </div>
+
+
+        <div class="profile-field">
+
+          <label>
+            Full Name
+          </label>
+
+          <input
+            class="profile-input"
+            name="fullName"
+            required
+            value="${window.MC.esc(
+              address.fullName ||
+              ''
+            )}"
+          >
+
+        </div>
+
+
+        <div class="profile-field">
+
+          <label>
+            Mobile
+          </label>
+
+          <input
+            class="profile-input"
+            name="mobile"
+            required
+            maxlength="10"
+            value="${window.MC.esc(
+              address.mobile ||
+              ''
+            )}"
+          >
+
+        </div>
+
+
+        <div class="profile-field">
+
+          <label>
+            PIN Code
+          </label>
+
+          <input
+            class="profile-input"
+            name="pinCode"
+            required
+            maxlength="6"
+            value="${window.MC.esc(
+              address.pinCode ||
+              ''
+            )}"
+          >
+
+        </div>
+
+
+        <div class="profile-field full">
+
+          <label>
+            Address
+          </label>
+
+          <textarea
+            class="profile-input profile-textarea"
+            name="addressLine"
+            required
+          >${window.MC.esc(
+            address.addressLine ||
+            ''
+          )}</textarea>
+
+        </div>
+
+
+        <div class="profile-field">
+
+          <label>
+            City
+          </label>
+
+          <input
+            class="profile-input"
+            name="city"
+            value="${window.MC.esc(
+              address.city ||
+              ''
+            )}"
+          >
+
+        </div>
+
+
+        <div class="profile-field">
+
+          <label>
+            State
+          </label>
+
+          <input
+            class="profile-input"
+            name="state"
+            value="${window.MC.esc(
+              address.state ||
+              ''
+            )}"
+          >
+
+        </div>
+
+      </div>
+
+
+      <label class="default-address-check">
+
+        <input
+          type="checkbox"
+          name="isDefault"
+          ${
+            address.isDefault
+              ? 'checked'
+              : ''
+          }
+        >
+
+        <span>
+          Make this my default delivery address
+        </span>
+
+      </label>
+
+
+      <div class="profile-dialog-actions">
+
+        <button
+          class="dialog-cancel"
+          type="button"
+        >
+          Cancel
+        </button>
+
+
+        <button
+          class="dialog-save"
+          type="submit"
+        >
+          Save Changes
+        </button>
+
+      </div>
+
+    </form>
+
+  `;
+
+
+  document.body.appendChild(
+    overlay
+  );
+
+
+  overlay
+    .querySelector(
+      '.dialog-cancel'
+    )
+    ?.addEventListener(
+      'click',
+      () => {
+
+        overlay.remove();
 
       }
     );
 
 
-    window.MC.toast(
-      'Address updated successfully.',
-      'success'
+  overlay.addEventListener(
+    'click',
+    event => {
+
+      if (
+        event.target ===
+        overlay
+      ) {
+
+        overlay.remove();
+
+      }
+
+    }
+  );
+
+
+  overlay
+    .querySelector(
+      '#editAddressForm'
+    )
+    ?.addEventListener(
+      'submit',
+      async event => {
+
+        event.preventDefault();
+
+
+        const form =
+          event.currentTarget;
+
+
+        const body =
+          Object.fromEntries(
+            new FormData(
+              form
+            )
+          );
+
+
+        body.mobile =
+          String(
+            body.mobile ||
+            ''
+          ).trim();
+
+
+        body.pinCode =
+          String(
+            body.pinCode ||
+            ''
+          ).trim();
+
+
+        body.label =
+          String(
+            body.label ||
+            ''
+          ).trim();
+
+
+        body.fullName =
+          String(
+            body.fullName ||
+            ''
+          ).trim();
+
+
+        body.addressLine =
+          String(
+            body.addressLine ||
+            ''
+          ).trim();
+
+
+        body.city =
+          String(
+            body.city ||
+            ''
+          ).trim();
+
+
+        body.state =
+          String(
+            body.state ||
+            ''
+          ).trim();
+
+
+        body.isDefault =
+          Boolean(
+            form.querySelector(
+              '[name="isDefault"]'
+            )?.checked
+          );
+
+
+        if (
+          !isValidMobile(
+            body.mobile
+          )
+        ) {
+
+          window.MC.toast(
+            'Valid mobile number dalo.',
+            'error'
+          );
+
+          return;
+
+        }
+
+
+        if (
+          !isValidPin(
+            body.pinCode
+          )
+        ) {
+
+          window.MC.toast(
+            'Valid PIN Code dalo.',
+            'error'
+          );
+
+          return;
+
+        }
+
+
+        const saveButton =
+          form.querySelector(
+            '.dialog-save'
+          );
+
+
+        if (saveButton) {
+
+          saveButton.disabled =
+            true;
+
+
+          saveButton.textContent =
+            'Saving...';
+
+        }
+
+
+        try {
+
+          await window.MC.api(
+            '/profile/addresses/' +
+            encodeURIComponent(
+              address._id
+            ),
+            {
+
+              method:
+                'PUT',
+
+              body:
+                JSON.stringify(
+                  body
+                )
+
+            }
+          );
+
+
+          overlay.remove();
+
+
+          window.MC.toast(
+            'Address updated successfully.',
+            'success'
+          );
+
+
+          await refreshProfile();
+
+
+        } catch (error) {
+
+          window.MC.toast(
+            error.message ||
+            'Address update failed.',
+            'error'
+          );
+
+
+          if (saveButton) {
+
+            saveButton.disabled =
+              false;
+
+
+            saveButton.textContent =
+              'Save Changes';
+
+          }
+
+        }
+
+      }
     );
-
-
-    await refreshProfile();
-
-
-  } catch (error) {
-
-    window.MC.toast(
-      error.message ||
-      'Address update failed.',
-      'error'
-    );
-
-  }
 
 }
 
@@ -1177,12 +1223,6 @@ async function deleteAddress(
   }
 
 
-  const oldText =
-    button
-      ?.textContent ||
-    'Delete';
-
-
   if (button) {
 
     button.disabled =
@@ -1201,10 +1241,8 @@ async function deleteAddress(
       '/profile/addresses/' +
       encodeURIComponent(id),
       {
-
         method:
           'DELETE'
-
       }
     );
 
@@ -1234,7 +1272,7 @@ async function deleteAddress(
 
 
       button.textContent =
-        oldText;
+        'Delete';
 
     }
 
@@ -1244,7 +1282,7 @@ async function deleteAddress(
 
 
 /* =========================
-   REFRESH PROFILE
+   REFRESH
 ========================= */
 
 async function refreshProfile() {
@@ -1256,7 +1294,8 @@ async function refreshProfile() {
 
 
   profileUser =
-    data.user || null;
+    data.user ||
+    null;
 
 
   if (!profileUser) {
@@ -1271,6 +1310,41 @@ async function refreshProfile() {
 
   fillProfile(
     profileUser
+  );
+
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+const logoutButton =
+  window.MC.$(
+    '#profileLogoutBtn'
+  );
+
+
+if (logoutButton) {
+
+  logoutButton.addEventListener(
+    'click',
+    async () => {
+
+      const confirmed =
+        confirm(
+          'Kya aap logout karna chahte hain?'
+        );
+
+
+      if (!confirmed) {
+        return;
+      }
+
+
+      await window.MC.logoutUser();
+
+    }
   );
 
 }
