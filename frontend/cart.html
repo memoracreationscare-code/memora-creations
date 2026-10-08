@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
   <meta charset="utf-8">
 
   <meta
@@ -10,16 +11,26 @@
   >
 
   <title>
-    Your Cart - MEMORA CREATIONS
+    Your Cart | MEMORA CREATIONS
   </title>
+
 
   <link
     rel="stylesheet"
-    href="/memora-creations/frontend/css/style.css?v=9"
+    href="/memora-creations/frontend/css/style.css?v=13"
   >
+
+
+  <link
+    rel="stylesheet"
+    href="/memora-creations/frontend/css/cart.css?v=1"
+  >
+
 </head>
 
-<body>
+
+<body class="cart-page-body">
+
 
   <header
     id="nav"
@@ -27,30 +38,250 @@
   ></header>
 
 
-  <main
-    class="container section"
+  <!-- WATERMARK -->
+
+  <div
+    class="cart-watermark"
+    aria-hidden="true"
   >
-
-    <h1>
-      Your Cart
-    </h1>
+    MEMORA CREATIONS
+  </div>
 
 
-    <div class="two">
-
-      <div
-        id="cartItems"
-      ></div>
+  <main class="container cart-page">
 
 
-      <aside
-        id="summary"
-        class="summary"
-      ></aside>
+    <!-- HEADER -->
 
-    </div>
+    <section class="cart-hero">
+
+      <div class="cart-eyebrow">
+        YOUR SELECTION
+      </div>
+
+
+      <h1>
+        Shopping Cart
+      </h1>
+
+
+      <p>
+        Review your products before proceeding
+        to checkout.
+      </p>
+
+    </section>
+
+
+    <!-- CART LAYOUT -->
+
+    <section class="cart-layout">
+
+
+      <!-- LEFT -->
+
+      <div>
+
+        <div class="cart-section-head">
+
+          <div>
+
+            <span>
+              PRODUCTS
+            </span>
+
+            <h2>
+              Your Items
+            </h2>
+
+          </div>
+
+
+          <a
+            href="/memora-creations/frontend/products.html"
+            class="continue-shopping"
+          >
+            ← Continue Shopping
+          </a>
+
+        </div>
+
+
+        <div id="cartItems">
+
+          <div class="cart-loading">
+            Loading cart...
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- RIGHT -->
+
+      <aside class="cart-summary-wrap">
+
+        <div class="cart-summary-title">
+
+          <span>
+            ORDER
+          </span>
+
+          <h2>
+            Order Summary
+          </h2>
+
+        </div>
+
+
+        <div
+          id="summary"
+          class="cart-summary"
+        ></div>
+
+
+        <div class="cart-secure-box">
+
+          <div class="cart-secure-icon">
+            🔒
+          </div>
+
+          <div>
+
+            <strong>
+              Secure Checkout
+            </strong>
+
+            <span>
+              Your order information is protected.
+            </span>
+
+          </div>
+
+        </div>
+
+      </aside>
+
+    </section>
+
+
+    <!-- TRUST -->
+
+    <section class="cart-trust">
+
+      <div>
+
+        <span class="trust-cart-icon">
+          ✓
+        </span>
+
+        <strong>
+          Quality Products
+        </strong>
+
+        <small>
+          Carefully selected items
+        </small>
+
+      </div>
+
+
+      <div>
+
+        <span class="trust-cart-icon">
+          🔒
+        </span>
+
+        <strong>
+          Secure Order
+        </strong>
+
+        <small>
+          Safe checkout process
+        </small>
+
+      </div>
+
+
+      <div>
+
+        <span class="trust-cart-icon">
+          💬
+        </span>
+
+        <strong>
+          Need Help?
+        </strong>
+
+        <small>
+          Customer care available
+        </small>
+
+      </div>
+
+    </section>
+
+
+    <!-- CUSTOMER CARE -->
+
+    <section class="cart-help">
+
+      <div>
+
+        <small>
+          MEMORA CUSTOMER CARE
+        </small>
+
+        <h2>
+          Need help with your cart?
+        </h2>
+
+        <p>
+          Order ya product se related kisi bhi
+          help ke liye humse contact karein.
+        </p>
+
+      </div>
+
+
+      <div class="cart-help-actions">
+
+        <a
+          href="https://wa.me/917054242294?text=Namaste%20Memora%20Creations%2C%20mujhe%20cart%20ya%20order%20me%20help%20chahiye."
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          💬 WhatsApp
+        </a>
+
+
+        <a
+          href="mailto:memoracreations.care@gmail.com?subject=Cart%20Support%20-%20Memora%20Creations"
+        >
+          ✉️ Email Support
+        </a>
+
+      </div>
+
+    </section>
 
   </main>
+
+
+  <!-- FOOTER -->
+
+  <footer class="cart-footer">
+
+    <strong>
+      MEMORA CREATIONS
+    </strong>
+
+    <p>
+      Beautiful Decor • Thoughtful Gifts • Memorable Spaces
+    </p>
+
+  </footer>
 
 
   <nav
@@ -59,14 +290,10 @@
   ></nav>
 
 
-  <!-- COMMON JS -->
-
   <script
-    src="/memora-creations/frontend/js/app.js?v=9"
+    src="/memora-creations/frontend/js/app.js?v=10"
   ></script>
 
-
-  <!-- SECURE CART START -->
 
   <script>
 
@@ -74,6 +301,7 @@
 
       const user =
         await window.MC.requireLogin();
+
 
       if (!user) {
         return;
@@ -87,7 +315,7 @@
 
 
       script.src =
-        '/memora-creations/frontend/js/cart.js?v=9';
+        '/memora-creations/frontend/js/cart.js?v=10';
 
 
       document.body.appendChild(
