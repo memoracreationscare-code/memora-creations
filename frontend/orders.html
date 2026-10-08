@@ -11,8 +11,9 @@
   >
 
   <title>
-    Products | MEMORA CREATIONS
+    My Orders | MEMORA CREATIONS
   </title>
+
 
   <link
     rel="stylesheet"
@@ -20,762 +21,18 @@
   >
 
 
-  <style>
-
-    /* =========================
-       PAGE HERO
-    ========================= */
-
-    .products-hero{
-      margin:24px 0 28px;
-
-      padding:
-        clamp(34px,5vw,58px);
-
-      border-radius:28px;
-
-      position:relative;
-
-      overflow:hidden;
-
-      background:
-        linear-gradient(
-          135deg,
-          #f3e6d9,
-          #fffaf6
-        );
-
-      border:
-        1px solid #eadfd5;
-
-      box-shadow:
-        0 18px 45px
-        rgba(61,39,23,.07);
-    }
-
-
-    .products-hero::before{
-      content:"";
-
-      position:absolute;
-
-      width:240px;
-      height:240px;
-
-      border-radius:50%;
-
-      right:-80px;
-      top:-100px;
-
-      background:
-        rgba(183,131,93,.11);
-    }
-
-
-    .products-hero::after{
-      content:"";
-
-      position:absolute;
-
-      width:160px;
-      height:160px;
-
-      border-radius:50%;
-
-      right:100px;
-      bottom:-85px;
-
-      border:
-        1px solid
-        rgba(138,90,59,.15);
-    }
-
-
-    .products-eyebrow{
-      position:relative;
-
-      z-index:1;
-
-      margin-bottom:11px;
-
-      color:#9b613c;
-
-      font-size:11px;
-
-      font-weight:900;
-
-      letter-spacing:.22em;
-
-      text-transform:uppercase;
-    }
-
-
-    .products-title-row{
-      position:relative;
-
-      z-index:1;
-
-      display:flex;
-
-      align-items:flex-end;
-
-      justify-content:space-between;
-
-      gap:20px;
-    }
-
-
-    .products-title-row h1{
-      margin:0;
-
-      color:#2b1b12;
-
-      font-family:
-        Georgia,
-        "Times New Roman",
-        serif;
-
-      font-size:
-        clamp(46px,6vw,72px);
-
-      line-height:.96;
-
-      letter-spacing:-.03em;
-    }
-
-
-    .products-count{
-      padding:
-        9px 13px;
-
-      border-radius:999px;
-
-      background:#fff;
-
-      border:
-        1px solid #e5d8cd;
-
-      color:#7b6f66;
-
-      font-size:13px;
-
-      font-weight:800;
-
-      box-shadow:
-        0 6px 15px
-        rgba(61,39,23,.04);
-    }
-
-
-    .products-subtitle{
-      position:relative;
-
-      z-index:1;
-
-      max-width:620px;
-
-      margin:
-        16px 0 0;
-
-      color:#766c64;
-
-      font-size:16px;
-
-      line-height:1.6;
-    }
-
-
-    /* =========================
-       FILTER PANEL
-    ========================= */
-
-    .filter-panel{
-      margin-bottom:30px;
-
-      padding:17px;
-
-      border:
-        1px solid #e8ddd3;
-
-      border-radius:22px;
-
-      background:#fff;
-
-      box-shadow:
-        0 10px 28px
-        rgba(61,39,23,.055);
-    }
-
-
-    .filter-form{
-      display:grid;
-
-      grid-template-columns:
-        minmax(250px,1.6fr)
-        minmax(180px,.8fr)
-        minmax(180px,.8fr)
-        auto;
-
-      gap:11px;
-    }
-
-
-    .filter-field{
-      position:relative;
-    }
-
-
-    .filter-input,
-    .filter-select{
-      width:100%;
-
-      min-height:53px;
-
-      border:
-        1px solid #e5dbd2;
-
-      border-radius:14px;
-
-      background:#fffdfb;
-
-      color:#2c211a;
-
-      font:inherit;
-
-      outline:none;
-    }
-
-
-    .filter-input{
-      padding:
-        0 16px 0 48px;
-    }
-
-
-    .filter-select{
-      padding:
-        0 38px 0 14px;
-    }
-
-
-    .filter-input:focus,
-    .filter-select:focus{
-      border-color:#b7835d;
-
-      box-shadow:
-        0 0 0 4px
-        rgba(183,131,93,.09);
-    }
-
-
-    .search-icon{
-      position:absolute;
-
-      left:16px;
-      top:50%;
-
-      transform:
-        translateY(-50%);
-
-      width:20px;
-      height:20px;
-
-      color:#9b613c;
-
-      pointer-events:none;
-    }
-
-
-    .search-icon svg{
-      width:20px;
-      height:20px;
-
-      stroke:currentColor;
-    }
-
-
-    .filter-btn{
-      min-height:53px;
-
-      padding:0 22px;
-
-      border:0;
-
-      border-radius:14px;
-
-      background:
-        linear-gradient(
-          180deg,
-          #9b613c,
-          #7e492a
-        );
-
-      color:#fff;
-
-      font-weight:800;
-
-      cursor:pointer;
-
-      box-shadow:
-        0 10px 20px
-        rgba(138,90,59,.18);
-    }
-
-
-    .clear-filters{
-      margin-top:12px;
-
-      display:flex;
-
-      justify-content:flex-end;
-    }
-
-
-    .clear-filters a{
-      color:#8a5a3b;
-
-      font-size:12px;
-
-      font-weight:800;
-    }
-
-
-    /* =========================
-       PRODUCT GRID
-    ========================= */
-
-    .premium-products-grid{
-      display:grid;
-
-      grid-template-columns:
-        repeat(4,minmax(0,1fr));
-
-      gap:18px;
-
-      padding-bottom:50px;
-    }
-
-
-    .premium-product-card{
-      overflow:hidden;
-
-      border:
-        1px solid #e8dfd8;
-
-      border-radius:22px;
-
-      background:#fff;
-
-      box-shadow:
-        0 8px 24px
-        rgba(46,31,20,.05);
-
-      transition:
-        transform .2s ease,
-        box-shadow .2s ease;
-    }
-
-
-    .premium-product-card:hover{
-      transform:
-        translateY(-4px);
-
-      box-shadow:
-        0 18px 38px
-        rgba(46,31,20,.11);
-    }
-
-
-    .premium-product-open{
-      width:100%;
-
-      padding:0;
-
-      border:0;
-
-      background:transparent;
-
-      color:inherit;
-
-      text-align:left;
-
-      cursor:pointer;
-    }
-
-
-    .premium-image-wrap{
-      position:relative;
-
-      aspect-ratio:1/1;
-
-      overflow:hidden;
-
-      background:#f5f2ee;
-    }
-
-
-    .premium-product-img{
-      width:100%;
-      height:100%;
-
-      display:block;
-
-      object-fit:cover;
-
-      transition:
-        transform .3s ease;
-    }
-
-
-    .premium-product-card:hover
-    .premium-product-img{
-      transform:scale(1.035);
-    }
-
-
-    .discount-badge{
-      position:absolute;
-
-      top:11px;
-      left:11px;
-
-      padding:
-        6px 9px;
-
-      border-radius:999px;
-
-      background:#2c2018;
-
-      color:#fff;
-
-      font-size:10px;
-
-      font-weight:900;
-
-      letter-spacing:.03em;
-    }
-
-
-    .stock-dot{
-      position:absolute;
-
-      top:14px;
-      right:14px;
-
-      width:10px;
-      height:10px;
-
-      border-radius:50%;
-
-      background:#2fa560;
-
-      box-shadow:
-        0 0 0 4px
-        rgba(47,165,96,.14);
-    }
-
-
-    .stock-dot.out{
-      background:#c54b43;
-
-      box-shadow:
-        0 0 0 4px
-        rgba(197,75,67,.14);
-    }
-
-
-    .premium-card-content{
-      padding:15px;
-    }
-
-
-    .premium-category{
-      margin-bottom:7px;
-
-      color:#9b613c;
-
-      font-size:10px;
-
-      font-weight:900;
-
-      text-transform:uppercase;
-
-      letter-spacing:.13em;
-    }
-
-
-    .premium-product-title{
-      min-height:42px;
-
-      margin:0 0 10px;
-
-      color:#302219;
-
-      font-size:15px;
-
-      font-weight:800;
-
-      line-height:1.4;
-    }
-
-
-    .premium-price-row{
-      display:flex;
-
-      align-items:baseline;
-
-      gap:8px;
-
-      flex-wrap:wrap;
-    }
-
-
-    .premium-price{
-      color:#221811;
-
-      font-size:19px;
-
-      font-weight:900;
-    }
-
-
-    .premium-old-price{
-      color:#9d9690;
-
-      font-size:13px;
-
-      text-decoration:line-through;
-    }
-
-
-    .stock-text{
-      margin-top:8px;
-
-      font-size:11px;
-
-      font-weight:700;
-
-      color:#5f8c6d;
-    }
-
-
-    .stock-text.out{
-      color:#b9534a;
-    }
-
-
-    .premium-card-actions{
-      display:grid;
-
-      grid-template-columns:
-        1fr 1fr;
-
-      gap:8px;
-
-      padding:
-        0 15px 15px;
-    }
-
-
-    .premium-card-actions .btn{
-      padding:
-        11px 8px;
-
-      border-radius:11px;
-
-      font-size:12px;
-    }
-
-
-    /* =========================
-       EMPTY
-    ========================= */
-
-    .products-empty{
-      grid-column:1/-1;
-
-      padding:
-        55px 20px;
-
-      text-align:center;
-
-      border:
-        1px dashed #ddcfc3;
-
-      border-radius:22px;
-
-      background:#fffdfb;
-
-      color:#7b716a;
-    }
-
-
-    .products-empty-icon{
-      font-size:42px;
-
-      margin-bottom:10px;
-    }
-
-
-    .products-empty strong{
-      display:block;
-
-      margin-bottom:5px;
-
-      color:#33241b;
-
-      font-size:18px;
-    }
-
-
-    /* =========================
-       MOBILE
-    ========================= */
-
-    @media(max-width:950px){
-
-      .filter-form{
-        grid-template-columns:
-          1fr 1fr;
-      }
-
-
-      .premium-products-grid{
-        grid-template-columns:
-          repeat(3,minmax(0,1fr));
-      }
-
-    }
-
-
-    @media(max-width:700px){
-
-      .products-hero{
-        margin:
-          12px 0 20px;
-
-        padding:
-          34px 20px;
-
-        border-radius:22px;
-      }
-
-
-      .products-title-row{
-        align-items:flex-start;
-
-        flex-direction:column;
-
-        gap:13px;
-      }
-
-
-      .products-title-row h1{
-        font-size:46px;
-      }
-
-
-      .products-count{
-        padding:
-          7px 11px;
-
-        font-size:11px;
-      }
-
-
-      .products-subtitle{
-        font-size:14px;
-      }
-
-
-      .filter-panel{
-        padding:13px;
-
-        border-radius:18px;
-      }
-
-
-      .filter-form{
-        grid-template-columns:1fr;
-      }
-
-
-      .filter-input,
-      .filter-select,
-      .filter-btn{
-        min-height:51px;
-      }
-
-
-      .premium-products-grid{
-        grid-template-columns:
-          repeat(2,minmax(0,1fr));
-
-        gap:10px;
-      }
-
-
-      .premium-product-card{
-        border-radius:16px;
-      }
-
-
-      .premium-card-content{
-        padding:11px;
-      }
-
-
-      .premium-product-title{
-        min-height:38px;
-
-        font-size:13px;
-      }
-
-
-      .premium-price{
-        font-size:16px;
-      }
-
-
-      .premium-old-price{
-        font-size:11px;
-      }
-
-
-      .premium-card-actions{
-        padding:
-          0 10px 10px;
-
-        grid-template-columns:1fr;
-
-        gap:6px;
-      }
-
-
-      .premium-card-actions .btn{
-        font-size:11px;
-      }
-
-    }
-
-
-    @media(max-width:380px){
-
-      .premium-products-grid{
-        grid-template-columns:1fr;
-      }
-
-    }
-
-  </style>
+  <link
+    rel="stylesheet"
+    href="/memora-creations/frontend/css/orders.css?v=1"
+  >
 
 </head>
 
 
-<body>
+<body class="orders-body">
 
 
-  <!-- NAV -->
+  <!-- NAVBAR -->
 
   <header
     id="nav"
@@ -783,169 +40,159 @@
   ></header>
 
 
-  <main class="container">
+  <!-- WATERMARK -->
+
+  <div
+    class="orders-watermark"
+    aria-hidden="true"
+  >
+    MEMORA CREATIONS
+  </div>
+
+
+  <main class="container orders-page">
 
 
     <!-- HERO -->
 
-    <section class="products-hero">
+    <section class="orders-hero">
 
-      <div class="products-eyebrow">
-        MEMORA COLLECTION
+      <div class="orders-eyebrow">
+        YOUR PURCHASES
       </div>
 
 
-      <div class="products-title-row">
+      <div class="orders-title-row">
 
-        <h1>
-          Shop Products
-        </h1>
+        <div>
 
+          <h1>
+            My Orders
+          </h1>
 
-        <span
-          id="resultCount"
-          class="products-count"
-        >
-          Loading...
-        </span>
-
-      </div>
-
-
-      <p class="products-subtitle">
-
-        Explore home decor, photo frames
-        and thoughtfully selected products
-        made to bring warmth and personality
-        to your space.
-
-      </p>
-
-    </section>
-
-
-    <!-- FILTERS -->
-
-    <section class="filter-panel">
-
-      <form
-        id="filterForm"
-        class="filter-form"
-      >
-
-
-        <!-- SEARCH -->
-
-        <div class="filter-field">
-
-          <span class="search-icon">
-
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke-width="2"
-              stroke-linecap="round"
-            >
-              <circle
-                cx="11"
-                cy="11"
-                r="7"
-              ></circle>
-
-              <path
-                d="M20 20l-4-4"
-              ></path>
-            </svg>
-
-          </span>
-
-
-          <input
-            class="filter-input"
-            name="q"
-            type="search"
-            placeholder="Search products..."
-            autocomplete="off"
-          >
+          <p>
+            Apne orders, products, payment
+            aur delivery status ko ek jagah track karein.
+          </p>
 
         </div>
 
 
-        <!-- CATEGORY -->
-
-        <select
-          class="filter-select"
-          id="categorySelect"
-          name="category"
+        <div
+          id="orderCount"
+          class="orders-count"
         >
+          Loading...
+        </div>
 
-          <option value="">
-            All Categories
-          </option>
+      </div>
 
-        </select>
-
-
-        <!-- SORT -->
-
-        <select
-          class="filter-select"
-          name="sort"
-        >
-
-          <option value="newest">
-            Newest
-          </option>
-
-          <option value="low">
-            Price: Low to High
-          </option>
-
-          <option value="high">
-            Price: High to Low
-          </option>
-
-        </select>
+    </section>
 
 
-        <button
-          class="filter-btn"
-          type="submit"
-        >
-          Apply Filters
-        </button>
+    <!-- ORDERS HEADING -->
 
-      </form>
+    <section class="orders-heading">
+
+      <div>
+
+        <span>
+          ORDER HISTORY
+        </span>
+
+        <h2>
+          Your Orders
+        </h2>
+
+      </div>
 
 
-      <div class="clear-filters">
+      <a
+        href="/memora-creations/frontend/products.html"
+        class="orders-shop-link"
+      >
+        Continue Shopping →
+      </a>
+
+    </section>
+
+
+    <!-- ORDERS -->
+
+    <section
+      id="orders"
+      class="orders-list"
+    >
+
+      <div class="orders-loading">
+        Loading your orders...
+      </div>
+
+    </section>
+
+
+    <!-- SUPPORT -->
+
+    <section class="orders-support">
+
+      <div>
+
+        <small>
+          MEMORA CUSTOMER CARE
+        </small>
+
+        <h2>
+          Need help with an order?
+        </h2>
+
+        <p>
+          Order status, payment ya delivery
+          se related help ke liye humse contact karein.
+        </p>
+
+      </div>
+
+
+      <div class="orders-support-actions">
 
         <a
-          href="/memora-creations/frontend/products.html"
+          href="https://wa.me/917054242294?text=Namaste%20Memora%20Creations%2C%20mujhe%20mere%20order%20ke%20baare%20me%20help%20chahiye."
+          target="_blank"
+          rel="noopener noreferrer"
         >
-          Clear all filters
+          💬 WhatsApp
+        </a>
+
+
+        <a
+          href="mailto:memoracreations.care@gmail.com?subject=Order%20Support%20-%20Memora%20Creations"
+        >
+          ✉️ Email Support
         </a>
 
       </div>
 
     </section>
 
-
-    <!-- PRODUCTS -->
-
-    <section>
-
-      <div
-        id="productGrid"
-        class="premium-products-grid"
-      ></div>
-
-    </section>
-
   </main>
 
 
-  <!-- BOTTOM NAV -->
+  <!-- FOOTER -->
+
+  <footer class="orders-footer">
+
+    <strong>
+      MEMORA CREATIONS
+    </strong>
+
+    <p>
+      Beautiful Decor • Thoughtful Gifts • Memorable Spaces
+    </p>
+
+  </footer>
+
+
+  <!-- MOBILE NAV -->
 
   <nav
     id="bottomNav"
@@ -953,18 +200,45 @@
   ></nav>
 
 
-  <!-- APP -->
+  <!-- COMMON JS -->
 
   <script
     src="/memora-creations/frontend/js/app.js?v=10"
   ></script>
 
 
-  <!-- PRODUCTS -->
+  <!-- SECURE ORDERS -->
 
-  <script
-    src="/memora-creations/frontend/js/products.js?v=10"
-  ></script>
+  <script>
+
+    (async function secureOrdersPage() {
+
+      const user =
+        await window.MC.requireLogin();
+
+
+      if (!user) {
+        return;
+      }
+
+
+      const script =
+        document.createElement(
+          'script'
+        );
+
+
+      script.src =
+        '/memora-creations/frontend/js/orders.js?v=11';
+
+
+      document.body.appendChild(
+        script
+      );
+
+    })();
+
+  </script>
 
 </body>
 
