@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
   <meta charset="utf-8">
 
   <meta
@@ -10,16 +11,26 @@
   >
 
   <title>
-    Checkout - MEMORA CREATIONS
+    Checkout | MEMORA CREATIONS
   </title>
+
 
   <link
     rel="stylesheet"
-    href="/memora-creations/frontend/css/style.css?v=9"
+    href="/memora-creations/frontend/css/style.css?v=13"
   >
+
+
+  <link
+    rel="stylesheet"
+    href="/memora-creations/frontend/css/checkout.css?v=1"
+  >
+
 </head>
 
-<body>
+
+<body class="checkout-body">
+
 
   <header
     id="nav"
@@ -27,194 +38,438 @@
   ></header>
 
 
+  <div
+    class="checkout-watermark"
+    aria-hidden="true"
+  >
+    MEMORA CREATIONS
+  </div>
+
+
   <main
     id="checkout"
-    class="container section"
+    class="container checkout-page"
   >
 
-    <div class="two">
+
+    <!-- HEADER -->
+
+    <section class="checkout-hero">
+
+      <div class="checkout-eyebrow">
+        SECURE CHECKOUT
+      </div>
+
+      <h1>
+        Complete Your Order
+      </h1>
+
+      <p>
+        Delivery address check karein,
+        payment method select karein
+        aur order confirm karein.
+      </p>
+
+    </section>
+
+
+    <!-- CHECKOUT GRID -->
+
+    <section class="checkout-layout">
+
+
+      <!-- LEFT -->
 
       <form
         id="checkoutForm"
-        class="form"
-        style="margin:0;"
+        class="checkout-card"
       >
 
-        <h1>
-          Checkout
-        </h1>
 
+        <div class="checkout-card-heading">
 
-        <div class="field">
+          <span>
+            STEP 1
+          </span>
 
-          <label>
-            Full Name *
-          </label>
-
-          <input
-            id="fullName"
-            class="input"
-            required
-            autocomplete="name"
-          >
+          <h2>
+            Delivery Address
+          </h2>
 
         </div>
 
 
-        <div class="field">
-
-          <label>
-            Mobile *
-          </label>
-
-          <input
-            id="mobile"
-            class="input"
-            type="tel"
-            required
-            inputmode="numeric"
-            pattern="[6-9][0-9]{9}"
-            maxlength="10"
-            autocomplete="tel"
-          >
-
-        </div>
+        <div class="checkout-form-grid">
 
 
-        <div class="field">
+          <div class="checkout-field">
 
-          <label>
-            Address *
-          </label>
-
-          <textarea
-            id="addressLine"
-            class="input"
-            required
-            autocomplete="street-address"
-          ></textarea>
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-            PIN Code *
-          </label>
-
-          <input
-            id="pinCode"
-            class="input"
-            required
-            inputmode="numeric"
-            pattern="[0-9]{6}"
-            maxlength="6"
-            autocomplete="postal-code"
-          >
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-            City
-          </label>
-
-          <input
-            id="city"
-            class="input"
-            autocomplete="address-level2"
-          >
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-            State
-          </label>
-
-          <input
-            id="state"
-            class="input"
-            autocomplete="address-level1"
-          >
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
+            <label for="fullName">
+              Full Name *
+            </label>
 
             <input
-              type="radio"
-              name="paymentMethod"
-              value="COD"
-              checked
-            >
-
-            Cash on Delivery
-
-          </label>
-
-
-          <br><br>
-
-
-          <label>
-
-            <input
-              type="radio"
-              name="paymentMethod"
-              value="RAZORPAY"
-            >
-
-            Pay Online (Razorpay)
-
-          </label>
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-
-            <input
-              id="terms"
-              type="checkbox"
+              id="fullName"
+              class="checkout-input"
               required
+              autocomplete="name"
+              placeholder="Your full name"
             >
 
-            I confirm the order details.
+          </div>
 
-          </label>
+
+          <div class="checkout-field">
+
+            <label for="mobile">
+              Mobile Number *
+            </label>
+
+            <input
+              id="mobile"
+              class="checkout-input"
+              type="tel"
+              required
+              inputmode="numeric"
+              pattern="[6-9][0-9]{9}"
+              maxlength="10"
+              autocomplete="tel"
+              placeholder="10 digit mobile number"
+            >
+
+          </div>
+
+
+          <div class="checkout-field full">
+
+            <label for="addressLine">
+              Full Address *
+            </label>
+
+            <textarea
+              id="addressLine"
+              class="checkout-input checkout-textarea"
+              required
+              autocomplete="street-address"
+              placeholder="House no, street, village / locality"
+            ></textarea>
+
+          </div>
+
+
+          <div class="checkout-field">
+
+            <label for="pinCode">
+              PIN Code *
+            </label>
+
+            <input
+              id="pinCode"
+              class="checkout-input"
+              required
+              inputmode="numeric"
+              pattern="[0-9]{6}"
+              maxlength="6"
+              autocomplete="postal-code"
+              placeholder="6 digit PIN"
+            >
+
+          </div>
+
+
+          <div class="checkout-field">
+
+            <label for="city">
+              City
+            </label>
+
+            <input
+              id="city"
+              class="checkout-input"
+              autocomplete="address-level2"
+              placeholder="City"
+            >
+
+          </div>
+
+
+          <div class="checkout-field full">
+
+            <label for="state">
+              State
+            </label>
+
+            <input
+              id="state"
+              class="checkout-input"
+              autocomplete="address-level1"
+              placeholder="State"
+            >
+
+          </div>
 
         </div>
+
+
+        <!-- PAYMENT -->
+
+        <div class="payment-section">
+
+          <div class="checkout-card-heading">
+
+            <span>
+              STEP 2
+            </span>
+
+            <h2>
+              Payment Method
+            </h2>
+
+          </div>
+
+
+          <div class="payment-options">
+
+
+            <label class="payment-option">
+
+              <input
+                type="radio"
+                name="paymentMethod"
+                value="COD"
+                checked
+              >
+
+              <span class="payment-radio-ui"></span>
+
+              <span class="payment-icon">
+                💵
+              </span>
+
+              <span class="payment-copy">
+
+                <strong>
+                  Cash on Delivery
+                </strong>
+
+                <small>
+                  Pay when your order arrives
+                </small>
+
+              </span>
+
+            </label>
+
+
+            <label class="payment-option">
+
+              <input
+                type="radio"
+                name="paymentMethod"
+                value="RAZORPAY"
+              >
+
+              <span class="payment-radio-ui"></span>
+
+              <span class="payment-icon">
+                💳
+              </span>
+
+              <span class="payment-copy">
+
+                <strong>
+                  Pay Online
+                </strong>
+
+                <small>
+                  Secure online payment via Razorpay
+                </small>
+
+              </span>
+
+            </label>
+
+          </div>
+
+        </div>
+
+
+        <!-- TERMS -->
+
+        <label class="checkout-confirm">
+
+          <input
+            id="terms"
+            type="checkbox"
+            required
+          >
+
+          <span>
+            I confirm that my delivery address
+            and order details are correct.
+          </span>
+
+        </label>
 
 
         <button
-          class="btn"
+          class="checkout-submit"
           type="submit"
         >
           Place Order / Pay
+          <span>→</span>
         </button>
+
+
+        <div class="checkout-safe-note">
+          🔒 Secure checkout • Your details are protected
+        </div>
 
       </form>
 
 
-      <aside
-        id="summary"
-        class="summary"
-      ></aside>
+      <!-- RIGHT SUMMARY -->
 
-    </div>
+      <aside class="checkout-summary-card">
+
+        <div class="checkout-summary-heading">
+
+          <span>
+            YOUR ORDER
+          </span>
+
+          <h2>
+            Order Summary
+          </h2>
+
+        </div>
+
+
+        <div
+          id="summary"
+          class="checkout-summary"
+        >
+
+          <div class="checkout-loading">
+            Loading order...
+          </div>
+
+        </div>
+
+
+        <a
+          class="checkout-back"
+          href="/memora-creations/frontend/cart.html"
+        >
+          ← Back to Cart
+        </a>
+
+
+        <div class="checkout-support-mini">
+
+          <div>
+            💬
+          </div>
+
+          <p>
+            <strong>
+              Need help?
+            </strong>
+
+            <span>
+              Contact Memora Customer Care
+            </span>
+          </p>
+
+        </div>
+
+      </aside>
+
+    </section>
+
+
+    <!-- TRUST -->
+
+    <section class="checkout-trust">
+
+      <div>
+        <span>🔒</span>
+        <strong>Secure Checkout</strong>
+        <small>Safe ordering process</small>
+      </div>
+
+      <div>
+        <span>✓</span>
+        <strong>Quality Products</strong>
+        <small>Carefully selected items</small>
+      </div>
+
+      <div>
+        <span>💬</span>
+        <strong>Customer Support</strong>
+        <small>WhatsApp & email help</small>
+      </div>
+
+    </section>
+
+
+    <!-- SUPPORT -->
+
+    <section class="checkout-help">
+
+      <div>
+
+        <small>
+          MEMORA CUSTOMER CARE
+        </small>
+
+        <h2>
+          Having trouble placing your order?
+        </h2>
+
+        <p>
+          Checkout, payment ya delivery address
+          se related help ke liye humse contact karein.
+        </p>
+
+      </div>
+
+
+      <div class="checkout-help-actions">
+
+        <a
+          href="https://wa.me/917054242294?text=Namaste%20Memora%20Creations%2C%20mujhe%20checkout%20me%20help%20chahiye."
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          💬 WhatsApp
+        </a>
+
+
+        <a
+          href="mailto:memoracreations.care@gmail.com?subject=Checkout%20Support%20-%20Memora%20Creations"
+        >
+          ✉️ Email Support
+        </a>
+
+      </div>
+
+    </section>
 
   </main>
+
+
+  <footer class="checkout-footer">
+
+    <strong>
+      MEMORA CREATIONS
+    </strong>
+
+    <p>
+      Beautiful Decor • Thoughtful Gifts • Memorable Spaces
+    </p>
+
+  </footer>
 
 
   <nav
@@ -223,14 +478,10 @@
   ></nav>
 
 
-  <!-- COMMON JS -->
-
   <script
-    src="/memora-creations/frontend/js/app.js?v=9"
+    src="/memora-creations/frontend/js/app.js?v=10"
   ></script>
 
-
-  <!-- SECURE CHECKOUT START -->
 
   <script>
 
@@ -238,6 +489,7 @@
 
       const user =
         await window.MC.requireLogin();
+
 
       if (!user) {
         return;
@@ -251,7 +503,7 @@
 
 
       script.src =
-        '/memora-creations/frontend/js/checkout.js?v=9';
+        '/memora-creations/frontend/js/checkout.js?v=10';
 
 
       document.body.appendChild(
