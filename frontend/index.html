@@ -13,7 +13,7 @@
 
   <link
     rel="stylesheet"
-    href="/memora-creations/frontend/css/style.css?v=11"
+    href="/memora-creations/frontend/css/style.css?v=12"
   >
 </head>
 
@@ -27,7 +27,9 @@
 
   <main class="container">
 
-    <!-- HERO -->
+    <!-- =========================
+         HERO
+    ========================== -->
 
     <section class="hero premium-hero">
 
@@ -60,34 +62,47 @@
     </section>
 
 
-    <!-- CATEGORIES -->
+    <!-- =========================
+         PREMIUM CATEGORIES
+    ========================== -->
 
-    <section class="section">
+    <section class="section category-section">
 
-      <div class="sectionhead">
+      <div class="category-heading">
 
-        <h2>
-          Categories
-        </h2>
+        <div class="category-eyebrow">
+          EXPLORE
+        </div>
 
-        <a
-          href="/memora-creations/frontend/products.html"
-        >
-          Shop all
-        </a>
+        <div class="category-title-row">
+
+          <h2>
+            Shop by Category
+          </h2>
+
+          <a
+            class="category-shop-all"
+            href="/memora-creations/frontend/products.html"
+          >
+            Shop all
+          </a>
+
+        </div>
 
       </div>
 
 
       <div
         id="categories"
-        class="chips"
+        class="category-grid"
       ></div>
 
     </section>
 
 
-    <!-- ALL PRODUCTS -->
+    <!-- =========================
+         ALL PRODUCTS
+    ========================== -->
 
     <section class="section">
 
@@ -183,6 +198,7 @@
         product.images?.[0]?.url ||
         'https://placehold.co/600x600?text=Memora';
 
+
       overlay.innerHTML = `
 
         <div class="product-popup">
@@ -195,16 +211,20 @@
             ×
           </button>
 
+
           <div
             class="product-popup-imagebox"
           >
 
             <img
               src="${window.MC.esc(image)}"
-              alt="${window.MC.esc(product.name)}"
+              alt="${window.MC.esc(
+                product.name
+              )}"
             >
 
           </div>
+
 
           <div
             class="product-popup-info"
@@ -219,6 +239,7 @@
 
             </span>
 
+
             <h2>
 
               ${window.MC.esc(
@@ -226,6 +247,7 @@
               )}
 
             </h2>
+
 
             <div
               class="product-popup-price"
@@ -258,6 +280,7 @@
 
             </div>
 
+
             <p class="muted">
 
               ${window.MC.esc(
@@ -266,6 +289,7 @@
 
             </p>
 
+
             <p>
 
               ${
@@ -273,12 +297,15 @@
                   product.stock
                 ) > 0
 
-                  ? `✅ In Stock (${Number(product.stock)})`
+                  ? `✅ In Stock (${Number(
+                      product.stock
+                    )})`
 
                   : '❌ Out of Stock'
               }
 
             </p>
+
 
             <div class="field">
 
@@ -290,16 +317,22 @@
                 class="input home-popup-qty"
                 type="number"
                 min="1"
-                max="${Number(product.stock || 1)}"
+                max="${Number(
+                  product.stock || 1
+                )}"
                 value="1"
+
                 ${
-                  Number(product.stock) < 1
+                  Number(
+                    product.stock
+                  ) < 1
                     ? 'disabled'
                     : ''
                 }
               >
 
             </div>
+
 
             <div
               class="product-popup-actions"
@@ -308,8 +341,11 @@
               <button
                 class="btn home-popup-add"
                 type="button"
+
                 ${
-                  Number(product.stock) < 1
+                  Number(
+                    product.stock
+                  ) < 1
                     ? 'disabled'
                     : ''
                 }
@@ -317,11 +353,15 @@
                 Add to Cart
               </button>
 
+
               <button
                 class="btn secondary home-popup-order"
                 type="button"
+
                 ${
-                  Number(product.stock) < 1
+                  Number(
+                    product.stock
+                  ) < 1
                     ? 'disabled'
                     : ''
                 }
@@ -337,12 +377,15 @@
 
       `;
 
+
       document.body.appendChild(
         overlay
       );
 
+
       document.body.style.overflow =
         'hidden';
+
 
       overlay
         .querySelector(
@@ -352,6 +395,7 @@
           'click',
           closeHomeProductPopup
         );
+
 
       overlay.addEventListener(
         'click',
@@ -367,6 +411,7 @@
 
         }
       );
+
 
       overlay
         .querySelector(
@@ -388,6 +433,7 @@
                 )
               );
 
+
             await addHomeProductToCart(
               product._id,
               qty
@@ -395,6 +441,7 @@
 
           }
         );
+
 
       overlay
         .querySelector(
@@ -416,8 +463,13 @@
                 )
               );
 
+
             location.href =
-              `${HOME_BASE}/frontend/checkout.html?buyNow=${encodeURIComponent(product._id)}&qty=${encodeURIComponent(qty)}`;
+              `${HOME_BASE}/frontend/checkout.html?buyNow=${encodeURIComponent(
+                product._id
+              )}&qty=${encodeURIComponent(
+                qty
+              )}`;
 
           }
         );
@@ -445,12 +497,17 @@
 
             <img
               class="productimg"
+
               src="${window.MC.esc(
                 product.images?.[0]?.url ||
                 'https://placehold.co/600x600?text=Memora'
               )}"
-              alt="${window.MC.esc(product.name)}"
+
+              alt="${window.MC.esc(
+                product.name
+              )}"
             >
+
 
             <div class="cardbody">
 
@@ -463,6 +520,7 @@
 
               </span>
 
+
               <h3>
 
                 ${window.MC.esc(
@@ -471,11 +529,13 @@
 
               </h3>
 
+
               <div class="price">
 
                 ${window.MC.money(
                   product.sellingPrice
                 )}
+
 
                 ${
                   Number(
@@ -500,6 +560,7 @@
 
               </div>
 
+
               <p class="muted">
 
                 ${
@@ -514,6 +575,7 @@
 
           </button>
 
+
           <div
             class="cardbody actions"
           >
@@ -522,6 +584,7 @@
               class="btn home-add-cart"
               type="button"
               data-id="${product._id}"
+
               ${
                 product.stock < 1
                   ? 'disabled'
@@ -531,10 +594,12 @@
               Add to Cart
             </button>
 
+
             <button
               class="btn secondary home-buy-now"
               type="button"
               data-id="${product._id}"
+
               ${
                 product.stock < 1
                   ? 'disabled'
@@ -585,7 +650,9 @@
           }
         );
 
+
         await window.MC.updateCartCount();
+
 
         if (
           typeof window.MC.showCartPopup ===
@@ -608,7 +675,9 @@
         const msg =
           String(
             error.message || ''
-          ).toLowerCase();
+          )
+            .toLowerCase();
+
 
         if (
           msg.includes('login') ||
@@ -627,6 +696,7 @@
           return;
 
         }
+
 
         window.MC.toast(
           error.message ||
@@ -648,13 +718,15 @@
     ) {
 
       location.href =
-        `${HOME_BASE}/frontend/checkout.html?buyNow=${encodeURIComponent(id)}&qty=1`;
+        `${HOME_BASE}/frontend/checkout.html?buyNow=${encodeURIComponent(
+          id
+        )}&qty=1`;
 
     }
 
 
     /* =========================
-       BIND BUTTONS
+       BIND PRODUCT BUTTONS
     ========================= */
 
     function bindHomeButtons() {
@@ -675,6 +747,7 @@
                     button.dataset.id
                 );
 
+
               if (product) {
 
                 openHomeProductPopup(
@@ -686,6 +759,7 @@
             };
 
         });
+
 
       document
         .querySelectorAll(
@@ -705,6 +779,7 @@
 
         });
 
+
       document
         .querySelectorAll(
           '.home-buy-now'
@@ -721,6 +796,141 @@
             };
 
         });
+
+    }
+
+
+    /* =========================
+       CATEGORY ICON
+    ========================= */
+
+    function getCategoryIcon(
+      categoryName
+    ) {
+
+      const name =
+        String(
+          categoryName || ''
+        )
+          .toUpperCase();
+
+
+      if (
+        name.includes(
+          'HOME'
+        )
+      ) {
+
+        return '🏠';
+
+      }
+
+
+      if (
+        name.includes(
+          'PHOTO'
+        )
+      ) {
+
+        return '🖼️';
+
+      }
+
+
+      if (
+        name.includes(
+          'WALL'
+        )
+      ) {
+
+        return '✨';
+
+      }
+
+
+      if (
+        name.includes(
+          'GIFT'
+        )
+      ) {
+
+        return '🎁';
+
+      }
+
+
+      if (
+        name.includes(
+          'CANDLE'
+        )
+      ) {
+
+        return '🕯️';
+
+      }
+
+
+      if (
+        name.includes(
+          'VASE'
+        )
+      ) {
+
+        return '🏺';
+
+      }
+
+
+      return '✨';
+
+    }
+
+
+    /* =========================
+       CATEGORY CARD
+    ========================= */
+
+    function homeCategoryCard(
+      category
+    ) {
+
+      const icon =
+        getCategoryIcon(
+          category.name
+        );
+
+
+      return `
+
+        <a
+          class="category-card"
+
+          href="${HOME_BASE}/frontend/products.html?category=${encodeURIComponent(
+            category._id
+          )}"
+        >
+
+          <div
+            class="category-icon"
+            aria-hidden="true"
+          >
+            ${icon}
+          </div>
+
+
+          <div
+            class="category-name"
+          >
+
+            ${window.MC.esc(
+              category.name
+            )}
+
+          </div>
+
+        </a>
+
+      `;
 
     }
 
@@ -749,31 +959,45 @@
 
           ]);
 
+
+        /* =====================
+           CATEGORIES
+        ===================== */
+
+        const categoryList =
+          categories.categories ||
+          [];
+
+
         document
           .getElementById(
             'categories'
           )
           .innerHTML =
 
-            (categories.categories || [])
-              .map(category => `
+            categoryList.length
 
-                <a
-                  class="pill"
-                  href="${HOME_BASE}/frontend/products.html?category=${encodeURIComponent(category._id)}"
-                >
+              ? categoryList
+                  .map(
+                    homeCategoryCard
+                  )
+                  .join('')
 
-                  ${window.MC.esc(
-                    category.name
-                  )}
+              : `
+                  <div class="empty">
+                    No categories available.
+                  </div>
+                `;
 
-                </a>
 
-              `)
-              .join('');
+        /* =====================
+           PRODUCTS
+        ===================== */
 
         homeProducts =
-          products.products || [];
+          products.products ||
+          [];
+
 
         document
           .getElementById(
@@ -795,6 +1019,7 @@
                   </div>
                 `;
 
+
         bindHomeButtons();
 
       } catch (error) {
@@ -803,6 +1028,7 @@
           'Home page error:',
           error
         );
+
 
         window.MC.toast(
           error.message ||
@@ -824,9 +1050,11 @@
       const user =
         await window.MC.requireLogin();
 
+
       if (!user) {
         return;
       }
+
 
       await loadHomePage();
 
