@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
   <meta charset="utf-8">
 
   <meta
@@ -13,13 +14,31 @@
     Products | MEMORA CREATIONS
   </title>
 
+
+  <!-- COMMON WEBSITE CSS -->
+
   <link
     rel="stylesheet"
-    href="/memora-creations/frontend/css/style.css?v=9"
+    href="/memora-creations/frontend/css/style.css?v=13"
   >
+
+
+  <!-- PRODUCTS PAGE CSS -->
+
+  <link
+    rel="stylesheet"
+    href="/memora-creations/frontend/css/products.css?v=1"
+  >
+
 </head>
 
-<body>
+
+<body class="products-body">
+
+
+  <!-- =========================
+       NAVBAR
+  ========================== -->
 
   <header
     id="nav"
@@ -27,91 +46,377 @@
   ></header>
 
 
-  <main
-    class="container section"
+  <!-- =========================
+       WATERMARK
+  ========================== -->
+
+  <div
+    class="products-watermark"
+    aria-hidden="true"
   >
-
-    <div
-      class="sectionhead"
-    >
-
-      <h1>
-        Products
-      </h1>
-
-      <span
-        id="resultCount"
-        class="muted"
-      ></span>
-
-    </div>
+    MEMORA CREATIONS
+  </div>
 
 
-    <form
-      id="filterForm"
-      class="actions"
-    >
+  <main class="container products-page">
 
-      <input
-        class="input"
-        name="q"
-        type="search"
-        placeholder="Search products..."
-        autocomplete="off"
+
+    <!-- =========================
+         HERO
+    ========================== -->
+
+    <section class="products-hero">
+
+      <div class="products-eyebrow">
+        MEMORA COLLECTION
+      </div>
+
+
+      <div class="products-title-row">
+
+        <div>
+
+          <h1>
+            Shop Products
+          </h1>
+
+
+          <p>
+            Beautiful decor, photo frames
+            and thoughtfully selected products
+            for your special spaces.
+          </p>
+
+        </div>
+
+
+        <div
+          id="resultCount"
+          class="products-count"
+        >
+          Loading...
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         FILTER
+    ========================== -->
+
+    <section class="products-filter-card">
+
+      <div class="filter-top">
+
+        <div>
+
+          <span class="filter-small">
+            FIND YOUR FAVOURITE
+          </span>
+
+          <h2>
+            Explore Collection
+          </h2>
+
+        </div>
+
+
+        <a
+          class="clear-filter-link"
+          href="/memora-creations/frontend/products.html"
+        >
+          Clear Filters
+        </a>
+
+      </div>
+
+
+      <form
+        id="filterForm"
+        class="products-filter-form"
       >
 
 
-      <select
-        class="select"
-        id="categorySelect"
-        name="category"
-      >
+        <!-- SEARCH -->
 
-        <option value="">
-          All Categories
-        </option>
+        <div class="products-search-box">
 
-      </select>
+          <span class="products-search-icon">
 
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            >
 
-      <select
-        class="select"
-        name="sort"
-      >
+              <circle
+                cx="11"
+                cy="11"
+                r="7"
+              ></circle>
 
-        <option value="newest">
-          Newest
-        </option>
+              <path
+                d="M20 20l-4-4"
+              ></path>
 
-        <option value="low">
-          Price Low → High
-        </option>
+            </svg>
 
-        <option value="high">
-          Price High → Low
-        </option>
-
-      </select>
+          </span>
 
 
-      <button
-        class="btn"
-        type="submit"
-      >
-        Apply
-      </button>
+          <input
+            name="q"
+            type="search"
+            placeholder="Search products..."
+            autocomplete="off"
+          >
 
-    </form>
+        </div>
 
 
-    <div
-      id="productGrid"
-      class="grid"
-      style="margin-top:18px;"
-    ></div>
+        <!-- CATEGORY -->
+
+        <select
+          id="categorySelect"
+          name="category"
+          class="products-select"
+        >
+
+          <option value="">
+            All Categories
+          </option>
+
+        </select>
+
+
+        <!-- SORT -->
+
+        <select
+          name="sort"
+          class="products-select"
+        >
+
+          <option value="newest">
+            Newest
+          </option>
+
+          <option value="low">
+            Price: Low to High
+          </option>
+
+          <option value="high">
+            Price: High to Low
+          </option>
+
+        </select>
+
+
+        <!-- APPLY -->
+
+        <button
+          class="products-filter-btn"
+          type="submit"
+        >
+          Apply
+        </button>
+
+      </form>
+
+    </section>
+
+
+    <!-- =========================
+         PRODUCTS HEADING
+    ========================== -->
+
+    <section class="products-section">
+
+      <div class="products-section-heading">
+
+        <div>
+
+          <div class="section-eyebrow">
+            DISCOVER
+          </div>
+
+          <h2>
+            Our Collection
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <!-- PRODUCTS GENERATED BY JS -->
+
+      <div
+        id="productGrid"
+        class="premium-products-grid"
+      ></div>
+
+    </section>
+
+
+    <!-- =========================
+         TRUST SECTION
+    ========================== -->
+
+    <section class="products-trust">
+
+
+      <div class="product-trust-item">
+
+        <div class="product-trust-icon">
+          ✓
+        </div>
+
+        <div>
+
+          <strong>
+            Quality Products
+          </strong>
+
+          <span>
+            Carefully selected collection
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div class="product-trust-item">
+
+        <div class="product-trust-icon">
+          🔒
+        </div>
+
+        <div>
+
+          <strong>
+            Secure Shopping
+          </strong>
+
+          <span>
+            Safe checkout experience
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div class="product-trust-item">
+
+        <div class="product-trust-icon">
+          💬
+        </div>
+
+        <div>
+
+          <strong>
+            Customer Care
+          </strong>
+
+          <span>
+            WhatsApp & email support
+          </span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         CUSTOMER CARE
+    ========================== -->
+
+    <section class="products-support">
+
+      <div class="products-support-copy">
+
+        <span>
+          MEMORA CUSTOMER CARE
+        </span>
+
+        <h2>
+          Need help choosing a product?
+        </h2>
+
+        <p>
+          Product, order ya payment se related
+          kisi bhi help ke liye humse contact karein.
+        </p>
+
+      </div>
+
+
+      <div class="products-support-actions">
+
+
+        <a
+          href="https://wa.me/917054242294?text=Namaste%20Memora%20Creations%2C%20mujhe%20product%20ke%20baare%20me%20help%20chahiye."
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          💬 WhatsApp
+          <small>
+            +91 70542 42294
+          </small>
+        </a>
+
+
+        <a
+          href="mailto:memoracreations.care@gmail.com?subject=Product%20Support%20-%20Memora%20Creations"
+        >
+          ✉️ Email Support
+          <small>
+            memoracreations.care@gmail.com
+          </small>
+        </a>
+
+      </div>
+
+    </section>
 
   </main>
 
+
+  <!-- =========================
+       FOOTER
+  ========================== -->
+
+  <footer class="products-footer">
+
+    <div class="container">
+
+      <strong>
+        MEMORA CREATIONS
+      </strong>
+
+      <p>
+        Beautiful Decor • Thoughtful Gifts • Memorable Spaces
+      </p>
+
+      <small>
+        © MEMORA CREATIONS • All Rights Reserved
+      </small>
+
+    </div>
+
+  </footer>
+
+
+  <!-- =========================
+       MOBILE NAVIGATION
+  ========================== -->
 
   <nav
     id="bottomNav"
@@ -122,41 +427,15 @@
   <!-- COMMON JS -->
 
   <script
-    src="/memora-creations/frontend/js/app.js?v=9"
+    src="/memora-creations/frontend/js/app.js?v=10"
   ></script>
 
 
-  <!-- SECURE PAGE START -->
+  <!-- PRODUCTS JS -->
 
-  <script>
-
-    (async function secureProductsPage() {
-
-      const user =
-        await window.MC.requireLogin();
-
-      if (!user) {
-        return;
-      }
-
-
-      const script =
-        document.createElement(
-          'script'
-        );
-
-
-      script.src =
-        '/memora-creations/frontend/js/products.js?v=9';
-
-
-      document.body.appendChild(
-        script
-      );
-
-    })();
-
-  </script>
+  <script
+    src="/memora-creations/frontend/js/products.js?v=10"
+  ></script>
 
 </body>
 
