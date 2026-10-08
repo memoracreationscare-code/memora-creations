@@ -14,13 +14,34 @@ function formatOrderDate(
   value
 ) {
 
+  if (!value) {
+    return '';
+  }
+
+
   try {
 
     return new Date(
       value
     )
       .toLocaleString(
-        'en-IN'
+        'en-IN',
+        {
+          day:
+            '2-digit',
+
+          month:
+            'short',
+
+          year:
+            'numeric',
+
+          hour:
+            '2-digit',
+
+          minute:
+            '2-digit'
+        }
       );
 
   } catch {
@@ -33,19 +54,455 @@ function formatOrderDate(
 
 
 /* =========================
+   STATUS CLASS
+========================= */
+
+function orderStatusClass(
+  status
+) {
+
+  const value =
+    String(
+      status || ''
+    )
+      .toLowerCase();
+
+
+  if (
+    value ===
+    'delivered'
+  ) {
+
+    return 'delivered';
+
+  }
+
+
+  if (
+    value ===
+    'cancelled'
+  ) {
+
+    return 'cancelled';
+
+  }
+
+
+  if (
+    value ===
+    'shipped' ||
+    value ===
+    'out for delivery'
+  ) {
+
+    return 'shipping';
+
+  }
+
+
+  return 'processing';
+
+}
+
+
+/* =========================
+   PAYMENT CLASS
+========================= */
+
+function paymentStatusClass(
+  status
+) {
+
+  const value =
+    String(
+      status || ''
+    )
+      .toUpperCase();
+
+
+  if (
+    value ===
+    'SUCCESS'
+  ) {
+
+    return 'paid';
+
+  }
+
+
+  if (
+    value ===
+    'FAILED' ||
+    value ===
+    'CANCELLED'
+  ) {
+
+    return 'failed';
+
+  }
+
+
+  return 'pending';
+
+}
+
+
+/* =========================
+   ORDER PRODUCTS
+========================= */
+
+function orderProductsHtml(
+  order
+) {
+
+  const items =
+    Array.isArray(
+      order.items
+    )
+      ? order.items
+      : [];
+
+
+  if (!items.length) {
+
+    return `
+
+      <div class="order-no-product">
+        Product information available nahi hai.
+      </div>
+
+    `;
+
+  }
+
+
+  return items
+    .map(
+      item => {
+
+        const image =
+          item.imageUrl ||
+          'https://placehold.co/180x180?text=Memora';
+
+
+        const quantity =
+          Math.max(
+            1,
+            Number(
+              item.quantity ||
+              1
+            )
+          );
+
+
+        return `
+
+          <div class="order-product">
+
+            <div class="order-product-image">
+
+              <img
+                src="${window.MC.esc(
+                  image
+                )}"
+                alt="${window.MC.esc(
+                  item.name ||
+                  'Product'
+                )}"
+                loading="lazy"
+              >
+
+            </div>
+
+
+            <div class="order-product-info">
+
+              <h3>
+
+                ${window.MC.esc(
+                  item.name ||
+                  'Product'
+                )}
+
+              </h3>
+
+
+              <div class="order-product-meta">
+
+                <span>
+                  Qty:
+                  <strong>
+                    ${quantity}
+                  </strong>
+                </span>
+
+
+                <span>
+                  Price:
+                  <strong>
+                    ${window.MC.money(
+                      item.unitPrice
+                    )}
+                  </strong>
+                </span>
+
+              </div>
+
+            </div>
+
+
+            <div class="order-product-total">
+
+              ${window.MC.money(
+                item.lineTotal
+              )}
+
+            </div>
+
+          </div>
+
+        `;
+
+      }
+    )
+    .join('');
+
+}
+
+
+/* =========================
+   ORDER CARD
+========================= */
+
+function orderCardHtml(
+  order
+) {
+
+  const items =
+    Array.isArray(
+      order.items
+    )
+      ? order.items
+      : [];
+
+
+  const totalQuantity =
+    items.reduce(
+      (
+        total,
+        item
+      ) =>
+        total +
+        Math.max(
+          1,
+          Number(
+            item.quantity ||
+            1
+          )
+        ),
+      0
+    );
+
+
+  const paymentLabel =
+    order.paymentMethod ===
+    'COD'
+      ? 'Cash on Delivery'
+      : 'Online Payment';
+
+
+  const canCancel =
+    [
+      'Order Placed',
+      'Confirmed'
+    ]
+      .includes(
+        order.orderStatus
+      );
+
+
+  return `
+
+    <article class="order-card">
+
+
+      <!-- TOP -->
+
+      <div class="order-card-top">
+
+        <div>
+
+          <span class="order-label">
+            ORDER ID
+          </span>
+
+          <h2>
+            ${window.MC.esc(
+              order.orderId ||
+              'Order'
+            )}
+          </h2>
+
+          <p>
+            ${window.MC.esc(
+              formatOrderDate(
+                order.createdAt
+              )
+            )}
+          </p>
+
+        </div>
+
+
+        <div
+          class="order-status ${orderStatusClass(
+            order.orderStatus
+          )}"
+        >
+
+          ${window.MC.esc(
+            order.orderStatus ||
+            'Order Placed'
+          )}
+
+        </div>
+
+      </div>
+
+
+      <!-- PRODUCTS -->
+
+      <div class="order-products">
+
+        ${orderProductsHtml(
+          order
+        )}
+
+      </div>
+
+
+      <!-- DETAILS -->
+
+      <div class="order-info-grid">
+
+
+        <div>
+
+          <span>
+            Items
+          </span>
+
+          <strong>
+            ${totalQuantity}
+          </strong>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            Payment
+          </span>
+
+          <strong>
+            ${window.MC.esc(
+              paymentLabel
+            )}
+          </strong>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            Payment Status
+          </span>
+
+          <strong
+            class="payment-state ${paymentStatusClass(
+              order.paymentStatus
+            )}"
+          >
+
+            ${window.MC.esc(
+              order.paymentStatus ||
+              ''
+            )}
+
+          </strong>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            Order Total
+          </span>
+
+          <strong class="order-grand-total">
+
+            ${window.MC.money(
+              order.grandTotal
+            )}
+
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <!-- ACTION -->
+
+      <div class="order-actions">
+
+        <a
+          class="order-track-btn"
+          href="${ORDERS_BASE}/frontend/order-details.html?id=${encodeURIComponent(
+            order._id
+          )}"
+        >
+          View / Track Order →
+        </a>
+
+
+        ${
+          canCancel
+
+            ? `
+
+              <button
+                class="order-cancel-btn cancel-order"
+                type="button"
+                data-id="${window.MC.esc(
+                  order._id
+                )}"
+              >
+                Cancel Order
+              </button>
+
+            `
+
+            : ''
+        }
+
+      </div>
+
+    </article>
+
+  `;
+
+}
+
+
+/* =========================
    LOAD ORDERS
 ========================= */
 
 async function loadOrdersPage() {
-
-  const user =
-    await window.MC.requireLogin();
-
-
-  if (!user) {
-    return;
-  }
-
 
   const ordersBox =
     window.MC.$(
@@ -67,265 +524,70 @@ async function loadOrdersPage() {
 
 
     const orders =
-      data.orders || [];
+      Array.isArray(
+        data.orders
+      )
+        ? data.orders
+        : [];
+
+
+    const countBox =
+      window.MC.$(
+        '#orderCount'
+      );
+
+
+    if (countBox) {
+
+      countBox.textContent =
+        `${orders.length} ${
+          orders.length === 1
+            ? 'order'
+            : 'orders'
+        }`;
+
+    }
 
 
     ordersBox.innerHTML =
+
       orders.length
 
         ? orders
             .map(
-              order => {
-
-                const firstItem =
-                  order.items?.[0];
-
-
-                const image =
-                  firstItem?.imageUrl ||
-                  'https://placehold.co/100x100?text=Memora';
-
-
-                const itemCount =
-                  Array.isArray(
-                    order.items
-                  )
-
-                    ? order.items.length
-
-                    : 0;
-
-
-                const paymentLabel =
-                  order.paymentMethod ===
-                  'COD'
-
-                    ? 'Cash on Delivery'
-
-                    : 'Online Payment';
-
-
-                const canCancel =
-                  [
-                    'Order Placed',
-                    'Confirmed'
-                  ]
-                    .includes(
-                      order.orderStatus
-                    );
-
-
-                return `
-
-                  <div
-                    class="card"
-                    style="
-                      margin-bottom:16px;
-                    "
-                  >
-
-                    <div
-                      class="cardbody order-row"
-                      style="
-                        display:grid;
-                        grid-template-columns:
-                          90px
-                          minmax(180px,1.4fr)
-                          minmax(150px,1fr)
-                          minmax(130px,1fr)
-                          auto;
-                        gap:20px;
-                        align-items:center;
-                      "
-                    >
-
-
-                      <!-- IMAGE -->
-
-                      <div>
-
-                        <img
-                          src="${window.MC.esc(image)}"
-                          alt="${window.MC.esc(
-                            firstItem?.name ||
-                            'Product'
-                          )}"
-                          style="
-                            width:80px;
-                            height:80px;
-                            object-fit:cover;
-                            border-radius:12px;
-                            display:block;
-                          "
-                        >
-
-                      </div>
-
-
-                      <!-- ORDER INFO -->
-
-                      <div>
-
-                        <div
-                          style="
-                            font-weight:800;
-                            font-size:17px;
-                            margin-bottom:6px;
-                          "
-                        >
-
-                          ${window.MC.esc(
-                            order.orderId ||
-                            ''
-                          )}
-
-                        </div>
-
-
-                        <div
-                          class="muted"
-                        >
-
-                          ${window.MC.esc(
-                            formatOrderDate(
-                              order.createdAt
-                            )
-                          )}
-
-                        </div>
-
-                      </div>
-
-
-                      <!-- PAYMENT -->
-
-                      <div>
-
-                        <div>
-
-                          <b>
-                            ${itemCount}
-                          </b>
-
-                          item(s)
-
-                        </div>
-
-
-                        <div
-                          class="muted"
-                        >
-
-                          ${window.MC.esc(
-                            paymentLabel
-                          )}
-
-                        </div>
-
-
-                        <div
-                          class="muted"
-                        >
-
-                          ${window.MC.esc(
-                            order.paymentStatus ||
-                            ''
-                          )}
-
-                        </div>
-
-                      </div>
-
-
-                      <!-- TOTAL / STATUS -->
-
-                      <div>
-
-                        <div
-                          class="price"
-                          style="
-                            margin-bottom:7px;
-                          "
-                        >
-
-                          ${window.MC.money(
-                            order.grandTotal
-                          )}
-
-                        </div>
-
-
-                        <span
-                          class="pill"
-                        >
-
-                          ${window.MC.esc(
-                            order.orderStatus ||
-                            ''
-                          )}
-
-                        </span>
-
-                      </div>
-
-
-                      <!-- ACTIONS -->
-
-                      <div
-                        class="actions"
-                        style="
-                          justify-content:flex-end;
-                        "
-                      >
-
-                        <a
-                          class="btn secondary"
-                          href="${ORDERS_BASE}/frontend/order-details.html?id=${encodeURIComponent(order._id)}"
-                        >
-                          View / Track
-                        </a>
-
-
-                        ${
-                          canCancel
-
-                            ? `
-
-                              <button
-                                class="btn danger cancel-order"
-                                type="button"
-                                data-id="${order._id}"
-                              >
-                                Cancel
-                              </button>
-
-                            `
-
-                            : ''
-                        }
-
-                      </div>
-
-                    </div>
-
-                  </div>
-
-                `;
-
-              }
+              orderCardHtml
             )
             .join('')
 
         : `
 
-            <div class="empty">
-              No orders yet.
+            <div class="orders-empty">
+
+              <div class="orders-empty-icon">
+                🛍️
+              </div>
+
+
+              <h2>
+                No Orders Yet
+              </h2>
+
+
+              <p>
+                Aapne abhi tak koi order place nahi kiya hai.
+              </p>
+
+
+              <a
+                href="${ORDERS_BASE}/frontend/products.html"
+              >
+                Start Shopping
+              </a>
+
             </div>
 
           `;
 
-
-    /* CANCEL BUTTON */
 
     window.MC
       .$$(
@@ -358,11 +620,37 @@ async function loadOrdersPage() {
 
     ordersBox.innerHTML = `
 
-      <div class="empty">
-        Orders load nahi ho pa rahe hain.
+      <div class="orders-empty">
+
+        <div class="orders-empty-icon">
+          ⚠️
+        </div>
+
+        <h2>
+          Orders load nahi ho pa rahe hain
+        </h2>
+
+        <p>
+          Please thodi der baad dobara try karein.
+        </p>
+
       </div>
 
     `;
+
+
+    const countBox =
+      window.MC.$(
+        '#orderCount'
+      );
+
+
+    if (countBox) {
+
+      countBox.textContent =
+        'Error';
+
+    }
 
 
     window.MC.toast(
@@ -377,6 +665,140 @@ async function loadOrdersPage() {
 
 
 /* =========================
+   CANCEL CONFIRM POPUP
+========================= */
+
+function askCancelConfirmation() {
+
+  return new Promise(
+    resolve => {
+
+      document
+        .querySelector(
+          '#cancelOrderPopup'
+        )
+        ?.remove();
+
+
+      const overlay =
+        document.createElement(
+          'div'
+        );
+
+
+      overlay.id =
+        'cancelOrderPopup';
+
+
+      overlay.className =
+        'cancel-popup-overlay';
+
+
+      overlay.innerHTML = `
+
+        <div class="cancel-popup">
+
+          <div class="cancel-popup-icon">
+            !
+          </div>
+
+
+          <h2>
+            Cancel Order?
+          </h2>
+
+
+          <p>
+            Kya aap sure hain ki
+            is order ko cancel karna chahte hain?
+          </p>
+
+
+          <div class="cancel-popup-actions">
+
+            <button
+              class="cancel-popup-back"
+              type="button"
+            >
+              Keep Order
+            </button>
+
+
+            <button
+              class="cancel-popup-confirm"
+              type="button"
+            >
+              Yes, Cancel
+            </button>
+
+          </div>
+
+        </div>
+
+      `;
+
+
+      document.body.appendChild(
+        overlay
+      );
+
+
+      const finish =
+        value => {
+
+          overlay.remove();
+
+          resolve(
+            value
+          );
+
+        };
+
+
+      overlay
+        .querySelector(
+          '.cancel-popup-back'
+        )
+        ?.addEventListener(
+          'click',
+          () =>
+            finish(false)
+        );
+
+
+      overlay
+        .querySelector(
+          '.cancel-popup-confirm'
+        )
+        ?.addEventListener(
+          'click',
+          () =>
+            finish(true)
+        );
+
+
+      overlay.addEventListener(
+        'click',
+        event => {
+
+          if (
+            event.target === overlay
+          ) {
+
+            finish(false);
+
+          }
+
+        }
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================
    CANCEL ORDER
 ========================= */
 
@@ -385,15 +807,17 @@ async function cancelCustomerOrder(
   button = null
 ) {
 
-  if (orderActionRunning) {
+  if (
+    orderActionRunning
+  ) {
+
     return;
+
   }
 
 
   const confirmed =
-    confirm(
-      'Are you sure you want to cancel this order?'
-    );
+    await askCancelConfirmation();
 
 
   if (!confirmed) {
@@ -405,9 +829,8 @@ async function cancelCustomerOrder(
     true;
 
 
-  const oldButtonText =
-    button
-      ?.textContent;
+  const oldText =
+    button?.textContent;
 
 
   if (button) {
@@ -462,8 +885,8 @@ async function cancelCustomerOrder(
 
 
       button.textContent =
-        oldButtonText ||
-        'Cancel';
+        oldText ||
+        'Cancel Order';
 
     }
 
@@ -476,86 +899,6 @@ async function cancelCustomerOrder(
   }
 
 }
-
-
-/* =========================
-   MOBILE RESPONSIVE FIX
-========================= */
-
-(function addOrderResponsiveStyle() {
-
-  if (
-    document.querySelector(
-      '#ordersResponsiveStyle'
-    )
-  ) {
-
-    return;
-
-  }
-
-
-  const style =
-    document.createElement(
-      'style'
-    );
-
-
-  style.id =
-    'ordersResponsiveStyle';
-
-
-  style.textContent = `
-
-    @media (max-width:900px) {
-
-      .order-row {
-        grid-template-columns:
-          80px 1fr !important;
-      }
-
-      .order-row > div:nth-child(3),
-      .order-row > div:nth-child(4),
-      .order-row > div:nth-child(5) {
-        grid-column:
-          2 / -1;
-      }
-
-      .order-row .actions {
-        justify-content:
-          flex-start !important;
-      }
-
-    }
-
-
-    @media (max-width:520px) {
-
-      .order-row {
-        grid-template-columns:
-          1fr !important;
-      }
-
-      .order-row > div {
-        grid-column:
-          1 / -1 !important;
-      }
-
-      .order-row img {
-        width:100px !important;
-        height:100px !important;
-      }
-
-    }
-
-  `;
-
-
-  document.head.appendChild(
-    style
-  );
-
-})();
 
 
 /* =========================
