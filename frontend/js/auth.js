@@ -57,10 +57,10 @@ function escapePopupText(
 
 
 /* =========================
-   LOGIN POPUP
+   STATUS POPUP
 ========================= */
 
-function showLoginPopup({
+function showStatusPopup({
   type = 'success',
   title = '',
   message = '',
@@ -70,7 +70,7 @@ function showLoginPopup({
 
   document
     .querySelector(
-      '#loginStatusPopup'
+      '#authStatusPopup'
     )
     ?.remove();
 
@@ -82,7 +82,7 @@ function showLoginPopup({
 
 
   overlay.id =
-    'loginStatusPopup';
+    'authStatusPopup';
 
 
   overlay.style.cssText = `
@@ -99,8 +99,7 @@ function showLoginPopup({
 
 
   const isSuccess =
-    type ===
-    'success';
+    type === 'success';
 
 
   overlay.innerHTML = `
@@ -115,7 +114,7 @@ function showLoginPopup({
         padding:34px 26px 26px;
         text-align:center;
         box-shadow:0 25px 70px rgba(0,0,0,.28);
-        animation:loginPopupIn .22s ease;
+        animation:authPopupIn .22s ease;
       "
     >
 
@@ -184,7 +183,7 @@ function showLoginPopup({
 
 
       <button
-        id="loginPopupButton"
+        id="authPopupButton"
         type="button"
         style="
           width:100%;
@@ -213,7 +212,7 @@ function showLoginPopup({
 
   if (
     !document.querySelector(
-      '#loginPopupAnimation'
+      '#authPopupAnimation'
     )
   ) {
 
@@ -224,12 +223,12 @@ function showLoginPopup({
 
 
     style.id =
-      'loginPopupAnimation';
+      'authPopupAnimation';
 
 
     style.textContent = `
 
-      @keyframes loginPopupIn {
+      @keyframes authPopupIn {
 
         from {
           opacity:0;
@@ -282,7 +281,7 @@ function showLoginPopup({
 
   overlay
     .querySelector(
-      '#loginPopupButton'
+      '#authPopupButton'
     )
     ?.addEventListener(
       'click',
@@ -297,8 +296,7 @@ function showLoginPopup({
       event => {
 
         if (
-          event.target ===
-          overlay
+          event.target === overlay
         ) {
 
           closePopup();
@@ -404,7 +402,7 @@ bindAuthForm(
         '/memora-creations/frontend/index.html';
 
 
-      showLoginPopup({
+      showStatusPopup({
 
         type:
           'success',
@@ -429,25 +427,6 @@ bindAuthForm(
       });
 
 
-      setTimeout(
-        () => {
-
-          if (
-            document.querySelector(
-              '#loginStatusPopup'
-            )
-          ) {
-
-            location.href =
-              destination;
-
-          }
-
-        },
-        1000
-      );
-
-
     } catch (error) {
 
       form.dataset.submitting =
@@ -466,7 +445,7 @@ bindAuthForm(
       }
 
 
-      showLoginPopup({
+      showStatusPopup({
 
         type:
           'error',
@@ -591,8 +570,29 @@ bindAuthForm(
       );
 
 
-      location.href =
-        '/memora-creations/frontend/index.html';
+      showStatusPopup({
+
+        type:
+          'success',
+
+        title:
+          'Account Created Successfully',
+
+        message:
+          'Welcome to Memora Creations. Your account has been created successfully.',
+
+        buttonText:
+          'Continue',
+
+        onClose:
+          () => {
+
+            location.href =
+              '/memora-creations/frontend/index.html';
+
+          }
+
+      });
 
 
     } catch (error) {
@@ -613,11 +613,22 @@ bindAuthForm(
       }
 
 
-      window.MC.toast(
-        error.message ||
-        'Account creation failed.',
-        'error'
-      );
+      showStatusPopup({
+
+        type:
+          'error',
+
+        title:
+          'Account Creation Failed',
+
+        message:
+          error.message ||
+          'Account create nahi ho paya. Please details dobara check karein.',
+
+        buttonText:
+          'Try Again'
+
+      });
 
     }
 
@@ -705,20 +716,42 @@ bindAuthForm(
         );
 
 
-      window.MC.toast(
-        data.message ||
-        'Password reset instructions sent.',
-        'success'
-      );
+      showStatusPopup({
+
+        type:
+          'success',
+
+        title:
+          'Request Submitted',
+
+        message:
+          data.message ||
+          'Password reset ke liye support se contact karein.',
+
+        buttonText:
+          'OK'
+
+      });
 
 
     } catch (error) {
 
-      window.MC.toast(
-        error.message ||
-        'Request failed.',
-        'error'
-      );
+      showStatusPopup({
+
+        type:
+          'error',
+
+        title:
+          'Request Failed',
+
+        message:
+          error.message ||
+          'Request submit nahi ho paya.',
+
+        buttonText:
+          'Try Again'
+
+      });
 
     } finally {
 
@@ -829,21 +862,29 @@ bindAuthForm(
       );
 
 
-      window.MC.toast(
-        'Password reset successful.',
-        'success'
-      );
+      showStatusPopup({
 
+        type:
+          'success',
 
-      setTimeout(
-        () => {
+        title:
+          'Password Updated',
 
-          location.href =
-            '/memora-creations/frontend/login.html';
+        message:
+          'Password successfully reset ho gaya hai. Ab aap login kar sakte hain.',
 
-        },
-        1200
-      );
+        buttonText:
+          'Go to Login',
+
+        onClose:
+          () => {
+
+            location.href =
+              '/memora-creations/frontend/login.html';
+
+          }
+
+      });
 
 
     } catch (error) {
@@ -864,11 +905,22 @@ bindAuthForm(
       }
 
 
-      window.MC.toast(
-        error.message ||
-        'Password reset failed.',
-        'error'
-      );
+      showStatusPopup({
+
+        type:
+          'error',
+
+        title:
+          'Password Reset Failed',
+
+        message:
+          error.message ||
+          'Password reset nahi ho paya.',
+
+        buttonText:
+          'Try Again'
+
+      });
 
     }
 
