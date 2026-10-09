@@ -15,6 +15,36 @@ const $$ =
 
 
 /* =========================
+   API ERROR
+========================= */
+
+class ApiError extends Error {
+
+  constructor(
+    message,
+    {
+      status = 0,
+      code = 'UNKNOWN_ERROR'
+    } = {}
+  ) {
+
+    super(message);
+
+    this.name =
+      'ApiError';
+
+    this.status =
+      status;
+
+    this.code =
+      code;
+
+  }
+
+}
+
+
+/* =========================
    API
 ========================= */
 
@@ -23,23 +53,63 @@ async function api(
   options = {}
 ) {
 
-  const res =
-    await fetch(
-      API + path,
+  if (
+    typeof navigator !==
+      'undefined' &&
+    navigator.onLine === false
+  ) {
+
+    throw new ApiError(
+      'Internet connection check karein.',
       {
-        credentials:
-          'include',
-
-        headers: {
-          'Content-Type':
-            'application/json',
-
-          ...(options.headers || {})
-        },
-
-        ...options
+        code:
+          'OFFLINE'
       }
     );
+
+  }
+
+
+  let res;
+
+
+  try {
+
+    res =
+      await fetch(
+        API + path,
+        {
+          credentials:
+            'include',
+
+          headers: {
+            'Content-Type':
+              'application/json',
+
+            ...(options.headers || {})
+          },
+
+          ...options
+        }
+      );
+
+  } catch (error) {
+
+    console.error(
+      'API network error:',
+      error
+    );
+
+
+    throw new ApiError(
+      'Server se connection nahi ho pa raha hai. Internet check karke dobara try karein.',
+      {
+        code:
+          'NETWORK_ERROR'
+      }
+    );
+
+  }
 
 
   let data = {};
@@ -47,17 +117,120 @@ async function api(
 
   try {
 
-    data =
-      await res.json();
+    const text =
+      await res.text();
 
-  } catch {}
+
+    if (text) {
+
+      try {
+
+        data =
+          JSON.parse(text);
+
+      } catch {
+
+        data = {};
+
+      }
+
+    }
+
+  } catch {
+
+    data = {};
+
+  }
 
 
   if (!res.ok) {
 
-    throw new Error(
+    let fallbackMessage =
+      'Something went wrong. Please try again.';
+
+
+    if (
+      res.status === 400
+    ) {
+
+      fallbackMessage =
+        'Request sahi nahi hai. Please details check karein.';
+
+    }
+
+
+    if (
+      res.status === 401
+    ) {
+
+      fallbackMessage =
+        'Session expire ho gaya hai. Please login again.';
+
+    }
+
+
+    if (
+      res.status === 403
+    ) {
+
+      fallbackMessage =
+        'Aapko is action ki permission nahi hai.';
+
+    }
+
+
+    if (
+      res.status === 404
+    ) {
+
+      fallbackMessage =
+        'Requested information nahi mili.';
+
+    }
+
+
+    if (
+      res.status === 409
+    ) {
+
+      fallbackMessage =
+        'Ye request already exist karti hai ya conflict ho raha hai.';
+
+    }
+
+
+    if (
+      res.status === 429
+    ) {
+
+      fallbackMessage =
+        'Bahut zyada requests ho gayi hain. Thodi der baad dobara try karein.';
+
+    }
+
+
+    if (
+      res.status >= 500
+    ) {
+
+      fallbackMessage =
+        'Server me temporary problem hai. Please thodi der baad dobara try karein.';
+
+    }
+
+
+    throw new ApiError(
       data.message ||
-      'Request failed.'
+      fallbackMessage,
+      {
+        status:
+          res.status,
+
+        code:
+          res.status === 401
+            ? 'UNAUTHORIZED'
+            : 'HTTP_ERROR'
+      }
     );
 
   }
@@ -304,7 +477,35 @@ async function currentUser() {
 
     return data.user || null;
 
-  } catch {
+  } catch (error) {
+
+    /*
+      Normal not-logged-in situation.
+    */
+
+    if (
+      error?.status === 401 ||
+      error?.code ===
+        'UNAUTHORIZED'
+    ) {
+
+      return null;
+
+    }
+
+
+    /*
+      Navbar ko completely break
+      hone se bachane ke liye
+      network/server error par
+      logged-out UI dikhaya jayega.
+    */
+
+    console.error(
+      'Current user error:',
+      error
+    );
+
 
     return null;
 
@@ -319,11 +520,20 @@ async function currentUser() {
 
 async function requireLogin() {
 
-  const user =
-    await currentUser();
+  try {
+
+    const data =
+      await api(
+        '/auth/me'
+      );
 
 
-  if (!user) {
+    if (data.user) {
+
+      return data.user;
+
+    }
+
 
     location.href =
       BASE +
@@ -336,10 +546,58 @@ async function requireLogin() {
 
     return null;
 
+
+  } catch (error) {
+
+    /*
+      User actually logged out /
+      session expired.
+    */
+
+    if (
+      error?.status === 401 ||
+      error?.code ===
+        'UNAUTHORIZED'
+    ) {
+
+      location.href =
+        BASE +
+        '/frontend/login.html?next=' +
+        encodeURIComponent(
+          location.pathname +
+          location.search
+        );
+
+
+      return null;
+
+    }
+
+
+    /*
+      IMPORTANT:
+      Internet/server error par
+      login page par redirect nahi
+      karenge.
+    */
+
+    console.error(
+      'Login check error:',
+      error
+    );
+
+
+    toast(
+      error?.message ||
+      'Account verify nahi ho pa raha hai. Please dobara try karein.',
+      'error'
+    );
+
+
+    return null;
+
   }
 
-
-  return user;
 }
 
 
@@ -348,6 +606,25 @@ async function requireLogin() {
 ========================= */
 
 async function logoutUser() {
+
+  const button =
+    $('#logoutBtn');
+
+
+  const oldText =
+    button?.textContent;
+
+
+  if (button) {
+
+    button.disabled =
+      true;
+
+    button.textContent =
+      'Logging out...';
+
+  }
+
 
   try {
 
@@ -359,12 +636,39 @@ async function logoutUser() {
       }
     );
 
-  } catch {}
+
+    location.href =
+      BASE +
+      '/frontend/login.html';
 
 
-  location.href =
-    BASE +
-    '/frontend/login.html';
+  } catch (error) {
+
+    console.error(
+      'Logout error:',
+      error
+    );
+
+
+    toast(
+      error?.message ||
+      'Logout nahi ho pa raha hai. Please dobara try karein.',
+      'error'
+    );
+
+
+    if (button) {
+
+      button.disabled =
+        false;
+
+      button.textContent =
+        oldText ||
+        'Logout';
+
+    }
+
+  }
 
 }
 
@@ -593,7 +897,13 @@ async function updateCartCount() {
         );
 
 
-  } catch {
+  } catch (error) {
+
+    console.error(
+      'Cart count error:',
+      error
+    );
+
 
     el.textContent =
       '0';
@@ -930,10 +1240,21 @@ document.addEventListener(
   'DOMContentLoaded',
   async () => {
 
-    await Promise.all([
-      nav(),
-      bottomNav()
-    ]);
+    try {
+
+      await Promise.all([
+        nav(),
+        bottomNav()
+      ]);
+
+    } catch (error) {
+
+      console.error(
+        'Navigation init error:',
+        error
+      );
+
+    }
 
   }
 );
@@ -965,6 +1286,8 @@ window.MC = {
 
   updateCartCount,
 
-  logoutUser
+  logoutUser,
+
+  ApiError
 
 };
