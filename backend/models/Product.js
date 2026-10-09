@@ -40,3 +40,24 @@ productSchema.pre('validate', function(next) {
 });
 
 module.exports = mongoose.model('Product', productSchema);
+productSchema.index({
+  isActive: 1,
+  createdAt: -1
+});
+
+productSchema.index({
+  isActive: 1,
+  sellingPrice: 1
+});
+
+productSchema.index({
+  isActive: 1,
+  category: 1,
+  createdAt: -1
+});
+
+productSchema.index({
+  isActive: 1,
+  isBestSeller: -1,
+  createdAt: -1
+});
