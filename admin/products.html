@@ -1,115 +1,1718 @@
-<!doctype html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin Products</title>
 
-<link rel="stylesheet" href="/memora-creations/admin/css/style.css?v=5">
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>
+    Product Management | Memora Creations
+  </title>
+
+  <!-- EXISTING ADMIN CSS -->
+
+  <link
+    rel="stylesheet"
+    href="/memora-creations/admin/css/style.css?v=5"
+  >
+
+  <!-- PREMIUM PRODUCTS PAGE DESIGN -->
+
+  <style>
+
+    /* =====================================
+       MEMORA CREATIONS
+       PREMIUM PRODUCTS MANAGEMENT
+    ===================================== */
+
+    :root {
+      --mc-primary: #302117;
+      --mc-brown: #8b5b3a;
+      --mc-brown-dark: #70452e;
+      --mc-cream: #f8f5f0;
+      --mc-white: #ffffff;
+      --mc-border: #e9dfd4;
+      --mc-muted: #81776f;
+      --mc-danger: #c34848;
+      --mc-shadow:
+        0 15px 45px rgba(48,33,23,.065);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+
+      background:
+        radial-gradient(
+          circle at top right,
+          rgba(197,154,112,.13),
+          transparent 35%
+        ),
+        radial-gradient(
+          circle at bottom left,
+          rgba(139,91,58,.07),
+          transparent 35%
+        ),
+        var(--mc-cream);
+
+      color: var(--mc-primary);
+    }
+
+    /* =====================================
+       ADMIN NAVIGATION
+    ===================================== */
+
+    .adminnav {
+      background: #241a14;
+      border-bottom: 1px solid #483428;
+      box-shadow:
+        0 8px 26px rgba(34,22,15,.12);
+    }
+
+    .adminnav .container {
+      display: flex;
+      align-items: center;
+      min-height: 78px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .admin-brand {
+      display: flex;
+      flex-direction: column;
+      margin-right: auto;
+      padding: 8px 0;
+    }
+
+    .admin-brand strong {
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 1px;
+    }
+
+    .admin-brand span {
+      margin-top: 4px;
+      color: #d5a987;
+      font-size: 10px;
+      letter-spacing: 2px;
+    }
+
+    .adminnav a {
+      color: #eadfd6;
+      padding: 11px 15px;
+      border-radius: 11px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      transition: .2s ease;
+    }
+
+    .adminnav a:hover,
+    .adminnav a.active {
+      background: #8b5b3a;
+      color: #ffffff;
+    }
+
+    .adminnav #logout {
+      border-radius: 11px;
+      margin-left: 6px;
+    }
+
+    /* =====================================
+       MAIN LAYOUT
+    ===================================== */
+
+    .adminmain {
+      padding-top: 34px;
+      padding-bottom: 75px;
+    }
+
+    /* =====================================
+       PREMIUM HERO
+    ===================================== */
+
+    .products-hero {
+      position: relative;
+      overflow: hidden;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      gap: 24px;
+
+      padding: 38px;
+
+      margin-bottom: 28px;
+
+      border-radius: 27px;
+
+      color: #ffffff;
+
+      background:
+        linear-gradient(
+          125deg,
+          #241811 0%,
+          #4f3020 65%,
+          #845539 100%
+        );
+
+      box-shadow:
+        0 20px 45px rgba(48,33,23,.17);
+    }
+
+    .products-hero::after {
+      content: "";
+
+      position: absolute;
+
+      width: 260px;
+      height: 260px;
+
+      right: -75px;
+      bottom: -135px;
+
+      border-radius: 50%;
+
+      border:
+        45px solid rgba(255,255,255,.045);
+
+      pointer-events: none;
+    }
+
+    .hero-information {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-eyebrow {
+      display: inline-block;
+
+      margin-bottom: 14px;
+
+      color: #eac5a2;
+
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 2.5px;
+    }
+
+    .products-hero h1 {
+      margin: 0 0 12px;
+
+      color: #ffffff;
+
+      font-size:
+        clamp(29px, 4vw, 43px);
+
+      font-weight: 900;
+      line-height: 1.15;
+    }
+
+    .products-hero p {
+      margin: 0;
+
+      max-width: 650px;
+
+      color: #e7d6c8;
+
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .hero-illustration {
+      width: 84px;
+      height: 84px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      flex-shrink: 0;
+
+      border-radius: 24px;
+
+      background:
+        rgba(255,255,255,.11);
+
+      border:
+        1px solid rgba(255,255,255,.15);
+
+      font-size: 40px;
+
+      position: relative;
+      z-index: 1;
+    }
+
+    /* =====================================
+       MAIN FORM CARD
+    ===================================== */
+
+    .product-form-card {
+      padding: 32px;
+
+      background: #ffffff;
+
+      border:
+        1px solid var(--mc-border);
+
+      border-radius: 26px;
+
+      box-shadow: var(--mc-shadow);
+
+      margin-bottom: 35px;
+    }
+
+    .product-card-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      gap: 18px;
+
+      padding-bottom: 24px;
+
+      margin-bottom: 28px;
+
+      border-bottom:
+        1px solid #eee6de;
+    }
+
+    .product-card-heading h2 {
+      margin: 0 0 8px;
+
+      font-size: 25px;
+      font-weight: 900;
+
+      color: var(--mc-primary);
+    }
+
+    .product-card-heading p {
+      margin: 0;
+
+      color: var(--mc-muted);
+
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .heading-icon {
+      width: 57px;
+      height: 57px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 17px;
+
+      background: #f5e8dd;
+
+      color: #8b5b3a;
+
+      font-size: 26px;
+
+      flex-shrink: 0;
+    }
+
+    /* =====================================
+       FORM GRID
+    ===================================== */
+
+    #productForm .formgrid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+      gap: 23px 20px;
+    }
+
+    #productForm .formgrid .full {
+      grid-column: 1 / -1;
+    }
+
+    .premium-field {
+      min-width: 0;
+    }
+
+    .premium-field > label {
+      display: block;
+
+      margin-bottom: 10px;
+
+      color: #4a3629;
+
+      font-size: 13px;
+      font-weight: 800;
+
+      letter-spacing: .02em;
+    }
+
+    .required-mark {
+      color: #c34848;
+    }
+
+    /* =====================================
+       PREMIUM INPUTS
+    ===================================== */
+
+    #productForm .input,
+    #productForm .select {
+      display: block;
+
+      width: 100%;
+      min-width: 0;
+
+      min-height: 54px;
+
+      padding: 14px 17px;
+
+      border:
+        1px solid #e5d8cc;
+
+      border-radius: 14px;
+
+      background: #fffdfb;
+
+      color: #302117;
+
+      font-size: 14px;
+      font-weight: 500;
+
+      outline: none;
+
+      transition:
+        border-color .2s ease,
+        box-shadow .2s ease,
+        background .2s ease;
+    }
+
+    #productForm .input::placeholder {
+      color: #aaa098;
+    }
+
+    #productForm .input:focus,
+    #productForm .select:focus {
+      border-color: #a8734e;
+
+      background: #ffffff;
+
+      box-shadow:
+        0 0 0 4px
+        rgba(168,115,78,.10);
+    }
+
+    #productForm textarea.input {
+      min-height: 142px;
+
+      resize: vertical;
+
+      line-height: 1.7;
+    }
+
+    /* =====================================
+       IMAGE UPLOAD
+    ===================================== */
+
+    .image-upload-area {
+      padding: 25px;
+
+      background:
+        linear-gradient(
+          135deg,
+          #fffcf9,
+          #f9f2eb
+        );
+
+      border:
+        2px dashed #d9c1ad;
+
+      border-radius: 19px;
+
+      transition: .2s ease;
+    }
+
+    .image-upload-area:hover {
+      border-color: #a8734e;
+    }
+
+    .upload-icon {
+      width: 57px;
+      height: 57px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background: #f0e1d3;
+
+      border-radius: 17px;
+
+      font-size: 27px;
+
+      margin-bottom: 15px;
+    }
+
+    .upload-title {
+      color: #38271c;
+
+      font-size: 15px;
+      font-weight: 900;
+
+      margin-bottom: 7px;
+    }
+
+    .upload-description {
+      color: #82756a;
+
+      font-size: 12px;
+      line-height: 1.6;
+
+      margin-bottom: 17px;
+    }
+
+    #images {
+      display: block;
+
+      width: 100%;
+
+      border:
+        1px solid #e5d6c9;
+
+      border-radius: 12px;
+
+      padding: 12px;
+
+      background: #ffffff;
+
+      color: #49372a;
+
+      font-size: 13px;
+    }
+
+    #images::file-selector-button {
+      padding: 10px 14px;
+
+      margin-right: 13px;
+
+      border: 0;
+
+      border-radius: 9px;
+
+      background: #8b5b3a;
+      color: #ffffff;
+
+      font-weight: 800;
+
+      cursor: pointer;
+    }
+
+    #preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+
+      margin-top: 15px;
+    }
+
+    /* =====================================
+       CHECKBOX CARDS
+    ===================================== */
+
+    .premium-option {
+      position: relative;
+
+      display: flex;
+      align-items: center;
+
+      gap: 15px;
+
+      min-height: 87px;
+
+      padding: 19px;
+
+      border:
+        1px solid #e9ddd2;
+
+      border-radius: 18px;
+
+      background: #fffaf6;
+
+      cursor: pointer;
+
+      transition: .2s ease;
+    }
+
+    .premium-option:hover {
+      border-color: #bf9a7d;
+
+      background: #f9f0e8;
+    }
+
+    .premium-option input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+
+      width: 46px;
+      height: 27px;
+
+      flex-shrink: 0;
+
+      margin: 0;
+
+      border: 0;
+      border-radius: 30px;
+
+      background: #dfd4cb;
+
+      cursor: pointer;
+
+      position: relative;
+
+      transition: background .2s ease;
+    }
+
+    .premium-option input[type="checkbox"]::after {
+      content: "";
+
+      position: absolute;
+
+      width: 19px;
+      height: 19px;
+
+      left: 4px;
+      top: 4px;
+
+      border-radius: 50%;
+
+      background: #ffffff;
+
+      box-shadow:
+        0 2px 6px rgba(0,0,0,.15);
+
+      transition: transform .2s ease;
+    }
+
+    .premium-option input[type="checkbox"]:checked {
+      background: #8b5b3a;
+    }
+
+    .premium-option input[type="checkbox"]:checked::after {
+      transform: translateX(19px);
+    }
+
+    .premium-option input[type="checkbox"]:focus-visible {
+      outline:
+        3px solid rgba(139,91,58,.3);
+
+      outline-offset: 3px;
+    }
+
+    .option-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .option-copy strong {
+      color: #302117;
+
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .option-copy small {
+      color: #81776f;
+
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    /* =====================================
+       SUBMIT BAR
+    ===================================== */
+
+    .product-form-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      gap: 20px;
+
+      flex-wrap: wrap;
+
+      border-top:
+        1px solid #eee5dd;
+
+      margin-top: 30px;
+      padding-top: 25px;
+    }
+
+    .form-helper-text {
+      max-width: 420px;
+
+      color: #80746a;
+
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .form-action-buttons {
+      display: flex;
+      gap: 11px;
+      flex-wrap: wrap;
+    }
+
+    .product-save-button {
+      min-height: 52px !important;
+
+      padding: 14px 26px !important;
+
+      border-radius: 13px !important;
+
+      background:
+        linear-gradient(
+          135deg,
+          #a36e4a,
+          #77472c
+        ) !important;
+
+      color: #ffffff !important;
+
+      font-size: 14px !important;
+      font-weight: 900 !important;
+
+      box-shadow:
+        0 10px 24px
+        rgba(139,91,58,.22);
+    }
+
+    .product-save-button:hover {
+      background:
+        linear-gradient(
+          135deg,
+          #8b5b3a,
+          #633923
+        ) !important;
+    }
+
+    .product-clear-button {
+      min-height: 52px !important;
+
+      padding: 14px 22px !important;
+
+      border-radius: 13px !important;
+    }
+
+    /* =====================================
+       SECTION HEADING
+    ===================================== */
+
+    .management-section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      gap: 18px;
+
+      margin: 35px 0 19px;
+    }
+
+    .management-section-heading h2 {
+      margin: 0 0 7px;
+
+      color: #302117;
+
+      font-size: 25px;
+      font-weight: 900;
+    }
+
+    .management-section-heading p {
+      margin: 0;
+
+      color: #81776f;
+
+      font-size: 13px;
+    }
+
+    .management-section-icon {
+      width: 48px;
+      height: 48px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background: #eee0d3;
+
+      border-radius: 15px;
+
+      font-size: 23px;
+    }
+
+    /* =====================================
+       PRODUCT LIST
+    ===================================== */
+
+    #products.grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+      gap: 19px;
+
+      margin-bottom: 37px;
+    }
+
+    #products .card {
+      overflow: hidden;
+
+      background: #ffffff;
+
+      border:
+        1px solid #e9dfd6;
+
+      border-radius: 21px;
+
+      box-shadow:
+        0 10px 30px rgba(48,33,23,.055);
+
+      transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+    }
+
+    #products .card:hover {
+      transform: translateY(-4px);
+
+      box-shadow:
+        0 18px 40px rgba(48,33,23,.11);
+    }
+
+    #products .productimg {
+      display: block;
+
+      width: 100%;
+
+      aspect-ratio: 1 / 1;
+
+      object-fit: cover;
+
+      background: #f3eee9;
+    }
+
+    #products .cardbody {
+      padding: 20px;
+    }
+
+    #products .cardbody h3 {
+      margin: 0 0 13px;
+
+      min-height: 42px;
+
+      color: #302117;
+
+      font-size: 15px;
+      font-weight: 850;
+
+      line-height: 1.5;
+    }
+
+    #products .cardbody p {
+      margin: 0 0 17px;
+
+      color: #76695e;
+
+      font-size: 13px;
+    }
+
+    #products .actions {
+      display: flex;
+      gap: 9px;
+      flex-wrap: wrap;
+    }
+
+    #products .btn {
+      border-radius: 11px;
+    }
+
+    /* =====================================
+       CATEGORIES CARD
+    ===================================== */
+
+    .categories-card {
+      padding: 29px;
+
+      background: #ffffff;
+
+      border:
+        1px solid var(--mc-border);
+
+      border-radius: 24px;
+
+      box-shadow: var(--mc-shadow);
+    }
+
+    .categories-card h2 {
+      margin: 0 0 8px;
+
+      font-size: 24px;
+
+      color: #302117;
+    }
+
+    .categories-card > p {
+      margin: 0 0 24px;
+
+      color: #81776f;
+
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    #categoryForm {
+      display: flex;
+      gap: 11px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    #categoryName {
+      flex: 1;
+
+      min-width: 180px;
+
+      min-height: 50px;
+
+      padding: 12px 16px;
+
+      border:
+        1px solid #e3d6ca;
+
+      border-radius: 13px;
+
+      background: #fffdfb;
+    }
+
+    #categoryName:focus {
+      outline: none;
+
+      border-color: #a8734e;
+
+      box-shadow:
+        0 0 0 4px
+        rgba(168,115,78,.10);
+    }
+
+    .category-add-button {
+      min-height: 50px !important;
+
+      padding: 12px 23px !important;
+
+      border-radius: 13px !important;
+    }
+
+    #categories {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+
+      gap: 12px;
+
+      margin-top: 23px;
+    }
+
+    #categories .pill {
+      display: inline-flex;
+      align-items: center;
+
+      gap: 5px;
+
+      padding: 6px;
+
+      border:
+        1px solid #e8ddd3;
+
+      border-radius: 14px;
+
+      background: #f5eee8;
+
+      font-size: 12px;
+    }
+
+    #categories .btn {
+      padding: 9px 12px;
+
+      min-height: 36px;
+
+      border-radius: 10px;
+    }
+
+    /* =====================================
+       FOOTER
+    ===================================== */
+
+    .products-page-footer {
+      margin-top: 38px;
+
+      padding-top: 20px;
+
+      border-top:
+        1px solid #e9dfd6;
+
+      color: #9a8d82;
+
+      font-size: 12px;
+      text-align: center;
+    }
+
+    /* =====================================
+       TABLET
+    ===================================== */
+
+    @media (max-width: 1000px) {
+
+      #products.grid {
+        grid-template-columns:
+          repeat(2, minmax(0, 1fr));
+      }
+
+      .products-hero {
+        padding: 28px;
+      }
+
+    }
+
+    /* =====================================
+       MOBILE
+    ===================================== */
+
+    @media (max-width: 700px) {
+
+      .adminnav .container {
+        gap: 7px;
+        justify-content: center;
+      }
+
+      .admin-brand {
+        width: 100%;
+        align-items: center;
+        margin-right: 0;
+      }
+
+      .adminnav a {
+        font-size: 11px;
+        padding: 9px;
+      }
+
+      .adminmain {
+        padding-top: 20px;
+      }
+
+      .products-hero {
+        flex-direction: column;
+        align-items: flex-start;
+
+        padding: 25px 20px;
+
+        border-radius: 21px;
+      }
+
+      .hero-illustration {
+        width: 60px;
+        height: 60px;
+
+        font-size: 29px;
+      }
+
+      .product-form-card {
+        padding: 20px 16px;
+
+        border-radius: 20px;
+      }
+
+      .product-card-heading {
+        align-items: flex-start;
+      }
+
+      .product-card-heading h2 {
+        font-size: 22px;
+      }
+
+      #productForm .formgrid {
+        grid-template-columns: 1fr;
+
+        gap: 18px;
+      }
+
+      #productForm .formgrid .full {
+        grid-column: auto;
+      }
+
+      .premium-option {
+        padding: 15px;
+      }
+
+      .product-form-footer {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .form-action-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .form-helper-text {
+        max-width: none;
+      }
+
+      .categories-card {
+        padding: 20px 16px;
+      }
+
+      .management-section-heading h2 {
+        font-size: 22px;
+      }
+
+    }
+
+    @media (max-width: 480px) {
+
+      #products.grid {
+        grid-template-columns: 1fr;
+      }
+
+      #categoryForm {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      #categoryName {
+        width: 100%;
+      }
+
+      .form-action-buttons {
+        grid-template-columns: 1fr;
+      }
+
+      .products-hero h1 {
+        font-size: 29px;
+      }
+
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      #products .card,
+      .premium-option {
+        transition: none;
+      }
+
+    }
+
+  </style>
+
 </head>
+
 
 <body>
 
-<nav class="adminnav">
-  <div class="container">
-    <b>MEMORA ADMIN</b>
-    <a href="/memora-creations/admin/dashboard.html">Dashboard</a>
-    <a href="/memora-creations/admin/products.html">Products</a>
-    <a href="/memora-creations/admin/orders.html">Orders</a>
-    <a href="/memora-creations/admin/users.html">Users</a>
-  </div>
-</nav>
+  <!-- =====================================
+       ADMIN NAVIGATION
+  ===================================== -->
 
-<main class="container adminmain">
+  <nav class="adminnav">
 
-  <div class="admin-card">
-    <h1>Products</h1>
+    <div class="container">
 
-    <form id="productForm">
-      <input type="hidden" id="editId">
+      <div class="admin-brand">
 
-      <div class="formgrid">
+        <strong>
+          MEMORA CREATIONS
+        </strong>
+
+        <span>
+          ADMIN CONTROL CENTER
+        </span>
+
+      </div>
+
+
+      <a
+        href="/memora-creations/admin/dashboard.html"
+      >
+        Dashboard
+      </a>
+
+
+      <a
+        class="active"
+        aria-current="page"
+        href="/memora-creations/admin/products.html"
+      >
+        Products
+      </a>
+
+
+      <a
+        href="/memora-creations/admin/orders.html"
+      >
+        Orders
+      </a>
+
+
+      <a
+        href="/memora-creations/admin/users.html"
+      >
+        Customers
+      </a>
+
+
+      <button
+        id="logout"
+        class="btn secondary"
+        type="button"
+      >
+        Logout
+      </button>
+
+    </div>
+
+  </nav>
+
+
+  <!-- =====================================
+       MAIN CONTENT
+  ===================================== -->
+
+  <main class="container adminmain">
+
+
+    <!-- =====================================
+         HERO
+    ===================================== -->
+
+    <section class="products-hero">
+
+      <div class="hero-information">
+
+        <span class="hero-eyebrow">
+          MEMORA CREATIONS ADMIN
+        </span>
+
+        <h1>
+          Products Management
+        </h1>
+
+        <p>
+          Add beautiful products, manage prices,
+          update stock and organize your
+          collections from one professional
+          dashboard.
+        </p>
+
+      </div>
+
+
+      <div
+        class="hero-illustration"
+        aria-hidden="true"
+      >
+        📦
+      </div>
+
+    </section>
+
+
+    <!-- =====================================
+         ADD / EDIT PRODUCT
+    ===================================== -->
+
+    <section class="product-form-card">
+
+
+      <div class="product-card-heading">
 
         <div>
-          <label>Name</label>
-          <input id="name" class="input" required>
+
+          <h2>
+            Product Details
+          </h2>
+
+          <p>
+            Complete the product information
+            carefully before saving.
+          </p>
+
         </div>
 
-        <div>
-          <label>Category</label>
-          <select id="category" class="select" required></select>
-        </div>
 
-        <div class="full">
-          <label>Description</label>
-          <textarea id="description" class="input" required></textarea>
-        </div>
-
-        <div>
-          <label>Original Price</label>
-          <input id="originalPrice" class="input" type="number" min="0" step="0.01" required>
-        </div>
-
-        <div>
-          <label>Selling Price</label>
-          <input id="sellingPrice" class="input" type="number" min="0" step="0.01" required>
-        </div>
-
-        <div>
-          <label>Stock</label>
-          <input id="stock" class="input" type="number" min="0" required>
-        </div>
-
-        <div>
-          <label>Keywords comma separated</label>
-          <input id="keywords" class="input">
-        </div>
-
-        <div class="full">
-          <label>Product Images</label>
-          <input id="images" type="file" accept="image/*" multiple>
-          <div id="preview" class="actions"></div>
-        </div>
-
-        <div>
-          <label>
-            <input id="isFeatured" type="checkbox"> Featured
-          </label>
-        </div>
-
-        <div>
-          <label>
-            <input id="isBestSeller" type="checkbox"> Best Seller
-          </label>
+        <div
+          class="heading-icon"
+          aria-hidden="true"
+        >
+          ✦
         </div>
 
       </div>
 
-      <br>
 
-      <button class="btn">Save Product</button>
-      <button type="button" id="cancelEdit" class="btn secondary">Clear</button>
-    </form>
-  </div>
+      <!-- EXISTING PRODUCT FORM ID PRESERVED -->
 
-  <div id="products" class="grid"></div>
+      <form id="productForm">
 
-  <div class="admin-card">
-    <h2>Categories</h2>
 
-    <form id="categoryForm" class="actions">
-      <input class="input" id="categoryName" placeholder="Category name" required>
-      <button class="btn">Add</button>
-    </form>
+        <!-- IMPORTANT FOR EDITING PRODUCTS -->
 
-    <div id="categories" class="actions" style="margin-top:12px"></div>
-  </div>
+        <input
+          type="hidden"
+          id="editId"
+        >
 
-</main>
 
-<script src="/memora-creations/frontend/js/app.js"></script>
-<script src="/memora-creations/admin/js/auth.js"></script>
-<script src="/memora-creations/admin/js/products.js?v=5"></script>
+        <div class="formgrid">
+
+
+          <!-- PRODUCT NAME -->
+
+          <div class="premium-field">
+
+            <label for="name">
+              Product Name
+              <span class="required-mark">*</span>
+            </label>
+
+            <input
+              id="name"
+              class="input"
+              type="text"
+              placeholder="Enter product name"
+              required
+            >
+
+          </div>
+
+
+          <!-- CATEGORY -->
+
+          <div class="premium-field">
+
+            <label for="category">
+              Category
+              <span class="required-mark">*</span>
+            </label>
+
+            <!--
+              Categories load automatically
+              from existing admin/products.js.
+              Do not add static options.
+            -->
+
+            <select
+              id="category"
+              class="select"
+              required
+            ></select>
+
+          </div>
+
+
+          <!-- DESCRIPTION -->
+
+          <div class="premium-field full">
+
+            <label for="description">
+              Product Description
+              <span class="required-mark">*</span>
+            </label>
+
+            <textarea
+              id="description"
+              class="input"
+              rows="5"
+              placeholder="Write product details, material, size, features and usage..."
+              required
+            ></textarea>
+
+          </div>
+
+
+          <!-- ORIGINAL PRICE -->
+
+          <div class="premium-field">
+
+            <label for="originalPrice">
+              Original Price (₹)
+              <span class="required-mark">*</span>
+            </label>
+
+            <input
+              id="originalPrice"
+              class="input"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="Example: 1499"
+              required
+            >
+
+          </div>
+
+
+          <!-- SELLING PRICE -->
+
+          <div class="premium-field">
+
+            <label for="sellingPrice">
+              Selling Price (₹)
+              <span class="required-mark">*</span>
+            </label>
+
+            <input
+              id="sellingPrice"
+              class="input"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="Example: 999"
+              required
+            >
+
+          </div>
+
+
+          <!-- STOCK -->
+
+          <div class="premium-field">
+
+            <label for="stock">
+              Available Stock
+              <span class="required-mark">*</span>
+            </label>
+
+            <input
+              id="stock"
+              class="input"
+              type="number"
+              min="0"
+              step="1"
+              placeholder="Available quantity"
+              required
+            >
+
+          </div>
+
+
+          <!-- KEYWORDS -->
+
+          <div class="premium-field">
+
+            <label for="keywords">
+              Product Keywords
+            </label>
+
+            <input
+              id="keywords"
+              class="input"
+              type="text"
+              placeholder="home decor, gifts, wall art"
+            >
+
+          </div>
+
+
+          <!-- PRODUCT IMAGES -->
+
+          <div class="premium-field full">
+
+            <label for="images">
+              Product Images
+            </label>
+
+
+            <div class="image-upload-area">
+
+              <div
+                class="upload-icon"
+                aria-hidden="true"
+              >
+                🖼️
+              </div>
+
+              <div class="upload-title">
+                Upload Product Photos
+              </div>
+
+              <p class="upload-description">
+                Select one or more clear product
+                images from your computer.
+              </p>
+
+
+              <input
+                id="images"
+                type="file"
+                accept="image/*"
+                multiple
+              >
+
+
+              <!-- EXISTING PREVIEW ID PRESERVED -->
+
+              <div
+                id="preview"
+                class="actions"
+              ></div>
+
+            </div>
+
+          </div>
+
+
+          <!-- FEATURED -->
+
+          <div class="premium-field">
+
+            <label class="premium-option">
+
+              <input
+                id="isFeatured"
+                type="checkbox"
+              >
+
+              <span class="option-copy">
+
+                <strong>
+                  Featured Product
+                </strong>
+
+                <small>
+                  Highlight this product
+                  in featured collections.
+                </small>
+
+              </span>
+
+            </label>
+
+          </div>
+
+
+          <!-- BEST SELLER -->
+
+          <div class="premium-field">
+
+            <label class="premium-option">
+
+              <input
+                id="isBestSeller"
+                type="checkbox"
+              >
+
+              <span class="option-copy">
+
+                <strong>
+                  Best Seller
+                </strong>
+
+                <small>
+                  Mark this product as a
+                  popular collection item.
+                </small>
+
+              </span>
+
+            </label>
+
+          </div>
+
+        </div>
+
+
+        <!-- SAVE BUTTONS -->
+
+        <div class="product-form-footer">
+
+          <div class="form-helper-text">
+
+            <strong>Tip:</strong>
+
+            Clear images, accurate prices
+            and detailed product descriptions
+            make your store more professional.
+
+          </div>
+
+
+          <div class="form-action-buttons">
+
+            <button
+              class="btn product-save-button"
+              type="submit"
+            >
+              Save Product
+            </button>
+
+
+            <button
+              type="button"
+              id="cancelEdit"
+              class="btn secondary product-clear-button"
+            >
+              Clear Form
+            </button>
+
+          </div>
+
+        </div>
+
+      </form>
+
+    </section>
+
+
+    <!-- =====================================
+         PRODUCT COLLECTION
+    ===================================== -->
+
+    <section>
+
+
+      <div class="management-section-heading">
+
+        <div>
+
+          <h2>
+            Your Products
+          </h2>
+
+          <p>
+            View, edit and manage
+            your listed products.
+          </p>
+
+        </div>
+
+
+        <div
+          class="management-section-icon"
+          aria-hidden="true"
+        >
+          🛍️
+        </div>
+
+      </div>
+
+
+      <!-- EXISTING PRODUCTS ID PRESERVED -->
+
+      <div
+        id="products"
+        class="grid"
+      ></div>
+
+    </section>
+
+
+    <!-- =====================================
+         CATEGORY MANAGEMENT
+    ===================================== -->
+
+    <section class="categories-card">
+
+
+      <h2>
+        Category Management
+      </h2>
+
+      <p>
+        Add new categories or manage
+        existing product collections.
+      </p>
+
+
+      <!-- EXISTING CATEGORY FORM PRESERVED -->
+
+      <form
+        id="categoryForm"
+        class="actions"
+      >
+
+
+        <input
+          id="categoryName"
+          class="input"
+          type="text"
+          placeholder="Enter category name"
+          required
+        >
+
+
+        <button
+          type="submit"
+          class="btn category-add-button"
+        >
+          + Add Category
+        </button>
+
+      </form>
+
+
+      <!-- EXISTING CATEGORY LIST ID PRESERVED -->
+
+      <div
+        id="categories"
+        class="actions"
+      ></div>
+
+    </section>
+
+
+    <!-- FOOTER -->
+
+    <footer class="products-page-footer">
+
+      © MEMORA CREATIONS
+      — Product Management System
+
+    </footer>
+
+  </main>
+
+
+  <!-- =====================================
+       EXISTING JAVASCRIPT
+       DO NOT REMOVE
+  ===================================== -->
+
+  <script
+    src="/memora-creations/frontend/js/app.js?v=10"
+  ></script>
+
+
+  <script
+    src="/memora-creations/admin/js/auth.js?v=5"
+  ></script>
+
+
+  <script
+    src="/memora-creations/admin/js/products.js?v=5"
+  ></script>
 
 </body>
+
 </html>
