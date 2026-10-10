@@ -1,41 +1,733 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Admin Users - MEMORA CREATIONS</title>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>
+    Customer Management | Memora Creations
+  </title>
+
+  <!-- EXISTING ADMIN CSS -->
 
   <link
     rel="stylesheet"
-    href="/memora-creations/admin/css/style.css?v=3"
+    href="/memora-creations/admin/css/style.css?v=5"
   >
+
+  <style>
+
+    /* =====================================
+       MEMORA CREATIONS
+       PREMIUM CUSTOMER MANAGEMENT
+    ===================================== */
+
+    :root {
+      --mc-dark: #302117;
+      --mc-brown: #8b5b3a;
+      --mc-cream: #f8f5f0;
+      --mc-border: #e9dfd4;
+      --mc-muted: #81776f;
+      --mc-white: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+
+      background:
+        radial-gradient(
+          circle at top right,
+          rgba(197,154,112,.14),
+          transparent 36%
+        ),
+        radial-gradient(
+          circle at bottom left,
+          rgba(139,91,58,.08),
+          transparent 35%
+        ),
+        var(--mc-cream);
+
+      color: var(--mc-dark);
+    }
+
+    /* =====================================
+       ADMIN NAVIGATION
+    ===================================== */
+
+    .adminnav {
+      background: #241a14;
+      border-bottom: 1px solid #483428;
+
+      box-shadow:
+        0 8px 26px rgba(34,22,15,.12);
+    }
+
+    .adminnav .container {
+      min-height: 78px;
+
+      display: flex;
+      align-items: center;
+
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .admin-brand {
+      display: flex;
+      flex-direction: column;
+
+      margin-right: auto;
+      padding: 8px 0;
+    }
+
+    .admin-brand strong {
+      color: white;
+
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 1px;
+    }
+
+    .admin-brand span {
+      margin-top: 4px;
+
+      color: #d5a987;
+      font-size: 10px;
+      letter-spacing: 2px;
+    }
+
+    .adminnav a {
+      padding: 11px 15px;
+
+      border-radius: 11px;
+
+      color: #eadfd6;
+
+      font-size: 13px;
+      font-weight: 700;
+
+      text-decoration: none;
+
+      transition: .2s ease;
+    }
+
+    .adminnav a:hover,
+    .adminnav a.active {
+      background: #8b5b3a;
+      color: white;
+    }
+
+    .adminnav #logout {
+      border-radius: 11px;
+      margin-left: 6px;
+    }
+
+    /* =====================================
+       MAIN PAGE
+    ===================================== */
+
+    .adminmain {
+      padding-top: 35px;
+      padding-bottom: 75px;
+    }
+
+    /* =====================================
+       PREMIUM HERO SECTION
+    ===================================== */
+
+    .customers-hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      gap: 25px;
+
+      padding: 38px;
+      margin-bottom: 28px;
+
+      position: relative;
+      overflow: hidden;
+
+      border-radius: 27px;
+
+      background:
+        linear-gradient(
+          125deg,
+          #241811 0%,
+          #4f3020 65%,
+          #845539 100%
+        );
+
+      color: white;
+
+      box-shadow:
+        0 20px 45px rgba(48,33,23,.17);
+    }
+
+    .customers-hero::after {
+      content: "";
+
+      position: absolute;
+
+      width: 260px;
+      height: 260px;
+
+      right: -75px;
+      bottom: -135px;
+
+      border-radius: 50%;
+
+      border:
+        45px solid rgba(255,255,255,.045);
+
+      pointer-events: none;
+    }
+
+    .hero-copy {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-eyebrow {
+      display: inline-block;
+
+      margin-bottom: 14px;
+
+      color: #eac5a2;
+
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 2px;
+    }
+
+    .customers-hero h1 {
+      margin: 0 0 13px;
+
+      color: white;
+
+      font-size:
+        clamp(29px,4vw,43px);
+
+      line-height: 1.15;
+      font-weight: 900;
+    }
+
+    .customers-hero p {
+      margin: 0;
+
+      max-width: 620px;
+
+      color: #e7d6c8;
+
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .hero-icon {
+      width: 84px;
+      height: 84px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      flex-shrink: 0;
+
+      position: relative;
+      z-index: 1;
+
+      background: rgba(255,255,255,.11);
+
+      border:
+        1px solid rgba(255,255,255,.15);
+
+      border-radius: 24px;
+
+      font-size: 38px;
+    }
+
+    /* =====================================
+       CUSTOMER PANEL
+    ===================================== */
+
+    .customers-panel {
+      padding: 30px;
+
+      background: white;
+
+      border:
+        1px solid var(--mc-border);
+
+      border-radius: 25px;
+
+      box-shadow:
+        0 15px 45px rgba(48,33,23,.065);
+    }
+
+    .customers-panel-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      gap: 20px;
+
+      margin-bottom: 25px;
+      padding-bottom: 23px;
+
+      border-bottom:
+        1px solid #eee5dc;
+    }
+
+    .customers-panel-heading h2 {
+      margin: 0 0 8px;
+
+      color: #302117;
+
+      font-size: 25px;
+      font-weight: 900;
+    }
+
+    .customers-panel-heading p {
+      margin: 0;
+
+      color: var(--mc-muted);
+
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .heading-icon {
+      width: 54px;
+      height: 54px;
+
+      flex-shrink: 0;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background: #f5e8dd;
+
+      border-radius: 16px;
+
+      font-size: 25px;
+    }
+
+    /* =====================================
+       CUSTOMER TABLE
+    ===================================== */
+
+    .customers-table-wrap {
+      width: 100%;
+      overflow-x: auto;
+
+      border:
+        1px solid #eae0d7;
+
+      border-radius: 18px;
+
+      background: white;
+    }
+
+    .customers-table {
+      width: 100%;
+
+      min-width: 850px;
+
+      border-collapse: collapse;
+      border-spacing: 0;
+    }
+
+    .customers-table thead {
+      background: #f5eee7;
+    }
+
+    .customers-table th {
+      padding: 18px;
+
+      color: #654732;
+
+      font-size: 12px;
+      font-weight: 900;
+
+      text-align: left;
+      white-space: nowrap;
+
+      border-bottom:
+        1px solid #e8d9cc;
+    }
+
+    .customers-table td {
+      padding: 18px;
+
+      color: #48392e;
+
+      font-size: 13px;
+      line-height: 1.6;
+
+      border-bottom:
+        1px solid #f0eae4;
+
+      vertical-align: middle;
+
+      overflow-wrap: anywhere;
+    }
+
+    .customers-table tbody tr:hover {
+      background: #fffcf9;
+    }
+
+    .customers-table tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    /* =====================================
+       CUSTOMER NAME BUTTON
+    ===================================== */
+
+    #users .customer-name {
+      color: #7b4e32 !important;
+
+      font-size: 14px !important;
+      font-weight: 900 !important;
+
+      text-decoration: none !important;
+
+      border-bottom:
+        1px dashed #b99173 !important;
+
+      padding-bottom: 3px !important;
+
+      text-align: left;
+
+      transition: .2s ease;
+    }
+
+    #users .customer-name:hover {
+      color: #302117 !important;
+
+      border-color:
+        #302117 !important;
+    }
+
+    #users .customer-name:focus-visible {
+      outline:
+        3px solid rgba(139,91,58,.24);
+
+      outline-offset: 4px;
+      border-radius: 4px;
+    }
+
+    /* =====================================
+       ACTION BUTTONS
+    ===================================== */
+
+    #users .btn {
+      min-height: 40px;
+
+      padding: 10px 13px;
+
+      border-radius: 10px;
+
+      font-size: 12px;
+      font-weight: 800;
+
+      transition: .2s ease;
+    }
+
+    #users .set-password {
+      background: #8b5b3a;
+      color: white;
+    }
+
+    #users .set-password:hover {
+      background: #6e432b;
+      transform: translateY(-2px);
+    }
+
+    #users .toggle-user {
+      background: #f1e7dd;
+
+      color: #5e4030;
+
+      border:
+        1px solid #e3d2c2;
+    }
+
+    #users .toggle-user:hover {
+      background: #e7d6c6;
+      transform: translateY(-2px);
+    }
+
+    /* =====================================
+       CUSTOMER ORDER DETAILS
+    ===================================== */
+
+    #users .admin-card {
+      padding: 23px;
+
+      border:
+        1px solid #e8ddd2;
+
+      border-radius: 18px;
+
+      background: #fffdfb;
+
+      box-shadow:
+        0 9px 28px rgba(48,33,23,.045);
+    }
+
+    #users .customer-orders {
+      color: #4c3b30;
+
+      line-height: 1.7;
+    }
+
+    #users .customer-orders .admin-card {
+      background: #ffffff;
+
+      border-left:
+        4px solid #a57653;
+    }
+
+    /* =====================================
+       HELP BANNER
+    ===================================== */
+
+    .customers-help {
+      display: flex;
+      align-items: flex-start;
+
+      gap: 15px;
+
+      padding: 19px;
+
+      margin-top: 24px;
+
+      border:
+        1px solid #eadccf;
+
+      border-radius: 16px;
+
+      background: #fbf5ee;
+    }
+
+    .help-icon {
+      width: 40px;
+      height: 40px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      flex-shrink: 0;
+
+      border-radius: 12px;
+
+      background: #f1e1d2;
+
+      font-size: 20px;
+    }
+
+    .customers-help strong {
+      display: block;
+
+      margin-bottom: 6px;
+
+      color: #523623;
+
+      font-size: 13px;
+    }
+
+    .customers-help p {
+      margin: 0;
+
+      color: #807166;
+
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    /* =====================================
+       FOOTER
+    ===================================== */
+
+    .customers-footer {
+      margin-top: 38px;
+      padding-top: 20px;
+
+      border-top:
+        1px solid #e8ddd4;
+
+      text-align: center;
+
+      color: #9a8d82;
+
+      font-size: 12px;
+    }
+
+    /* =====================================
+       RESPONSIVE
+    ===================================== */
+
+    @media (max-width: 800px) {
+
+      .customers-hero {
+        padding: 28px;
+      }
+
+      .customers-panel {
+        padding: 20px;
+      }
+
+    }
+
+    @media (max-width: 700px) {
+
+      .adminnav .container {
+        justify-content: center;
+        gap: 7px;
+      }
+
+      .admin-brand {
+        width: 100%;
+        align-items: center;
+        margin-right: 0;
+      }
+
+      .adminnav a {
+        padding: 9px;
+        font-size: 11px;
+      }
+
+      .adminmain {
+        padding-top: 20px;
+      }
+
+      .customers-hero {
+        flex-direction: column;
+        align-items: flex-start;
+
+        padding: 25px 20px;
+
+        border-radius: 21px;
+      }
+
+      .customers-hero h1 {
+        font-size: 30px;
+      }
+
+      .hero-icon {
+        width: 60px;
+        height: 60px;
+
+        font-size: 28px;
+      }
+
+      .customers-panel {
+        padding: 17px;
+
+        border-radius: 20px;
+      }
+
+      .customers-panel-heading {
+        align-items: flex-start;
+      }
+
+      .customers-panel-heading h2 {
+        font-size: 22px;
+      }
+
+      .heading-icon {
+        width: 45px;
+        height: 45px;
+      }
+
+      .customers-table th,
+      .customers-table td {
+        padding: 13px;
+      }
+
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      .adminnav a,
+      #users .btn {
+        transition: none;
+      }
+
+    }
+
+  </style>
+
 </head>
 
+
 <body>
+
+  <!-- =====================================
+       ADMIN NAVIGATION
+  ===================================== -->
 
   <nav class="adminnav">
 
     <div class="container">
 
-      <b>MEMORA ADMIN</b>
+      <div class="admin-brand">
 
-      <a href="/memora-creations/admin/dashboard.html">
+        <strong>
+          MEMORA CREATIONS
+        </strong>
+
+        <span>
+          ADMIN CONTROL CENTER
+        </span>
+
+      </div>
+
+
+      <a
+        href="/memora-creations/admin/dashboard.html"
+      >
         Dashboard
       </a>
 
-      <a href="/memora-creations/admin/products.html">
+
+      <a
+        href="/memora-creations/admin/products.html"
+      >
         Products
       </a>
 
-      <a href="/memora-creations/admin/orders.html">
+
+      <a
+        href="/memora-creations/admin/orders.html"
+      >
         Orders
       </a>
 
-      <a href="/memora-creations/admin/users.html">
-        Users
+
+      <a
+        class="active"
+        aria-current="page"
+        href="/memora-creations/admin/users.html"
+      >
+        Customers
       </a>
+
 
       <button
         id="logout"
@@ -50,38 +742,207 @@
   </nav>
 
 
+  <!-- =====================================
+       MAIN CONTENT
+  ===================================== -->
+
   <main class="container adminmain">
 
-    <h1>Customers</h1>
 
-    <div class="tablewrap">
+    <!-- CUSTOMER HERO -->
 
-      <table>
+    <section class="customers-hero">
 
-        <thead>
+      <div class="hero-copy">
 
-          <tr>
-            <th>Name</th>
-            <th>Mobile</th>
-            <th>Email</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
+        <span class="hero-eyebrow">
+          MEMORA CREATIONS ADMIN
+        </span>
 
-        </thead>
+        <h1>
+          Customer Management
+        </h1>
 
-        <tbody id="users"></tbody>
+        <p>
+          Manage registered customers,
+          review their orders, check account
+          status and handle password reset
+          requests from one professional
+          dashboard.
+        </p>
 
-      </table>
+      </div>
 
-    </div>
+
+      <div
+        class="hero-icon"
+        aria-hidden="true"
+      >
+        👥
+      </div>
+
+    </section>
+
+
+    <!-- =====================================
+         CUSTOMER LIST
+    ===================================== -->
+
+    <section class="customers-panel">
+
+
+      <div class="customers-panel-heading">
+
+        <div>
+
+          <h2>
+            Registered Customers
+          </h2>
+
+          <p>
+            View and manage customer accounts
+            and order history.
+          </p>
+
+        </div>
+
+
+        <div
+          class="heading-icon"
+          aria-hidden="true"
+        >
+          👤
+        </div>
+
+      </div>
+
+
+      <!-- IMPORTANT:
+           USERS TABLE ID PRESERVED
+           EXISTING JS EXPECTS 5 COLUMNS
+      -->
+
+      <div class="customers-table-wrap">
+
+        <table class="customers-table">
+
+          <thead>
+
+            <tr>
+
+              <th>
+                Customer Name
+              </th>
+
+              <th>
+                Mobile Number
+              </th>
+
+              <th>
+                Email Address
+              </th>
+
+              <th>
+                Account Status
+              </th>
+
+              <th>
+                Actions
+              </th>
+
+            </tr>
+
+          </thead>
+
+
+          <!-- EXISTING JAVASCRIPT
+               LOADS CUSTOMERS HERE -->
+
+          <tbody id="users">
+
+            <tr>
+
+              <td colspan="5">
+                Loading customers...
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+
+      <!-- INFORMATION -->
+
+      <div class="customers-help">
+
+        <div
+          class="help-icon"
+          aria-hidden="true"
+        >
+          💡
+        </div>
+
+        <div>
+
+          <strong>
+            Customer Management Tips
+          </strong>
+
+          <p>
+
+            Click a customer name to view
+            their order history.
+
+            Use Set Password for an
+            authorized password reset.
+
+            Enable or Disable controls
+            account access.
+
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- FOOTER -->
+
+    <footer class="customers-footer">
+
+      © MEMORA CREATIONS
+      — Customer Management System
+
+    </footer>
 
   </main>
 
 
-  <script src="/memora-creations/frontend/js/app.js?v=3"></script>
-  <script src="/memora-creations/admin/js/auth.js?v=3"></script>
-  <script src="/memora-creations/admin/js/users.js?v=3"></script>
+  <!-- =====================================
+       EXISTING JAVASCRIPT
+       IDs AND FUNCTIONALITY PRESERVED
+  ===================================== -->
+
+  <script
+    src="/memora-creations/frontend/js/app.js?v=10"
+  ></script>
+
+
+  <script
+    src="/memora-creations/admin/js/auth.js?v=5"
+  ></script>
+
+
+  <script
+    src="/memora-creations/admin/js/users.js?v=5"
+  ></script>
 
 </body>
+
 </html>
