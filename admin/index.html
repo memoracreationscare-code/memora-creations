@@ -1,37 +1,983 @@
-<!doctype html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin Login</title>
 
-<link rel="stylesheet" href="/memora-creations/admin/css/style.css">
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <meta
+    name="theme-color"
+    content="#241811"
+  >
+
+  <title>
+    Admin Login | Memora Creations
+  </title>
+
+  <!-- EXISTING ADMIN CSS -->
+
+  <link
+    rel="stylesheet"
+    href="/memora-creations/admin/css/style.css?v=5"
+  >
+
+  <!-- PREMIUM LOGIN PAGE STYLES -->
+
+  <style>
+
+    :root {
+      --login-dark: #241811;
+      --login-brown: #8b5b3a;
+      --login-gold: #c59a70;
+      --login-cream: #faf6f1;
+      --login-muted: #85756a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+    }
+
+    body:has(#adminLogin) {
+      margin: 0;
+      min-height: 100vh;
+
+      display: block;
+
+      background:
+        radial-gradient(
+          circle at 15% 15%,
+          rgba(197,154,112,.20),
+          transparent 30%
+        ),
+        radial-gradient(
+          circle at 95% 95%,
+          rgba(139,91,58,.19),
+          transparent 40%
+        ),
+        linear-gradient(
+          135deg,
+          #f8f3ed 0%,
+          #eee1d4 100%
+        );
+
+      color: var(--login-dark);
+      font-family: Inter, Arial, sans-serif;
+    }
+
+    .login-layout {
+      width: 100%;
+      min-height: 100vh;
+
+      display: grid;
+      grid-template-columns:
+        minmax(0, 1fr)
+        minmax(390px, 480px);
+
+      align-items: stretch;
+
+      padding: 25px;
+
+      gap: 25px;
+    }
+
+    /* ================================
+       LEFT BRAND PANEL
+    ================================ */
+
+    .login-brand-panel {
+      position: relative;
+      overflow: hidden;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+
+      min-height: 640px;
+
+      padding: 42px;
+
+      border-radius: 30px;
+
+      background:
+        radial-gradient(
+          circle at 90% 15%,
+          rgba(197,154,112,.23),
+          transparent 35%
+        ),
+        linear-gradient(
+          145deg,
+          #241811 0%,
+          #3c2519 52%,
+          #71472f 100%
+        );
+
+      color: white;
+
+      box-shadow:
+        0 25px 65px rgba(48,33,23,.16);
+    }
+
+    .login-brand-panel::before {
+      content: "";
+
+      position: absolute;
+
+      width: 410px;
+      height: 410px;
+
+      right: -175px;
+      bottom: -180px;
+
+      border:
+        75px solid rgba(255,255,255,.045);
+
+      border-radius: 50%;
+
+      pointer-events: none;
+    }
+
+    .login-brand-panel::after {
+      content: "";
+
+      position: absolute;
+
+      width: 260px;
+      height: 260px;
+
+      top: -150px;
+      right: 80px;
+
+      border:
+        45px solid rgba(255,255,255,.035);
+
+      border-radius: 50%;
+
+      pointer-events: none;
+    }
+
+    .brand-top,
+    .brand-middle,
+    .brand-bottom {
+      position: relative;
+      z-index: 1;
+    }
+
+    .brand-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-logo-icon {
+      width: 52px;
+      height: 52px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 16px;
+
+      background:
+        rgba(255,255,255,.12);
+
+      border:
+        1px solid rgba(255,255,255,.15);
+
+      color: #f2c9a8;
+
+      font-size: 29px;
+      font-weight: 900;
+    }
+
+    .brand-logo-text strong {
+      display: block;
+
+      color: white;
+
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: .08em;
+    }
+
+    .brand-logo-text span {
+      display: block;
+
+      margin-top: 5px;
+
+      color: #d7b597;
+
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .18em;
+    }
+
+    .brand-eyebrow {
+      display: inline-block;
+
+      padding: 10px 15px;
+
+      border:
+        1px solid rgba(234,195,161,.25);
+
+      border-radius: 999px;
+
+      background:
+        rgba(255,255,255,.07);
+
+      color: #e8c19e;
+
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .13em;
+    }
+
+    .brand-middle h1 {
+      max-width: 660px;
+
+      margin: 26px 0 20px;
+
+      color: white;
+
+      font-size:
+        clamp(38px,5vw,64px);
+
+      line-height: 1.08;
+      font-weight: 900;
+      letter-spacing: -.04em;
+    }
+
+    .brand-middle h1 em {
+      display: block;
+
+      color: #e3b88f;
+
+      font-style: normal;
+    }
+
+    .brand-middle p {
+      max-width: 500px;
+
+      margin: 0;
+
+      color: #e4d2c3;
+
+      font-size: 15px;
+      line-height: 1.85;
+    }
+
+    .brand-features {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+
+      margin-top: 30px;
+    }
+
+    .brand-feature {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+
+      padding: 11px 14px;
+
+      background:
+        rgba(255,255,255,.09);
+
+      border:
+        1px solid rgba(255,255,255,.09);
+
+      border-radius: 12px;
+
+      color: #f0e1d3;
+
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .brand-bottom {
+      padding-top: 25px;
+
+      border-top:
+        1px solid rgba(255,255,255,.14);
+
+      color: #bda48f;
+
+      font-size: 12px;
+    }
+
+    /* ================================
+       RIGHT LOGIN PANEL
+    ================================ */
+
+    .login-right-panel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      padding: 25px 12px;
+    }
+
+    #adminLogin.login-card {
+      display: block;
+
+      width: 100%;
+      max-width: 430px;
+
+      margin: 0;
+
+      padding: 36px;
+
+      border:
+        1px solid #e8dcd0;
+
+      border-radius: 28px;
+
+      background:
+        rgba(255,255,255,.97);
+
+      box-shadow:
+        0 24px 65px rgba(48,33,23,.10);
+    }
+
+    .login-card-header {
+      text-align: center;
+
+      margin-bottom: 30px;
+    }
+
+    .login-card-icon {
+      width: 72px;
+      height: 72px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      margin: 0 auto 19px;
+
+      border-radius: 23px;
+
+      background:
+        linear-gradient(
+          135deg,
+          #f3e3d5,
+          #f9efe6
+        );
+
+      color: #855437;
+
+      font-size: 35px;
+    }
+
+    .login-card-header h2 {
+      margin: 0 0 9px;
+
+      color: #302117;
+
+      font-size: 29px;
+      font-weight: 900;
+    }
+
+    .login-card-header p {
+      margin: 0;
+
+      color: #8c7c70;
+
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    /* ================================
+       LOGIN FIELDS
+    ================================ */
+
+    #adminLogin .field {
+      margin-bottom: 21px;
+    }
+
+    #adminLogin .field label {
+      display: block;
+
+      margin-bottom: 10px;
+
+      color: #493527;
+
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    #adminLogin .input {
+      display: block;
+
+      width: 100%;
+      min-height: 55px;
+
+      padding: 15px 16px;
+
+      border:
+        1px solid #e6d9cd;
+
+      border-radius: 14px;
+
+      background: #fffdfb;
+
+      color: #302117;
+
+      font-size: 14px;
+
+      outline: none;
+
+      transition:
+        border-color .2s ease,
+        box-shadow .2s ease,
+        background .2s ease;
+    }
+
+    #adminLogin .input::placeholder {
+      color: #aaa097;
+    }
+
+    #adminLogin .input:focus {
+      border-color: #a8734e;
+
+      background: white;
+
+      box-shadow:
+        0 0 0 4px
+        rgba(168,115,78,.11);
+    }
+
+    .password-container {
+      position: relative;
+    }
+
+    #adminLogin .password-container .input {
+      padding-right: 92px;
+    }
+
+    .show-password-btn {
+      position: absolute;
+
+      right: 7px;
+      top: 50%;
+
+      transform: translateY(-50%);
+
+      min-width: 74px;
+      min-height: 39px;
+
+      padding: 8px 12px;
+
+      border: 0;
+      border-radius: 10px;
+
+      background: #f0e6dd;
+
+      color: #70472f;
+
+      font-size: 12px;
+      font-weight: 900;
+
+      cursor: pointer;
+
+      transition: background .2s ease;
+    }
+
+    .show-password-btn:hover {
+      background: #e6d2c1;
+    }
+
+    .show-password-btn:focus-visible {
+      outline:
+        3px solid rgba(139,91,58,.24);
+
+      outline-offset: 2px;
+    }
+
+    /* ================================
+       SIGN IN BUTTON
+    ================================ */
+
+    #adminLogin .login-submit {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      width: 100%;
+      min-height: 55px;
+
+      margin-top: 28px;
+
+      padding: 15px 20px;
+
+      border: 0;
+      border-radius: 14px;
+
+      background:
+        linear-gradient(
+          135deg,
+          #a36e4a,
+          #77472c
+        );
+
+      color: white;
+
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: .02em;
+
+      cursor: pointer;
+
+      box-shadow:
+        0 12px 26px rgba(139,91,58,.22);
+
+      transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+    }
+
+    #adminLogin .login-submit:hover {
+      transform: translateY(-2px);
+
+      box-shadow:
+        0 15px 30px rgba(139,91,58,.28);
+    }
+
+    #adminLogin .login-submit:focus-visible {
+      outline:
+        3px solid rgba(139,91,58,.3);
+
+      outline-offset: 3px;
+    }
+
+    .login-security-note {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      gap: 8px;
+
+      margin-top: 24px;
+
+      padding: 13px;
+
+      border:
+        1px solid #f0e8df;
+
+      border-radius: 13px;
+
+      background: #fcf8f4;
+
+      color: #85756a;
+
+      font-size: 11px;
+
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .login-footer {
+      margin-top: 28px;
+
+      color: #a09286;
+
+      font-size: 11px;
+      text-align: center;
+    }
+
+    /* ================================
+       TABLET / MOBILE
+    ================================ */
+
+    @media (max-width: 950px) {
+
+      .login-layout {
+        grid-template-columns: 1fr;
+
+        gap: 20px;
+
+        padding: 20px;
+      }
+
+      .login-brand-panel {
+        min-height: auto;
+
+        gap: 35px;
+
+        padding: 29px;
+      }
+
+      .brand-middle h1 {
+        font-size: 37px;
+      }
+
+      .brand-bottom {
+        display: none;
+      }
+
+      .login-right-panel {
+        padding: 0 0 20px;
+      }
+
+      #adminLogin.login-card {
+        max-width: 100%;
+      }
+
+    }
+
+    @media (max-width: 520px) {
+
+      .login-layout {
+        padding: 12px;
+        gap: 13px;
+      }
+
+      .login-brand-panel {
+        padding: 22px;
+
+        border-radius: 22px;
+      }
+
+      .brand-logo-text strong {
+        font-size: 14px;
+      }
+
+      .brand-logo-text span {
+        font-size: 9px;
+      }
+
+      .brand-middle h1 {
+        margin: 16px 0 12px;
+
+        font-size: 30px;
+      }
+
+      .brand-middle p {
+        font-size: 12px;
+      }
+
+      .brand-features {
+        margin-top: 19px;
+      }
+
+      .brand-feature {
+        font-size: 10px;
+        padding: 9px 11px;
+      }
+
+      #adminLogin.login-card {
+        padding: 26px 19px;
+
+        border-radius: 21px;
+      }
+
+      .login-card-header h2 {
+        font-size: 25px;
+      }
+
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      #adminLogin .input,
+      #adminLogin .login-submit {
+        transition: none;
+      }
+
+    }
+
+  </style>
+
 </head>
+
 
 <body>
 
-<main class="container">
-<form id="adminLogin" class="form">
+  <main class="login-layout">
 
-<h1>MEMORA CREATIONS Admin</h1>
 
-<div class="field">
-<label>Email</label>
-<input class="input" name="email" type="email" required>
-</div>
+    <!-- ================================
+         BRAND PANEL
+    ================================ -->
 
-<div class="field">
-<label>Password</label>
-<input class="input" name="password" type="password" required>
-</div>
+    <section class="login-brand-panel">
 
-<button class="btn" type="submit">Login</button>
+      <div class="brand-top">
 
-</form>
-</main>
+        <div class="brand-logo">
 
-<script src="/memora-creations/frontend/js/app.js"></script>
-<script src="/memora-creations/admin/js/auth.js"></script>
+          <div
+            class="brand-logo-icon"
+            aria-hidden="true"
+          >
+            ✦
+          </div>
+
+          <div class="brand-logo-text">
+
+            <strong>
+              MEMORA CREATIONS
+            </strong>
+
+            <span>
+              ADMIN CONTROL CENTER
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="brand-middle">
+
+        <span class="brand-eyebrow">
+          WELCOME TO MEMORA
+        </span>
+
+        <h1>
+          Manage your
+          <em>beautiful business.</em>
+        </h1>
+
+        <p>
+          Your dedicated workspace to manage
+          products, customer orders, inventory
+          and store operations with ease.
+        </p>
+
+
+        <div class="brand-features">
+
+          <span class="brand-feature">
+            📦 Product Management
+          </span>
+
+          <span class="brand-feature">
+            🛒 Order Management
+          </span>
+
+          <span class="brand-feature">
+            👥 Customer Management
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div class="brand-bottom">
+
+        © MEMORA CREATIONS
+        — Store Administration
+
+      </div>
+
+    </section>
+
+
+    <!-- ================================
+         LOGIN PANEL
+    ================================ -->
+
+    <section class="login-right-panel">
+
+
+      <!-- IMPORTANT:
+           ORIGINAL FORM ID PRESERVED -->
+
+      <form
+        id="adminLogin"
+        class="form login-card"
+      >
+
+
+        <div class="login-card-header">
+
+          <div
+            class="login-card-icon"
+            aria-hidden="true"
+          >
+            🔐
+          </div>
+
+          <h2>
+            Admin Login
+          </h2>
+
+          <p>
+            Sign in to access your
+            store management dashboard.
+          </p>
+
+        </div>
+
+
+        <!-- EMAIL -->
+
+        <div class="field">
+
+          <label for="adminEmail">
+            Email Address
+          </label>
+
+          <input
+            id="adminEmail"
+            class="input"
+            name="email"
+            type="email"
+            placeholder="Enter your admin email"
+            autocomplete="username"
+            required
+          >
+
+        </div>
+
+
+        <!-- PASSWORD -->
+
+        <div class="field">
+
+          <label for="adminPassword">
+            Password
+          </label>
+
+
+          <div class="password-container">
+
+            <input
+              id="adminPassword"
+              class="input"
+              name="password"
+              type="password"
+              placeholder="Enter your password"
+              autocomplete="current-password"
+              required
+            >
+
+
+            <button
+              id="toggleAdminPassword"
+              class="show-password-btn"
+              type="button"
+              aria-controls="adminPassword"
+              aria-pressed="false"
+            >
+              Show
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- LOGIN BUTTON -->
+
+        <button
+          class="btn login-submit"
+          type="submit"
+        >
+          Sign In to Dashboard →
+        </button>
+
+
+        <div class="login-security-note">
+
+          🔒
+          Authorized administrators only.
+
+        </div>
+
+
+        <div class="login-footer">
+
+          MEMORA CREATIONS
+          — Admin Access
+
+        </div>
+
+      </form>
+
+    </section>
+
+  </main>
+
+
+  <!-- =====================================
+       EXISTING APPLICATION SCRIPTS
+       LOGIN FUNCTIONALITY PRESERVED
+  ===================================== -->
+
+  <script
+    src="/memora-creations/frontend/js/app.js?v=10"
+  ></script>
+
+  <script
+    src="/memora-creations/admin/js/auth.js?v=5"
+  ></script>
+
+
+  <!-- PASSWORD SHOW / HIDE -->
+
+  <script>
+
+    (function () {
+
+      const passwordInput =
+        document.getElementById(
+          'adminPassword'
+        );
+
+      const toggleButton =
+        document.getElementById(
+          'toggleAdminPassword'
+        );
+
+      if (!passwordInput || !toggleButton) {
+        return;
+      }
+
+      toggleButton.addEventListener(
+        'click',
+        function () {
+
+          const isCurrentlyHidden =
+            passwordInput.type === 'password';
+
+          passwordInput.type =
+            isCurrentlyHidden
+              ? 'text'
+              : 'password';
+
+          toggleButton.textContent =
+            isCurrentlyHidden
+              ? 'Hide'
+              : 'Show';
+
+          toggleButton.setAttribute(
+            'aria-pressed',
+            String(isCurrentlyHidden)
+          );
+
+        }
+      );
+
+    })();
+
+  </script>
 
 </body>
+
 </html>
