@@ -24,12 +24,16 @@ const cashfreeRoutes = require('./routes/cashfreeRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 
 /* =========================================
-   EXISTING RAZORPAY WEBHOOK
+   PAYMENT WEBHOOK CONTROLLERS
 ========================================= */
 
 const {
   webhook
 } = require('./controllers/paymentController');
+
+const {
+  cashfreeWebhook
+} = require('./controllers/cashfreeWebhookController');
 
 
 /* =========================================
@@ -54,7 +58,7 @@ app.use(
 
 
 /* =========================================
-   MEMORA CREATIONS - ALLOWED ORIGINS
+   ALLOWED CORS ORIGINS
 ========================================= */
 
 const configuredOrigins = (
@@ -67,9 +71,7 @@ const configuredOrigins = (
 
 const allowedOrigins = new Set([
   ...configuredOrigins,
-
   'https://memoracreationscare-code.github.io',
-
   'https://memora-creations.pages.dev'
 ]);
 
@@ -105,6 +107,26 @@ app.post(
     limit: '1mb'
   }),
   webhook
+);
+
+
+/* =========================================
+   CASHFREE WEBHOOK
+
+   IMPORTANT:
+   Register before express.json().
+
+   Cashfree signature validation
+   requires the original raw body.
+========================================= */
+
+app.post(
+  '/api/cashfree/webhook',
+  express.raw({
+    type: 'application/json',
+    limit: '1mb'
+  }),
+  cashfreeWebhook
 );
 
 
@@ -148,7 +170,6 @@ const authLimiter = rateLimit({
   }
 });
 
-
 app.use(
   '/api/auth/login',
   authLimiter
@@ -168,10 +189,6 @@ app.use(
   '/api/payment',
   authLimiter
 );
-
-/* =========================================
-   CASHFREE RATE LIMITING
-========================================= */
 
 app.use(
   '/api/cashfree',
@@ -226,33 +243,15 @@ app.use(
   orderRoutes
 );
 
-/* =========================================
-   RAZORPAY PAYMENT ROUTES
-   KEPT FOR EXISTING CHECKOUT
-========================================= */
-
 app.use(
   '/api/payment',
   paymentRoutes
 );
 
-
-/* =========================================
-   NEW CASHFREE PAYMENT ROUTES
-
-   POST /api/cashfree/create-order
-   POST /api/cashfree/verify
-========================================= */
-
 app.use(
   '/api/cashfree',
   cashfreeRoutes
 );
-
-
-/* =========================================
-   ADMIN ROUTES
-========================================= */
 
 app.use(
   '/api/admin',
@@ -317,7 +316,6 @@ app.use(
 
 const port =
   Number(process.env.PORT || 5000);
-
 
 if (require.main === module) {
 
