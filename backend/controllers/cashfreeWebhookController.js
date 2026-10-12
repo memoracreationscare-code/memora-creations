@@ -1,12 +1,18 @@
 
-/* =========================================
-   MEMORA CREATIONS
-   CASHFREE WEBHOOK CONTROLLER
-========================================= */
+/*
+=========================================
+ MEMORA CREATIONS
+ CASHFREE WEBHOOK CONTROLLER
+
+ PAYMENT SECURITY
+ SIGNATURE VERIFICATION
+ DUPLICATE WEBHOOK PROTECTION
+ ATOMIC PAYMENT CONFIRMATION
+=========================================
+*/
 
 const {
-  Order,
-  Cart
+  Order
 } = require('../models');
 
 const {
@@ -19,17 +25,56 @@ const {
 } = require('../services/cashfreeService');
 
 
-/* =========================================
+/* =====================================
+   WEBHOOK RESPONSE HELPER
+===================================== */
+
+function webhookResponse(
+  res,
+  status,
+  message
+) {
+
+  return res.status(status).json({
+
+    success:
+      status >= 200 && status < 300,
+
+    message
+
+  });
+
+}
+
+
+/* =====================================
    CASHFREE WEBHOOK HANDLER
-========================================= */
+===================================== */
 
 async function cashfreeWebhook(req, res) {
 
   try {
 
-    /* =====================================
-       1. VERIFY SIGNATURE
-    ===================================== */
+    /* =================================
+       1. VERIFY RAW REQUEST
+    ================================= */
+
+    const rawBody = req.body;
+
+    if (!Buffer.isBuffer(rawBody)) {
+
+      return webhookResponse(
+        res,
+        400,
+        'Invalid webhook body.'
+      );
+
+    }
+
+
+    /* =================================
+       2. VERIFY SIGNATURE
+    ================================= */
 
     const signature =
       req.headers['x-webhook-signature'];
@@ -37,27 +82,35 @@ async function cashfreeWebhook(req, res) {
     const timestamp =
       req.headers['x-webhook-timestamp'];
 
-    const rawBody = req.body;
-
-    const isValid =
+    const validSignature =
       verifyCashfreeWebhook({
+
         rawBody,
+
         signature,
+
         timestamp
+
       });
 
-    if (!isValid) {
+    if (!validSignature) {
 
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid webhook signature.'
-      });
+      console.warn(
+        'Cashfree webhook signature rejected.'
+      );
+
+      return webhookResponse(
+        res,
+        401,
+        'Invalid webhook signature.'
+      );
 
     }
 
-    /* =====================================
-       2. PARSE WEBHOOK
-    ===================================== */
+
+    /* =================================
+       3. PARSE EVENT
+    ================================= */
 
     let event;
 
@@ -67,138 +120,178 @@ async function cashfreeWebhook(req, res) {
         rawBody.toString('utf8')
       );
 
-    } catch (_) {
+    } catch (parseError) {
 
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid webhook payload.'
-      });
+      return webhookResponse(
+        res,
+        400,
+        'Invalid webhook JSON.'
+      );
 
     }
 
-    /* =====================================
-       3. HANDLE SUCCESS EVENTS ONLY
 
-       Failed or abandoned attempts
-       do not immediately cancel orders.
-       Late payments may still arrive.
-    ===================================== */
+    /* =================================
+       4. HANDLE SUPPORTED EVENT
+
+       Failed or dropped payment attempts
+       must not automatically release
+       stock or cancel an order.
+
+       Late successful payments may arrive.
+    ================================= */
 
     if (
-      event.type !==
+      event?.type !==
       'PAYMENT_SUCCESS_WEBHOOK'
     ) {
 
-      return res.status(200).json({
-        success: true,
-        message: 'Event acknowledged.'
-      });
+      return webhookResponse(
+        res,
+        200,
+        'Webhook event acknowledged.'
+      );
 
     }
+
+
+    /* =================================
+       5. EXTRACT PAYMENT DATA
+    ================================= */
 
     const payment =
       event.data?.payment;
 
-    const cashfreeOrderId =
+    const gatewayOrderId =
       event.data?.order?.order_id;
 
     if (
-      !cashfreeOrderId ||
+      !gatewayOrderId ||
       payment?.payment_status !== 'SUCCESS'
     ) {
 
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid payment success event.'
-      });
+      return webhookResponse(
+        res,
+        400,
+        'Invalid payment success event.'
+      );
 
     }
 
-    /* =====================================
-       4. FIND MERCHANT ORDER
-    ===================================== */
+
+    /* =================================
+       6. FIND LOCAL ORDER
+    ================================= */
 
     const order = await Order.findOne({
+
       cashfreeOrderId:
-        String(cashfreeOrderId),
+        String(gatewayOrderId),
 
       paymentMethod:
         'CASHFREE'
+
     });
 
     if (!order) {
 
-      // Retry is preferable to losing a
-      // legitimate payment notification.
+      console.warn(
+        'Cashfree order not found:',
+        String(gatewayOrderId)
+      );
 
-      return res.status(503).json({
-        success: false,
-        message: 'Order not available yet.'
-      });
+      return webhookResponse(
+        res,
+        503,
+        'Order not available yet.'
+      );
 
     }
 
-    /* =====================================
-       5. VERIFY DIRECTLY WITH CASHFREE
-    ===================================== */
 
-    const cashfreeOrder =
+    /* =================================
+       7. VERIFY WITH CASHFREE API
+
+       Do not trust the webhook payload
+       alone for payment confirmation.
+    ================================= */
+
+    const gatewayOrder =
       await fetchCashfreeOrder(
         order.cashfreeOrderId
       );
 
     if (
-      cashfreeOrder.order_id !==
+      gatewayOrder.order_id !==
       order.cashfreeOrderId
     ) {
 
-      return res.status(409).json({
-        success: false,
-        message: 'Payment order mismatch.'
-      });
-
-    }
-
-    const isPaid =
-      isCashfreePaymentSuccessful(
-        cashfreeOrder,
-        order.grandTotal
+      return webhookResponse(
+        res,
+        409,
+        'Cashfree order reference mismatch.'
       );
 
-    if (!isPaid) {
+    }
 
-      // Do not mark an unpaid order
-      // as successful.
 
-      return res.status(503).json({
-        success: false,
-        message: 'Payment not confirmed yet.'
-      });
+    /* =================================
+       8. VERIFY AMOUNT AND CURRENCY
+    ================================= */
+
+    const paid =
+      isCashfreePaymentSuccessful(
+
+        gatewayOrder,
+
+        order.grandTotal
+
+      );
+
+    if (!paid) {
+
+      console.warn(
+        'Cashfree payment not verified:',
+        order.orderId
+      );
+
+      return webhookResponse(
+        res,
+        503,
+        'Payment is not confirmed yet.'
+      );
 
     }
 
-    /* =====================================
-       6. ALREADY VERIFIED?
-    ===================================== */
+
+    /* =================================
+       9. HANDLE ALREADY PAID ORDER
+
+       Browser verification and webhook
+       may both confirm the same payment.
+    ================================= */
 
     if (
       order.paymentStatus === 'SUCCESS'
     ) {
 
-      return res.status(200).json({
-        success: true,
-        message: 'Payment already confirmed.'
-      });
+      return webhookResponse(
+        res,
+        200,
+        'Payment already confirmed.'
+      );
 
     }
 
-    /* =====================================
-       7. PROTECT CANCELLED ORDERS
-    ===================================== */
+
+    /* =================================
+       10. CHECK ELIGIBILITY
+    ================================= */
 
     if (
       order.orderStatus === 'Cancelled' ||
-      order.stockReserved !== true
+      order.stockReserved !== true ||
+      order.paymentStatus !== 'PENDING'
     ) {
 
       console.error(
@@ -206,32 +299,75 @@ async function cashfreeWebhook(req, res) {
         order.orderId
       );
 
-      return res.status(409).json({
-        success: false,
-        message: 'Paid order requires manual review.'
-      });
+      return webhookResponse(
+        res,
+        409,
+        'Paid order requires manual review.'
+      );
 
     }
 
-    /* =====================================
-       8. CONFIRM PAYMENT ATOMICALLY
 
-       Only one request can change an
-       unpaid order into SUCCESS.
-    ===================================== */
+    /* =================================
+       11. ATOMIC PAYMENT UPDATE
+
+       Only PENDING payment can transition
+       to SUCCESS.
+
+       This query prevents duplicate
+       updates from concurrent requests.
+    ================================= */
+
+    const update = {
+
+      $set: {
+
+        paymentStatus:
+          'SUCCESS'
+
+      },
+
+      $push: {
+
+        statusHistory: {
+
+          status:
+            order.orderStatus,
+
+          note:
+            'Cashfree payment confirmed by verified webhook.',
+
+          changedAt:
+            new Date()
+
+        }
+
+      }
+
+    };
+
+    if (
+      payment.cf_payment_id != null
+    ) {
+
+      update.$set.cashfreePaymentId =
+        String(payment.cf_payment_id);
+
+    }
 
     const updatedOrder =
       await Order.findOneAndUpdate(
+
         {
+
           _id:
             order._id,
 
           paymentMethod:
             'CASHFREE',
 
-          paymentStatus: {
-            $ne: 'SUCCESS'
-          },
+          paymentStatus:
+            'PENDING',
 
           stockReserved:
             true,
@@ -239,86 +375,75 @@ async function cashfreeWebhook(req, res) {
           orderStatus: {
             $ne: 'Cancelled'
           }
+
         },
 
-        {
-          $set: {
-            paymentStatus:
-              'SUCCESS',
-
-            cashfreePaymentId:
-              payment.cf_payment_id
-                ? String(payment.cf_payment_id)
-                : undefined
-          },
-
-          $push: {
-            statusHistory: {
-              status: 'Order Placed',
-
-              note:
-                'Cashfree payment confirmed by verified webhook.',
-
-              changedAt:
-                new Date()
-            }
-          }
-        },
+        update,
 
         {
           new: true
         }
+
       );
 
-    /* =====================================
-       9. CONFIRM FINAL DATABASE STATE
-    ===================================== */
+
+    /* =================================
+       12. HANDLE CONCURRENT VERIFICATION
+
+       If no update occurred, another
+       request may have confirmed payment.
+    ================================= */
 
     const confirmedOrder =
       updatedOrder ||
-      await Order.findById(order._id);
+      await Order.findById(
+        order._id
+      );
 
     if (
       !confirmedOrder ||
-      confirmedOrder.paymentStatus !== 'SUCCESS'
+      confirmedOrder.paymentStatus !== 'SUCCESS' ||
+      confirmedOrder.orderStatus === 'Cancelled' ||
+      confirmedOrder.stockReserved !== true
     ) {
 
-      return res.status(503).json({
-        success: false,
-        message: 'Payment update could not be completed.'
-      });
+      console.error(
+        'Cashfree payment reconciliation needed:',
+        order.orderId
+      );
 
-    }
-
-    /* =====================================
-       10. CLEAR CART AFTER SUCCESS
-    ===================================== */
-
-    if (
-      confirmedOrder.clearCartOnPayment === true
-    ) {
-
-      await Cart.updateOne(
-        {
-          user: confirmedOrder.user
-        },
-        {
-          $set: {
-            items: []
-          }
-        }
+      return webhookResponse(
+        res,
+        409,
+        'Payment requires manual review.'
       );
 
     }
 
-    /* =====================================
-       11. ACKNOWLEDGE WEBHOOK
-    ===================================== */
 
-    return res.status(200).json({
-      success: true,
-      message: 'Cashfree payment confirmed.'
-    });
+    /* =================================
+       13. CART PROTECTION
+
+       Do not clear the entire cart
+       inside a delayed webhook.
+
+       The customer may have added new
+       products while payment was pending.
+
+       A separate cart reconciliation
+       mechanism is required.
+    ================================= */
+
+
+    /* =================================
+       14. ACKNOWLEDGE SUCCESS
+    ================================= */
+
+    return webhookResponse(
+      res,
+      200,
+      'Cashfree payment confirmed.'
+    );
 
   } catch (err) {
 
@@ -327,20 +452,23 @@ async function cashfreeWebhook(req, res) {
       err.message
     );
 
-    return res.status(500).json({
-      success: false,
-      message: 'Webhook processing failed.'
-    });
+    return webhookResponse(
+      res,
+      500,
+      'Webhook processing failed.'
+    );
 
   }
 
 }
 
 
-/* =========================================
+/* =====================================
    EXPORT
-========================================= */
+===================================== */
 
 module.exports = {
+
   cashfreeWebhook
+
 };
