@@ -7,6 +7,7 @@
  SANDBOX + PRODUCTION
 
  ORDER CREATION
+ 30 MINUTE PAYMENT EXPIRY
  PAYMENT VERIFICATION
  PAYMENT ATTEMPTS
  SAFE ORDER RECONCILIATION
@@ -15,6 +16,8 @@
 
 const CASHFREE_API_VERSION =
   '2023-08-01';
+
+const PAYMENT_EXPIRY_MINUTES = 30;
 
 
 /* =====================================
@@ -217,6 +220,11 @@ function validateOrderId(orderId) {
 
 /* =====================================
    CREATE CASHFREE ORDER
+
+   NEW FEATURE:
+   PAYMENT EXPIRY = 30 MINUTES
+
+   Applies only to newly created orders.
 ===================================== */
 
 async function createCashfreeOrder({
@@ -251,6 +259,23 @@ async function createCashfreeOrder({
 
   }
 
+  /* =================================
+     30 MINUTE EXPIRY
+
+     Cashfree accepts ISO 8601 time.
+  ================================= */
+
+  const orderExpiryTime =
+    new Date(
+      Date.now() +
+      PAYMENT_EXPIRY_MINUTES * 60 * 1000
+    ).toISOString();
+
+
+  /* =================================
+     CASHFREE ORDER PAYLOAD
+  ================================= */
+
   const payload = {
 
     order_id:
@@ -261,6 +286,9 @@ async function createCashfreeOrder({
 
     order_currency:
       'INR',
+
+    order_expiry_time:
+      orderExpiryTime,
 
     customer_details: {
 
@@ -326,8 +354,8 @@ async function fetchCashfreeOrder(orderId) {
 /* =====================================
    FETCH ALL PAYMENT ATTEMPTS
 
-   Cashfree may return multiple payment
-   attempts for a single order.
+   Cashfree may return multiple
+   payment attempts for one order.
 ===================================== */
 
 async function fetchCashfreePayments(orderId) {
@@ -393,11 +421,9 @@ function isCashfreePaymentSuccessful(
 /* =====================================
    SUMMARIZE PAYMENT ATTEMPTS
 
-   IMPORTANT:
-   This is informational.
+   INFORMATIONAL ONLY
 
-   Do not release stock solely
-   based on these results.
+   Does not release stock.
 ===================================== */
 
 function summarizeCashfreePayments(payments) {
@@ -479,11 +505,10 @@ function summarizeCashfreePayments(payments) {
 /* =====================================
    CHECK ORDER FINAL STATE
 
-   Informational only.
+   INSPECTION ONLY
 
-   Final payment reconciliation must
-   verify gateway response, local order
-   state and in-flight payment events.
+   Does not cancel orders.
+   Does not release stock.
 ===================================== */
 
 async function inspectCashfreeOrder(orderId) {
