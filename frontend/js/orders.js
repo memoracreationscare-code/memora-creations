@@ -1,916 +1,392 @@
-const ORDERS_BASE =
-  '/memora-creations';
 
+/*
+  MEMORA CREATIONS
+  ORDER CONTROLLER
 
-let orderActionRunning =
-  false;
+  COD + CASHFREE + RAZORPAY
+  Safe cancellation handling
+*/
 
+const mongoose = require('mongoose');
 
-/* =========================
-   FORMAT DATE
-========================= */
+const {
+  Order
+} = require('../models');
 
-function formatOrderDate(
-  value
-) {
+const {
+  asyncHandler,
+  error,
+  ok
+} = require('../utils/http');
 
-  if (!value) {
-    return '';
-  }
+const {
+  validateAddress
+} = require('../utils/validation');
 
+const {
+  getTrustedItems,
+  totals,
+  createCodOrder,
+  releaseStock
+} = require('../services/orderService');
 
-  try {
+const {
+  fetchCashfreeOrder,
+  isCashfreePaymentSuccessful
+} = require('../services/cashfreeService');
 
-    return new Date(
-      value
-    )
-      .toLocaleString(
-        'en-IN',
-        {
-          day:
-            '2-digit',
 
-          month:
-            'short',
+/* =====================================
+   ORDER PREVIEW
+===================================== */
 
-          year:
-            'numeric',
+const preview = asyncHandler(async (req, res) => {
 
-          hour:
-            '2-digit',
-
-          minute:
-            '2-digit'
-        }
-      );
-
-  } catch {
-
-    return '';
-
-  }
-
-}
-
-
-/* =========================
-   STATUS CLASS
-========================= */
-
-function orderStatusClass(
-  status
-) {
-
-  const value =
-    String(
-      status || ''
-    )
-      .toLowerCase();
-
-
-  if (
-    value ===
-    'delivered'
-  ) {
-
-    return 'delivered';
-
-  }
-
-
-  if (
-    value ===
-    'cancelled'
-  ) {
-
-    return 'cancelled';
-
-  }
-
-
-  if (
-    value ===
-    'shipped' ||
-    value ===
-    'out for delivery'
-  ) {
-
-    return 'shipping';
-
-  }
-
-
-  return 'processing';
-
-}
-
-
-/* =========================
-   PAYMENT CLASS
-========================= */
-
-function paymentStatusClass(
-  status
-) {
-
-  const value =
-    String(
-      status || ''
-    )
-      .toUpperCase();
-
-
-  if (
-    value ===
-    'SUCCESS'
-  ) {
-
-    return 'paid';
-
-  }
-
-
-  if (
-    value ===
-    'FAILED' ||
-    value ===
-    'CANCELLED'
-  ) {
-
-    return 'failed';
-
-  }
-
-
-  return 'pending';
-
-}
-
-
-/* =========================
-   ORDER PRODUCTS
-========================= */
-
-function orderProductsHtml(
-  order
-) {
-
-  const items =
-    Array.isArray(
-      order.items
-    )
-      ? order.items
-      : [];
-
-
-  if (!items.length) {
-
-    return `
-
-      <div class="order-no-product">
-        Product information available nahi hai.
-      </div>
-
-    `;
-
-  }
-
-
-  return items
-    .map(
-      item => {
-
-        const image =
-          item.imageUrl ||
-          'https://placehold.co/180x180?text=Memora';
-
-
-        const quantity =
-          Math.max(
-            1,
-            Number(
-              item.quantity ||
-              1
-            )
-          );
-
-
-        return `
-
-          <div class="order-product">
-
-            <div class="order-product-image">
-
-              <img
-                src="${window.MC.esc(
-                  image
-                )}"
-                alt="${window.MC.esc(
-                  item.name ||
-                  'Product'
-                )}"
-                loading="lazy"
-              >
-
-            </div>
-
-
-            <div class="order-product-info">
-
-              <h3>
-
-                ${window.MC.esc(
-                  item.name ||
-                  'Product'
-                )}
-
-              </h3>
-
-
-              <div class="order-product-meta">
-
-                <span>
-                  Qty:
-                  <strong>
-                    ${quantity}
-                  </strong>
-                </span>
-
-
-                <span>
-                  Price:
-                  <strong>
-                    ${window.MC.money(
-                      item.unitPrice
-                    )}
-                  </strong>
-                </span>
-
-              </div>
-
-            </div>
-
-
-            <div class="order-product-total">
-
-              ${window.MC.money(
-                item.lineTotal
-              )}
-
-            </div>
-
-          </div>
-
-        `;
-
-      }
-    )
-    .join('');
-
-}
-
-
-/* =========================
-   ORDER CARD
-========================= */
-
-function orderCardHtml(
-  order
-) {
-
-  const items =
-    Array.isArray(
-      order.items
-    )
-      ? order.items
-      : [];
-
-
-  const totalQuantity =
-    items.reduce(
-      (
-        total,
-        item
-      ) =>
-        total +
-        Math.max(
-          1,
-          Number(
-            item.quantity ||
-            1
-          )
-        ),
-      0
-    );
-
-
-  const paymentLabel =
-    order.paymentMethod ===
-    'COD'
-      ? 'Cash on Delivery'
-      : 'Online Payment';
-
-
-  const canCancel =
-    [
-      'Order Placed',
-      'Confirmed'
-    ]
-      .includes(
-        order.orderStatus
-      );
-
-
-  return `
-
-    <article class="order-card">
-
-
-      <!-- TOP -->
-
-      <div class="order-card-top">
-
-        <div>
-
-          <span class="order-label">
-            ORDER ID
-          </span>
-
-          <h2>
-            ${window.MC.esc(
-              order.orderId ||
-              'Order'
-            )}
-          </h2>
-
-          <p>
-            ${window.MC.esc(
-              formatOrderDate(
-                order.createdAt
-              )
-            )}
-          </p>
-
-        </div>
-
-
-        <div
-          class="order-status ${orderStatusClass(
-            order.orderStatus
-          )}"
-        >
-
-          ${window.MC.esc(
-            order.orderStatus ||
-            'Order Placed'
-          )}
-
-        </div>
-
-      </div>
-
-
-      <!-- PRODUCTS -->
-
-      <div class="order-products">
-
-        ${orderProductsHtml(
-          order
-        )}
-
-      </div>
-
-
-      <!-- DETAILS -->
-
-      <div class="order-info-grid">
-
-
-        <div>
-
-          <span>
-            Items
-          </span>
-
-          <strong>
-            ${totalQuantity}
-          </strong>
-
-        </div>
-
-
-        <div>
-
-          <span>
-            Payment
-          </span>
-
-          <strong>
-            ${window.MC.esc(
-              paymentLabel
-            )}
-          </strong>
-
-        </div>
-
-
-        <div>
-
-          <span>
-            Payment Status
-          </span>
-
-          <strong
-            class="payment-state ${paymentStatusClass(
-              order.paymentStatus
-            )}"
-          >
-
-            ${window.MC.esc(
-              order.paymentStatus ||
-              ''
-            )}
-
-          </strong>
-
-        </div>
-
-
-        <div>
-
-          <span>
-            Order Total
-          </span>
-
-          <strong class="order-grand-total">
-
-            ${window.MC.money(
-              order.grandTotal
-            )}
-
-          </strong>
-
-        </div>
-
-      </div>
-
-
-      <!-- ACTION -->
-
-      <div class="order-actions">
-
-        <a
-          class="order-track-btn"
-          href="${ORDERS_BASE}/frontend/order-details.html?id=${encodeURIComponent(
-            order._id
-          )}"
-        >
-          View / Track Order →
-        </a>
-
-
-        ${
-          canCancel
-
-            ? `
-
-              <button
-                class="order-cancel-btn cancel-order"
-                type="button"
-                data-id="${window.MC.esc(
-                  order._id
-                )}"
-              >
-                Cancel Order
-              </button>
-
-            `
-
-            : ''
-        }
-
-      </div>
-
-    </article>
-
-  `;
-
-}
-
-
-/* =========================
-   LOAD ORDERS
-========================= */
-
-async function loadOrdersPage() {
-
-  const ordersBox =
-    window.MC.$(
-      '#orders'
-    );
-
-
-  if (!ordersBox) {
-    return;
-  }
-
-
-  try {
-
-    const data =
-      await window.MC.api(
-        '/orders'
-      );
-
-
-    const orders =
-      Array.isArray(
-        data.orders
-      )
-        ? data.orders
-        : [];
-
-
-    const countBox =
-      window.MC.$(
-        '#orderCount'
-      );
-
-
-    if (countBox) {
-
-      countBox.textContent =
-        `${orders.length} ${
-          orders.length === 1
-            ? 'order'
-            : 'orders'
-        }`;
-
-    }
-
-
-    ordersBox.innerHTML =
-
-      orders.length
-
-        ? orders
-            .map(
-              orderCardHtml
-            )
-            .join('')
-
-        : `
-
-            <div class="orders-empty">
-
-              <div class="orders-empty-icon">
-                🛍️
-              </div>
-
-
-              <h2>
-                No Orders Yet
-              </h2>
-
-
-              <p>
-                Aapne abhi tak koi order place nahi kiya hai.
-              </p>
-
-
-              <a
-                href="${ORDERS_BASE}/frontend/products.html"
-              >
-                Start Shopping
-              </a>
-
-            </div>
-
-          `;
-
-
-    window.MC
-      .$$(
-        '.cancel-order'
-      )
-      .forEach(
-        button => {
-
-          button.onclick =
-            async () => {
-
-              await cancelCustomerOrder(
-                button.dataset.id,
-                button
-              );
-
-            };
-
-        }
-      );
-
-
-  } catch (error) {
-
-    console.error(
-      'Orders load error:',
-      error
-    );
-
-
-    ordersBox.innerHTML = `
-
-      <div class="orders-empty">
-
-        <div class="orders-empty-icon">
-          ⚠️
-        </div>
-
-        <h2>
-          Orders load nahi ho pa rahe hain
-        </h2>
-
-        <p>
-          Please thodi der baad dobara try karein.
-        </p>
-
-      </div>
-
-    `;
-
-
-    const countBox =
-      window.MC.$(
-        '#orderCount'
-      );
-
-
-    if (countBox) {
-
-      countBox.textContent =
-        'Error';
-
-    }
-
-
-    window.MC.toast(
-      error.message ||
-      'Orders load failed.',
-      'error'
-    );
-
-  }
-
-}
-
-
-/* =========================
-   CANCEL CONFIRM POPUP
-========================= */
-
-function askCancelConfirmation() {
-
-  return new Promise(
-    resolve => {
-
-      document
-        .querySelector(
-          '#cancelOrderPopup'
-        )
-        ?.remove();
-
-
-      const overlay =
-        document.createElement(
-          'div'
-        );
-
-
-      overlay.id =
-        'cancelOrderPopup';
-
-
-      overlay.className =
-        'cancel-popup-overlay';
-
-
-      overlay.innerHTML = `
-
-        <div class="cancel-popup">
-
-          <div class="cancel-popup-icon">
-            !
-          </div>
-
-
-          <h2>
-            Cancel Order?
-          </h2>
-
-
-          <p>
-            Kya aap sure hain ki
-            is order ko cancel karna chahte hain?
-          </p>
-
-
-          <div class="cancel-popup-actions">
-
-            <button
-              class="cancel-popup-back"
-              type="button"
-            >
-              Keep Order
-            </button>
-
-
-            <button
-              class="cancel-popup-confirm"
-              type="button"
-            >
-              Yes, Cancel
-            </button>
-
-          </div>
-
-        </div>
-
-      `;
-
-
-      document.body.appendChild(
-        overlay
-      );
-
-
-      const finish =
-        value => {
-
-          overlay.remove();
-
-          resolve(
-            value
-          );
-
-        };
-
-
-      overlay
-        .querySelector(
-          '.cancel-popup-back'
-        )
-        ?.addEventListener(
-          'click',
-          () =>
-            finish(false)
-        );
-
-
-      overlay
-        .querySelector(
-          '.cancel-popup-confirm'
-        )
-        ?.addEventListener(
-          'click',
-          () =>
-            finish(true)
-        );
-
-
-      overlay.addEventListener(
-        'click',
-        event => {
-
-          if (
-            event.target === overlay
-          ) {
-
-            finish(false);
-
-          }
-
-        }
-      );
-
-    }
+  const trusted = await getTrustedItems(
+    req.body.items
   );
 
-}
+  const amount = totals(trusted);
+
+  const items = trusted.map(item => ({
+    productId: item.product.productId,
+    _id: item.product._id,
+    name: item.product.name,
+    imageUrl: item.product.images?.[0]?.url || '',
+    quantity: item.quantity,
+    unitPrice: item.product.sellingPrice,
+    lineTotal:
+      item.product.sellingPrice * item.quantity
+  }));
+
+  return ok(res, {
+    ...amount,
+    items
+  });
+
+});
 
 
-/* =========================
+/* =====================================
+   CREATE COD ORDER
+===================================== */
+
+const createCod = asyncHandler(async (req, res) => {
+
+  const address = req.body.address;
+
+  const validationMessage = validateAddress(
+    address
+  );
+
+  if (validationMessage) {
+    throw error(400, validationMessage);
+  }
+
+  const order = await createCodOrder({
+    user: req.user,
+    address,
+    items: req.body.items,
+    clearCart: req.body.clearCart === true
+  });
+
+  return ok(
+    res,
+    {
+      message: 'COD order placed successfully.',
+      order
+    },
+    201
+  );
+
+});
+
+
+/* =====================================
+   GET CUSTOMER ORDERS
+===================================== */
+
+const listOrders = asyncHandler(async (req, res) => {
+
+  const orders = await Order.find({
+    user: req.user._id
+  })
+    .sort({ createdAt: -1 })
+    .lean();
+
+  return ok(res, { orders });
+
+});
+
+
+/* =====================================
+   GET SINGLE ORDER
+===================================== */
+
+const getOrder = asyncHandler(async (req, res) => {
+
+  const order = await Order.findOne({
+    _id: req.params.id,
+    user: req.user._id
+  }).lean();
+
+  if (!order) {
+    throw error(404, 'Order not found.');
+  }
+
+  return ok(res, { order });
+
+});
+
+
+/* =====================================
    CANCEL ORDER
-========================= */
 
-async function cancelCustomerOrder(
-  id,
-  button = null
-) {
+   COD:
+   Cancel before dispatch.
+
+   CASHFREE:
+   Confirm gateway status first.
+   Pending active payments cannot be
+   cancelled until gateway expiry.
+
+   RAZORPAY:
+   Unpaid cancellation requires a
+   separate gateway-safe flow.
+===================================== */
+
+const cancelOrder = asyncHandler(async (req, res) => {
+
+  const order = await Order.findOne({
+    _id: req.params.id,
+    user: req.user._id
+  });
+
+  if (!order) {
+    throw error(404, 'Order not found.');
+  }
 
   if (
-    orderActionRunning
+    !['Order Placed', 'Confirmed']
+      .includes(order.orderStatus)
   ) {
+    throw error(
+      400,
+      'This order can no longer be cancelled.'
+    );
+  }
 
-    return;
+  if (order.orderStatus === 'Cancelled') {
+    throw error(409, 'Order already cancelled.');
+  }
+
+  /* =================================
+     CASHFREE PAYMENT VALIDATION
+  ================================= */
+
+  if (order.paymentMethod === 'CASHFREE') {
+
+    if (!order.cashfreeOrderId) {
+      throw error(
+        409,
+        'Cashfree reference missing. Contact support.'
+      );
+    }
+
+    const gatewayOrder = await fetchCashfreeOrder(
+      order.cashfreeOrderId
+    );
+
+    if (
+      gatewayOrder.order_id !== order.cashfreeOrderId
+    ) {
+      throw error(
+        409,
+        'Cashfree order mismatch.'
+      );
+    }
+
+    const paid = isCashfreePaymentSuccessful(
+      gatewayOrder,
+      order.grandTotal
+    );
+
+    if (
+      paid ||
+      gatewayOrder.order_status === 'PAID' ||
+      order.paymentStatus === 'SUCCESS'
+    ) {
+      throw error(
+        409,
+        'Paid online orders require support assistance for cancellation and refund.'
+      );
+    }
+
+    // ACTIVE payments may still succeed.
+    // Do not release reserved stock yet.
+
+    if (gatewayOrder.order_status !== 'EXPIRED') {
+      throw error(
+        409,
+        'Payment is still active or awaiting confirmation. Please contact support.'
+      );
+    }
 
   }
 
+  /* =================================
+     LEGACY RAZORPAY PROTECTION
+  ================================= */
 
-  const confirmed =
-    await askCancelConfirmation();
+  if (order.paymentMethod === 'RAZORPAY') {
 
-
-  if (!confirmed) {
-    return;
-  }
-
-
-  orderActionRunning =
-    true;
-
-
-  const oldText =
-    button?.textContent;
-
-
-  if (button) {
-
-    button.disabled =
-      true;
-
-
-    button.textContent =
-      'Cancelling...';
+    throw error(
+      409,
+      'Razorpay orders require support-assisted cancellation.'
+    );
 
   }
 
+  /* =================================
+     COD PAYMENT PROTECTION
+  ================================= */
+
+  if (
+    order.paymentMethod === 'COD' &&
+    order.paymentStatus !== 'COD_PENDING'
+  ) {
+    throw error(
+      409,
+      'This COD order requires support assistance.'
+    );
+  }
+
+  /* =================================
+     DATABASE TRANSACTION
+  ================================= */
+
+  const session = await mongoose.startSession();
+
+  let cancelledOrder;
 
   try {
 
-    await window.MC.api(
-      '/orders/' +
-      encodeURIComponent(id) +
-      '/cancel',
-      {
+    await session.withTransaction(async () => {
 
-        method:
-          'PATCH'
+      // Read again inside the transaction,
+      // because status may have changed.
 
+      const freshOrder = await Order.findOne({
+        _id: order._id,
+        user: req.user._id
+      }).session(session);
+
+      if (!freshOrder) {
+        throw error(404, 'Order not found.');
       }
-    );
 
+      if (
+        !['Order Placed', 'Confirmed']
+          .includes(freshOrder.orderStatus)
+      ) {
+        throw error(
+          409,
+          'Order status changed. Refresh and retry.'
+        );
+      }
 
-    window.MC.toast(
-      'Order cancelled successfully.',
-      'success'
-    );
+      if (
+        freshOrder.paymentMethod !==
+        order.paymentMethod
+      ) {
+        throw error(
+          409,
+          'Payment method changed.'
+        );
+      }
 
+      if (
+        freshOrder.paymentMethod === 'CASHFREE' &&
+        (
+          freshOrder.paymentStatus === 'SUCCESS' ||
+          !['PENDING', 'FAILED']
+            .includes(freshOrder.paymentStatus)
+        )
+      ) {
+        throw error(
+          409,
+          'Payment status changed. Cancellation stopped.'
+        );
+      }
 
-    await loadOrdersPage();
+      if (
+        freshOrder.paymentMethod === 'COD' &&
+        freshOrder.paymentStatus !== 'COD_PENDING'
+      ) {
+        throw error(
+          409,
+          'COD payment status changed.'
+        );
+      }
 
+      const previousStatus = freshOrder.orderStatus;
 
-  } catch (error) {
+      // Return reserved stock safely within
+      // the same database transaction.
 
-    window.MC.toast(
-      error.message ||
-      'Order cancel failed.',
-      'error'
-    );
+      await releaseStock(
+        freshOrder,
+        session
+      );
 
+      freshOrder.orderStatus = 'Cancelled';
 
-    if (button) {
+      if (
+        freshOrder.paymentMethod === 'CASHFREE'
+      ) {
+        freshOrder.paymentStatus = 'CANCELLED';
+      } else if (
+        freshOrder.paymentMethod === 'COD'
+      ) {
+        freshOrder.paymentStatus = 'CANCELLED';
+      }
 
-      button.disabled =
-        false;
+      freshOrder.statusHistory.push({
+        status: 'Cancelled',
+        note:
+          'Cancelled by customer. Previous status: ' +
+          previousStatus,
+        changedAt: new Date()
+      });
 
+      await freshOrder.save({ session });
 
-      button.textContent =
-        oldText ||
-        'Cancel Order';
+      cancelledOrder = freshOrder;
 
-    }
-
+    });
 
   } finally {
 
-    orderActionRunning =
-      false;
+    await session.endSession();
 
   }
 
-}
+  return ok(res, {
+    message: 'Order cancelled successfully.',
+    order: cancelledOrder
+  });
+
+});
 
 
-/* =========================
-   START
-========================= */
+/* =====================================
+   EXPORT
+===================================== */
 
-if (
-  window.MC.$(
-    '#orders'
-  )
-) {
-
-  loadOrdersPage();
-
-}
+module.exports = {
+  preview,
+  createCod,
+  listOrders,
+  getOrder,
+  cancelOrder
+};
