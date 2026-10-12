@@ -1,10 +1,15 @@
 
 /*
-  MEMORA CREATIONS
-  ORDER CONTROLLER
+=========================================
+ MEMORA CREATIONS
+ ORDER CONTROLLER
 
-  COD + CASHFREE + RAZORPAY
-  Safe cancellation handling
+ COD + CASHFREE + RAZORPAY
+
+ Safe Order Management
+ Payment Protection
+ Stock Protection
+=========================================
 */
 
 const mongoose = require('mongoose');
@@ -30,11 +35,6 @@ const {
   releaseStock
 } = require('../services/orderService');
 
-const {
-  fetchCashfreeOrder,
-  isCashfreePaymentSuccessful
-} = require('../services/cashfreeService');
-
 
 /* =====================================
    ORDER PREVIEW
@@ -42,26 +42,43 @@ const {
 
 const preview = asyncHandler(async (req, res) => {
 
-  const trusted = await getTrustedItems(
+  const trustedItems = await getTrustedItems(
     req.body.items
   );
 
-  const amount = totals(trusted);
+  const amountDetails = totals(trustedItems);
 
-  const items = trusted.map(item => ({
-    productId: item.product.productId,
-    _id: item.product._id,
-    name: item.product.name,
-    imageUrl: item.product.images?.[0]?.url || '',
-    quantity: item.quantity,
-    unitPrice: item.product.sellingPrice,
+  const items = trustedItems.map(item => ({
+
+    productId:
+      item.product.productId,
+
+    _id:
+      item.product._id,
+
+    name:
+      item.product.name,
+
+    imageUrl:
+      item.product.images?.[0]?.url || '',
+
+    quantity:
+      item.quantity,
+
+    unitPrice:
+      item.product.sellingPrice,
+
     lineTotal:
       item.product.sellingPrice * item.quantity
+
   }));
 
   return ok(res, {
-    ...amount,
+
+    ...amountDetails,
+
     items
+
   });
 
 });
@@ -80,20 +97,35 @@ const createCod = asyncHandler(async (req, res) => {
   );
 
   if (validationMessage) {
-    throw error(400, validationMessage);
+
+    throw error(
+      400,
+      validationMessage
+    );
+
   }
 
   const order = await createCodOrder({
-    user: req.user,
+
+    user:
+      req.user,
+
     address,
-    items: req.body.items,
-    clearCart: req.body.clearCart === true
+
+    items:
+      req.body.items,
+
+    clearCart:
+      req.body.clearCart === true
+
   });
 
   return ok(
     res,
     {
-      message: 'COD order placed successfully.',
+      message:
+        'COD order placed successfully.',
+
       order
     },
     201
@@ -109,12 +141,21 @@ const createCod = asyncHandler(async (req, res) => {
 const listOrders = asyncHandler(async (req, res) => {
 
   const orders = await Order.find({
-    user: req.user._id
+
+    user:
+      req.user._id
+
   })
-    .sort({ createdAt: -1 })
+    .sort({
+      createdAt: -1
+    })
     .lean();
 
-  return ok(res, { orders });
+  return ok(res, {
+
+    orders
+
+  });
 
 });
 
@@ -126,15 +167,29 @@ const listOrders = asyncHandler(async (req, res) => {
 const getOrder = asyncHandler(async (req, res) => {
 
   const order = await Order.findOne({
-    _id: req.params.id,
-    user: req.user._id
+
+    _id:
+      req.params.id,
+
+    user:
+      req.user._id
+
   }).lean();
 
   if (!order) {
-    throw error(404, 'Order not found.');
+
+    throw error(
+      404,
+      'Order not found.'
+    );
+
   }
 
-  return ok(res, { order });
+  return ok(res, {
+
+    order
+
+  });
 
 });
 
@@ -142,124 +197,144 @@ const getOrder = asyncHandler(async (req, res) => {
 /* =====================================
    CANCEL ORDER
 
-   COD:
-   Cancel before dispatch.
+   SECURITY RULES:
 
-   CASHFREE:
-   Confirm gateway status first.
-   Pending active payments cannot be
-   cancelled until gateway expiry.
+   1. Only owner can cancel.
 
-   RAZORPAY:
-   Unpaid cancellation requires a
-   separate gateway-safe flow.
+   2. COD cancellation supported
+      before dispatch.
+
+   3. Cashfree cancellation requires
+      a separate gateway-safe flow.
+
+   4. Razorpay legacy cancellation
+      requires support.
+
+   5. Stock release and cancellation
+      run in one DB transaction.
+
+   6. Duplicate cancellation blocked.
 ===================================== */
 
 const cancelOrder = asyncHandler(async (req, res) => {
 
   const order = await Order.findOne({
-    _id: req.params.id,
-    user: req.user._id
+
+    _id:
+      req.params.id,
+
+    user:
+      req.user._id
+
   });
 
   if (!order) {
-    throw error(404, 'Order not found.');
+
+    throw error(
+      404,
+      'Order not found.'
+    );
+
+  }
+
+
+  /* =================================
+     CHECK ORDER STATUS
+  ================================= */
+
+  if (
+    order.orderStatus === 'Cancelled'
+  ) {
+
+    throw error(
+      409,
+      'This order is already cancelled.'
+    );
+
   }
 
   if (
-    !['Order Placed', 'Confirmed']
-      .includes(order.orderStatus)
+    ![
+      'Order Placed',
+      'Confirmed'
+    ].includes(order.orderStatus)
   ) {
+
     throw error(
       400,
       'This order can no longer be cancelled.'
     );
+
   }
 
-  if (order.orderStatus === 'Cancelled') {
-    throw error(409, 'Order already cancelled.');
-  }
 
   /* =================================
-     CASHFREE PAYMENT VALIDATION
-  ================================= */
+     CASHFREE PROTECTION
 
-  if (order.paymentMethod === 'CASHFREE') {
-
-    if (!order.cashfreeOrderId) {
-      throw error(
-        409,
-        'Cashfree reference missing. Contact support.'
-      );
-    }
-
-    const gatewayOrder = await fetchCashfreeOrder(
-      order.cashfreeOrderId
-    );
-
-    if (
-      gatewayOrder.order_id !== order.cashfreeOrderId
-    ) {
-      throw error(
-        409,
-        'Cashfree order mismatch.'
-      );
-    }
-
-    const paid = isCashfreePaymentSuccessful(
-      gatewayOrder,
-      order.grandTotal
-    );
-
-    if (
-      paid ||
-      gatewayOrder.order_status === 'PAID' ||
-      order.paymentStatus === 'SUCCESS'
-    ) {
-      throw error(
-        409,
-        'Paid online orders require support assistance for cancellation and refund.'
-      );
-    }
-
-    // ACTIVE payments may still succeed.
-    // Do not release reserved stock yet.
-
-    if (gatewayOrder.order_status !== 'EXPIRED') {
-      throw error(
-        409,
-        'Payment is still active or awaiting confirmation. Please contact support.'
-      );
-    }
-
-  }
-
-  /* =================================
-     LEGACY RAZORPAY PROTECTION
-  ================================= */
-
-  if (order.paymentMethod === 'RAZORPAY') {
-
-    throw error(
-      409,
-      'Razorpay orders require support-assisted cancellation.'
-    );
-
-  }
-
-  /* =================================
-     COD PAYMENT PROTECTION
+     Customer-side cancellation is
+     temporarily disabled to prevent
+     late-payment race conditions.
   ================================= */
 
   if (
-    order.paymentMethod === 'COD' &&
-    order.paymentStatus !== 'COD_PENDING'
+    order.paymentMethod === 'CASHFREE'
   ) {
+
     throw error(
       409,
-      'This COD order requires support assistance.'
+      'Cashfree orders require support-assisted cancellation. Please contact customer care.'
     );
+
   }
+
+
+  /* =================================
+     RAZORPAY PROTECTION
+  ================================= */
+
+  if (
+    order.paymentMethod === 'RAZORPAY'
+  ) {
+
+    throw error(
+      409,
+      'Online payment orders require support-assisted cancellation.'
+    );
+
+  }
+
+
+  /* =================================
+     ALLOW COD ONLY
+  ================================= */
+
+  if (
+    order.paymentMethod !== 'COD'
+  ) {
+
+    throw error(
+      400,
+      'Unsupported payment method.'
+    );
+
+  }
+
+
+  /* =================================
+     CHECK COD PAYMENT STATUS
+  ================================= */
+
+  if (
+    order.paymentStatus !== 'COD_PENDING'
+  ) {
+
+    throw error(
+      409,
+      'This COD order cannot be cancelled automatically.'
+    );
+
+  }
+
 
   /* =================================
      DATABASE TRANSACTION
@@ -267,101 +342,125 @@ const cancelOrder = asyncHandler(async (req, res) => {
 
   const session = await mongoose.startSession();
 
-  let cancelledOrder;
+  let cancelledOrder = null;
 
   try {
 
     await session.withTransaction(async () => {
 
-      // Read again inside the transaction,
-      // because status may have changed.
+      /*
+       Read fresh order inside transaction
+       to avoid using stale status.
+      */
 
       const freshOrder = await Order.findOne({
-        _id: order._id,
-        user: req.user._id
+
+        _id:
+          order._id,
+
+        user:
+          req.user._id
+
       }).session(session);
 
+
       if (!freshOrder) {
-        throw error(404, 'Order not found.');
+
+        throw error(
+          404,
+          'Order not found.'
+        );
+
       }
 
+
+      /* =================================
+         RECHECK ORDER STATUS
+      ================================= */
+
       if (
-        !['Order Placed', 'Confirmed']
-          .includes(freshOrder.orderStatus)
+        ![
+          'Order Placed',
+          'Confirmed'
+        ].includes(freshOrder.orderStatus)
       ) {
+
         throw error(
           409,
-          'Order status changed. Refresh and retry.'
+          'Order status has changed. Please refresh.'
         );
+
       }
 
-      if (
-        freshOrder.paymentMethod !==
-        order.paymentMethod
-      ) {
-        throw error(
-          409,
-          'Payment method changed.'
-        );
-      }
+
+      /* =================================
+         RECHECK PAYMENT
+      ================================= */
 
       if (
-        freshOrder.paymentMethod === 'CASHFREE' &&
-        (
-          freshOrder.paymentStatus === 'SUCCESS' ||
-          !['PENDING', 'FAILED']
-            .includes(freshOrder.paymentStatus)
-        )
-      ) {
-        throw error(
-          409,
-          'Payment status changed. Cancellation stopped.'
-        );
-      }
-
-      if (
-        freshOrder.paymentMethod === 'COD' &&
+        freshOrder.paymentMethod !== 'COD' ||
         freshOrder.paymentStatus !== 'COD_PENDING'
       ) {
+
         throw error(
           409,
-          'COD payment status changed.'
+          'Payment details changed. Cancellation stopped.'
         );
+
       }
 
-      const previousStatus = freshOrder.orderStatus;
 
-      // Return reserved stock safely within
-      // the same database transaction.
+      /* =================================
+         RELEASE RESERVED STOCK
+      ================================= */
 
       await releaseStock(
         freshOrder,
         session
       );
 
-      freshOrder.orderStatus = 'Cancelled';
 
-      if (
-        freshOrder.paymentMethod === 'CASHFREE'
-      ) {
-        freshOrder.paymentStatus = 'CANCELLED';
-      } else if (
-        freshOrder.paymentMethod === 'COD'
-      ) {
-        freshOrder.paymentStatus = 'CANCELLED';
-      }
+      /* =================================
+         UPDATE ORDER
+      ================================= */
+
+      freshOrder.orderStatus =
+        'Cancelled';
+
+      freshOrder.paymentStatus =
+        'CANCELLED';
+
+
+      /* =================================
+         SAVE STATUS HISTORY
+      ================================= */
 
       freshOrder.statusHistory.push({
-        status: 'Cancelled',
+
+        status:
+          'Cancelled',
+
         note:
-          'Cancelled by customer. Previous status: ' +
-          previousStatus,
-        changedAt: new Date()
+          'COD order cancelled by customer.',
+
+        changedAt:
+          new Date()
+
       });
 
-      await freshOrder.save({ session });
 
-      cancelledOrder = freshOrder;
+      /* =================================
+         SAVE ORDER
+      ================================= */
+
+      await freshOrder.save({
+
+        session
+
+      });
+
+      cancelledOrder =
+        freshOrder;
 
     });
 
@@ -371,22 +470,38 @@ const cancelOrder = asyncHandler(async (req, res) => {
 
   }
 
+
+  /* =================================
+     FINAL RESPONSE
+  ================================= */
+
   return ok(res, {
-    message: 'Order cancelled successfully.',
-    order: cancelledOrder
+
+    message:
+      'Order cancelled successfully.',
+
+    order:
+      cancelledOrder
+
   });
 
 });
 
 
 /* =====================================
-   EXPORT
+   EXPORT FUNCTIONS
 ===================================== */
 
 module.exports = {
+
   preview,
+
   createCod,
+
   listOrders,
+
   getOrder,
+
   cancelOrder
+
 };
