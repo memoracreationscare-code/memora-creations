@@ -10,15 +10,26 @@ const rateLimit = require('express-rate-limit');
 
 const connectDatabase = require('./config/db');
 
+/* =========================================
+   API ROUTES
+========================================= */
+
 const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+const cashfreeRoutes = require('./routes/cashfreeRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 
-const { webhook } = require('./controllers/paymentController');
+/* =========================================
+   EXISTING RAZORPAY WEBHOOK
+========================================= */
+
+const {
+  webhook
+} = require('./controllers/paymentController');
 
 
 /* =========================================
@@ -43,14 +54,7 @@ app.use(
 
 
 /* =========================================
-   MEMORA CREATIONS - MULTIPLE CORS ORIGINS
-
-   Supports:
-   1. GitHub Pages
-   2. Cloudflare Pages
-   3. Comma-separated CORS_ORIGIN values
-
-   Does not allow arbitrary websites.
+   MEMORA CREATIONS - ALLOWED ORIGINS
 ========================================= */
 
 const configuredOrigins = (
@@ -73,21 +77,13 @@ app.use(
   cors({
     origin: function (origin, callback) {
 
-      // Allow requests without an Origin header,
-      // such as server-to-server requests.
-
       if (!origin) {
         return callback(null, true);
       }
 
-      // Allow only explicitly approved origins.
-
       if (allowedOrigins.has(origin)) {
         return callback(null, true);
       }
-
-      // Do not add CORS permission for
-      // unapproved browser origins.
 
       return callback(null, false);
     },
@@ -99,7 +95,7 @@ app.use(
 
 /* =========================================
    RAZORPAY WEBHOOK
-   KEEP RAW BODY FOR SIGNATURE VERIFICATION
+   PRESERVED FOR EXISTING ORDERS
 ========================================= */
 
 app.post(
@@ -173,6 +169,15 @@ app.use(
   authLimiter
 );
 
+/* =========================================
+   CASHFREE RATE LIMITING
+========================================= */
+
+app.use(
+  '/api/cashfree',
+  authLimiter
+);
+
 
 /* =========================================
    HEALTH CHECK
@@ -221,10 +226,33 @@ app.use(
   orderRoutes
 );
 
+/* =========================================
+   RAZORPAY PAYMENT ROUTES
+   KEPT FOR EXISTING CHECKOUT
+========================================= */
+
 app.use(
   '/api/payment',
   paymentRoutes
 );
+
+
+/* =========================================
+   NEW CASHFREE PAYMENT ROUTES
+
+   POST /api/cashfree/create-order
+   POST /api/cashfree/verify
+========================================= */
+
+app.use(
+  '/api/cashfree',
+  cashfreeRoutes
+);
+
+
+/* =========================================
+   ADMIN ROUTES
+========================================= */
 
 app.use(
   '/api/admin',
