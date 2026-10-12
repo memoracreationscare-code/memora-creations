@@ -1,9 +1,18 @@
 
-/* =====================================================
-   MEMORA CREATIONS - ADMIN ORDERS
-   PREMIUM POPUP EDITION
-   Existing order and Shiprocket functions preserved
-===================================================== */
+/*
+=========================================
+ MEMORA CREATIONS
+ ADMIN ORDERS MANAGEMENT
+
+ CASHFREE PAYMENT REFERENCES
+ RAZORPAY REFERENCES
+ ORDER DETAILS
+ STATUS UPDATE
+ SHIPROCKET COURIER RATES
+ SHIPMENT CREATION + AWB
+ PACKAGING LABEL
+=========================================
+*/
 
 const ADMIN_ORDER_STATUSES = [
   'Order Placed',
@@ -23,96 +32,220 @@ const mcEscape = value =>
 const mcMoney = value =>
   window.MC.money(Number(value || 0));
 
+const mcApi = (path, options) =>
+  window.MC.api(path, options);
 
-/* =====================================================
-   PREMIUM SHIPROCKET CONFIRMATION POPUP
-===================================================== */
+
+/* =====================================
+   DISPLAY HELPERS
+===================================== */
+
+function displayValue(value) {
+  return value === undefined ||
+    value === null ||
+    value === ''
+      ? 'Not Available'
+      : String(value);
+}
+
+function formatDate(value) {
+  if (!value) return '-';
+
+  const date = new Date(value);
+
+  return Number.isNaN(date.getTime())
+    ? '-'
+    : date.toLocaleString('en-IN');
+}
+
+function notify(message, type = 'success') {
+  window.MC.toast(message, type);
+}
+
+function paymentReferenceHtml(order) {
+
+  if (order.paymentMethod === 'CASHFREE') {
+
+    return `
+      <div class="admin-card"
+        style="margin-top:15px;padding:18px;
+        background:#faf6f2;overflow-wrap:anywhere">
+
+        <h3>Cashfree Payment References</h3>
+
+        <p>
+          <b>Cashfree Order ID:</b>
+          ${mcEscape(displayValue(order.cashfreeOrderId))}
+        </p>
+
+        <p>
+          <b>Cashfree CF Order ID:</b>
+          ${mcEscape(displayValue(order.cashfreeCfOrderId))}
+        </p>
+
+        <p>
+          <b>Cashfree Payment ID:</b>
+          ${mcEscape(displayValue(order.cashfreePaymentId))}
+        </p>
+
+        <p>
+          <b>Payment Status:</b>
+          ${mcEscape(order.paymentStatus)}
+        </p>
+
+        <p>
+          <b>Stock Reserved:</b>
+          ${order.stockReserved === true ? 'YES' : 'NO'}
+        </p>
+
+        <p style="font-size:12px;color:#805333">
+          Verify payment status in Cashfree
+          before processing any unpaid order.
+          A pending payment is not a failed payment.
+        </p>
+
+      </div>
+    `;
+  }
+
+  if (order.paymentMethod === 'RAZORPAY') {
+
+    return `
+      <div class="admin-card"
+        style="margin-top:15px;padding:18px;
+        background:#faf6f2;overflow-wrap:anywhere">
+
+        <h3>Razorpay Payment References</h3>
+
+        <p>
+          <b>Razorpay Order ID:</b>
+          ${mcEscape(displayValue(order.razorpayOrderId))}
+        </p>
+
+        <p>
+          <b>Razorpay Payment ID:</b>
+          ${mcEscape(displayValue(order.razorpayPaymentId))}
+        </p>
+
+      </div>
+    `;
+  }
+
+  return `
+    <div class="admin-card"
+      style="margin-top:15px;padding:18px">
+      <h3>Cash on Delivery</h3>
+      <p>
+        Payment Status:
+        <b>${mcEscape(order.paymentStatus)}</b>
+      </p>
+    </div>
+  `;
+}
+
+
+/* =====================================
+   CHECK ORDER IS READY FOR SHIPMENT
+===================================== */
+
+function canCreateShipment(order) {
+
+  if (
+    order.orderStatus === 'Cancelled' ||
+    order.orderStatus === 'Delivered'
+  ) {
+    return false;
+  }
+
+  if (order.paymentMethod === 'COD') {
+    return order.paymentStatus === 'COD_PENDING';
+  }
+
+  return order.paymentStatus === 'SUCCESS';
+}
+
+
+/* =====================================
+   SHIPROCKET CONFIRMATION
+===================================== */
 
 function confirmShiprocketShipment() {
+
   return new Promise(resolve => {
 
     const previousFocus = document.activeElement;
-    const overlay = document.createElement('div');
 
+    const overlay = document.createElement('div');
     overlay.className = 'mc-admin-popup-overlay';
-    overlay.style.zIndex = '20000';
+
+    overlay.style.cssText = `
+      position:fixed;
+      inset:0;
+      z-index:20000;
+      background:rgba(0,0,0,.6);
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:20px;
+    `;
 
     overlay.innerHTML = `
-      <div
-        class="mc-admin-popup"
-        role="dialog"
+      <div role="dialog"
         aria-modal="true"
-        aria-labelledby="mcShipmentTitle"
-      >
+        aria-labelledby="shipmentConfirmTitle"
+        style="
+          max-width:430px;
+          width:100%;
+          background:white;
+          padding:28px;
+          border-radius:20px;
+          text-align:center;
+          box-shadow:0 15px 60px #0003;
+        ">
 
-        <div style="
-          width:68px;
-          height:68px;
-          margin:0 auto 18px;
-          display:flex;
-          align-items:center;
-          justify-content:center;
-          border-radius:50%;
-          background:#f6ede4;
-          font-size:31px;
-        ">🚚</div>
+        <div style="font-size:40px">🚚</div>
 
-        <h2 id="mcShipmentTitle">
+        <h2 id="shipmentConfirmTitle">
           Create Shipment?
         </h2>
 
         <p>
-          You are about to create a real
-          Shiprocket shipment and request
-          an AWB tracking number.
+          You are about to create a
+          Shiprocket shipment.
+        </p>
+
+        <p style="
+          padding:12px;
+          background:#fff6ec;
+          border-radius:10px;
+          font-size:13px;
+        ">
+          Please confirm courier,
+          weight, dimensions and delivery address.
         </p>
 
         <div style="
-          background:#fff7ef;
-          border:1px solid #f0dfcb;
-          color:#805333;
-          border-radius:12px;
-          padding:13px;
-          margin:17px 0;
-          font-size:13px;
-          line-height:1.6;
+          display:flex;
+          gap:10px;
+          margin-top:20px;
         ">
-          Please verify the courier, package
-          dimensions and delivery address
-          before continuing.
-        </div>
-
-        <div class="mc-admin-popup-actions">
 
           <button
             type="button"
-            id="mcShipmentCancel"
-            style="
-              flex:1;
-              min-height:47px;
-              border:0;
-              border-radius:12px;
-              background:#f1e9e1;
-              color:#302117;
-              font-weight:800;
-              cursor:pointer;
-            "
-          >Cancel</button>
+            class="shipment-cancel"
+            style="flex:1;padding:14px;
+            border:0;border-radius:10px">
+            Cancel
+          </button>
 
           <button
             type="button"
-            id="mcShipmentConfirm"
-            style="
-              flex:1;
-              min-height:47px;
-              border:0;
-              border-radius:12px;
-              background:#8b5b3a;
-              color:white;
-              font-weight:800;
-              cursor:pointer;
-            "
-          >Create Shipment</button>
+            class="shipment-confirm"
+            style="flex:1;padding:14px;
+            border:0;border-radius:10px;
+            background:#946343;color:white">
+            Create Shipment
+          </button>
 
         </div>
       </div>
@@ -121,21 +254,22 @@ function confirmShiprocketShipment() {
     document.body.appendChild(overlay);
 
     const cancelButton =
-      overlay.querySelector('#mcShipmentCancel');
+      overlay.querySelector('.shipment-cancel');
 
     const confirmButton =
-      overlay.querySelector('#mcShipmentConfirm');
+      overlay.querySelector('.shipment-confirm');
 
-    let completed = false;
+    let finished = false;
 
-    function finish(value) {
-      if (completed) return;
+    function done(value) {
 
-      completed = true;
+      if (finished) return;
+
+      finished = true;
 
       document.removeEventListener(
         'keydown',
-        handleKeydown
+        onKeydown
       );
 
       overlay.remove();
@@ -147,13 +281,14 @@ function confirmShiprocketShipment() {
       resolve(value);
     }
 
-    function handleKeydown(event) {
+    function onKeydown(event) {
+
       if (event.key === 'Escape') {
-        event.preventDefault();
-        finish(false);
+        done(false);
       }
 
       if (event.key === 'Tab') {
+
         if (
           event.shiftKey &&
           document.activeElement === cancelButton
@@ -170,51 +305,41 @@ function confirmShiprocketShipment() {
       }
     }
 
+    cancelButton.onclick = () => done(false);
+    confirmButton.onclick = () => done(true);
+
+    overlay.onclick = event => {
+      if (event.target === overlay) done(false);
+    };
+
     document.addEventListener(
       'keydown',
-      handleKeydown
+      onKeydown
     );
-
-    cancelButton.onclick = () => finish(false);
-    confirmButton.onclick = () => finish(true);
-
-    overlay.addEventListener('click', event => {
-      if (event.target === overlay) {
-        finish(false);
-      }
-    });
 
     cancelButton.focus();
   });
 }
 
 
-/* =====================================================
+/* =====================================
    PRINT PACKAGING LABEL
-===================================================== */
+===================================== */
 
 function printShippingLabel(order) {
 
   const address = order.shippingAddress || {};
 
-  const customerName =
+  const customer =
     order.customer?.fullName ||
     order.user?.fullName ||
     address.fullName ||
-    '';
+    'Customer';
 
   const mobile =
     order.customer?.mobile ||
-    order.user?.mobile ||
     address.mobile ||
     '';
-
-  const paymentText =
-    order.paymentMethod === 'COD'
-      ? `COD ₹${Number(
-          order.grandTotal || 0
-        ).toLocaleString('en-IN')}`
-      : 'PREPAID';
 
   const products = (order.items || [])
     .map((item, index) => `
@@ -226,270 +351,159 @@ function printShippingLabel(order) {
     `)
     .join('');
 
-  const printWindow = window.open(
-    '',
-    '_blank',
-    'width=700,height=900'
-  );
+  const paymentText =
+    order.paymentMethod === 'COD'
+      ? `COD: ${mcMoney(order.grandTotal)}`
+      : 'PREPAID';
 
-  if (!printWindow) {
-    window.MC.toast(
-      'Please allow popups.',
-      'error'
-    );
-    return;
-  }
-
-  printWindow.document.write(`
+  const label = `
     <!doctype html>
-    <html lang="en">
+    <html>
     <head>
       <meta charset="utf-8">
-      <title>
-        Label - ${mcEscape(order.orderId)}
-      </title>
-
+      <title>Packaging Label</title>
       <style>
-        @page {
-          size:100mm 150mm;
-          margin:4mm;
-        }
-
-        * {
-          box-sizing:border-box;
-        }
-
         body {
-          margin:0;
           font-family:Arial,sans-serif;
-          color:#000;
+          padding:22px;
+          color:#111;
         }
-
-        .label {
-          width:92mm;
-          min-height:140mm;
-          margin:auto;
-          padding:4mm;
-          border:2px solid #000;
+        h2 {text-align:center}
+        .box {
+          border:2px solid #222;
+          padding:15px;
+          margin:15px 0;
         }
-
-        .brand {
-          text-align:center;
-          font-size:20px;
-          font-weight:800;
-          padding-bottom:8px;
-          border-bottom:2px solid #000;
-        }
-
-        .payment {
-          margin:8px 0;
-          padding:8px;
-          border:2px solid #000;
-          text-align:center;
-          font-size:20px;
-          font-weight:900;
-        }
-
-        .section {
-          padding:8px 0;
-          border-bottom:1px solid #000;
-          line-height:1.45;
-          font-size:13px;
-        }
-
-        .title {
-          font-size:11px;
-          font-weight:800;
-          text-transform:uppercase;
-          margin-bottom:4px;
-        }
-
-        .name {
-          font-size:16px;
-          font-weight:800;
-        }
-
         table {
           width:100%;
           border-collapse:collapse;
-          font-size:11px;
         }
-
-        th,td {
-          border:1px solid #000;
-          padding:5px;
+        td,th {
+          border:1px solid #555;
+          padding:9px;
+          text-align:left;
         }
-
-        .total {
-          font-size:16px;
-          font-weight:900;
-        }
-
-        .no-print {
-          text-align:center;
-          margin:15px;
-        }
-
         @media print {
-          .no-print {
-            display:none;
-          }
+          button {display:none}
         }
       </style>
     </head>
-
     <body>
+      <h2>MEMORA CREATIONS</h2>
+      <h3>Shipping / Packaging Label</h3>
 
-      <div class="no-print">
-        <button onclick="window.print()">
-          Print Label
-        </button>
-      </div>
-
-      <div class="label">
-
-        <div class="brand">
-          MEMORA CREATIONS
-        </div>
-
-        <div class="payment">
-          ${paymentText}
-        </div>
-
-        <div class="section">
-
-          <div class="title">Order ID</div>
-
-          <b>${mcEscape(order.orderId)}</b>
-
-          <br>
-
-          ${
-            order.createdAt
-              ? new Date(order.createdAt)
-                  .toLocaleString('en-IN')
-              : ''
-          }
-
-        </div>
-
-        <div class="section">
-
-          <div class="title">Ship To</div>
-
-          <div class="name">
-            ${mcEscape(customerName)}
-          </div>
-
+      <div class="box">
+        <p><b>Order:</b>
+          ${mcEscape(order.orderId)}
+        </p>
+        <p><b>Customer:</b>
+          ${mcEscape(customer)}
+        </p>
+        <p><b>Mobile:</b>
+          ${mcEscape(mobile)}
+        </p>
+        <p><b>Address:</b>
           ${mcEscape(address.addressLine)}
-
-          <br>
-
-          ${mcEscape(address.city)}
-
-          ${
-            address.state
-              ? ', ' + mcEscape(address.state)
-              : ''
-          }
-
-          <br>
-
-          <b>
-            PIN: ${mcEscape(address.pinCode)}
-          </b>
-
-          <br>
-
-          Mobile:
-          <b>${mcEscape(mobile)}</b>
-
-        </div>
-
-        <div class="section">
-
-          <div class="title">
-            Package Contents
-          </div>
-
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Product</th>
-                <th>Qty</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              ${products}
-            </tbody>
-          </table>
-
-        </div>
-
-        <div class="section">
-
-          Payment:
-          <b>${mcEscape(order.paymentMethod)}</b>
-
-          <br>
-
-          Payment Status:
-          <b>${mcEscape(order.paymentStatus)}</b>
-
-          <br><br>
-
-          <div class="total">
-            Total:
-            ₹${Number(
-              order.grandTotal || 0
-            ).toLocaleString('en-IN')}
-          </div>
-
-        </div>
+        </p>
+        <p>
+          ${mcEscape(address.city)},
+          ${mcEscape(address.state)}
+        </p>
+        <p><b>PIN:</b>
+          ${mcEscape(address.pinCode)}
+        </p>
+        <p><b>Payment:</b>
+          ${mcEscape(paymentText)}
+        </p>
       </div>
 
-      <script>
-        setTimeout(function () {
-          window.print();
-        }, 500);
-      <\/script>
-
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Product</th>
+            <th>Quantity</th>
+          </tr>
+        </thead>
+        <tbody>${products}</tbody>
+      </table>
     </body>
     </html>
-  `);
+  `;
 
-  printWindow.document.close();
+  const blob = new Blob(
+    [label],
+    { type: 'text/html' }
+  );
+
+  const url = URL.createObjectURL(blob);
+
+  const printWindow = window.open(
+    url,
+    '_blank'
+  );
+
+  if (!printWindow) {
+    URL.revokeObjectURL(url);
+    notify('Please allow print popup.', 'error');
+    return;
+  }
+
+  printWindow.addEventListener(
+    'load',
+    () => {
+      printWindow.focus();
+      printWindow.print();
+      setTimeout(() => URL.revokeObjectURL(url), 30000);
+    },
+    { once: true }
+  );
 }
 
 
-/* =====================================================
-   SHIPROCKET FORM
-===================================================== */
+/* =====================================
+   SHIPMENT FORM
+===================================== */
 
 function shipmentFormHtml(order) {
 
-  return `
-    <div
-      class="admin-card shipment-box"
-      style="margin-top:20px;"
-    >
+  if (!canCreateShipment(order)) {
+    return `
+      <div class="admin-card"
+        style="padding:18px;margin:15px 0;
+        background:#fff7ed">
 
-      <h3>🚚 Shiprocket Shipping</h3>
+        <b>Shipment unavailable</b>
+
+        <p>
+          Online payment must be SUCCESS
+          before shipment creation.
+          COD orders must be eligible.
+        </p>
+
+      </div>
+    `;
+  }
+
+  return `
+    <div class="admin-card"
+      style="margin-top:20px;padding:20px">
+
+      <h3>🚚 Shiprocket Shipment</h3>
 
       <p class="mini">
-        Customer, address, PIN, products aur
-        payment details automatic rahengi.
-        Sirf package ka weight aur size bharo.
+        Check courier rates before creating
+        a shipment.
       </p>
 
-      <form
-        class="shipment-form"
-        data-id="${mcEscape(order._id)}"
-      >
+      <form class="shipment-form">
 
-        <div class="formgrid">
+        <div style="
+          display:grid;
+          grid-template-columns:
+          repeat(auto-fit,minmax(150px,1fr));
+          gap:12px;
+        ">
 
           <div class="field">
             <label>Weight (KG)</label>
@@ -499,7 +513,7 @@ function shipmentFormHtml(order) {
               type="number"
               step="0.01"
               min="0.01"
-              placeholder="Example: 0.5"
+              placeholder="0.5"
               required
             >
           </div>
@@ -512,20 +526,20 @@ function shipmentFormHtml(order) {
               type="number"
               step="0.1"
               min="0.1"
-              placeholder="Example: 30"
+              placeholder="25"
               required
             >
           </div>
 
           <div class="field">
-            <label>Width (CM)</label>
+            <label>Breadth (CM)</label>
             <input
               class="input"
-              name="width"
+              name="breadth"
               type="number"
               step="0.1"
               min="0.1"
-              placeholder="Example: 25"
+              placeholder="20"
               required
             >
           </div>
@@ -538,12 +552,12 @@ function shipmentFormHtml(order) {
               type="number"
               step="0.1"
               min="0.1"
-              placeholder="Example: 8"
+              placeholder="8"
               required
             >
           </div>
 
-          <div class="field full">
+          <div class="field">
             <label>Pickup Location</label>
             <input
               class="input"
@@ -559,35 +573,29 @@ function shipmentFormHtml(order) {
           display:flex;
           gap:10px;
           flex-wrap:wrap;
-          margin-top:15px;
+          margin-top:16px;
         ">
 
           <button
             class="btn secondary check-couriers"
-            type="button"
-          >
+            type="button">
             🔍 Check Courier Rates
           </button>
 
           <button
             class="btn create-shipment"
             type="submit"
-            disabled
-          >
+            disabled>
             Create Shipment + AWB
           </button>
 
         </div>
 
-        <div
-          class="courier-results"
-          style="margin-top:15px;"
-        ></div>
+        <div class="courier-results"
+          style="margin-top:15px"></div>
 
-        <div
-          class="shipment-result"
-          style="margin-top:15px;"
-        ></div>
+        <div class="shipment-result"
+          style="margin-top:15px"></div>
 
       </form>
 
@@ -596,13 +604,19 @@ function shipmentFormHtml(order) {
 }
 
 
-/* =====================================================
+/* =====================================
    CHECK COURIER RATES
-===================================================== */
+===================================== */
 
 async function checkCourierRates(form, order) {
 
-  if (!form.reportValidity()) {
+  if (!form.reportValidity()) return;
+
+  if (!canCreateShipment(order)) {
+    notify(
+      'Payment not confirmed for shipment.',
+      'error'
+    );
     return;
   }
 
@@ -620,18 +634,17 @@ async function checkCourierRates(form, order) {
   );
 
   checkButton.disabled = true;
+  createButton.disabled = true;
 
   checkButton.textContent =
     'Checking Couriers...';
 
-  createButton.disabled = true;
-
   result.textContent =
-    'Shiprocket se courier rates check ho rahe hain...';
+    'Loading Shiprocket courier rates...';
 
   try {
 
-    const data = await window.MC.api(
+    const data = await mcApi(
       '/admin/orders/' +
       order._id +
       '/check-couriers',
@@ -641,163 +654,105 @@ async function checkCourierRates(form, order) {
       }
     );
 
-    const couriers = (data.couriers || [])
-      .sort((a, b) =>
+    const couriers =
+      Array.isArray(data.couriers)
+        ? data.couriers
+        : [];
+
+    couriers.sort(
+      (a, b) =>
         Number(a.rate || 0) -
         Number(b.rate || 0)
-      );
+    );
 
     if (!couriers.length) {
 
-      result.innerHTML = `
-        <div class="message error">
-          ❌ Is route ke liye koi courier
-          available nahi mila.
-        </div>
-      `;
+      result.textContent =
+        'No couriers available for this address.';
 
       return;
     }
 
     result.innerHTML = `
-
       <div class="message success">
-
-        ✅ Courier available
-
-        <br>
-
-        Pickup PIN:
-        <b>
-          ${mcEscape(data.pickupPincode)}
-        </b>
-
-        →
-
-        Delivery PIN:
-        <b>
-          ${mcEscape(data.deliveryPincode)}
-        </b>
-
+        Courier rates loaded.
       </div>
 
-      <div style="margin-top:12px;">
+      ${couriers.map((courier, index) => {
 
-        ${couriers.map((courier, index) => {
+        const rate = Number(
+          courier.rate ||
+          courier.freightCharge ||
+          0
+        );
 
-          const rate = Number(
-            courier.rate ||
-            courier.freightCharge ||
-            0
-          );
+        return `
+          <label class="admin-card"
+            style="
+              display:block;
+              margin:10px 0;
+              padding:14px;
+              cursor:pointer;
+            ">
 
-          const delivery =
-            courier.etd ||
-            (
-              courier.estimatedDeliveryDays
-                ? courier.estimatedDeliveryDays +
-                  ' days'
-                : ''
-            );
-
-          return `
-
-            <label
-              class="admin-card"
-              style="
-                display:block;
-                margin:10px 0;
-                cursor:pointer;
-              "
+            <input
+              type="radio"
+              name="courierCompanyId"
+              value="${mcEscape(courier.courierCompanyId)}"
+              ${index === 0 ? 'checked' : ''}
             >
 
-              <input
-                type="radio"
-                name="courierCompanyId"
-                value="${mcEscape(
-                  courier.courierCompanyId
-                )}"
-                ${index === 0 ? 'checked' : ''}
-              >
+            <b>
+              ${mcEscape(
+                courier.courierName || 'Courier'
+              )}
+            </b>
 
-              <b>
-                ${mcEscape(
-                  courier.courierName || 'Courier'
-                )}
-              </b>
-
-              <br>
-
+            <p>
               Shipping Charge:
-              <b>${mcMoney(rate)}</b>
+              ${mcMoney(rate)}
+            </p>
 
-              ${
-                courier.codCharges
-                  ? `
-                    <br>
-                    COD Charge:
-                    ${mcMoney(courier.codCharges)}
-                  `
-                  : ''
-              }
+            ${courier.codCharges
+              ? `<p>COD Charge:
+                  ${mcMoney(courier.codCharges)}
+                 </p>`
+              : ''
+            }
 
-              ${
-                delivery
-                  ? `
-                    <br>
-                    Estimated Delivery:
-                    ${mcEscape(delivery)}
-                  `
-                  : ''
-              }
+            ${courier.etd
+              ? `<p>Delivery:
+                  ${mcEscape(courier.etd)}
+                 </p>`
+              : ''
+            }
 
-              ${
-                courier.rating
-                  ? `
-                    <br>
-                    Rating:
-                    ${mcEscape(courier.rating)}
-                  `
-                  : ''
-              }
+          </label>
+        `;
 
-            </label>
-
-          `;
-
-        }).join('')}
-
-      </div>
+      }).join('')}
     `;
 
     createButton.disabled = false;
 
-    window.MC.toast(
+    notify(
       'Courier rates loaded.',
       'success'
     );
 
-  } catch (error) {
+  } catch (err) {
 
-    result.innerHTML = `
-      <div class="message error">
-        ❌ ${mcEscape(
-          error.message ||
-          'Courier rate check failed.'
-        )}
-      </div>
-    `;
+    result.textContent =
+      err.message || 'Courier check failed.';
 
-    window.MC.toast(
-      error.message ||
-      'Courier rate check failed.',
+    notify(
+      err.message || 'Courier check failed.',
       'error'
     );
 
   } finally {
 
     checkButton.disabled = false;
-
     checkButton.textContent =
       '🔍 Check Courier Rates';
 
@@ -805,57 +760,59 @@ async function checkCourierRates(form, order) {
 }
 
 
-/* =====================================================
-   CREATE SHIPMENT + AWB
-===================================================== */
+/* =====================================
+   CREATE SHIPMENT
+===================================== */
 
 async function submitShipmentForm(form, order) {
 
-  if (!form.reportValidity()) {
+  if (!form.reportValidity()) return;
+
+  if (!canCreateShipment(order)) {
+    notify(
+      'This order is not ready for shipment.',
+      'error'
+    );
     return;
   }
 
+  const selectedCourier =
+    form.querySelector(
+      'input[name="courierCompanyId"]:checked'
+    );
+
+  if (!selectedCourier) {
+    notify(
+      'Please select a courier.',
+      'error'
+    );
+    return;
+  }
+
+  const confirmed =
+    await confirmShiprocketShipment();
+
+  if (!confirmed) return;
+
+  const button =
+    form.querySelector('.create-shipment');
+
   const result =
     form.querySelector('.shipment-result');
-
-  const submitButton =
-    form.querySelector('.create-shipment');
 
   const body = Object.fromEntries(
     new FormData(form)
   );
 
-  if (!body.courierCompanyId) {
-
-    window.MC.toast(
-      'Please select a courier first.',
-      'error'
-    );
-
-    return;
-  }
-
-  // PREMIUM CONFIRMATION:
-  // No API call unless admin explicitly confirms.
-
-  const confirmed =
-    await confirmShiprocketShipment();
-
-  if (!confirmed) {
-    return;
-  }
-
-  submitButton.disabled = true;
-
-  submitButton.textContent =
-    'Creating Shipment...';
+  button.disabled = true;
+  button.textContent = 'Creating Shipment...';
 
   result.textContent =
-    'Creating shipment and generating AWB...';
+    'Creating shipment with Shiprocket...';
 
   try {
 
-    const data = await window.MC.api(
+    const data = await mcApi(
       '/admin/orders/' +
       order._id +
       '/create-shipment',
@@ -865,359 +822,292 @@ async function submitShipmentForm(form, order) {
       }
     );
 
-    const sr =
+    const shipment =
       data.shiprocketOrder || {};
 
     const awb =
       data.awb || {};
 
     result.innerHTML = `
-
       <div class="message success">
 
-        ✅ Shipment created successfully.
+        <b>Shipment created.</b>
 
-        <br><br>
+        <p>
+          Shiprocket Order ID:
+          ${mcEscape(
+            displayValue(shipment.order_id)
+          )}
+        </p>
 
-        ${
-          sr.order_id
-            ? `
-              <b>Shiprocket Order ID:</b>
-              ${mcEscape(sr.order_id)}
-              <br>
-            `
-            : ''
-        }
+        <p>
+          Shipment ID:
+          ${mcEscape(
+            displayValue(shipment.shipment_id)
+          )}
+        </p>
 
-        ${
-          sr.shipment_id
-            ? `
-              <b>Shipment ID:</b>
-              ${mcEscape(sr.shipment_id)}
-              <br>
-            `
-            : ''
-        }
+        <p>
+          Courier:
+          ${mcEscape(
+            displayValue(awb.courierName)
+          )}
+        </p>
 
-        ${
-          awb.courierName
-            ? `
-              <b>Courier:</b>
-              ${mcEscape(awb.courierName)}
-              <br>
-            `
-            : ''
-        }
-
-        ${
-          awb.awbCode
-            ? `
-              <b>AWB / Tracking Number:</b>
-              ${mcEscape(awb.awbCode)}
-              <br>
-            `
-            : ''
-        }
-
-        <br>
-
-        ${
-          awb.awbCode
-            ? `
-              <b>
-                ✅ Tracking number generated
-                successfully.
-              </b>
-            `
-            : `
-              <b>
-                ⚠️ Shipment created but AWB
-                number was not returned.
-              </b>
-            `
-        }
+        <p>
+          AWB:
+          ${mcEscape(
+            displayValue(awb.awbCode)
+          )}
+        </p>
 
       </div>
     `;
 
-    window.MC.toast(
+    notify(
       awb.awbCode
-        ? 'Shipment and AWB created successfully.'
-        : 'Shipment created.',
+        ? 'Shipment and AWB created.'
+        : 'Shipment created. Check AWB.',
       'success'
     );
 
-  } catch (error) {
+    // Prevent accidental repeat submission.
+    button.textContent =
+      'Shipment Request Sent';
 
-    result.innerHTML = `
-      <div class="message error">
-        ❌ ${mcEscape(
-          error.message ||
-          'Shipment creation failed.'
-        )}
-      </div>
-    `;
+  } catch (err) {
 
-    window.MC.toast(
-      error.message ||
-      'Shipment creation failed.',
+    result.textContent =
+      err.message || 'Shipment creation failed.';
+
+    button.disabled = false;
+    button.textContent =
+      'Create Shipment + AWB';
+
+    notify(
+      err.message || 'Shipment failed.',
       'error'
     );
-
-  } finally {
-
-    submitButton.disabled = false;
-
-    submitButton.textContent =
-      'Create Shipment + AWB';
 
   }
 }
 
 
-/* =====================================================
+/* =====================================
    ORDER DETAILS
-===================================================== */
+===================================== */
 
 function orderDetailsHtml(order) {
 
-  const address = order.shippingAddress || {};
+  const address =
+    order.shippingAddress || {};
 
   const items = (order.items || [])
     .map(item => `
-
-      <div
-        class="admin-card"
-        style="margin:10px 0;"
-      >
+      <div class="admin-card"
+        style="padding:15px;margin:10px 0">
 
         <div style="
           display:flex;
-          gap:15px;
           align-items:center;
           flex-wrap:wrap;
+          gap:15px;
         ">
 
-          ${
-            item.imageUrl
-              ? `
-                <img
-                  src="${mcEscape(item.imageUrl)}"
-                  alt="Product"
-                  width="70"
-                  height="70"
-                  style="
-                    object-fit:cover;
-                    border-radius:10px;
-                  "
-                >
-              `
-              : ''
+          ${item.imageUrl
+            ? `<img
+                 src="${mcEscape(item.imageUrl)}"
+                 alt="Product"
+                 width="70"
+                 height="70"
+                 style="object-fit:cover;
+                 border-radius:10px">`
+            : ''
           }
 
-          <div style="flex:1;min-width:150px;">
+          <div style="flex:1">
 
             <b>${mcEscape(item.name)}</b>
 
-            <div class="mini">
+            <p class="mini">
               Product ID:
               ${mcEscape(item.productId)}
-            </div>
+            </p>
 
-            <div>
-              Qty:
+            <p>
+              Quantity:
               ${Number(item.quantity || 0)}
-            </div>
+            </p>
 
-            <div>
-              Price:
+            <p>
+              Unit Price:
               ${mcMoney(item.unitPrice)}
-            </div>
+            </p>
 
           </div>
 
-          <b>
-            ${mcMoney(item.lineTotal)}
-          </b>
+          <b>${mcMoney(item.lineTotal)}</b>
 
         </div>
-      </div>
 
+      </div>
     `)
     .join('');
 
   const history = (order.statusHistory || [])
     .map(item => `
-
-      <div style="margin-bottom:10px;">
+      <div style="margin:10px 0">
 
         <b>${mcEscape(item.status)}</b>
 
         <div class="mini">
-          ${
-            item.changedAt
-              ? new Date(item.changedAt)
-                  .toLocaleString('en-IN')
-              : ''
-          }
+          ${formatDate(item.changedAt)}
         </div>
 
-        ${
-          item.note
-            ? `<div>${mcEscape(item.note)}</div>`
-            : ''
-        }
+        <div>
+          ${mcEscape(item.note || '')}
+        </div>
 
       </div>
     `)
     .join('');
 
   return `
-
-    <div
-      class="admin-card"
-      style="margin:12px 0;"
-    >
+    <div class="admin-card"
+      style="padding:22px;margin:12px 0">
 
       <h2>Order Details</h2>
 
       <p>
-
         <b>Order ID:</b>
         ${mcEscape(order.orderId)}
+      </p>
 
-        <br>
-
+      <p>
         <b>Customer:</b>
         ${mcEscape(
           order.customer?.fullName ||
-          order.user?.fullName
+          order.user?.fullName ||
+          'Customer'
         )}
+      </p>
 
-        <br>
-
+      <p>
         <b>Mobile:</b>
         ${mcEscape(
           order.customer?.mobile ||
-          order.user?.mobile
+          order.user?.mobile ||
+          ''
         )}
+      </p>
 
-        <br>
-
+      <p>
         <b>Email:</b>
         ${mcEscape(
           order.customer?.email ||
-          order.user?.email
+          order.user?.email ||
+          ''
         )}
-
       </p>
 
       <h3>Delivery Address</h3>
 
       <p>
-
         ${mcEscape(address.fullName)}
+      </p>
 
-        <br>
-
+      <p>
         ${mcEscape(address.addressLine)}
+      </p>
 
-        <br>
-
+      <p>
         ${mcEscape(address.city)}
-
-        ${
-          address.state
-            ? ', ' + mcEscape(address.state)
-            : ''
+        ${address.state
+          ? ', ' + mcEscape(address.state)
+          : ''
         }
+      </p>
 
-        <br>
-
+      <p>
         PIN:
         ${mcEscape(address.pinCode)}
+      </p>
 
-        <br>
-
+      <p>
         Mobile:
         ${mcEscape(address.mobile)}
-
       </p>
 
       <h3>Products</h3>
 
-      ${
-        items || '<p>No products found.</p>'
-      }
+      ${items || '<p>No products.</p>'}
 
       <h3>Payment & Total</h3>
 
       <p>
-
         <b>Payment Method:</b>
         ${mcEscape(order.paymentMethod)}
-
-        <br>
-
-        <b>Payment Status:</b>
-        ${mcEscape(order.paymentStatus)}
-
-        <br>
-
-        <b>Order Status:</b>
-        ${mcEscape(order.orderStatus)}
-
       </p>
 
       <p>
-
-        Subtotal:
-        <b>${mcMoney(order.subtotal)}</b>
-
-        <br>
-
-        Delivery:
-        <b>${mcMoney(order.deliveryCharge)}</b>
-
-        <br>
-
-        You Save:
-        <b>${mcMoney(order.discount)}</b>
-
-        <br>
-
-        Total:
-        <b>${mcMoney(order.grandTotal)}</b>
-
+        <b>Payment Status:</b>
+        ${mcEscape(order.paymentStatus)}
       </p>
+
+      <p>
+        <b>Order Status:</b>
+        ${mcEscape(order.orderStatus)}
+      </p>
+
+      <p>
+        Subtotal:
+        ${mcMoney(order.subtotal)}
+      </p>
+
+      <p>
+        Delivery:
+        ${mcMoney(order.deliveryCharge)}
+      </p>
+
+      <p>
+        You Save:
+        ${mcMoney(order.discount)}
+      </p>
+
+      <p>
+        <b>Total:
+          ${mcMoney(order.grandTotal)}
+        </b>
+      </p>
+
+      <!-- CASHFREE / RAZORPAY REFERENCES -->
+
+      ${paymentReferenceHtml(order)}
 
       <h3>Status History</h3>
 
-      ${
-        history ||
-        '<p>No status history.</p>'
-      }
+      ${history || '<p>No status history.</p>'}
+
+      <!-- SHIPROCKET -->
 
       ${shipmentFormHtml(order)}
 
       <div style="
         display:flex;
-        gap:10px;
         flex-wrap:wrap;
-        margin-top:15px;
+        gap:10px;
+        margin-top:18px;
       ">
 
         <button
           class="btn print-label"
-          type="button"
-        >
+          type="button">
           🖨 Print Packaging Label
         </button>
 
         <button
           class="btn secondary close-details"
-          type="button"
-        >
+          type="button">
           Close Details
         </button>
 
@@ -1228,136 +1118,170 @@ function orderDetailsHtml(order) {
 }
 
 
-/* =====================================================
-   BIND ORDER BUTTONS
-===================================================== */
+/* =====================================
+   VIEW ORDER
+===================================== */
 
-function bindOrderButtons() {
+function openOrderDetails(id) {
 
-  document
-    .querySelectorAll('.view-order')
-    .forEach(button => {
+  const order = adminOrders.find(
+    item => String(item._id) === String(id)
+  );
 
-      button.addEventListener('click', () => {
+  const detailsRow = document.getElementById(
+    'details-' + id
+  );
 
-        const id = button.dataset.id;
+  if (!order || !detailsRow) return;
 
-        const order = adminOrders.find(
-          item => item._id === id
-        );
+  detailsRow.innerHTML = `
+    <td colspan="6">
+      ${orderDetailsHtml(order)}
+    </td>
+  `;
 
-        const detailsRow =
-          document.getElementById(
-            'details-' + id
-          );
+  detailsRow.style.display = 'table-row';
 
-        if (!order || !detailsRow) {
-          return;
-        }
-
-        detailsRow.innerHTML = `
-          <td colspan="6">
-            ${orderDetailsHtml(order)}
-          </td>
-        `;
-
-        detailsRow.style.display = 'table-row';
-
-        const form =
-          detailsRow.querySelector(
-            '.shipment-form'
-          );
-
-        detailsRow
-          .querySelector('.print-label')
-          ?.addEventListener('click', () => {
-            printShippingLabel(order);
-          });
-
-        form
-          ?.querySelector('.check-couriers')
-          ?.addEventListener('click', () => {
-            checkCourierRates(form, order);
-          });
-
-        form?.addEventListener(
-          'submit',
-          event => {
-
-            event.preventDefault();
-
-            submitShipmentForm(
-              event.currentTarget,
-              order
-            );
-
-          }
-        );
-
-        detailsRow
-          .querySelector('.close-details')
-          ?.addEventListener('click', () => {
-
-            detailsRow.style.display = 'none';
-
-          });
-
-      });
+  detailsRow
+    .querySelector('.print-label')
+    ?.addEventListener('click', () => {
+      printShippingLabel(order);
     });
 
+  const form =
+    detailsRow.querySelector('.shipment-form');
 
-  /* ORDER STATUS CHANGE */
+  form
+    ?.querySelector('.check-couriers')
+    ?.addEventListener('click', () => {
+      checkCourierRates(form, order);
+    });
 
-  document
-    .querySelectorAll('.order-status')
-    .forEach(select => {
+  form?.addEventListener('submit', event => {
 
-      select.addEventListener(
-        'change',
-        async () => {
+    event.preventDefault();
 
-          try {
+    submitShipmentForm(form, order);
+  });
 
-            await window.MC.api(
-              '/admin/orders/' +
-              select.dataset.id,
-              {
-                method: 'PUT',
-                body: JSON.stringify({
-                  orderStatus: select.value
-                })
-              }
-            );
+  detailsRow
+    .querySelector('.close-details')
+    ?.addEventListener('click', () => {
 
-            window.MC.toast(
-              'Order status updated.',
-              'success'
-            );
-
-            await loadAdminOrders();
-
-          } catch (error) {
-
-            window.MC.toast(
-              error.message ||
-              'Order update failed.',
-              'error'
-            );
-
-            await loadAdminOrders();
-
-          }
-
-        }
-      );
+      detailsRow.style.display = 'none';
 
     });
 }
 
 
-/* =====================================================
-   LOAD ORDERS
-===================================================== */
+/* =====================================
+   UPDATE ORDER STATUS
+===================================== */
+
+async function updateAdminOrderStatus(select) {
+
+  const order = adminOrders.find(
+    item => String(item._id) ===
+      String(select.dataset.id)
+  );
+
+  if (!order) return;
+
+  const newStatus = select.value;
+
+  if (newStatus === order.orderStatus) {
+    return;
+  }
+
+  if (
+    newStatus === 'Cancelled' &&
+    ['CASHFREE', 'RAZORPAY'].includes(
+      order.paymentMethod
+    )
+  ) {
+
+    notify(
+      'Online payment orders require support-assisted cancellation.',
+      'error'
+    );
+
+    select.value = order.orderStatus;
+    return;
+  }
+
+  if (
+    newStatus === 'Cancelled' &&
+    !window.confirm(
+      'Cancel this order? Reserved stock may be returned.'
+    )
+  ) {
+
+    select.value = order.orderStatus;
+    return;
+  }
+
+  select.disabled = true;
+
+  try {
+
+    await mcApi(
+      '/admin/orders/' + order._id,
+      {
+        method: 'PUT',
+        body: JSON.stringify({
+          orderStatus: newStatus
+        })
+      }
+    );
+
+    notify('Order status updated.');
+
+  } catch (err) {
+
+    notify(
+      err.message || 'Order update failed.',
+      'error'
+    );
+
+  } finally {
+
+    select.disabled = false;
+
+    await loadAdminOrders();
+
+  }
+}
+
+
+/* =====================================
+   BIND BUTTONS
+===================================== */
+
+function bindOrderButtons() {
+
+  document.querySelectorAll('.view-order')
+    .forEach(button => {
+
+      button.addEventListener('click', () => {
+        openOrderDetails(button.dataset.id);
+      });
+
+    });
+
+  document.querySelectorAll('.order-status')
+    .forEach(select => {
+
+      select.addEventListener('change', () => {
+        updateAdminOrderStatus(select);
+      });
+
+    });
+}
+
+
+/* =====================================
+   LOAD ADMIN ORDERS
+===================================== */
 
 async function loadAdminOrders() {
 
@@ -1366,23 +1290,25 @@ async function loadAdminOrders() {
 
   if (!admin) return;
 
-  const search =
-    document.querySelector('#search')
-      ?.value || '';
-
   const ordersBox =
     document.querySelector('#orders');
 
   if (!ordersBox) return;
 
+  const search =
+    document.querySelector('#search')
+      ?.value || '';
+
   try {
 
-    const data = await window.MC.api(
+    const data = await mcApi(
       '/admin/orders?search=' +
       encodeURIComponent(search)
     );
 
-    adminOrders = data.orders || [];
+    adminOrders = Array.isArray(data.orders)
+      ? data.orders
+      : [];
 
     if (!adminOrders.length) {
 
@@ -1397,164 +1323,167 @@ async function loadAdminOrders() {
       return;
     }
 
-    ordersBox.innerHTML = adminOrders
-      .map(order => `
+    ordersBox.innerHTML =
+      adminOrders.map(order => {
 
-        <tr>
+        const isOnline =
+          order.paymentMethod === 'CASHFREE' ||
+          order.paymentMethod === 'RAZORPAY';
 
-          <td>
+        const statuses =
+          isOnline
+            ? ADMIN_ORDER_STATUSES.filter(
+                status => status !== 'Cancelled'
+              )
+            : ADMIN_ORDER_STATUSES;
 
-            <b>
-              ${mcEscape(order.orderId)}
-            </b>
+        if (!statuses.includes(order.orderStatus)) {
+          statuses.push(order.orderStatus);
+        }
 
-            <br>
+        return `
+          <tr>
 
-            <span class="mini">
+            <td>
 
-              ${
-                order.createdAt
-                  ? new Date(order.createdAt)
-                      .toLocaleString('en-IN')
-                  : ''
-              }
+              <b>
+                ${mcEscape(order.orderId)}
+              </b>
 
-            </span>
+              <br>
 
-            <br><br>
+              <span class="mini">
+                ${formatDate(order.createdAt)}
+              </span>
 
-            <button
-              class="btn secondary view-order"
-              type="button"
-              data-id="${mcEscape(order._id)}"
-            >
-              View Details
-            </button>
+              <br><br>
 
-          </td>
+              <button
+                class="btn secondary view-order"
+                type="button"
+                data-id="${mcEscape(order._id)}">
+                View Details
+              </button>
 
-          <td>
+            </td>
 
-            ${mcEscape(
-              order.user?.fullName ||
-              order.customer?.fullName ||
-              'Guest'
-            )}
+            <td>
 
-            <br>
+              ${mcEscape(
+                order.user?.fullName ||
+                order.customer?.fullName ||
+                'Guest'
+              )}
 
-            ${mcEscape(
-              order.user?.mobile ||
-              order.customer?.mobile
-            )}
+              <br>
 
-          </td>
+              ${mcEscape(
+                order.user?.mobile ||
+                order.customer?.mobile ||
+                ''
+              )}
 
-          <td>
-            ${mcMoney(order.grandTotal)}
-          </td>
+            </td>
 
-          <td>
+            <td>
+              ${mcMoney(order.grandTotal)}
+            </td>
 
-            ${mcEscape(order.paymentMethod)}
+            <td>
 
-            <br>
+              ${mcEscape(order.paymentMethod)}
 
-            <span class="mini">
-              ${mcEscape(order.paymentStatus)}
-            </span>
+              <br>
 
-          </td>
+              <span class="mini">
+                ${mcEscape(order.paymentStatus)}
+              </span>
 
-          <td>
-            ${mcEscape(order.orderStatus)}
-          </td>
+            </td>
 
-          <td>
+            <td>
+              ${mcEscape(order.orderStatus)}
+            </td>
 
-            <select
-              class="select order-status"
-              data-id="${mcEscape(order._id)}"
-            >
+            <td>
 
-              ${ADMIN_ORDER_STATUSES.map(
-                status => `
+              <select
+                class="select order-status"
+                data-id="${mcEscape(order._id)}"
+                ${order.orderStatus === 'Cancelled'
+                  ? 'disabled'
+                  : ''}
+              >
 
+                ${statuses.map(status => `
                   <option
-                    value="${status}"
-                    ${
-                      status === order.orderStatus
-                        ? 'selected'
-                        : ''
-                    }
+                    value="${mcEscape(status)}"
+                    ${status === order.orderStatus
+                      ? 'selected'
+                      : ''}
                   >
-                    ${status}
+                    ${mcEscape(status)}
                   </option>
+                `).join('')}
 
-                `
-              ).join('')}
+              </select>
 
-            </select>
+            </td>
 
-          </td>
+          </tr>
 
-        </tr>
+          <tr
+            id="details-${mcEscape(order._id)}"
+            style="display:none">
+          </tr>
+        `;
 
-        <tr
-          id="details-${mcEscape(order._id)}"
-          style="display:none;"
-        ></tr>
-
-      `)
-      .join('');
+      }).join('');
 
     bindOrderButtons();
 
-  } catch (error) {
+  } catch (err) {
 
-    window.MC.toast(
-      error.message ||
-      'Orders load failed.',
+    notify(
+      err.message || 'Orders loading failed.',
       'error'
     );
+
+    ordersBox.innerHTML = `
+      <tr>
+        <td colspan="6">
+          Failed to load orders.
+        </td>
+      </tr>
+    `;
 
   }
 }
 
 
-/* =====================================================
-   SEARCH BUTTON
-===================================================== */
+/* =====================================
+   SEARCH
+===================================== */
 
-document
-  .querySelector('#searchBtn')
+document.querySelector('#searchBtn')
   ?.addEventListener(
     'click',
     loadAdminOrders
   );
 
+document.querySelector('#search')
+  ?.addEventListener('keydown', event => {
 
-/* =====================================================
-   SEARCH USING ENTER
-===================================================== */
-
-document
-  .querySelector('#search')
-  ?.addEventListener(
-    'keydown',
-    event => {
-
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        loadAdminOrders();
-      }
-
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      loadAdminOrders();
     }
-  );
+
+  });
 
 
-/* =====================================================
-   START ORDERS PAGE
-===================================================== */
+/* =====================================
+   START
+===================================== */
 
 loadAdminOrders();
