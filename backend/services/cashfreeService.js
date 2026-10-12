@@ -1,11 +1,43 @@
 
-/* =========================================
-   MEMORA CREATIONS
-   CASHFREE PAYMENT SERVICE
-   Sandbox / Production Support
-========================================= */
+/*
+=========================================
+ MEMORA CREATIONS
+ CASHFREE PAYMENT SERVICE
 
-const CASHFREE_API_VERSION = '2023-08-01';
+ SANDBOX + PRODUCTION
+
+ ORDER CREATION
+ PAYMENT VERIFICATION
+ PAYMENT ATTEMPTS
+ SAFE ORDER RECONCILIATION
+=========================================
+*/
+
+const CASHFREE_API_VERSION =
+  '2023-08-01';
+
+
+/* =====================================
+   ERROR HELPER
+===================================== */
+
+function cashfreeError(
+  message,
+  statusCode = 502
+) {
+
+  const err = new Error(message);
+
+  err.statusCode = statusCode;
+
+  return err;
+
+}
+
+
+/* =====================================
+   CASHFREE CONFIGURATION
+===================================== */
 
 function getCashfreeConfig() {
 
@@ -15,26 +47,28 @@ function getCashfreeConfig() {
   const clientSecret =
     process.env.CASHFREE_CLIENT_SECRET;
 
-  const env = (
+  const env = String(
     process.env.CASHFREE_ENV || 'sandbox'
   ).toLowerCase();
 
   if (!clientId || !clientSecret) {
-    const error = new Error(
-      'Cashfree credentials are not configured.'
+
+    throw cashfreeError(
+      'Cashfree credentials are not configured.',
+      503
     );
 
-    error.statusCode = 503;
-    throw error;
   }
 
-  if (!['sandbox', 'production'].includes(env)) {
-    const error = new Error(
-      'Invalid Cashfree environment.'
+  if (
+    !['sandbox', 'production'].includes(env)
+  ) {
+
+    throw cashfreeError(
+      'Invalid Cashfree environment.',
+      503
     );
 
-    error.statusCode = 503;
-    throw error;
   }
 
   const baseUrl =
@@ -48,12 +82,13 @@ function getCashfreeConfig() {
     env,
     baseUrl
   };
+
 }
 
 
-/* =========================================
+/* =====================================
    CASHFREE API REQUEST
-========================================= */
+===================================== */
 
 async function cashfreeRequest(
   endpoint,
@@ -70,12 +105,19 @@ async function cashfreeRequest(
   try {
 
     response = await fetch(
+
       config.baseUrl + endpoint,
+
       {
         method,
 
         headers: {
-          'Content-Type': 'application/json',
+
+          'Content-Type':
+            'application/json',
+
+          'Accept':
+            'application/json',
 
           'x-client-id':
             config.clientId,
@@ -85,6 +127,7 @@ async function cashfreeRequest(
 
           'x-api-version':
             CASHFREE_API_VERSION
+
         },
 
         ...(body !== undefined
@@ -93,50 +136,91 @@ async function cashfreeRequest(
             }
           : {}),
 
-        signal: AbortSignal.timeout(20000)
+        signal:
+          AbortSignal.timeout(20000)
+
       }
+
     );
 
-  } catch (_) {
+  } catch (err) {
 
-    const error = new Error(
+    console.error(
+      'Cashfree connection error:',
+      err.message
+    );
+
+    throw cashfreeError(
       'Cashfree server connection failed.'
     );
 
-    error.statusCode = 502;
-    throw error;
-
   }
 
-  const data = await response
-    .json()
-    .catch(() => ({}));
+  let data;
+
+  try {
+
+    data = await response.json();
+
+  } catch (_) {
+
+    throw cashfreeError(
+      'Invalid response from Cashfree.'
+    );
+
+  }
 
   if (!response.ok) {
 
     console.error(
-      'Cashfree API failed:',
+      'Cashfree API error:',
       response.status,
-      data.code || 'UNKNOWN_ERROR'
+      data?.code || 'UNKNOWN_ERROR'
     );
 
-    const error = new Error(
-      'Cashfree payment request failed. Please try again.'
+    throw cashfreeError(
+      'Cashfree request failed.',
+      502
     );
 
-    error.statusCode = 502;
-    throw error;
   }
 
   return data;
+
 }
 
 
-/* =========================================
-   CREATE CASHFREE PAYMENT ORDER
-========================================= */
+/* =====================================
+   VALIDATE ORDER ID
+===================================== */
+
+function validateOrderId(orderId) {
+
+  if (
+    typeof orderId !== 'string' ||
+    !orderId.trim()
+  ) {
+
+    throw cashfreeError(
+      'Cashfree order ID is required.',
+      400
+    );
+
+  }
+
+  return encodeURIComponent(
+    orderId.trim()
+  );
+
+}
+
+
+/* =====================================
+   CREATE CASHFREE ORDER
+===================================== */
 
 async function createCashfreeOrder({
+
   orderId,
   amount,
   customerId,
@@ -144,9 +228,11 @@ async function createCashfreeOrder({
   customerPhone,
   customerEmail,
   returnUrl
+
 }) {
 
-  const parsedAmount = Number(amount);
+  const parsedAmount =
+    Number(amount);
 
   if (
     !orderId ||
@@ -157,76 +243,119 @@ async function createCashfreeOrder({
       String(customerPhone || '')
     )
   ) {
-    const error = new Error(
-      'Invalid Cashfree order details.'
+
+    throw cashfreeError(
+      'Invalid Cashfree order details.',
+      400
     );
 
-    error.statusCode = 400;
-    throw error;
   }
 
   const payload = {
-    order_id: String(orderId),
+
+    order_id:
+      String(orderId),
 
     order_amount:
       Math.round(parsedAmount * 100) / 100,
 
-    order_currency: 'INR',
+    order_currency:
+      'INR',
 
     customer_details: {
-      customer_id: String(customerId),
+
+      customer_id:
+        String(customerId),
 
       customer_name:
         String(customerName || 'Customer'),
 
       customer_phone:
         String(customerPhone)
+
     }
+
   };
 
   if (customerEmail) {
+
     payload.customer_details.customer_email =
       String(customerEmail);
+
   }
 
   if (returnUrl) {
+
     payload.order_meta = {
-      return_url: String(returnUrl)
+
+      return_url:
+        String(returnUrl)
+
     };
-  }
 
-  return cashfreeRequest('/orders', {
-    method: 'POST',
-    body: payload
-  });
-}
-
-
-/* =========================================
-   VERIFY CASHFREE PAYMENT ORDER
-========================================= */
-
-async function fetchCashfreeOrder(orderId) {
-
-  if (!orderId) {
-    const error = new Error(
-      'Cashfree order ID is required.'
-    );
-
-    error.statusCode = 400;
-    throw error;
   }
 
   return cashfreeRequest(
-    '/orders/' +
-    encodeURIComponent(String(orderId))
+    '/orders',
+    {
+      method: 'POST',
+      body: payload
+    }
   );
+
 }
 
 
-/* =========================================
-   CHECK VERIFIED PAYMENT STATUS
-========================================= */
+/* =====================================
+   FETCH CASHFREE ORDER
+===================================== */
+
+async function fetchCashfreeOrder(orderId) {
+
+  const id = validateOrderId(
+    orderId
+  );
+
+  return cashfreeRequest(
+    '/orders/' + id
+  );
+
+}
+
+
+/* =====================================
+   FETCH ALL PAYMENT ATTEMPTS
+
+   Cashfree may return multiple payment
+   attempts for a single order.
+===================================== */
+
+async function fetchCashfreePayments(orderId) {
+
+  const id = validateOrderId(
+    orderId
+  );
+
+  const payments = await cashfreeRequest(
+    '/orders/' + id + '/payments'
+  );
+
+  if (!Array.isArray(payments)) {
+
+    throw cashfreeError(
+      'Invalid Cashfree payments response.'
+    );
+
+  }
+
+  return payments;
+
+}
+
+
+/* =====================================
+   CHECK SUCCESSFUL ORDER
+===================================== */
 
 function isCashfreePaymentSuccessful(
   cashfreeOrder,
@@ -240,6 +369,7 @@ function isCashfreePaymentSuccessful(
     Number(expectedAmount);
 
   return (
+
     cashfreeOrder?.order_status === 'PAID' &&
 
     cashfreeOrder?.order_currency === 'INR' &&
@@ -248,19 +378,174 @@ function isCashfreePaymentSuccessful(
 
     Number.isFinite(requiredAmount) &&
 
+    actualAmount >= 0 &&
+
+    requiredAmount >= 0 &&
+
     Math.round(actualAmount * 100) ===
-      Math.round(requiredAmount * 100)
+    Math.round(requiredAmount * 100)
+
   );
+
 }
 
 
-/* =========================================
+/* =====================================
+   SUMMARIZE PAYMENT ATTEMPTS
+
+   IMPORTANT:
+   This is informational.
+
+   Do not release stock solely
+   based on these results.
+===================================== */
+
+function summarizeCashfreePayments(payments) {
+
+  if (!Array.isArray(payments)) {
+
+    throw cashfreeError(
+      'Invalid payment attempts.',
+      400
+    );
+
+  }
+
+  const summary = {
+
+    totalAttempts:
+      payments.length,
+
+    successful:
+      0,
+
+    pending:
+      0,
+
+    failed:
+      0,
+
+    other:
+      0,
+
+    hasSuccessfulPayment:
+      false,
+
+    hasPendingPayment:
+      false
+
+  };
+
+  for (const payment of payments) {
+
+    const status = String(
+      payment?.payment_status || ''
+    ).toUpperCase();
+
+    if (status === 'SUCCESS') {
+
+      summary.successful++;
+
+    } else if (status === 'PENDING') {
+
+      summary.pending++;
+
+    } else if (
+      status === 'FAILED' ||
+      status === 'USER_DROPPED'
+    ) {
+
+      summary.failed++;
+
+    } else {
+
+      summary.other++;
+
+    }
+
+  }
+
+  summary.hasSuccessfulPayment =
+    summary.successful > 0;
+
+  summary.hasPendingPayment =
+    summary.pending > 0;
+
+  return summary;
+
+}
+
+
+/* =====================================
+   CHECK ORDER FINAL STATE
+
+   Informational only.
+
+   Final payment reconciliation must
+   verify gateway response, local order
+   state and in-flight payment events.
+===================================== */
+
+async function inspectCashfreeOrder(orderId) {
+
+  const gatewayOrder =
+    await fetchCashfreeOrder(orderId);
+
+  const payments =
+    await fetchCashfreePayments(orderId);
+
+  const summary =
+    summarizeCashfreePayments(payments);
+
+  const orderStatus = String(
+    gatewayOrder.order_status || 'UNKNOWN'
+  ).toUpperCase();
+
+  const terminal =
+    orderStatus === 'EXPIRED' ||
+    orderStatus === 'TERMINATED';
+
+  return {
+
+    gatewayOrder,
+
+    payments,
+
+    summary,
+
+    orderStatus,
+
+    terminal,
+
+    requiresManualReview:
+      orderStatus === 'PAID' ||
+      summary.hasSuccessfulPayment ||
+      summary.hasPendingPayment ||
+      !terminal
+
+  };
+
+}
+
+
+/* =====================================
    EXPORT FUNCTIONS
-========================================= */
+===================================== */
 
 module.exports = {
+
   getCashfreeConfig,
+
   createCashfreeOrder,
+
   fetchCashfreeOrder,
-  isCashfreePaymentSuccessful
+
+  fetchCashfreePayments,
+
+  isCashfreePaymentSuccessful,
+
+  summarizeCashfreePayments,
+
+  inspectCashfreeOrder
+
 };
