@@ -1,3 +1,21 @@
+
+/*
+=========================================
+ MEMORA CREATIONS
+ ADMIN ROUTES
+
+ ADMIN AUTHENTICATION
+ DASHBOARD
+ PRODUCTS
+ CATEGORIES
+ ORDERS
+ USERS
+ CLOUDINARY
+ SHIPROCKET
+ CASHFREE INSPECTION
+=========================================
+*/
+
 const router =
   require('express').Router();
 
@@ -6,9 +24,7 @@ const c =
 
 const {
   requireAdmin
-} =
-  require('../middleware/auth');
-
+} = require('../middleware/auth');
 
 const cloudinaryController =
   require('../controllers/cloudinaryController');
@@ -17,17 +33,18 @@ const shiprocketController =
   require('../controllers/shiprocketController');
 
 const {
-  configured:
-    shiprocketConfigured,
-
+  configured: shiprocketConfigured,
   getShiprocketToken
-} =
-  require('../services/shiprocketService');
+} = require('../services/shiprocketService');
+
+const {
+  inspectOldCashfreeOrders
+} = require('../services/cashfreeCleanupService');
 
 
-/* =========================
+/* =====================================
    ADMIN AUTH
-========================= */
+===================================== */
 
 router.post(
   '/login',
@@ -40,66 +57,111 @@ router.post(
 );
 
 
-/* =========================
+/* =====================================
    ADMIN LOGIN REQUIRED
-========================= */
 
-router.use(
-  requireAdmin
-);
+   All routes below require a
+   valid Admin login session.
+===================================== */
+
+router.use(requireAdmin);
 
 
-/* =========================
-   SHIPROCKET TEST
-========================= */
+/* =====================================
+   CASHFREE PENDING ORDER INSPECTION
+
+   GET /api/admin/cashfree/inspect
+
+   Read-only:
+   No order modifications
+   No stock release
+   No payment status changes
+===================================== */
 
 router.get(
-  '/shiprocket/test',
+  '/cashfree/inspect',
   async (req, res) => {
 
     try {
 
+      /*
+        Optional query parameters:
+
+        ?minutes=60&limit=20
+
+        Defaults:
+        60 minutes
+        20 orders
+      */
+
+      const minutes = Number(
+        req.query.minutes ?? 60
+      );
+
+      const limit = Number(
+        req.query.limit ?? 20
+      );
+
       if (
-        !shiprocketConfigured()
+        !Number.isInteger(minutes) ||
+        minutes < 1 ||
+        minutes > 10080
       ) {
 
-        return res
-          .status(500)
-          .json({
-            success: false,
-            message:
-              'Shiprocket credentials are not configured.'
-          });
+        return res.status(400).json({
+          success: false,
+          message:
+            'Minutes must be between 1 and 10080.'
+        });
 
       }
 
+      if (
+        !Number.isInteger(limit) ||
+        limit < 1 ||
+        limit > 100
+      ) {
 
-      await getShiprocketToken();
-
-
-      return res.json({
-        success: true,
-        message:
-          'Shiprocket connected successfully.'
-      });
-
-
-    } catch (error) {
-
-      console.error(
-        'Shiprocket connection test failed:',
-        error
-      );
-
-
-      return res
-        .status(500)
-        .json({
+        return res.status(400).json({
           success: false,
           message:
-            error.message ||
-            'Shiprocket connection failed.'
+            'Limit must be between 1 and 100.'
         });
+
+      }
+
+      const report =
+        await inspectOldCashfreeOrders({
+
+          olderThanMinutes: minutes,
+
+          limit
+
+        });
+
+      return res.status(200).json({
+
+        success: true,
+
+        message:
+          'Cashfree inspection completed.',
+
+        ...report
+
+      });
+
+    } catch (err) {
+
+      console.error(
+        'Cashfree inspection failed:',
+        err.message
+      );
+
+      return res.status(500).json({
+        success: false,
+        message:
+          'Cashfree inspection failed. Check server logs.'
+      });
 
     }
 
@@ -107,9 +169,57 @@ router.get(
 );
 
 
-/* =========================
+/* =====================================
+   SHIPROCKET CONNECTION TEST
+===================================== */
+
+router.get(
+  '/shiprocket/test',
+  async (req, res) => {
+
+    try {
+
+      if (!shiprocketConfigured()) {
+
+        return res.status(500).json({
+          success: false,
+          message:
+            'Shiprocket credentials are not configured.'
+        });
+
+      }
+
+      await getShiprocketToken();
+
+      return res.json({
+        success: true,
+        message:
+          'Shiprocket connected successfully.'
+      });
+
+    } catch (err) {
+
+      console.error(
+        'Shiprocket connection test failed:',
+        err
+      );
+
+      return res.status(500).json({
+        success: false,
+        message:
+          err.message ||
+          'Shiprocket connection failed.'
+      });
+
+    }
+
+  }
+);
+
+
+/* =====================================
    CLOUDINARY
-========================= */
+===================================== */
 
 router.post(
   '/cloudinary/signature',
@@ -117,9 +227,9 @@ router.post(
 );
 
 
-/* =========================
+/* =====================================
    DASHBOARD
-========================= */
+===================================== */
 
 router.get(
   '/dashboard',
@@ -127,9 +237,9 @@ router.get(
 );
 
 
-/* =========================
+/* =====================================
    PRODUCTS
-========================= */
+===================================== */
 
 router.get(
   '/products',
@@ -152,9 +262,9 @@ router.delete(
 );
 
 
-/* =========================
+/* =====================================
    CATEGORIES
-========================= */
+===================================== */
 
 router.post(
   '/categories',
@@ -172,9 +282,9 @@ router.delete(
 );
 
 
-/* =========================
+/* =====================================
    ORDERS
-========================= */
+===================================== */
 
 router.get(
   '/orders',
@@ -187,7 +297,9 @@ router.put(
 );
 
 
-/* CHECK COURIER RATES */
+/* =====================================
+   CHECK COURIER RATES
+===================================== */
 
 router.post(
   '/orders/:id/check-couriers',
@@ -195,7 +307,9 @@ router.post(
 );
 
 
-/* CREATE SHIPROCKET SHIPMENT */
+/* =====================================
+   CREATE SHIPROCKET SHIPMENT
+===================================== */
 
 router.post(
   '/orders/:id/create-shipment',
@@ -203,21 +317,19 @@ router.post(
 );
 
 
-/* =========================
+/* =====================================
    USERS
-========================= */
+===================================== */
 
 router.get(
   '/users',
   c.listUsers
 );
 
-
 router.get(
   '/users/:id/orders',
   c.userOrders
 );
-
 
 router.patch(
   '/users/:id/toggle',
@@ -225,9 +337,9 @@ router.patch(
 );
 
 
-/* =========================
+/* =====================================
    ADMIN RESET USER PASSWORD
-========================= */
+===================================== */
 
 router.patch(
   '/users/:id/password',
@@ -235,5 +347,8 @@ router.patch(
 );
 
 
-module.exports =
-  router;
+/* =====================================
+   EXPORT ROUTER
+===================================== */
+
+module.exports = router;
