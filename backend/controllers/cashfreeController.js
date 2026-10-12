@@ -1,11 +1,18 @@
 
-/* =========================================
-   MEMORA CREATIONS
-   CASHFREE PAYMENT CONTROLLER
-   SANDBOX / PRODUCTION
-========================================= */
+/*
+=========================================
+ MEMORA CREATIONS
+ CASHFREE PAYMENT CONTROLLER
+
+ SANDBOX + PRODUCTION
+ PAYMENT VERIFICATION
+ DUPLICATE PAYMENT PROTECTION
+ ORDER SECURITY
+=========================================
+*/
 
 const crypto = require('crypto');
+const mongoose = require('mongoose');
 
 const {
   Order,
@@ -36,15 +43,14 @@ const {
 } = require('../services/cashfreeService');
 
 
-/* =========================================
-   CREATE CASHFREE PAYMENT ORDER
-========================================= */
+/* =====================================
+   CREATE CASHFREE ORDER
+===================================== */
 
 const createOrder = asyncHandler(
   async (req, res) => {
 
-    const address =
-      req.body.address;
+    const address = req.body?.address;
 
     const validationMessage =
       validateAddress(address);
@@ -56,10 +62,12 @@ const createOrder = asyncHandler(
       );
     }
 
-    const items =
-      req.body.items;
+    const items = req.body?.items;
 
-    // Always calculate prices on the server.
+    /*
+      Prices must always be calculated
+      from the database.
+    */
 
     const trustedItems =
       await getTrustedItems(items);
@@ -76,18 +84,33 @@ const createOrder = asyncHandler(
     ) {
       throw error(
         400,
-        'Invalid order total.'
+        'Invalid order amount.'
       );
     }
+
+    /*
+      Unique Cashfree order reference.
+    */
 
     const cashfreeOrderId =
       'MC_CF_' +
       Date.now() +
       '_' +
-      crypto.randomBytes(5)
+      crypto.randomBytes(8)
         .toString('hex');
 
-    // Create payment session at Cashfree.
+    /*
+      Check gateway configuration before
+      creating a payment session.
+    */
+
+    const config =
+      getCashfreeConfig();
+
+    /*
+      Create payment session through
+      Cashfree server API.
+    */
 
     const cashfreeOrder =
       await createCashfreeOrder({
@@ -109,9 +132,14 @@ const createOrder = asyncHandler(
           address.mobile,
 
         customerEmail:
-          req.user.email || undefined
+          req.user.email ||
+          undefined
 
       });
+
+    /*
+      Validate gateway response.
+    */
 
     if (
       !cashfreeOrder ||
@@ -120,12 +148,20 @@ const createOrder = asyncHandler(
     ) {
       throw error(
         502,
-        'Cashfree payment session was not created correctly.'
+        'Cashfree payment session could not be created.'
       );
     }
 
-    // Save local order and reserve stock.
-    // Existing COD and Razorpay flows stay unchanged.
+    /*
+      Create local pending order and
+      reserve stock inside transaction.
+
+      Important:
+      If the local transaction fails,
+      the gateway session may remain.
+      It must be handled by a separate
+      reconciliation workflow.
+    */
 
     const order =
       await createCashfreePendingOrder({
@@ -144,17 +180,31 @@ const createOrder = asyncHandler(
 
       });
 
-    if (
-      cashfreeOrder.cf_order_id
-    ) {
-      order.cashfreeCfOrderId =
-        String(cashfreeOrder.cf_order_id);
+    /*
+      Cashfree reference for reporting.
+      The main order is already saved.
+    */
 
-      await order.save();
+    if (cashfreeOrder.cf_order_id) {
+
+      await Order.updateOne(
+        {
+          _id: order._id
+        },
+        {
+          $set: {
+            cashfreeCfOrderId:
+              String(cashfreeOrder.cf_order_id)
+          }
+        }
+      );
+
     }
 
-    const config =
-      getCashfreeConfig();
+    /*
+      Return the SDK payment session.
+      Never expose Cashfree credentials.
+    */
 
     return ok(res, {
 
@@ -169,7 +219,8 @@ const createOrder = asyncHandler(
       paymentSessionId:
         cashfreeOrder.payment_session_id,
 
-      amount,
+      amount:
+        order.grandTotal,
 
       currency:
         'INR',
@@ -183,32 +234,39 @@ const createOrder = asyncHandler(
 );
 
 
-/* =========================================
+/* =====================================
    VERIFY CASHFREE PAYMENT
 
-   Never trust payment success from
-   the browser alone.
-
-   Confirm directly with Cashfree API.
-========================================= */
+   Verify only with Cashfree API.
+   Never trust browser payment status.
+===================================== */
 
 const verifyPayment = asyncHandler(
   async (req, res) => {
 
     const orderId =
-      req.body.orderId;
+      req.body?.orderId;
 
-    if (!orderId) {
+    if (
+      !orderId ||
+      !mongoose.isValidObjectId(orderId)
+    ) {
       throw error(
         400,
-        'Order ID is required.'
+        'Valid order ID is required.'
       );
     }
+
+    /*
+      Customer may verify only
+      their own Cashfree orders.
+    */
 
     const order =
       await Order.findOne({
 
-        _id: orderId,
+        _id:
+          orderId,
 
         user:
           req.user._id,
@@ -225,42 +283,76 @@ const verifyPayment = asyncHandler(
       );
     }
 
-    if (
-      !order.cashfreeOrderId
-    ) {
+    if (!order.cashfreeOrderId) {
       throw error(
-        400,
-        'Cashfree order reference is missing.'
+        409,
+        'Cashfree order reference missing.'
       );
     }
 
-    // Fetch authoritative status
-    // directly from Cashfree.
+    /*
+      Fetch authoritative status.
+    */
 
-    const cashfreeOrder =
+    const gatewayOrder =
       await fetchCashfreeOrder(
         order.cashfreeOrderId
       );
 
     if (
-      cashfreeOrder.order_id !==
+      gatewayOrder.order_id !==
       order.cashfreeOrderId
     ) {
       throw error(
-        400,
-        'Cashfree order ID mismatch.'
+        409,
+        'Cashfree order reference mismatch.'
       );
     }
 
-    const isPaid =
+    /*
+      Validate payment amount,
+      currency and PAID status.
+    */
+
+    const paid =
       isCashfreePaymentSuccessful(
-        cashfreeOrder,
+        gatewayOrder,
         order.grandTotal
       );
 
-    // Do not confirm an unpaid order.
+    /*
+      A PAID gateway status with invalid
+      amount/currency needs manual review.
+    */
 
-    if (!isPaid) {
+    if (
+      gatewayOrder.order_status === 'PAID' &&
+      !paid
+    ) {
+      throw error(
+        409,
+        'Payment requires manual review.'
+      );
+    }
+
+    /*
+      Payment not confirmed.
+
+      Do not release stock here.
+      Do not mark SUCCESS.
+      Do not clear cart.
+    */
+
+    if (!paid) {
+
+      if (
+        order.paymentStatus === 'SUCCESS'
+      ) {
+        throw error(
+          409,
+          'Payment records require reconciliation.'
+        );
+      }
 
       return ok(res, {
 
@@ -271,7 +363,7 @@ const verifyPayment = asyncHandler(
           order.paymentStatus,
 
         cashfreeStatus:
-          cashfreeOrder.order_status ||
+          gatewayOrder.order_status ||
           'UNKNOWN',
 
         message:
@@ -281,34 +373,32 @@ const verifyPayment = asyncHandler(
 
     }
 
-    // Avoid marking the same order
-    // successful more than once.
+    /*
+      Confirm payment atomically.
 
-    if (
-      order.paymentStatus !== 'SUCCESS'
-    ) {
+      Webhook and browser verification
+      may run simultaneously.
 
-      if (
-        order.orderStatus === 'Cancelled' ||
-        order.stockReserved !== true
-      ) {
-        throw error(
-          409,
-          'Payment received, but this order requires manual review.'
-        );
-      }
+      Only a reserved, non-cancelled
+      order can transition to SUCCESS.
+    */
 
+    const updatedOrder =
       await Order.findOneAndUpdate(
+
         {
+
           _id:
             order._id,
+
+          user:
+            req.user._id,
 
           paymentMethod:
             'CASHFREE',
 
-          paymentStatus: {
-            $ne: 'SUCCESS'
-          },
+          paymentStatus:
+            'PENDING',
 
           stockReserved:
             true,
@@ -316,50 +406,86 @@ const verifyPayment = asyncHandler(
           orderStatus: {
             $ne: 'Cancelled'
           }
+
         },
+
         {
+
           $set: {
             paymentStatus:
               'SUCCESS'
           },
 
           $push: {
+
             statusHistory: {
+
               status:
                 order.orderStatus,
 
               note:
-                'Cashfree payment verified successfully.',
+                'Cashfree payment confirmed by server verification.',
 
               changedAt:
                 new Date()
+
             }
+
           }
+
         },
+
         {
-          new:
-            true
+          new: true
         }
+
       );
 
-    }
+    /*
+      Reload latest database state.
+
+      Webhook may already have completed
+      the transition.
+    */
 
     const confirmedOrder =
-      await Order.findById(
-        order._id
-      );
+      updatedOrder ||
+      await Order.findOne({
+
+        _id:
+          order._id,
+
+        user:
+          req.user._id,
+
+        paymentMethod:
+          'CASHFREE'
+
+      });
+
+    /*
+      Do not report success for a
+      cancelled/unreserved order.
+    */
 
     if (
       !confirmedOrder ||
-      confirmedOrder.paymentStatus !== 'SUCCESS'
+      confirmedOrder.paymentStatus !== 'SUCCESS' ||
+      confirmedOrder.orderStatus === 'Cancelled' ||
+      confirmedOrder.stockReserved !== true
     ) {
       throw error(
         409,
-        'Payment confirmation requires review.'
+        'Payment received, but order requires manual review.'
       );
     }
 
-    // Clear cart after verified payment.
+    /*
+      Clear cart only after verified
+      successful payment.
+
+      This preserves current behavior.
+    */
 
     if (
       confirmedOrder.clearCartOnPayment === true
@@ -379,6 +505,10 @@ const verifyPayment = asyncHandler(
 
     }
 
+    /*
+      Payment confirmed.
+    */
+
     return ok(res, {
 
       verified:
@@ -386,6 +516,9 @@ const verifyPayment = asyncHandler(
 
       paymentStatus:
         'SUCCESS',
+
+      cashfreeStatus:
+        gatewayOrder.order_status,
 
       message:
         'Cashfree payment verified successfully.',
@@ -399,11 +532,14 @@ const verifyPayment = asyncHandler(
 );
 
 
-/* =========================================
+/* =====================================
    EXPORTS
-========================================= */
+===================================== */
 
 module.exports = {
+
   createOrder,
+
   verifyPayment
+
 };
