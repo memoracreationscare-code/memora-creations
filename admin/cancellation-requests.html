@@ -1,0 +1,815 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>
+    Cancellation Requests | MEMORA CREATIONS
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="/memora-creations/admin/css/style.css?v=6"
+  >
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #f8f5f0;
+      color: #302117;
+    }
+
+    .mc-header {
+      padding: 28px 0;
+    }
+
+    .mc-header h1 {
+      margin: 0 0 10px;
+      font-size: clamp(25px, 4vw, 37px);
+    }
+
+    .mc-header p {
+      margin: 0;
+      color: #88766a;
+      line-height: 1.7;
+    }
+
+    .mc-panel {
+      padding: 24px;
+      border: 1px solid #e9ddd1;
+      border-radius: 20px;
+      background: white;
+      box-shadow: 0 10px 35px #3421160b;
+    }
+
+    .mc-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 22px;
+    }
+
+    .mc-toolbar h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .mc-search {
+      width: min(350px, 100%);
+      padding: 12px 15px;
+      border: 1px solid #e4d5c8;
+      border-radius: 11px;
+      background: #fffdfa;
+      font: inherit;
+    }
+
+    .mc-count {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 13px;
+      border-radius: 30px;
+      background: #fff0de;
+      color: #8c531b;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .mc-table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid #eee2d6;
+      border-radius: 15px;
+    }
+
+    .mc-table {
+      width: 100%;
+      min-width: 850px;
+      border-collapse: collapse;
+    }
+
+    .mc-table th {
+      padding: 15px;
+      background: #f6eee6;
+      color: #654732;
+      font-size: 12px;
+      text-align: left;
+    }
+
+    .mc-table td {
+      padding: 16px;
+      border-bottom: 1px solid #f0e8e0;
+      font-size: 13px;
+      vertical-align: middle;
+      overflow-wrap: anywhere;
+    }
+
+    .mc-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .mc-table small {
+      display: block;
+      margin-top: 5px;
+      color: #85746a;
+      line-height: 1.6;
+    }
+
+    .mc-badge {
+      display: inline-flex;
+      padding: 7px 11px;
+      border-radius: 30px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .mc-pending {
+      color: #946100;
+      background: #fff2d8;
+    }
+
+    .mc-success {
+      color: #166534;
+      background: #e8f7ed;
+    }
+
+    .mc-failed {
+      color: #b42318;
+      background: #fceae7;
+    }
+
+    .mc-neutral {
+      color: #59616d;
+      background: #edf0f3;
+    }
+
+    .mc-request {
+      color: #1c5ca8;
+      background: #e8f1ff;
+    }
+
+    .mc-link {
+      display: inline-block;
+      padding: 10px 13px;
+      border-radius: 10px;
+      background: #865535;
+      color: white;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .mc-link:hover {
+      background: #643a24;
+      color: white;
+    }
+
+    .mc-notice {
+      margin: 20px 0;
+      padding: 16px 18px;
+      border: 1px solid #efd9b6;
+      border-radius: 13px;
+      background: #fff7e8;
+      color: #805b2c;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .mc-empty {
+      padding: 30px;
+      color: #81746a;
+      text-align: center;
+      line-height: 1.8;
+    }
+
+    .mc-footer {
+      margin: 25px 0 40px;
+      color: #97877b;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    @media (max-width: 650px) {
+      .mc-panel {
+        padding: 14px;
+      }
+
+      .mc-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .mc-search {
+        width: 100%;
+      }
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <!-- ADMIN NAV -->
+
+  <nav class="adminnav">
+    <div class="container">
+
+      <b>MEMORA ADMIN</b>
+
+      <a
+        href="/memora-creations/admin/dashboard.html"
+      >
+        Dashboard
+      </a>
+
+      <a
+        href="/memora-creations/admin/products.html"
+      >
+        Products
+      </a>
+
+      <a
+        href="/memora-creations/admin/orders.html"
+      >
+        Orders
+      </a>
+
+      <a
+        href="/memora-creations/admin/cancellation-requests.html"
+        aria-current="page"
+      >
+        Cancel Requests
+      </a>
+
+      <a
+        href="/memora-creations/admin/users.html"
+      >
+        Customers
+      </a>
+
+      <button
+        id="logout"
+        class="btn secondary"
+        type="button"
+      >
+        Logout
+      </button>
+
+    </div>
+  </nav>
+
+  <main class="container adminmain">
+
+    <section class="mc-header">
+
+      <h1>
+        Cancellation Requests
+      </h1>
+
+      <p>
+        Review customer cancellation requests
+        for Cashfree orders.
+      </p>
+
+    </section>
+
+    <section class="mc-panel">
+
+      <div class="mc-toolbar">
+
+        <div>
+          <h2>Customer Requests</h2>
+          <p id="loadingStatus">
+            Loading requests...
+          </p>
+        </div>
+
+        <div>
+          <span
+            id="requestCount"
+            class="mc-count"
+          >
+            0 Requests
+          </span>
+        </div>
+
+        <input
+          id="requestSearch"
+          class="mc-search"
+          type="search"
+          placeholder="Search Order ID or Customer"
+          aria-label="Search cancellation requests"
+        >
+
+      </div>
+
+      <div class="mc-table-wrap">
+
+        <table class="mc-table">
+
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th>Customer</th>
+              <th>Total</th>
+              <th>Payment</th>
+              <th>Order Status</th>
+              <th>Request Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody id="requestRows">
+
+            <tr>
+              <td colspan="7" class="mc-empty">
+                Loading cancellation requests...
+              </td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+      <div class="mc-notice">
+
+        <strong>Important Payment Safety</strong>
+
+        <p>
+          Cancellation Request ka matlab
+          Order Cancel hona nahi hai.
+          Cashfree payment verify kiye bina
+          Payment Status, Stock ya Refund
+          update na karein.
+        </p>
+
+        <p>
+          Agar Payment SUCCESS ho gaya hai,
+          to cancellation se pehle refund
+          review zaroori hai.
+        </p>
+
+      </div>
+
+    </section>
+
+    <div class="mc-footer">
+      © MEMORA CREATIONS — Cancellation Review
+    </div>
+
+  </main>
+
+  <!-- COMMON API -->
+
+  <script
+    src="/memora-creations/frontend/js/app.js?v=10"
+  ></script>
+
+  <!-- ADMIN AUTH -->
+
+  <script
+    src="/memora-creations/admin/js/auth.js?v=5"
+  ></script>
+
+  <!-- REQUEST MANAGEMENT -->
+
+  <script>
+    (() => {
+      'use strict';
+
+      const MARKER =
+        'CUSTOMER_CASHFREE_CANCEL_REQUEST';
+
+      const rowsBox =
+        document.getElementById('requestRows');
+
+      const searchInput =
+        document.getElementById('requestSearch');
+
+      const countBox =
+        document.getElementById('requestCount');
+
+      const statusBox =
+        document.getElementById('loadingStatus');
+
+      let allRequests = [];
+
+
+      /* =========================
+         HELPERS
+      ========================= */
+
+      function createText(tag, value) {
+
+        const element =
+          document.createElement(tag);
+
+        element.textContent =
+          String(value ?? '');
+
+        return element;
+      }
+
+
+      function formatDate(value) {
+
+        if (!value) return '-';
+
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) {
+          return '-';
+        }
+
+        return date.toLocaleString('en-IN');
+      }
+
+
+      function money(value) {
+
+        return window.MC.money(
+          Number(value || 0)
+        );
+      }
+
+
+      function paymentBadge(status) {
+
+        const value =
+          String(status || 'UNKNOWN')
+            .toUpperCase();
+
+        const badge =
+          createText('span', value);
+
+        badge.className = 'mc-badge';
+
+        if (value === 'SUCCESS') {
+          badge.classList.add('mc-success');
+
+        } else if (value === 'PENDING') {
+          badge.classList.add('mc-pending');
+
+        } else if (
+          value === 'FAILED' ||
+          value === 'CANCELLED'
+        ) {
+          badge.classList.add('mc-failed');
+
+        } else {
+          badge.classList.add('mc-neutral');
+        }
+
+        return badge;
+      }
+
+
+      /* =========================
+         FIND CUSTOMER REQUESTS
+      ========================= */
+
+      function extractRequests(orders) {
+
+        const result = [];
+
+        for (const order of orders) {
+
+          if (
+            order.paymentMethod !== 'CASHFREE'
+          ) {
+            continue;
+          }
+
+          const history =
+            Array.isArray(order.statusHistory)
+              ? order.statusHistory
+              : [];
+
+          const requests = history.filter(
+            entry => String(
+              entry.note || ''
+            ).startsWith(MARKER)
+          );
+
+          if (!requests.length) {
+            continue;
+          }
+
+          const latestRequest =
+            requests[requests.length - 1];
+
+          result.push({
+            order,
+            requestDate:
+              latestRequest.changedAt ||
+              order.updatedAt
+          });
+        }
+
+        result.sort((a, b) =>
+          new Date(b.requestDate || 0) -
+          new Date(a.requestDate || 0)
+        );
+
+        return result;
+      }
+
+
+      /* =========================
+         RENDER TABLE
+      ========================= */
+
+      function renderRequests() {
+
+        const search =
+          searchInput.value
+            .trim()
+            .toLowerCase();
+
+        const filtered =
+          allRequests.filter(item => {
+
+            const order = item.order;
+
+            const customer =
+              order.user?.fullName ||
+              order.customer?.fullName ||
+              '';
+
+            const mobile =
+              order.user?.mobile ||
+              order.customer?.mobile ||
+              '';
+
+            const orderId =
+              order.orderId || '';
+
+            return (
+              String(orderId)
+                .toLowerCase()
+                .includes(search) ||
+
+              String(customer)
+                .toLowerCase()
+                .includes(search) ||
+
+              String(mobile)
+                .toLowerCase()
+                .includes(search)
+            );
+
+          });
+
+        rowsBox.replaceChildren();
+
+        countBox.textContent =
+          allRequests.length +
+          ' Requests';
+
+        if (!filtered.length) {
+
+          const row =
+            document.createElement('tr');
+
+          const cell =
+            createText(
+              'td',
+              allRequests.length
+                ? 'No matching requests found.'
+                : 'No cancellation requests found among the loaded orders.'
+            );
+
+          cell.colSpan = 7;
+          cell.className = 'mc-empty';
+
+          row.appendChild(cell);
+
+          rowsBox.appendChild(row);
+
+          return;
+        }
+
+        for (const item of filtered) {
+
+          const order = item.order;
+
+          const row =
+            document.createElement('tr');
+
+          const customer =
+            order.user?.fullName ||
+            order.customer?.fullName ||
+            'Customer';
+
+          const mobile =
+            order.user?.mobile ||
+            order.customer?.mobile ||
+            '';
+
+          const orderCell =
+            document.createElement('td');
+
+          const orderId =
+            createText(
+              'strong',
+              order.orderId || '-'
+            );
+
+          const requestBadge =
+            createText(
+              'small',
+              'Cancellation Requested'
+            );
+
+          requestBadge.style.color = '#245ac2';
+
+          orderCell.append(
+            orderId,
+            requestBadge
+          );
+
+          const customerCell =
+            document.createElement('td');
+
+          customerCell.append(
+            createText('strong', customer),
+            createText('small', mobile)
+          );
+
+          const totalCell =
+            createText(
+              'td',
+              money(order.grandTotal)
+            );
+
+          const paymentCell =
+            document.createElement('td');
+
+          paymentCell.appendChild(
+            paymentBadge(order.paymentStatus)
+          );
+
+          const statusCell =
+            createText(
+              'td',
+              order.orderStatus || '-'
+            );
+
+          const dateCell =
+            createText(
+              'td',
+              formatDate(item.requestDate)
+            );
+
+          const actionCell =
+            document.createElement('td');
+
+          const link =
+            document.createElement('a');
+
+          link.className = 'mc-link';
+
+          link.href =
+            '/memora-creations/admin/orders.html';
+
+          link.textContent =
+            'Review Order →';
+
+          actionCell.appendChild(link);
+
+          row.append(
+            orderCell,
+            customerCell,
+            totalCell,
+            paymentCell,
+            statusCell,
+            dateCell,
+            actionCell
+          );
+
+          rowsBox.appendChild(row);
+        }
+      }
+
+
+      /* =========================
+         LOAD FROM ADMIN API
+      ========================= */
+
+      async function loadRequests() {
+
+        try {
+
+          /*
+            Admin list endpoint currently
+            returns up to 200 latest orders.
+
+            Older requests outside that
+            window will not appear here.
+          */
+
+          const response =
+            await window.MC.api(
+              '/admin/orders'
+            );
+
+          const orders =
+            Array.isArray(response.orders)
+              ? response.orders
+              : [];
+
+          allRequests =
+            extractRequests(orders);
+
+          statusBox.textContent =
+            'Cancellation requests from ' +
+            'the latest ' +
+            orders.length +
+            ' loaded orders.';
+
+          renderRequests();
+
+        } catch (err) {
+
+          console.error(
+            'Cancellation requests load failed:',
+            err
+          );
+
+          statusBox.textContent =
+            'Unable to load requests.';
+
+          rowsBox.replaceChildren();
+
+          const row =
+            document.createElement('tr');
+
+          const cell =
+            createText(
+              'td',
+              err.message ||
+              'Please refresh and try again.'
+            );
+
+          cell.colSpan = 7;
+          cell.className = 'mc-empty';
+
+          row.appendChild(cell);
+
+          rowsBox.appendChild(row);
+        }
+      }
+
+
+      /* =========================
+         SEARCH
+      ========================= */
+
+      searchInput.addEventListener(
+        'input',
+        renderRequests
+      );
+
+
+      /* =========================
+         ADMIN AUTH + START
+      ========================= */
+
+      async function start() {
+
+        if (
+          typeof window.requireAdmin !== 'function'
+        ) {
+          return;
+        }
+
+        const admin =
+          await window.requireAdmin();
+
+        if (!admin) {
+          return;
+        }
+
+        await loadRequests();
+      }
+
+      start();
+
+    })();
+  </script>
+
+</body>
+</html>
