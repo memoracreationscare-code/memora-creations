@@ -29,26 +29,26 @@
       color: #302117;
     }
 
-    .mc-header {
+    .mc-page-header {
       padding: 28px 0;
     }
 
-    .mc-header h1 {
+    .mc-page-header h1 {
       margin: 0 0 10px;
-      font-size: clamp(25px, 4vw, 37px);
+      font-size: clamp(26px, 4vw, 38px);
     }
 
-    .mc-header p {
+    .mc-page-header p {
       margin: 0;
-      color: #88766a;
+      color: #85746a;
       line-height: 1.7;
     }
 
     .mc-panel {
-      padding: 24px;
+      background: white;
       border: 1px solid #e9ddd1;
       border-radius: 20px;
-      background: white;
+      padding: 24px;
       box-shadow: 0 10px 35px #3421160b;
     }
 
@@ -58,12 +58,27 @@
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 15px;
-      margin-bottom: 22px;
+      margin-bottom: 20px;
     }
 
     .mc-toolbar h2 {
+      margin: 0 0 6px;
+      font-size: 21px;
+    }
+
+    .mc-toolbar p {
       margin: 0;
-      font-size: 20px;
+      font-size: 12px;
+      color: #85746a;
+    }
+
+    .mc-counter {
+      border-radius: 99px;
+      padding: 9px 14px;
+      background: #fff0de;
+      color: #895117;
+      font-weight: 800;
+      font-size: 12px;
     }
 
     .mc-search {
@@ -75,17 +90,6 @@
       font: inherit;
     }
 
-    .mc-count {
-      display: inline-flex;
-      align-items: center;
-      padding: 8px 13px;
-      border-radius: 30px;
-      background: #fff0de;
-      color: #8c531b;
-      font-size: 12px;
-      font-weight: 800;
-    }
-
     .mc-table-wrap {
       width: 100%;
       overflow-x: auto;
@@ -95,7 +99,7 @@
 
     .mc-table {
       width: 100%;
-      min-width: 850px;
+      min-width: 1000px;
       border-collapse: collapse;
     }
 
@@ -115,89 +119,168 @@
       overflow-wrap: anywhere;
     }
 
-    .mc-table tr:last-child td {
-      border-bottom: 0;
-    }
-
     .mc-table small {
       display: block;
       margin-top: 5px;
       color: #85746a;
-      line-height: 1.6;
+      line-height: 1.5;
     }
 
     .mc-badge {
       display: inline-flex;
       padding: 7px 11px;
-      border-radius: 30px;
+      border-radius: 99px;
       font-size: 11px;
       font-weight: 800;
     }
 
     .mc-pending {
-      color: #946100;
       background: #fff2d8;
+      color: #946100;
     }
 
     .mc-success {
-      color: #166534;
       background: #e8f7ed;
+      color: #166534;
     }
 
     .mc-failed {
-      color: #b42318;
       background: #fceae7;
+      color: #b42318;
     }
 
     .mc-neutral {
-      color: #59616d;
       background: #edf0f3;
+      color: #59616d;
     }
 
-    .mc-request {
-      color: #1c5ca8;
-      background: #e8f1ff;
+    .mc-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 145px;
     }
 
-    .mc-link {
+    .mc-verify {
+      padding: 11px 13px;
+      border: 0;
+      border-radius: 10px;
+      background: #166534;
+      color: white;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .mc-verify:hover {
+      background: #14532d;
+    }
+
+    .mc-verify:disabled {
+      opacity: .55;
+      cursor: wait;
+    }
+
+    .mc-review-link {
       display: inline-block;
       padding: 10px 13px;
       border-radius: 10px;
       background: #865535;
       color: white;
       text-decoration: none;
+      text-align: center;
       font-size: 12px;
       font-weight: 800;
     }
 
-    .mc-link:hover {
-      background: #643a24;
-      color: white;
+    .mc-result {
+      margin-top: 20px;
+      padding: 20px;
+      border: 1px solid #d7c8b9;
+      border-radius: 16px;
+      background: #fcfaf7;
+    }
+
+    .mc-result h3 {
+      margin: 0 0 15px;
+      font-size: 20px;
+    }
+
+    .mc-result-grid {
+      display: grid;
+      grid-template-columns:
+        repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+    }
+
+    .mc-result-item {
+      padding: 13px;
+      border-radius: 11px;
+      background: white;
+      border: 1px solid #eee3d8;
+    }
+
+    .mc-result-item span {
+      display: block;
+      color: #88766a;
+      font-size: 11px;
+      margin-bottom: 7px;
+    }
+
+    .mc-result-item strong {
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .mc-message {
+      margin-top: 15px;
+      border-radius: 12px;
+      padding: 15px;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .mc-message.warning {
+      background: #fff3da;
+      color: #875600;
+    }
+
+    .mc-message.danger {
+      background: #fdecea;
+      color: #a3271b;
+    }
+
+    .mc-message.success {
+      background: #eaf7ee;
+      color: #166534;
     }
 
     .mc-notice {
-      margin: 20px 0;
-      padding: 16px 18px;
-      border: 1px solid #efd9b6;
-      border-radius: 13px;
+      margin-top: 20px;
+      padding: 17px;
       background: #fff7e8;
       color: #805b2c;
+      border: 1px solid #efd9b6;
+      border-radius: 13px;
       font-size: 13px;
       line-height: 1.8;
     }
 
     .mc-empty {
+      text-align: center;
       padding: 30px;
       color: #81746a;
-      text-align: center;
-      line-height: 1.8;
     }
 
     .mc-footer {
-      margin: 25px 0 40px;
+      margin: 30px 0;
+      text-align: center;
       color: #97877b;
       font-size: 12px;
-      text-align: center;
+    }
+
+    [hidden] {
+      display: none !important;
     }
 
     @media (max-width: 650px) {
@@ -220,28 +303,22 @@
 
 <body>
 
-  <!-- ADMIN NAV -->
+  <!-- ADMIN NAVIGATION -->
 
   <nav class="adminnav">
     <div class="container">
 
       <b>MEMORA ADMIN</b>
 
-      <a
-        href="/memora-creations/admin/dashboard.html"
-      >
+      <a href="/memora-creations/admin/dashboard.html">
         Dashboard
       </a>
 
-      <a
-        href="/memora-creations/admin/products.html"
-      >
+      <a href="/memora-creations/admin/products.html">
         Products
       </a>
 
-      <a
-        href="/memora-creations/admin/orders.html"
-      >
+      <a href="/memora-creations/admin/orders.html">
         Orders
       </a>
 
@@ -252,9 +329,7 @@
         Cancel Requests
       </a>
 
-      <a
-        href="/memora-creations/admin/users.html"
-      >
+      <a href="/memora-creations/admin/users.html">
         Customers
       </a>
 
@@ -269,17 +344,17 @@
     </div>
   </nav>
 
+  <!-- MAIN -->
+
   <main class="container adminmain">
 
-    <section class="mc-header">
+    <section class="mc-page-header">
 
-      <h1>
-        Cancellation Requests
-      </h1>
+      <h1>Cancellation Requests</h1>
 
       <p>
         Review customer cancellation requests
-        for Cashfree orders.
+        and verify Cashfree payments safely.
       </p>
 
     </section>
@@ -290,29 +365,30 @@
 
         <div>
           <h2>Customer Requests</h2>
+
           <p id="loadingStatus">
             Loading requests...
           </p>
         </div>
 
-        <div>
-          <span
-            id="requestCount"
-            class="mc-count"
-          >
-            0 Requests
-          </span>
-        </div>
+        <span
+          id="requestCount"
+          class="mc-counter"
+        >
+          0 Requests
+        </span>
 
         <input
           id="requestSearch"
           class="mc-search"
           type="search"
           placeholder="Search Order ID or Customer"
-          aria-label="Search cancellation requests"
+          aria-label="Search requests"
         >
 
       </div>
+
+      <!-- REQUEST TABLE -->
 
       <div class="mc-table-wrap">
 
@@ -333,7 +409,10 @@
           <tbody id="requestRows">
 
             <tr>
-              <td colspan="7" class="mc-empty">
+              <td
+                colspan="7"
+                class="mc-empty"
+              >
                 Loading cancellation requests...
               </td>
             </tr>
@@ -344,22 +423,51 @@
 
       </div>
 
+      <!-- CASHFREE VERIFICATION RESULT -->
+
+      <section
+        id="verificationResult"
+        class="mc-result"
+        hidden
+        aria-live="polite"
+      >
+
+        <h3>Cashfree Payment Verification</h3>
+
+        <div
+          id="verificationDetails"
+          class="mc-result-grid"
+        ></div>
+
+        <div
+          id="verificationMessage"
+          class="mc-message warning"
+        ></div>
+
+      </section>
+
+      <!-- WARNING -->
+
       <div class="mc-notice">
 
         <strong>Important Payment Safety</strong>
 
         <p>
-          Cancellation Request ka matlab
-          Order Cancel hona nahi hai.
-          Cashfree payment verify kiye bina
-          Payment Status, Stock ya Refund
-          update na karein.
+          Verify Payment sirf Cashfree se
+          Payment Status check karta hai.
         </p>
 
         <p>
-          Agar Payment SUCCESS ho gaya hai,
-          to cancellation se pehle refund
-          review zaroori hai.
+          Is button se Order Cancel,
+          Refund ya Stock Release
+          nahi hota.
+        </p>
+
+        <p>
+          Payment SUCCESS hone par
+          Refund Review zaroori hai.
+          Pending Payment par cancellation
+          approve na karein.
         </p>
 
       </div>
@@ -387,6 +495,7 @@
   <!-- REQUEST MANAGEMENT -->
 
   <script>
+
     (() => {
       'use strict';
 
@@ -405,14 +514,25 @@
       const statusBox =
         document.getElementById('loadingStatus');
 
+      const resultBox =
+        document.getElementById('verificationResult');
+
+      const detailsBox =
+        document.getElementById('verificationDetails');
+
+      const messageBox =
+        document.getElementById('verificationMessage');
+
       let allRequests = [];
+
+      let verifying = false;
 
 
       /* =========================
-         HELPERS
+         SAFE TEXT HELPERS
       ========================= */
 
-      function createText(tag, value) {
+      function textElement(tag, value) {
 
         const element =
           document.createElement(tag);
@@ -430,11 +550,9 @@
 
         const date = new Date(value);
 
-        if (Number.isNaN(date.getTime())) {
-          return '-';
-        }
-
-        return date.toLocaleString('en-IN');
+        return Number.isNaN(date.getTime())
+          ? '-'
+          : date.toLocaleString('en-IN');
       }
 
 
@@ -446,31 +564,40 @@
       }
 
 
-      function paymentBadge(status) {
+      /* =========================
+         PAYMENT BADGE
+      ========================= */
+
+      function createPaymentBadge(status) {
 
         const value =
           String(status || 'UNKNOWN')
             .toUpperCase();
 
         const badge =
-          createText('span', value);
+          textElement('span', value);
 
         badge.className = 'mc-badge';
 
         if (value === 'SUCCESS') {
+
           badge.classList.add('mc-success');
 
         } else if (value === 'PENDING') {
+
           badge.classList.add('mc-pending');
 
         } else if (
           value === 'FAILED' ||
           value === 'CANCELLED'
         ) {
+
           badge.classList.add('mc-failed');
 
         } else {
+
           badge.classList.add('mc-neutral');
+
         }
 
         return badge;
@@ -478,7 +605,7 @@
 
 
       /* =========================
-         FIND CUSTOMER REQUESTS
+         EXTRACT CUSTOMER REQUESTS
       ========================= */
 
       function extractRequests(orders) {
@@ -498,30 +625,37 @@
               ? order.statusHistory
               : [];
 
-          const requests = history.filter(
-            entry => String(
-              entry.note || ''
-            ).startsWith(MARKER)
-          );
+          const requests =
+            history.filter(item =>
+
+              String(
+                item.note || ''
+              ).startsWith(MARKER)
+
+            );
 
           if (!requests.length) {
             continue;
           }
 
-          const latestRequest =
+          const latest =
             requests[requests.length - 1];
 
           result.push({
             order,
+
             requestDate:
-              latestRequest.changedAt ||
+              latest.changedAt ||
               order.updatedAt
           });
         }
 
-        result.sort((a, b) =>
-          new Date(b.requestDate || 0) -
-          new Date(a.requestDate || 0)
+        result.sort(
+          (a, b) =>
+
+            new Date(b.requestDate || 0) -
+            new Date(a.requestDate || 0)
+
         );
 
         return result;
@@ -529,7 +663,7 @@
 
 
       /* =========================
-         RENDER TABLE
+         RENDER REQUEST LIST
       ========================= */
 
       function renderRequests() {
@@ -554,21 +688,18 @@
               order.customer?.mobile ||
               '';
 
-            const orderId =
-              order.orderId || '';
+            return [
 
-            return (
-              String(orderId)
-                .toLowerCase()
-                .includes(search) ||
+              order.orderId,
+              customer,
+              mobile
 
-              String(customer)
-                .toLowerCase()
-                .includes(search) ||
+            ].some(value =>
 
-              String(mobile)
+              String(value || '')
                 .toLowerCase()
                 .includes(search)
+
             );
 
           });
@@ -585,10 +716,10 @@
             document.createElement('tr');
 
           const cell =
-            createText(
+            textElement(
               'td',
               allRequests.length
-                ? 'No matching requests found.'
+                ? 'No matching requests.'
                 : 'No cancellation requests found among the loaded orders.'
             );
 
@@ -619,107 +750,402 @@
             order.customer?.mobile ||
             '';
 
+          // Order ID
+
           const orderCell =
             document.createElement('td');
 
-          const orderId =
-            createText(
+          orderCell.append(
+            textElement(
               'strong',
               order.orderId || '-'
-            );
-
-          const requestBadge =
-            createText(
+            ),
+            textElement(
               'small',
               'Cancellation Requested'
-            );
-
-          requestBadge.style.color = '#245ac2';
-
-          orderCell.append(
-            orderId,
-            requestBadge
+            )
           );
+
+          // Customer
 
           const customerCell =
             document.createElement('td');
 
           customerCell.append(
-            createText('strong', customer),
-            createText('small', mobile)
+            textElement(
+              'strong',
+              customer
+            ),
+            textElement(
+              'small',
+              mobile
+            )
           );
 
+          // Amount
+
           const totalCell =
-            createText(
+            textElement(
               'td',
               money(order.grandTotal)
             );
+
+          // Payment
 
           const paymentCell =
             document.createElement('td');
 
           paymentCell.appendChild(
-            paymentBadge(order.paymentStatus)
+            createPaymentBadge(
+              order.paymentStatus
+            )
           );
 
-          const statusCell =
-            createText(
+          // Order Status
+
+          const orderStatusCell =
+            textElement(
               'td',
               order.orderStatus || '-'
             );
 
+          // Request Date
+
           const dateCell =
-            createText(
+            textElement(
               'td',
               formatDate(item.requestDate)
             );
 
+          // Actions
+
           const actionCell =
             document.createElement('td');
 
-          const link =
+          const actionBox =
+            document.createElement('div');
+
+          actionBox.className = 'mc-actions';
+
+          const verifyButton =
+            document.createElement('button');
+
+          verifyButton.type = 'button';
+
+          verifyButton.className =
+            'mc-verify';
+
+          verifyButton.textContent =
+            '✓ Verify Payment';
+
+          verifyButton.dataset.id =
+            String(order._id || '');
+
+          verifyButton.addEventListener(
+            'click',
+            () => verifyPayment(
+              verifyButton,
+              order
+            )
+          );
+
+          const reviewLink =
             document.createElement('a');
 
-          link.className = 'mc-link';
+          reviewLink.className =
+            'mc-review-link';
 
-          link.href =
+          reviewLink.href =
             '/memora-creations/admin/orders.html';
 
-          link.textContent =
+          reviewLink.textContent =
             'Review Order →';
 
-          actionCell.appendChild(link);
+          actionBox.append(
+            verifyButton,
+            reviewLink
+          );
+
+          actionCell.appendChild(
+            actionBox
+          );
 
           row.append(
             orderCell,
             customerCell,
             totalCell,
             paymentCell,
-            statusCell,
+            orderStatusCell,
             dateCell,
             actionCell
           );
 
           rowsBox.appendChild(row);
+
         }
       }
 
 
       /* =========================
-         LOAD FROM ADMIN API
+         VERIFICATION RESULT HELPERS
+      ========================= */
+
+      function addResultItem(
+        label,
+        value
+      ) {
+
+        const box =
+          document.createElement('div');
+
+        box.className =
+          'mc-result-item';
+
+        box.append(
+          textElement('span', label),
+          textElement('strong', value)
+        );
+
+        detailsBox.appendChild(box);
+      }
+
+
+      function showVerificationResult(data) {
+
+        resultBox.hidden = false;
+
+        detailsBox.replaceChildren();
+
+        const order =
+          data.order || {};
+
+        const cashfree =
+          data.cashfree || {};
+
+        const review =
+          data.review || {};
+
+        addResultItem(
+          'Order ID',
+          order.orderId || '-'
+        );
+
+        addResultItem(
+          'Order Amount',
+          money(order.grandTotal)
+        );
+
+        addResultItem(
+          'Database Payment Status',
+          order.paymentStatus || '-'
+        );
+
+        addResultItem(
+          'Cashfree Order Status',
+          cashfree.environmentOrderStatus ||
+          '-'
+        );
+
+        addResultItem(
+          'Payment Confirmed',
+          cashfree.paymentConfirmed
+            ? 'YES'
+            : 'NO'
+        );
+
+        addResultItem(
+          'Total Attempts',
+          cashfree.totalAttempts ?? '-'
+        );
+
+        addResultItem(
+          'Successful Attempts',
+          cashfree.successfulAttempts ?? '-'
+        );
+
+        addResultItem(
+          'Pending Attempts',
+          cashfree.pendingAttempts ?? '-'
+        );
+
+        addResultItem(
+          'Failed Attempts',
+          cashfree.failedAttempts ?? '-'
+        );
+
+        addResultItem(
+          'Stock Reserved',
+          order.stockReserved
+            ? 'YES'
+            : 'NO'
+        );
+
+        addResultItem(
+          'Verification Result',
+          review.recommendation ||
+          'MANUAL_REVIEW_REQUIRED'
+        );
+
+        messageBox.className =
+          'mc-message warning';
+
+        if (
+          review.recommendation ===
+          'REFUND_REVIEW_REQUIRED'
+        ) {
+
+          messageBox.className =
+            'mc-message danger';
+
+        } else if (
+          review.recommendation ===
+          'ELIGIBLE_FOR_MANUAL_REVIEW'
+        ) {
+
+          messageBox.className =
+            'mc-message success';
+
+        }
+
+        messageBox.textContent =
+          (review.message ||
+            'Manual review required.') +
+          ' No order, payment or stock changes were made.';
+
+        resultBox.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest'
+        });
+      }
+
+
+      /* =========================
+         VERIFY PAYMENT VIA CASHFREE
+      ========================= */
+
+      async function verifyPayment(
+        button,
+        order
+      ) {
+
+        if (verifying) {
+          return;
+        }
+
+        const orderId =
+          button.dataset.id;
+
+        if (!orderId) {
+          return;
+        }
+
+        verifying = true;
+
+        button.disabled = true;
+
+        const previousText =
+          button.textContent;
+
+        button.textContent =
+          'Verifying...';
+
+        resultBox.hidden = false;
+
+        detailsBox.replaceChildren();
+
+        messageBox.className =
+          'mc-message warning';
+
+        messageBox.textContent =
+          'Contacting Cashfree. Please wait...';
+
+        try {
+
+          const response =
+            await window.MC.api(
+
+              '/admin/orders/' +
+              encodeURIComponent(orderId) +
+              '/cashfree/verify'
+
+            );
+
+          /*
+            Strict result check.
+            An incomplete response must
+            not be treated as verified.
+          */
+
+          if (
+            !response ||
+            !response.review ||
+            !response.cashfree ||
+            response.cashfree.identityVerified !== true
+          ) {
+
+            throw new Error(
+              'Cashfree verification response is incomplete.'
+            );
+
+          }
+
+          showVerificationResult(
+            response
+          );
+
+          window.MC.toast(
+            'Cashfree verification completed.',
+            'success'
+          );
+
+        } catch (err) {
+
+          console.error(
+            'Cashfree verification failed:',
+            err
+          );
+
+          resultBox.hidden = false;
+
+          detailsBox.replaceChildren();
+
+          messageBox.className =
+            'mc-message danger';
+
+          messageBox.textContent =
+            'Verification failed for ' +
+            String(order.orderId || 'this order') +
+            '. No cancellation was performed. ' +
+            String(
+              err.message ||
+              'Please try again.'
+            );
+
+          window.MC.toast(
+            'Payment verification failed.',
+            'error'
+          );
+
+        } finally {
+
+          verifying = false;
+
+          button.disabled = false;
+
+          button.textContent =
+            previousText;
+
+        }
+      }
+
+
+      /* =========================
+         LOAD REQUESTS FROM ADMIN API
       ========================= */
 
       async function loadRequests() {
 
         try {
-
-          /*
-            Admin list endpoint currently
-            returns up to 200 latest orders.
-
-            Older requests outside that
-            window will not appear here.
-          */
 
           const response =
             await window.MC.api(
@@ -735,8 +1161,7 @@
             extractRequests(orders);
 
           statusBox.textContent =
-            'Cancellation requests from ' +
-            'the latest ' +
+            'Requests from the latest ' +
             orders.length +
             ' loaded orders.';
 
@@ -745,7 +1170,7 @@
         } catch (err) {
 
           console.error(
-            'Cancellation requests load failed:',
+            'Requests loading failed:',
             err
           );
 
@@ -758,7 +1183,7 @@
             document.createElement('tr');
 
           const cell =
-            createText(
+            textElement(
               'td',
               err.message ||
               'Please refresh and try again.'
@@ -791,7 +1216,8 @@
       async function start() {
 
         if (
-          typeof window.requireAdmin !== 'function'
+          typeof window.requireAdmin !==
+          'function'
         ) {
           return;
         }
@@ -809,6 +1235,7 @@
       start();
 
     })();
+
   </script>
 
 </body>
