@@ -4,10 +4,17 @@
  MEMORA CREATIONS
  CASHFREE WEBHOOK CONTROLLER
 
- PAYMENT SECURITY
- SIGNATURE VERIFICATION
- DUPLICATE WEBHOOK PROTECTION
- ATOMIC PAYMENT CONFIRMATION
+ SECURITY:
+ - Raw body verification
+ - Cashfree signature verification
+ - Payment success event verification
+ - Cashfree API confirmation
+ - Amount and currency verification
+ - Duplicate webhook protection
+ - Atomic payment confirmation
+ - Cancelled order protection
+ - Late payment manual review
+ - No automatic stock release
 =========================================
 */
 
@@ -26,44 +33,40 @@ const {
 
 
 /* =====================================
-   WEBHOOK RESPONSE HELPER
+   RESPONSE HELPER
 ===================================== */
 
-function webhookResponse(
-  res,
-  status,
-  message
-) {
+function respond(res, status, message) {
 
   return res.status(status).json({
-
     success:
       status >= 200 && status < 300,
-
     message
-
   });
 
 }
 
 
 /* =====================================
-   CASHFREE WEBHOOK HANDLER
+   CASHFREE WEBHOOK
 ===================================== */
 
 async function cashfreeWebhook(req, res) {
 
   try {
 
-    /* =================================
-       1. VERIFY RAW REQUEST
-    ================================= */
+    /*
+      1. Raw body required.
+
+      Signature must be validated
+      against the original bytes.
+    */
 
     const rawBody = req.body;
 
     if (!Buffer.isBuffer(rawBody)) {
 
-      return webhookResponse(
+      return respond(
         res,
         400,
         'Invalid webhook body.'
@@ -72,9 +75,9 @@ async function cashfreeWebhook(req, res) {
     }
 
 
-    /* =================================
-       2. VERIFY SIGNATURE
-    ================================= */
+    /*
+      2. Verify Cashfree signature.
+    */
 
     const signature =
       req.headers['x-webhook-signature'];
@@ -84,13 +87,9 @@ async function cashfreeWebhook(req, res) {
 
     const validSignature =
       verifyCashfreeWebhook({
-
         rawBody,
-
         signature,
-
         timestamp
-
       });
 
     if (!validSignature) {
@@ -99,18 +98,18 @@ async function cashfreeWebhook(req, res) {
         'Cashfree webhook signature rejected.'
       );
 
-      return webhookResponse(
+      return respond(
         res,
         401,
-        'Invalid webhook signature.'
+        'Invalid Cashfree webhook signature.'
       );
 
     }
 
 
-    /* =================================
-       3. PARSE EVENT
-    ================================= */
+    /*
+      3. Parse verified payload.
+    */
 
     let event;
 
@@ -120,9 +119,9 @@ async function cashfreeWebhook(req, res) {
         rawBody.toString('utf8')
       );
 
-    } catch (parseError) {
+    } catch (_) {
 
-      return webhookResponse(
+      return respond(
         res,
         400,
         'Invalid webhook JSON.'
@@ -131,22 +130,21 @@ async function cashfreeWebhook(req, res) {
     }
 
 
-    /* =================================
-       4. HANDLE SUPPORTED EVENT
+    /*
+      4. Only successful payment
+      events confirm an order.
 
-       Failed or dropped payment attempts
-       must not automatically release
-       stock or cancel an order.
-
-       Late successful payments may arrive.
-    ================================= */
+      Failed payments must NOT
+      automatically cancel orders
+      or release stock.
+    */
 
     if (
       event?.type !==
       'PAYMENT_SUCCESS_WEBHOOK'
     ) {
 
-      return webhookResponse(
+      return respond(
         res,
         200,
         'Webhook event acknowledged.'
@@ -155,22 +153,24 @@ async function cashfreeWebhook(req, res) {
     }
 
 
-    /* =================================
-       5. EXTRACT PAYMENT DATA
-    ================================= */
+    /*
+      5. Validate payment data.
+    */
 
     const payment =
       event.data?.payment;
 
     const gatewayOrderId =
-      event.data?.order?.order_id;
+      String(
+        event.data?.order?.order_id || ''
+      ).trim();
 
     if (
       !gatewayOrderId ||
       payment?.payment_status !== 'SUCCESS'
     ) {
 
-      return webhookResponse(
+      return respond(
         res,
         400,
         'Invalid payment success event.'
@@ -179,103 +179,126 @@ async function cashfreeWebhook(req, res) {
     }
 
 
-    /* =================================
-       6. FIND LOCAL ORDER
-    ================================= */
+    /*
+      6. Locate local order.
+    */
 
     const order = await Order.findOne({
-
-      cashfreeOrderId:
-        String(gatewayOrderId),
-
-      paymentMethod:
-        'CASHFREE'
-
+      cashfreeOrderId: gatewayOrderId,
+      paymentMethod: 'CASHFREE'
     });
 
     if (!order) {
 
       console.warn(
-        'Cashfree order not found:',
-        String(gatewayOrderId)
+        'Cashfree payment has no matching local order:',
+        gatewayOrderId
       );
 
-      return webhookResponse(
+      return respond(
         res,
         503,
-        'Order not available yet.'
+        'Order not available for reconciliation.'
       );
 
     }
 
 
-    /* =================================
-       7. VERIFY WITH CASHFREE API
+    /*
+      7. Verify with Cashfree API.
 
-       Do not trust the webhook payload
-       alone for payment confirmation.
-    ================================= */
+      Never trust the webhook
+      payment status alone.
+    */
 
     const gatewayOrder =
       await fetchCashfreeOrder(
-        order.cashfreeOrderId
+        gatewayOrderId
       );
 
     if (
-      gatewayOrder.order_id !==
-      order.cashfreeOrderId
+      String(gatewayOrder?.order_id || '') !==
+      String(order.cashfreeOrderId)
     ) {
 
-      return webhookResponse(
+      return respond(
         res,
         409,
-        'Cashfree order reference mismatch.'
+        'Cashfree order ID mismatch.'
       );
 
     }
 
 
-    /* =================================
-       8. VERIFY AMOUNT AND CURRENCY
-    ================================= */
+    /*
+      8. Check gateway payment,
+      exact order amount and INR.
+    */
 
     const paid =
       isCashfreePaymentSuccessful(
-
         gatewayOrder,
-
         order.grandTotal
-
       );
 
     if (!paid) {
 
-      console.warn(
-        'Cashfree payment not verified:',
-        order.orderId
-      );
+      if (
+        gatewayOrder?.order_status === 'PAID'
+      ) {
 
-      return webhookResponse(
+        console.error(
+          'Cashfree amount or currency mismatch:',
+          order.orderId
+        );
+
+        return respond(
+          res,
+          409,
+          'Payment amount requires manual review.'
+        );
+
+      }
+
+      return respond(
         res,
         503,
-        'Payment is not confirmed yet.'
+        'Cashfree payment not confirmed yet.'
       );
 
     }
 
 
-    /* =================================
-       9. HANDLE ALREADY PAID ORDER
+    /*
+      9. Already paid order.
 
-       Browser verification and webhook
-       may both confirm the same payment.
-    ================================= */
+      Protect against duplicate
+      webhook processing.
+    */
 
     if (
       order.paymentStatus === 'SUCCESS'
     ) {
 
-      return webhookResponse(
+      if (
+        order.orderStatus === 'Cancelled' ||
+        order.stockReserved !== true
+      ) {
+
+        console.error(
+          'Paid order has inconsistent state:',
+          order.orderId
+        );
+
+        return respond(
+          res,
+          409,
+          'Paid order requires manual review.'
+        );
+
+      }
+
+      return respond(
         res,
         200,
         'Payment already confirmed.'
@@ -284,9 +307,14 @@ async function cashfreeWebhook(req, res) {
     }
 
 
-    /* =================================
-       10. CHECK ELIGIBILITY
-    ================================= */
+    /*
+      10. Do not confirm payment
+      for cancelled/unreserved
+      or non-pending orders.
+
+      A late successful payment
+      needs manual reconciliation.
+    */
 
     if (
       order.orderStatus === 'Cancelled' ||
@@ -295,50 +323,45 @@ async function cashfreeWebhook(req, res) {
     ) {
 
       console.error(
-        'Cashfree manual review required:',
+        'Late Cashfree payment requires reconciliation:',
         order.orderId
       );
 
-      return webhookResponse(
+      return respond(
         res,
         409,
-        'Paid order requires manual review.'
+        'Payment requires manual review.'
       );
 
     }
 
 
-    /* =================================
-       11. ATOMIC PAYMENT UPDATE
+    /*
+      11. Build atomic update.
 
-       Only PENDING payment can transition
-       to SUCCESS.
+      Browser verification and
+      webhook may arrive together.
 
-       This query prevents duplicate
-       updates from concurrent requests.
-    ================================= */
+      Only one can change
+      PENDING to SUCCESS.
+    */
 
     const update = {
 
       $set: {
-
-        paymentStatus:
-          'SUCCESS'
-
+        paymentStatus: 'SUCCESS'
       },
 
       $push: {
 
         statusHistory: {
 
-          status:
-            order.orderStatus,
+          status: order.orderStatus,
 
           note:
             'Cashfree payment confirmed by verified webhook.',
 
-          changedAt:
-            new Date()
+          changedAt: new Date()
 
         }
 
@@ -355,22 +378,30 @@ async function cashfreeWebhook(req, res) {
 
     }
 
+
+    /*
+      12. Conditional atomic update.
+
+      Cancelled orders are excluded.
+      Released stock is excluded.
+      Already confirmed payments
+      are excluded.
+    */
+
     const updatedOrder =
       await Order.findOneAndUpdate(
 
         {
 
-          _id:
-            order._id,
+          _id: order._id,
 
-          paymentMethod:
-            'CASHFREE',
+          paymentMethod: 'CASHFREE',
 
-          paymentStatus:
-            'PENDING',
+          cashfreeOrderId: gatewayOrderId,
 
-          stockReserved:
-            true,
+          paymentStatus: 'PENDING',
+
+          stockReserved: true,
 
           orderStatus: {
             $ne: 'Cancelled'
@@ -387,32 +418,33 @@ async function cashfreeWebhook(req, res) {
       );
 
 
-    /* =================================
-       12. HANDLE CONCURRENT VERIFICATION
+    /*
+      13. If update did not apply,
+      reload the order.
 
-       If no update occurred, another
-       request may have confirmed payment.
-    ================================= */
+      Another payment verification
+      may already have completed.
+    */
 
-    const confirmedOrder =
+    const finalOrder =
       updatedOrder ||
       await Order.findById(
         order._id
       );
 
     if (
-      !confirmedOrder ||
-      confirmedOrder.paymentStatus !== 'SUCCESS' ||
-      confirmedOrder.orderStatus === 'Cancelled' ||
-      confirmedOrder.stockReserved !== true
+      !finalOrder ||
+      finalOrder.paymentStatus !== 'SUCCESS' ||
+      finalOrder.orderStatus === 'Cancelled' ||
+      finalOrder.stockReserved !== true
     ) {
 
       console.error(
-        'Cashfree payment reconciliation needed:',
+        'Cashfree reconciliation required:',
         order.orderId
       );
 
-      return webhookResponse(
+      return respond(
         res,
         409,
         'Payment requires manual review.'
@@ -421,25 +453,17 @@ async function cashfreeWebhook(req, res) {
     }
 
 
-    /* =================================
-       13. CART PROTECTION
+    /*
+      14. Do not clear the cart
+      from a delayed webhook.
 
-       Do not clear the entire cart
-       inside a delayed webhook.
+      Do not change stock here.
 
-       The customer may have added new
-       products while payment was pending.
+      Do not approve cancellations
+      from webhook events.
+    */
 
-       A separate cart reconciliation
-       mechanism is required.
-    ================================= */
-
-
-    /* =================================
-       14. ACKNOWLEDGE SUCCESS
-    ================================= */
-
-    return webhookResponse(
+    return respond(
       res,
       200,
       'Cashfree payment confirmed.'
@@ -452,7 +476,7 @@ async function cashfreeWebhook(req, res) {
       err.message
     );
 
-    return webhookResponse(
+    return respond(
       res,
       500,
       'Webhook processing failed.'
@@ -468,7 +492,5 @@ async function cashfreeWebhook(req, res) {
 ===================================== */
 
 module.exports = {
-
   cashfreeWebhook
-
 };
