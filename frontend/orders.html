@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 
@@ -14,12 +15,10 @@
     My Orders | MEMORA CREATIONS
   </title>
 
-
   <link
     rel="stylesheet"
     href="/memora-creations/frontend/css/style.css?v=13"
   >
-
 
   <link
     rel="stylesheet"
@@ -28,9 +27,7 @@
 
 </head>
 
-
 <body class="orders-body">
-
 
   <!-- NAVBAR -->
 
@@ -38,7 +35,6 @@
     id="nav"
     class="topbar"
   ></header>
-
 
   <!-- WATERMARK -->
 
@@ -49,9 +45,7 @@
     MEMORA CREATIONS
   </div>
 
-
   <main class="container orders-page">
-
 
     <!-- HERO -->
 
@@ -60,7 +54,6 @@
       <div class="orders-eyebrow">
         YOUR PURCHASES
       </div>
-
 
       <div class="orders-title-row">
 
@@ -77,7 +70,6 @@
 
         </div>
 
-
         <div
           id="orderCount"
           class="orders-count"
@@ -88,7 +80,6 @@
       </div>
 
     </section>
-
 
     <!-- ORDERS HEADING -->
 
@@ -106,7 +97,6 @@
 
       </div>
 
-
       <a
         href="/memora-creations/frontend/products.html"
         class="orders-shop-link"
@@ -116,12 +106,12 @@
 
     </section>
 
-
-    <!-- ORDERS -->
+    <!-- ORDERS LIST -->
 
     <section
       id="orders"
       class="orders-list"
+      aria-live="polite"
     >
 
       <div class="orders-loading">
@@ -130,6 +120,43 @@
 
     </section>
 
+    <!-- CANCELLATION INFORMATION -->
+
+    <section
+      class="orders-cancellation-info"
+      style="
+        margin: 22px 0;
+        padding: 18px 20px;
+        background: #fff9f2;
+        border: 1px solid #ead9c8;
+        border-radius: 16px;
+        color: #765138;
+        line-height: 1.8;
+        font-size: 13px;
+      "
+    >
+
+      <strong>
+        Order Cancellation Information
+      </strong>
+
+      <p style="margin: 8px 0 0">
+
+        COD orders ko eligible status me directly
+        cancel kiya ja sakta hai.
+
+        Cashfree online payments ke liye
+        Cancellation Request submit kar sakte hain.
+
+        Request submit hone ka matlab
+        order cancel ya refund confirm hona nahi hai.
+
+        Payment verification ke baad hi
+        aage ki cancellation process hogi.
+
+      </p>
+
+    </section>
 
     <!-- SUPPORT -->
 
@@ -152,7 +179,6 @@
 
       </div>
 
-
       <div class="orders-support-actions">
 
         <a
@@ -162,7 +188,6 @@
         >
           💬 WhatsApp
         </a>
-
 
         <a
           href="mailto:memoracreations.care@gmail.com?subject=Order%20Support%20-%20Memora%20Creations"
@@ -175,7 +200,6 @@
     </section>
 
   </main>
-
 
   <!-- FOOTER -->
 
@@ -191,7 +215,6 @@
 
   </footer>
 
-
   <!-- MOBILE NAV -->
 
   <nav
@@ -199,47 +222,92 @@
     class="bottomnav"
   ></nav>
 
-
-  <!-- COMMON JS -->
+  <!-- COMMON JAVASCRIPT -->
 
   <script
     src="/memora-creations/frontend/js/app.js?v=10"
   ></script>
 
-
-  <!-- SECURE ORDERS -->
+  <!-- SECURE CUSTOMER ORDERS -->
 
   <script>
 
     (async function secureOrdersPage() {
 
-      const user =
-        await window.MC.requireLogin();
+      try {
 
+        if (
+          !window.MC ||
+          typeof window.MC.requireLogin !== 'function'
+        ) {
 
-      if (!user) {
-        return;
-      }
+          throw new Error(
+            'Website authentication could not load.'
+          );
 
+        }
 
-      const script =
-        document.createElement(
-          'script'
+        const user =
+          await window.MC.requireLogin();
+
+        if (!user) {
+          return;
+        }
+
+        /*
+          Load the updated Customer Orders JS
+          only after successful login.
+
+          Version 12 prevents an old cached
+          orders.js from being reused.
+        */
+
+        const script =
+          document.createElement('script');
+
+        script.src =
+          '/memora-creations/frontend/js/orders.js?v=12';
+
+        script.onerror = function () {
+
+          const ordersBox =
+            document.getElementById('orders');
+
+          if (ordersBox) {
+
+            ordersBox.textContent =
+              'Orders page load nahi ho pa raha hai. ' +
+              'Please refresh karke dobara try karein.';
+
+          }
+
+        };
+
+        document.body.appendChild(script);
+
+      } catch (err) {
+
+        console.error(
+          'My Orders initialization failed:',
+          err
         );
 
+        const ordersBox =
+          document.getElementById('orders');
 
-      script.src =
-        '/memora-creations/frontend/js/orders.js?v=11';
+        if (ordersBox) {
 
+          ordersBox.textContent =
+            'My Orders open nahi ho pa raha hai. ' +
+            'Please login ya refresh karke try karein.';
 
-      document.body.appendChild(
-        script
-      );
+        }
+
+      }
 
     })();
 
   </script>
 
 </body>
-
 </html>
