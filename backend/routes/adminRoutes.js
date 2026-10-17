@@ -9,6 +9,7 @@
  PRODUCTS
  CATEGORIES
  ORDERS
+ COD PAYMENT CONFIRMATION
  USERS
  CLOUDINARY
  SHIPROCKET
@@ -32,6 +33,9 @@ const cloudinaryController =
 const shiprocketController =
   require('../controllers/shiprocketController');
 
+const codPaymentController =
+  require('../controllers/codPaymentController');
+
 const {
   configured: shiprocketConfigured,
   getShiprocketToken
@@ -43,7 +47,7 @@ const {
 
 
 /* =====================================
-   ADMIN AUTH
+   ADMIN AUTHENTICATION
 ===================================== */
 
 router.post(
@@ -60,8 +64,7 @@ router.post(
 /* =====================================
    ADMIN LOGIN REQUIRED
 
-   All routes below require a
-   valid Admin login session.
+   Every route below is protected.
 ===================================== */
 
 router.use(requireAdmin);
@@ -70,12 +73,9 @@ router.use(requireAdmin);
 /* =====================================
    CASHFREE PENDING ORDER INSPECTION
 
-   GET /api/admin/cashfree/inspect
+   READ-ONLY OPERATION
 
-   Read-only:
-   No order modifications
-   No stock release
-   No payment status changes
+   GET /api/admin/cashfree/inspect
 ===================================== */
 
 router.get(
@@ -83,16 +83,6 @@ router.get(
   async (req, res) => {
 
     try {
-
-      /*
-        Optional query parameters:
-
-        ?minutes=60&limit=20
-
-        Defaults:
-        60 minutes
-        20 orders
-      */
 
       const minutes = Number(
         req.query.minutes ?? 60
@@ -132,22 +122,15 @@ router.get(
 
       const report =
         await inspectOldCashfreeOrders({
-
           olderThanMinutes: minutes,
-
           limit
-
         });
 
       return res.status(200).json({
-
         success: true,
-
         message:
           'Cashfree inspection completed.',
-
         ...report
-
       });
 
     } catch (err) {
@@ -298,7 +281,34 @@ router.put(
 
 
 /* =====================================
-   CHECK COURIER RATES
+   COD PAYMENT CONFIRMATION
+
+   PATCH /api/admin/orders/:id/cod/paid
+
+   Requires:
+   - Valid Admin Login
+   - COD Payment Method
+   - Order Delivered
+   - COD_PENDING Payment
+   - Explicit Confirmation
+
+   Body:
+   {
+     "confirmed": true
+   }
+
+   This route must never be used for
+   Cashfree or Razorpay payments.
+===================================== */
+
+router.patch(
+  '/orders/:id/cod/paid',
+  codPaymentController.markCodPaid
+);
+
+
+/* =====================================
+   SHIPROCKET COURIER RATES
 ===================================== */
 
 router.post(
@@ -308,7 +318,7 @@ router.post(
 
 
 /* =====================================
-   CREATE SHIPROCKET SHIPMENT
+   SHIPROCKET SHIPMENT CREATION
 ===================================== */
 
 router.post(
