@@ -4,18 +4,15 @@
  MEMORA CREATIONS
  ADMIN ROUTES
 
- FULL REPLACEMENT
-
- ADMIN AUTH
  DASHBOARD
  PRODUCTS
  CATEGORIES
  ORDERS
  COD PAYMENT
  CASHFREE VERIFICATION
- CASHFREE CANCELLATION APPROVAL
- SHIPROCKET
+ SANDBOX CANCELLATION APPROVAL
  CLOUDINARY
+ SHIPROCKET
  USERS
 =========================================
 */
@@ -38,10 +35,10 @@ const shiprocketController =
 const codPaymentController =
   require('../controllers/codPaymentController');
 
-const cashfreeCancellationReviewController =
+const cashfreeReviewController =
   require('../controllers/cashfreeCancellationReviewController');
 
-const cashfreeCancellationApprovalController =
+const cashfreeApprovalController =
   require('../controllers/cashfreeCancellationApprovalController');
 
 const {
@@ -70,14 +67,14 @@ router.post(
 
 
 /* =====================================
-   PROTECT ADMIN ROUTES
+   ADMIN SECURITY
 ===================================== */
 
 router.use(requireAdmin);
 
 
 /* =====================================
-   ADMIN DASHBOARD
+   DASHBOARD
 ===================================== */
 
 router.get(
@@ -151,7 +148,7 @@ router.get(
       return res.status(500).json({
         success: false,
         message:
-          'Cashfree inspection failed. Check server logs.'
+          'Cashfree inspection failed.'
       });
 
     }
@@ -215,7 +212,7 @@ router.delete(
 
 
 /* =====================================
-   ADMIN ORDERS
+   ORDERS
 ===================================== */
 
 router.get(
@@ -230,35 +227,81 @@ router.put(
 
 
 /* =====================================
-   CASHFREE PAYMENT VERIFICATION
+   CASHFREE VERIFY PAYMENT
 
    READ ONLY
-
-   GET:
-   /api/admin/orders/:id/cashfree/verify
 ===================================== */
 
 router.get(
   '/orders/:id/cashfree/verify',
-  cashfreeCancellationReviewController
+  cashfreeReviewController
     .verifyCancellationPayment
 );
 
 
 /* =====================================
+   SANDBOX APPROVAL SECURITY
+
+   CONDITIONS:
+
+   1. Admin must be logged in
+   2. Cashfree environment = sandbox
+   3. Explicit server-side enable required
+
+   Disabled by default.
+   Never enabled in production.
+===================================== */
+
+function requireSandboxApproval(req, res, next) {
+
+  const environment = String(
+    process.env.CASHFREE_ENV || 'sandbox'
+  ).trim().toLowerCase();
+
+  const enabled =
+    process.env
+      .CASHFREE_CANCELLATION_APPROVAL_ENABLED
+      === 'true';
+
+  if (
+    environment !== 'sandbox' ||
+    !enabled
+  ) {
+
+    return res.status(403).json({
+      success: false,
+      message:
+        'Cashfree cancellation approval is disabled.'
+    });
+
+  }
+
+  return next();
+}
+
+
+/* =====================================
    CASHFREE CANCELLATION APPROVAL
 
-   NOT ENABLED YET
+   SANDBOX ONLY
 
-   This remains deliberately disabled
-   until payment/webhook concurrency
-   and stock reconciliation have been
-   tested.
+   POST:
+   /api/admin/orders/:id/cashfree/approve
 
-   Do not register the POST approval
-   route without completing the
-   safety checks.
+   BODY:
+   {
+     "confirmed": true
+   }
+
+   Additional payment checks happen
+   inside the approval controller.
 ===================================== */
+
+router.post(
+  '/orders/:id/cashfree/approve',
+  requireSandboxApproval,
+  cashfreeApprovalController.approveCancellation
+);
 
 
 /* =====================================
@@ -282,6 +325,7 @@ router.get(
     try {
 
       if (!shiprocketConfigured()) {
+
         return res.status(500).json({
           success: false,
           message:
@@ -310,6 +354,7 @@ router.get(
           err.message ||
           'Shiprocket connection failed.'
       });
+
     }
   }
 );
@@ -326,7 +371,7 @@ router.post(
 
 
 /* =====================================
-   CREATE SHIPROCKET SHIPMENT
+   SHIPROCKET SHIPMENT CREATION
 ===================================== */
 
 router.post(
