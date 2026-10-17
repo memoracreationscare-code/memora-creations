@@ -4,16 +4,16 @@
  MEMORA CREATIONS
  ADMIN ROUTES
 
- FULL REPLACEMENT CODE
+ FULL REPLACEMENT
 
- ADMIN LOGIN / LOGOUT
+ ADMIN AUTH
  DASHBOARD
  PRODUCTS
  CATEGORIES
  ORDERS
  COD PAYMENT
- CASHFREE PAYMENT VERIFICATION
- CASHFREE INSPECTION
+ CASHFREE VERIFICATION
+ CASHFREE CANCELLATION APPROVAL
  SHIPROCKET
  CLOUDINARY
  USERS
@@ -41,6 +41,9 @@ const codPaymentController =
 const cashfreeCancellationReviewController =
   require('../controllers/cashfreeCancellationReviewController');
 
+const cashfreeCancellationApprovalController =
+  require('../controllers/cashfreeCancellationApprovalController');
+
 const {
   configured: shiprocketConfigured,
   getShiprocketToken
@@ -52,7 +55,7 @@ const {
 
 
 /* =====================================
-   ADMIN AUTHENTICATION
+   ADMIN LOGIN / LOGOUT
 ===================================== */
 
 router.post(
@@ -67,16 +70,14 @@ router.post(
 
 
 /* =====================================
-   ADMIN LOGIN REQUIRED
-
-   ALL ROUTES BELOW ARE PROTECTED
+   PROTECT ADMIN ROUTES
 ===================================== */
 
 router.use(requireAdmin);
 
 
 /* =====================================
-   DASHBOARD
+   ADMIN DASHBOARD
 ===================================== */
 
 router.get(
@@ -87,10 +88,6 @@ router.get(
 
 /* =====================================
    CASHFREE PENDING INSPECTION
-
-   READ ONLY
-
-   GET /api/admin/cashfree/inspect
 ===================================== */
 
 router.get(
@@ -112,13 +109,11 @@ router.get(
         minutes < 1 ||
         minutes > 10080
       ) {
-
         return res.status(400).json({
           success: false,
           message:
             'Minutes must be between 1 and 10080.'
         });
-
       }
 
       if (
@@ -126,13 +121,11 @@ router.get(
         limit < 1 ||
         limit > 100
       ) {
-
         return res.status(400).json({
           success: false,
           message:
             'Limit must be between 1 and 100.'
         });
-
       }
 
       const report =
@@ -162,13 +155,12 @@ router.get(
       });
 
     }
-
   }
 );
 
 
 /* =====================================
-   CLOUDINARY IMAGE UPLOAD
+   CLOUDINARY
 ===================================== */
 
 router.post(
@@ -238,26 +230,12 @@ router.put(
 
 
 /* =====================================
-   CASHFREE CANCELLATION
-   PAYMENT VERIFICATION
-
-   GET:
-   /api/admin/orders/:id/cashfree/verify
+   CASHFREE PAYMENT VERIFICATION
 
    READ ONLY
 
-   Checks:
-   - Cashfree Order Status
-   - Payment Attempts
-   - Successful Payments
-   - Pending Payments
-   - Expired Payments
-
-   DOES NOT:
-   - Cancel Order
-   - Initiate Refund
-   - Release Stock
-   - Change Payment Status
+   GET:
+   /api/admin/orders/:id/cashfree/verify
 ===================================== */
 
 router.get(
@@ -268,18 +246,23 @@ router.get(
 
 
 /* =====================================
+   CASHFREE CANCELLATION APPROVAL
+
+   NOT ENABLED YET
+
+   This remains deliberately disabled
+   until payment/webhook concurrency
+   and stock reconciliation have been
+   tested.
+
+   Do not register the POST approval
+   route without completing the
+   safety checks.
+===================================== */
+
+
+/* =====================================
    COD MARK AS PAID
-
-   PATCH:
-   /api/admin/orders/:id/cod/paid
-
-   Body:
-   {
-     "confirmed": true
-   }
-
-   Only delivered COD orders with
-   pending payment can be marked Paid.
 ===================================== */
 
 router.patch(
@@ -299,13 +282,11 @@ router.get(
     try {
 
       if (!shiprocketConfigured()) {
-
         return res.status(500).json({
           success: false,
           message:
             'Shiprocket credentials are not configured.'
         });
-
       }
 
       await getShiprocketToken();
@@ -329,9 +310,7 @@ router.get(
           err.message ||
           'Shiprocket connection failed.'
       });
-
     }
-
   }
 );
 
@@ -377,7 +356,7 @@ router.patch(
 
 
 /* =====================================
-   ADMIN RESET CUSTOMER PASSWORD
+   RESET CUSTOMER PASSWORD
 ===================================== */
 
 router.patch(
@@ -387,7 +366,7 @@ router.patch(
 
 
 /* =====================================
-   EXPORT ROUTER
+   EXPORT
 ===================================== */
 
 module.exports = router;
