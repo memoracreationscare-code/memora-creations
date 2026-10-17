@@ -4,23 +4,25 @@
  MEMORA CREATIONS
  ADMIN ROUTES
 
- ADMIN AUTHENTICATION
+ FULL REPLACEMENT CODE
+
+ ADMIN LOGIN / LOGOUT
  DASHBOARD
  PRODUCTS
  CATEGORIES
  ORDERS
- COD PAYMENT CONFIRMATION
- USERS
- CLOUDINARY
- SHIPROCKET
+ COD PAYMENT
+ CASHFREE PAYMENT VERIFICATION
  CASHFREE INSPECTION
+ SHIPROCKET
+ CLOUDINARY
+ USERS
 =========================================
 */
 
-const router =
-  require('express').Router();
+const router = require('express').Router();
 
-const c =
+const adminController =
   require('../controllers/adminController');
 
 const {
@@ -35,6 +37,9 @@ const shiprocketController =
 
 const codPaymentController =
   require('../controllers/codPaymentController');
+
+const cashfreeCancellationReviewController =
+  require('../controllers/cashfreeCancellationReviewController');
 
 const {
   configured: shiprocketConfigured,
@@ -52,28 +57,38 @@ const {
 
 router.post(
   '/login',
-  c.login
+  adminController.login
 );
 
 router.post(
   '/logout',
-  c.logout
+  adminController.logout
 );
 
 
 /* =====================================
    ADMIN LOGIN REQUIRED
 
-   Every route below is protected.
+   ALL ROUTES BELOW ARE PROTECTED
 ===================================== */
 
 router.use(requireAdmin);
 
 
 /* =====================================
-   CASHFREE PENDING ORDER INSPECTION
+   DASHBOARD
+===================================== */
 
-   READ-ONLY OPERATION
+router.get(
+  '/dashboard',
+  adminController.dashboard
+);
+
+
+/* =====================================
+   CASHFREE PENDING INSPECTION
+
+   READ ONLY
 
    GET /api/admin/cashfree/inspect
 ===================================== */
@@ -153,6 +168,127 @@ router.get(
 
 
 /* =====================================
+   CLOUDINARY IMAGE UPLOAD
+===================================== */
+
+router.post(
+  '/cloudinary/signature',
+  cloudinaryController.signature
+);
+
+
+/* =====================================
+   PRODUCTS
+===================================== */
+
+router.get(
+  '/products',
+  adminController.listProducts
+);
+
+router.post(
+  '/products',
+  adminController.createProduct
+);
+
+router.put(
+  '/products/:id',
+  adminController.updateProduct
+);
+
+router.delete(
+  '/products/:id',
+  adminController.deleteProduct
+);
+
+
+/* =====================================
+   CATEGORIES
+===================================== */
+
+router.post(
+  '/categories',
+  adminController.createCategory
+);
+
+router.put(
+  '/categories/:id',
+  adminController.updateCategory
+);
+
+router.delete(
+  '/categories/:id',
+  adminController.deleteCategory
+);
+
+
+/* =====================================
+   ADMIN ORDERS
+===================================== */
+
+router.get(
+  '/orders',
+  adminController.listOrders
+);
+
+router.put(
+  '/orders/:id',
+  adminController.updateOrder
+);
+
+
+/* =====================================
+   CASHFREE CANCELLATION
+   PAYMENT VERIFICATION
+
+   GET:
+   /api/admin/orders/:id/cashfree/verify
+
+   READ ONLY
+
+   Checks:
+   - Cashfree Order Status
+   - Payment Attempts
+   - Successful Payments
+   - Pending Payments
+   - Expired Payments
+
+   DOES NOT:
+   - Cancel Order
+   - Initiate Refund
+   - Release Stock
+   - Change Payment Status
+===================================== */
+
+router.get(
+  '/orders/:id/cashfree/verify',
+  cashfreeCancellationReviewController
+    .verifyCancellationPayment
+);
+
+
+/* =====================================
+   COD MARK AS PAID
+
+   PATCH:
+   /api/admin/orders/:id/cod/paid
+
+   Body:
+   {
+     "confirmed": true
+   }
+
+   Only delivered COD orders with
+   pending payment can be marked Paid.
+===================================== */
+
+router.patch(
+  '/orders/:id/cod/paid',
+  codPaymentController.markCodPaid
+);
+
+
+/* =====================================
    SHIPROCKET CONNECTION TEST
 ===================================== */
 
@@ -201,113 +337,6 @@ router.get(
 
 
 /* =====================================
-   CLOUDINARY
-===================================== */
-
-router.post(
-  '/cloudinary/signature',
-  cloudinaryController.signature
-);
-
-
-/* =====================================
-   DASHBOARD
-===================================== */
-
-router.get(
-  '/dashboard',
-  c.dashboard
-);
-
-
-/* =====================================
-   PRODUCTS
-===================================== */
-
-router.get(
-  '/products',
-  c.listProducts
-);
-
-router.post(
-  '/products',
-  c.createProduct
-);
-
-router.put(
-  '/products/:id',
-  c.updateProduct
-);
-
-router.delete(
-  '/products/:id',
-  c.deleteProduct
-);
-
-
-/* =====================================
-   CATEGORIES
-===================================== */
-
-router.post(
-  '/categories',
-  c.createCategory
-);
-
-router.put(
-  '/categories/:id',
-  c.updateCategory
-);
-
-router.delete(
-  '/categories/:id',
-  c.deleteCategory
-);
-
-
-/* =====================================
-   ORDERS
-===================================== */
-
-router.get(
-  '/orders',
-  c.listOrders
-);
-
-router.put(
-  '/orders/:id',
-  c.updateOrder
-);
-
-
-/* =====================================
-   COD PAYMENT CONFIRMATION
-
-   PATCH /api/admin/orders/:id/cod/paid
-
-   Requires:
-   - Valid Admin Login
-   - COD Payment Method
-   - Order Delivered
-   - COD_PENDING Payment
-   - Explicit Confirmation
-
-   Body:
-   {
-     "confirmed": true
-   }
-
-   This route must never be used for
-   Cashfree or Razorpay payments.
-===================================== */
-
-router.patch(
-  '/orders/:id/cod/paid',
-  codPaymentController.markCodPaid
-);
-
-
-/* =====================================
    SHIPROCKET COURIER RATES
 ===================================== */
 
@@ -318,7 +347,7 @@ router.post(
 
 
 /* =====================================
-   SHIPROCKET SHIPMENT CREATION
+   CREATE SHIPROCKET SHIPMENT
 ===================================== */
 
 router.post(
@@ -333,27 +362,27 @@ router.post(
 
 router.get(
   '/users',
-  c.listUsers
+  adminController.listUsers
 );
 
 router.get(
   '/users/:id/orders',
-  c.userOrders
+  adminController.userOrders
 );
 
 router.patch(
   '/users/:id/toggle',
-  c.toggleUser
+  adminController.toggleUser
 );
 
 
 /* =====================================
-   ADMIN RESET USER PASSWORD
+   ADMIN RESET CUSTOMER PASSWORD
 ===================================== */
 
 router.patch(
   '/users/:id/password',
-  c.resetUserPassword
+  adminController.resetUserPassword
 );
 
 
