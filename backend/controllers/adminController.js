@@ -11,7 +11,7 @@
  ORDERS
  USERS
 
- CASHFREE + RAZORPAY STATISTICS
+ PAYMENT-CONFIRMED REVENUE
 =========================================
 */
 
@@ -93,6 +93,7 @@ const login = asyncHandler(async (req, res) => {
   }
 
   admin.lastLoginAt = new Date();
+
   await admin.save();
 
   setAuthCookie(res, {
@@ -134,7 +135,13 @@ const logout = asyncHandler(async (_req, res) => {
 /* =====================================
    ADMIN DASHBOARD
 
-   CASHFREE + RAZORPAY INCLUDED
+   IMPORTANT:
+   Only SUCCESS payments count as sales.
+
+   Delivered COD with COD_PENDING
+   does NOT count as received revenue.
+
+   Cashfree and Razorpay require SUCCESS.
 ===================================== */
 
 const dashboard = asyncHandler(async (_req, res) => {
@@ -165,18 +172,25 @@ const dashboard = asyncHandler(async (_req, res) => {
       }
     }),
 
+    /*
+      REVENUE FIX
+
+      Count only successfully
+      confirmed payments.
+
+      COD must be manually marked
+      SUCCESS after cash receipt.
+
+      Exclude cancelled orders.
+    */
+
     Order.aggregate([
       {
         $match: {
-          $or: [
-            {
-              paymentStatus: 'SUCCESS'
-            },
-            {
-              paymentMethod: 'COD',
-              orderStatus: 'Delivered'
-            }
-          ]
+          paymentStatus: 'SUCCESS',
+          orderStatus: {
+            $ne: 'Cancelled'
+          }
         }
       },
       {
@@ -190,9 +204,7 @@ const dashboard = asyncHandler(async (_req, res) => {
     ]),
 
     /*
-      FIXED:
-      Count successful online payments
-      from both Cashfree and Razorpay.
+      ONLINE SUCCESSFUL PAYMENTS
     */
 
     Order.countDocuments({
@@ -202,12 +214,23 @@ const dashboard = asyncHandler(async (_req, res) => {
           'RAZORPAY'
         ]
       },
-      paymentStatus: 'SUCCESS'
+      paymentStatus: 'SUCCESS',
+      orderStatus: {
+        $ne: 'Cancelled'
+      }
     }),
+
+    /*
+      TOTAL COD ORDERS
+    */
 
     Order.countDocuments({
       paymentMethod: 'COD'
     }),
+
+    /*
+      PENDING ORDERS
+    */
 
     Order.countDocuments({
       orderStatus: {
@@ -218,17 +241,33 @@ const dashboard = asyncHandler(async (_req, res) => {
       }
     }),
 
+    /*
+      DELIVERED ORDERS
+    */
+
     Order.countDocuments({
       orderStatus: 'Delivered'
     }),
+
+    /*
+      CANCELLED ORDERS
+    */
 
     Order.countDocuments({
       orderStatus: 'Cancelled'
     }),
 
+    /*
+      ACTIVE PRODUCTS
+    */
+
     Product.countDocuments({
       isActive: true
     }),
+
+    /*
+      LOW STOCK
+    */
 
     Product.countDocuments({
       isActive: true,
@@ -236,6 +275,10 @@ const dashboard = asyncHandler(async (_req, res) => {
         $lte: 5
       }
     }),
+
+    /*
+      ACTIVE CUSTOMERS
+    */
 
     User.countDocuments({
       isActive: true
