@@ -2,379 +2,108 @@
 /*
 =========================================
  MEMORA CREATIONS
- ADMIN ROUTES
+ CUSTOMER ORDER ROUTES
 
- ADMIN AUTHENTICATION
- DASHBOARD
- PRODUCTS
- CATEGORIES
- ORDERS
- COD PAYMENT CONFIRMATION
- USERS
- CLOUDINARY
- SHIPROCKET
- CASHFREE INSPECTION
- CASHFREE CANCELLATION VERIFICATION
+ FULL REPLACEMENT CODE
+
+ ORDER PREVIEW
+ COD ORDER CREATION
+ MY ORDERS
+ ORDER DETAILS
+ COD ORDER CANCELLATION
+ CASHFREE CANCELLATION REQUEST
 =========================================
 */
 
-const router =
-  require('express').Router();
+const router = require('express').Router();
 
-const c =
-  require('../controllers/adminController');
+const orderController =
+  require('../controllers/orderController');
+
+const cancellationRequestController =
+  require('../controllers/cancellationRequestController');
 
 const {
-  requireAdmin
+  requireUser
 } = require('../middleware/auth');
 
-const cloudinaryController =
-  require('../controllers/cloudinaryController');
 
-const shiprocketController =
-  require('../controllers/shiprocketController');
+/* =====================================
+   CUSTOMER LOGIN REQUIRED
+===================================== */
 
-const codPaymentController =
-  require('../controllers/codPaymentController');
-
-const cashfreeCancellationReviewController =
-  require('../controllers/cashfreeCancellationReviewController');
-
-const {
-  configured: shiprocketConfigured,
-  getShiprocketToken
-} = require('../services/shiprocketService');
-
-const {
-  inspectOldCashfreeOrders
-} = require('../services/cashfreeCleanupService');
+router.use(requireUser);
 
 
 /* =====================================
-   ADMIN AUTHENTICATION
+   ORDER PREVIEW
 ===================================== */
 
 router.post(
-  '/login',
-  c.login
-);
-
-router.post(
-  '/logout',
-  c.logout
+  '/preview',
+  orderController.preview
 );
 
 
 /* =====================================
-   ADMIN LOGIN REQUIRED
-
-   Every route below is protected.
-===================================== */
-
-router.use(requireAdmin);
-
-
-/* =====================================
-   CASHFREE PENDING ORDER INSPECTION
-
-   READ-ONLY OPERATION
-
-   GET /api/admin/cashfree/inspect
-===================================== */
-
-router.get(
-  '/cashfree/inspect',
-  async (req, res) => {
-
-    try {
-
-      const minutes = Number(
-        req.query.minutes ?? 60
-      );
-
-      const limit = Number(
-        req.query.limit ?? 20
-      );
-
-      if (
-        !Number.isInteger(minutes) ||
-        minutes < 1 ||
-        minutes > 10080
-      ) {
-
-        return res.status(400).json({
-          success: false,
-          message:
-            'Minutes must be between 1 and 10080.'
-        });
-
-      }
-
-      if (
-        !Number.isInteger(limit) ||
-        limit < 1 ||
-        limit > 100
-      ) {
-
-        return res.status(400).json({
-          success: false,
-          message:
-            'Limit must be between 1 and 100.'
-        });
-
-      }
-
-      const report =
-        await inspectOldCashfreeOrders({
-          olderThanMinutes: minutes,
-          limit
-        });
-
-      return res.status(200).json({
-        success: true,
-        message:
-          'Cashfree inspection completed.',
-        ...report
-      });
-
-    } catch (err) {
-
-      console.error(
-        'Cashfree inspection failed:',
-        err.message
-      );
-
-      return res.status(500).json({
-        success: false,
-        message:
-          'Cashfree inspection failed. Check server logs.'
-      });
-
-    }
-
-  }
-);
-
-
-/* =====================================
-   SHIPROCKET CONNECTION TEST
-===================================== */
-
-router.get(
-  '/shiprocket/test',
-  async (req, res) => {
-
-    try {
-
-      if (!shiprocketConfigured()) {
-
-        return res.status(500).json({
-          success: false,
-          message:
-            'Shiprocket credentials are not configured.'
-        });
-
-      }
-
-      await getShiprocketToken();
-
-      return res.json({
-        success: true,
-        message:
-          'Shiprocket connected successfully.'
-      });
-
-    } catch (err) {
-
-      console.error(
-        'Shiprocket connection test failed:',
-        err
-      );
-
-      return res.status(500).json({
-        success: false,
-        message:
-          err.message ||
-          'Shiprocket connection failed.'
-      });
-
-    }
-
-  }
-);
-
-
-/* =====================================
-   CLOUDINARY
+   CREATE COD ORDER
 ===================================== */
 
 router.post(
-  '/cloudinary/signature',
-  cloudinaryController.signature
+  '/cod',
+  orderController.createCod
 );
 
 
 /* =====================================
-   DASHBOARD
+   MY ORDERS
 ===================================== */
 
 router.get(
-  '/dashboard',
-  c.dashboard
+  '/',
+  orderController.listOrders
 );
 
 
 /* =====================================
-   PRODUCTS
-===================================== */
+   CASHFREE CANCELLATION REQUEST
 
-router.get(
-  '/products',
-  c.listProducts
-);
+   POST:
+   /api/orders/:id/cancel-request
 
-router.post(
-  '/products',
-  c.createProduct
-);
+   Only records customer's request.
 
-router.put(
-  '/products/:id',
-  c.updateProduct
-);
-
-router.delete(
-  '/products/:id',
-  c.deleteProduct
-);
-
-
-/* =====================================
-   CATEGORIES
+   Does not cancel order.
+   Does not initiate refund.
+   Does not release stock.
 ===================================== */
 
 router.post(
-  '/categories',
-  c.createCategory
-);
-
-router.put(
-  '/categories/:id',
-  c.updateCategory
-);
-
-router.delete(
-  '/categories/:id',
-  c.deleteCategory
+  '/:id/cancel-request',
+  cancellationRequestController.requestCancellation
 );
 
 
 /* =====================================
-   ORDERS
-===================================== */
+   CANCEL COD ORDER
 
-router.get(
-  '/orders',
-  c.listOrders
-);
-
-router.put(
-  '/orders/:id',
-  c.updateOrder
-);
-
-
-/* =====================================
-   CASHFREE CANCELLATION
-   PAYMENT VERIFICATION
-
-   READ-ONLY
-
-   GET
-   /api/admin/orders/:id/cashfree/verify
-
-   Checks Cashfree payment status
-   and payment attempts.
-
-   Does NOT:
-   - Cancel order
-   - Approve cancellation
-   - Change payment status
-   - Initiate refund
-   - Release stock
-===================================== */
-
-router.get(
-  '/orders/:id/cashfree/verify',
-  cashfreeCancellationReviewController
-    .verifyCancellationPayment
-);
-
-
-/* =====================================
-   COD PAYMENT CONFIRMATION
-
-   PATCH /api/admin/orders/:id/cod/paid
-
-   Only for Delivered COD orders
-   with pending payment.
-
-   Explicit Admin confirmation required.
+   PATCH:
+   /api/orders/:id/cancel
 ===================================== */
 
 router.patch(
-  '/orders/:id/cod/paid',
-  codPaymentController.markCodPaid
+  '/:id/cancel',
+  orderController.cancelOrder
 );
 
 
 /* =====================================
-   SHIPROCKET COURIER RATES
-===================================== */
-
-router.post(
-  '/orders/:id/check-couriers',
-  shiprocketController.checkCourierRates
-);
-
-
-/* =====================================
-   SHIPROCKET SHIPMENT CREATION
-===================================== */
-
-router.post(
-  '/orders/:id/create-shipment',
-  shiprocketController.createShipment
-);
-
-
-/* =====================================
-   USERS
+   GET SINGLE ORDER DETAILS
 ===================================== */
 
 router.get(
-  '/users',
-  c.listUsers
-);
-
-router.get(
-  '/users/:id/orders',
-  c.userOrders
-);
-
-router.patch(
-  '/users/:id/toggle',
-  c.toggleUser
-);
-
-
-/* =====================================
-   ADMIN RESET USER PASSWORD
-===================================== */
-
-router.patch(
-  '/users/:id/password',
-  c.resetUserPassword
+  '/:id',
+  orderController.getOrder
 );
 
 
