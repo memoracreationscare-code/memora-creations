@@ -2,27 +2,27 @@
 /*
 =========================================
  MEMORA CREATIONS
+
  CASHFREE CANCELLATION APPROVAL
 
- ADMIN ONLY
+ ADMIN ONLY — SAFETY CHECKS
 
- Security:
- - Verify Cashfree again
- - Require terminal gateway order
- - Block successful payments
- - Block pending payment attempts
- - Check cancellation request
- - Use MongoDB transaction
- - Release stock only once
- - No automatic refunds
+ - Customer request required
+ - Cashfree order must be terminal
+ - Every payment attempt checked
+ - Successful payment blocked
+ - Pending payment blocked
+ - Unknown payment state blocked
+ - Amount and currency verified
+ - Stock released in transaction
+ - Concurrent local updates checked
+ - No automatic refund
 =========================================
 */
 
 const mongoose = require('mongoose');
 
-const {
-  Order
-} = require('../models');
+const { Order } = require('../models');
 
 const {
   asyncHandler,
@@ -43,31 +43,46 @@ const {
 const REQUEST_MARKER =
   'CUSTOMER_CASHFREE_CANCEL_REQUEST';
 
+const ELIGIBLE_ORDER_STATUSES = [
+  'Order Placed',
+  'Confirmed'
+];
+
+const TERMINAL_CASHFREE_STATUSES = [
+  'EXPIRED',
+  'TERMINATED'
+];
+
+const SAFE_FAILED_ATTEMPTS = [
+  'FAILED',
+  'USER_DROPPED'
+];
+
 
 /* =====================================
-   CHECK CUSTOMER REQUEST
+   CUSTOMER REQUEST CHECK
 ===================================== */
 
 function hasCancellationRequest(order) {
 
-  const history = Array.isArray(
-    order.statusHistory
-  )
-    ? order.statusHistory
-    : [];
+  const history =
+    Array.isArray(order?.statusHistory)
+      ? order.statusHistory
+      : [];
 
-  return history.some(item =>
+  return history.some(item => {
 
-    String(
+    return String(
       item.note || ''
-    ).startsWith(REQUEST_MARKER)
+    ).startsWith(REQUEST_MARKER);
 
-  );
+  });
+
 }
 
 
 /* =====================================
-   CHECK LOCAL ORDER SAFETY
+   CHECK DATABASE ORDER
 ===================================== */
 
 function validateLocalOrder(order) {
@@ -79,40 +94,30 @@ function validateLocalOrder(order) {
     );
   }
 
-  if (order.paymentMethod !== 'CASHFREE') {
+  if (
+    order.paymentMethod !== 'CASHFREE'
+  ) {
     throw error(
       400,
       'Only Cashfree orders are supported.'
     );
   }
 
-  if (
-    !hasCancellationRequest(order)
-  ) {
+  if (!hasCancellationRequest(order)) {
     throw error(
       409,
-      'Customer cancellation request not found.'
+      'Customer cancellation request is missing.'
     );
   }
 
   if (
-    order.orderStatus === 'Cancelled'
+    !ELIGIBLE_ORDER_STATUSES.includes(
+      order.orderStatus
+    )
   ) {
     throw error(
       409,
-      'Order is already cancelled.'
-    );
-  }
-
-  if (
-    ![
-      'Order Placed',
-      'Confirmed'
-    ].includes(order.orderStatus)
-  ) {
-    throw error(
-      409,
-      'This order is already being processed.'
+      'Order status does not allow cancellation.'
     );
   }
 
@@ -121,7 +126,7 @@ function validateLocalOrder(order) {
   ) {
     throw error(
       409,
-      'Payment status changed. Manual review required.'
+      'Payment is not pending. Manual review required.'
     );
   }
 
@@ -130,16 +135,18 @@ function validateLocalOrder(order) {
   ) {
     throw error(
       409,
-      'Stock reservation must be reviewed.'
+      'Stock reservation requires manual review.'
     );
   }
 
   if (
-    !order.cashfreeOrderId
+    !String(
+      order.cashfreeOrderId || ''
+    ).trim()
   ) {
     throw error(
       409,
-      'Cashfree order reference missing.'
+      'Cashfree order ID is missing.'
     );
   }
 
@@ -147,99 +154,30 @@ function validateLocalOrder(order) {
 
 
 /* =====================================
-   VERIFY CASHFREE PAYMENT
-
-   Must be called before approval.
+   VALIDATE GATEWAY AMOUNT
 ===================================== */
 
-async function verifyGatewaySafety(order) {
+function validateGatewayIdentity(
+  order,
+  gatewayOrder
+) {
+
+  const localId =
+    String(order.cashfreeOrderId);
 
   const gatewayId =
     String(
-      order.cashfreeOrderId
-    ).trim();
-
-  const inspection =
-    await inspectCashfreeOrder(
-      gatewayId
-    );
-
-  const gatewayOrder =
-    inspection.gatewayOrder;
-
-  /*
-    Ensure gateway identity matches.
-  */
-
-  if (
-    String(
       gatewayOrder?.order_id || ''
-    ) !== gatewayId
-  ) {
+    );
+
+  if (localId !== gatewayId) {
     throw error(
       409,
-      'Cashfree order identity mismatch.'
+      'Cashfree order ID mismatch.'
     );
   }
 
-  /*
-    An order can be cancelled only
-    after Cashfree has reached a
-    terminal, non-paid state.
-  */
-
-  const status =
-    String(
-      inspection.orderStatus || ''
-    ).toUpperCase();
-
-  if (
-    ![
-      'EXPIRED',
-      'TERMINATED'
-    ].includes(status)
-  ) {
-    throw error(
-      409,
-      'Cashfree order is not terminal. Cancellation blocked.'
-    );
-  }
-
-  /*
-    Check payment order, amount,
-    currency and all payment attempts.
-
-    Never interpret only one FAILED
-    payment attempt as proof that
-    the entire order was unpaid.
-  */
-
-  const confirmedPaid =
-    isCashfreePaymentSuccessful(
-      gatewayOrder,
-      order.grandTotal
-    );
-
-  const summary =
-    inspection.summary;
-
-  if (
-    confirmedPaid ||
-    summary.hasSuccessfulPayment ||
-    summary.hasPendingPayment
-  ) {
-    throw error(
-      409,
-      'Cashfree payment requires manual review. Cancellation blocked.'
-    );
-  }
-
-  /*
-    Check gateway amount/currency,
-    even for expired orders.
-  */
-
-  const expectedAmount =
+  const localAmount =
     Number(order.grandTotal);
 
   const gatewayAmount =
@@ -249,9 +187,11 @@ async function verifyGatewaySafety(order) {
 
   if (
     gatewayOrder?.order_currency !== 'INR' ||
-    !Number.isFinite(expectedAmount) ||
+    !Number.isFinite(localAmount) ||
     !Number.isFinite(gatewayAmount) ||
-    Math.round(expectedAmount * 100) !==
+    localAmount <= 0 ||
+    gatewayAmount <= 0 ||
+    Math.round(localAmount * 100) !==
       Math.round(gatewayAmount * 100)
   ) {
     throw error(
@@ -260,43 +200,141 @@ async function verifyGatewaySafety(order) {
     );
   }
 
+}
+
+
+/* =====================================
+   VERIFY CASHFREE LIVE STATUS
+===================================== */
+
+async function verifyCashfreeSafety(order) {
+
+  const inspection =
+    await inspectCashfreeOrder(
+      String(order.cashfreeOrderId)
+    );
+
+  const gatewayOrder =
+    inspection.gatewayOrder;
+
+  validateGatewayIdentity(
+    order,
+    gatewayOrder
+  );
+
+  const status =
+    String(
+      inspection.orderStatus || ''
+    ).toUpperCase();
+
   /*
-    Fail closed if Cashfree reports
-    an unexpected order/payment
-    state or missing attempt data.
+    Only confirmed terminal
+    non-paid gateway orders.
   */
+
+  if (
+    !TERMINAL_CASHFREE_STATUSES.includes(
+      status
+    )
+  ) {
+    throw error(
+      409,
+      'Cashfree order is not terminal. Cancellation blocked.'
+    );
+  }
 
   if (
     !Array.isArray(
       inspection.payments
-    ) ||
-    !summary ||
-    summary.other > 0
+    )
   ) {
     throw error(
       409,
-      'Unknown Cashfree payment state. Manual review required.'
+      'Payment attempts could not be verified.'
+    );
+  }
+
+  if (
+    isCashfreePaymentSuccessful(
+      gatewayOrder,
+      order.grandTotal
+    )
+  ) {
+    throw error(
+      409,
+      'Payment successful. Refund review required.'
+    );
+  }
+
+  /*
+    Check every attempt.
+
+    No unknown, pending or
+    successful attempt may pass.
+
+    Only known unsuccessful
+    statuses are allowed.
+  */
+
+  for (
+    const payment of inspection.payments
+  ) {
+
+    const paymentStatus =
+      String(
+        payment?.payment_status || ''
+      ).toUpperCase();
+
+    if (
+      !SAFE_FAILED_ATTEMPTS.includes(
+        paymentStatus
+      )
+    ) {
+      throw error(
+        409,
+        'Cashfree payment attempt needs manual review. Cancellation blocked.'
+      );
+    }
+
+  }
+
+  const summary =
+    inspection.summary;
+
+  if (
+    !summary ||
+    summary.hasSuccessfulPayment ||
+    summary.hasPendingPayment ||
+    summary.other !== 0 ||
+    summary.successful !== 0 ||
+    summary.pending !== 0
+  ) {
+    throw error(
+      409,
+      'Cashfree payment verification was not conclusive.'
     );
   }
 
   return {
-    status,
-    summary
+    gatewayStatus: status,
+    checkedAt: new Date()
   };
 
 }
 
 
 /* =====================================
-   APPROVE CASHFREE CANCELLATION
+   APPROVE CANCELLATION
 
-   POST:
+   POST
    /api/admin/orders/:id/cashfree/approve
 
-   Body:
+   BODY:
    {
      "confirmed": true
    }
+
+   Route must use requireAdmin.
 ===================================== */
 
 const approveCancellation =
@@ -314,22 +352,17 @@ const approveCancellation =
       );
     }
 
-    /*
-      Require deliberate approval.
-    */
-
     if (
       req.body?.confirmed !== true
     ) {
       throw error(
         400,
-        'Admin confirmation required.'
+        'Explicit admin confirmation required.'
       );
     }
 
     /*
-      Read order before gateway
-      verification.
+      Read current database state.
     */
 
     const original =
@@ -338,64 +371,74 @@ const approveCancellation =
     validateLocalOrder(original);
 
     /*
-      Recheck Cashfree immediately
-      before the database transaction.
+      Check live gateway state.
 
-      Gateway request errors block
-      cancellation automatically.
+      Network failure, unexpected
+      status or payment conflict
+      will block approval.
     */
 
     const verified =
-      await verifyGatewaySafety(
+      await verifyCashfreeSafety(
         original
       );
 
     /*
-      Protect against concurrent
-      local payment/order changes
-      using a database transaction.
+      DB transaction keeps stock
+      and order status together.
     */
 
     const session =
       await mongoose.startSession();
 
-    let cancelledOrder;
+    let cancelledOrder = null;
 
     try {
 
       await session.withTransaction(
         async () => {
 
+          /*
+            Read the latest local
+            order inside transaction.
+          */
+
           const freshOrder =
             await Order.findById(
               orderId
             ).session(session);
 
-          /*
-            Recheck all local conditions
-            inside the transaction.
-          */
-
           validateLocalOrder(
             freshOrder
           );
 
+          /*
+            Prevent approving if
+            order data changed while
+            payment was verified.
+          */
+
           if (
-            String(freshOrder.cashfreeOrderId) !==
-            String(original.cashfreeOrderId)
+            String(
+              freshOrder.cashfreeOrderId
+            ) !== String(
+              original.cashfreeOrderId
+            ) ||
+            Number(
+              freshOrder.grandTotal
+            ) !== Number(
+              original.grandTotal
+            )
           ) {
             throw error(
               409,
-              'Payment reference changed.'
+              'Order payment details changed. Approval blocked.'
             );
           }
 
           /*
-            Restore stock through
-            the existing order service.
-
-            This function uses the
-            same MongoDB transaction.
+            Release stock exactly
+            within this transaction.
           */
 
           await releaseStock(
@@ -404,8 +447,8 @@ const approveCancellation =
           );
 
           /*
-            Update payment and
-            order status together.
+            Only after stock operation
+            succeeds, update order.
           */
 
           freshOrder.orderStatus =
@@ -419,9 +462,9 @@ const approveCancellation =
 
             note:
               'Cashfree cancellation approved ' +
-              'by admin after verifying terminal ' +
-              'gateway status: ' +
-              verified.status,
+              'by admin after terminal gateway ' +
+              'verification: ' +
+              verified.gatewayStatus,
 
             changedAt: new Date()
           });
@@ -445,14 +488,24 @@ const approveCancellation =
     return ok(res, {
 
       message:
-        'Cashfree cancellation approved successfully.',
+        'Cashfree order cancellation completed.',
 
-      cashfreeStatus:
-        verified.status,
+      gatewayStatus:
+        verified.gatewayStatus,
+
+      paymentStatus:
+        cancelledOrder.paymentStatus,
+
+      orderStatus:
+        cancelledOrder.orderStatus,
+
+      stockReserved:
+        cancelledOrder.stockReserved,
 
       refundInitiated: false,
 
-      order: cancelledOrder
+      orderId:
+        cancelledOrder.orderId
 
     });
 
