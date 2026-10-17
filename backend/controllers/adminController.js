@@ -4,12 +4,14 @@
  MEMORA CREATIONS
  ADMIN CONTROLLER
 
- SEPARATE ADMIN LOGIN / LOGOUT
+ ADMIN LOGIN / LOGOUT
+ DASHBOARD
  PRODUCTS
  CATEGORIES
  ORDERS
  USERS
- DASHBOARD
+
+ CASHFREE + RAZORPAY STATISTICS
 =========================================
 */
 
@@ -93,7 +95,6 @@ const login = asyncHandler(async (req, res) => {
   admin.lastLoginAt = new Date();
   await admin.save();
 
-  // This creates only the Admin cookie.
   setAuthCookie(res, {
     sub: String(admin._id),
     type: 'admin'
@@ -114,10 +115,6 @@ const login = asyncHandler(async (req, res) => {
 
 /* =====================================
    ADMIN LOGOUT
-
-   IMPORTANT:
-   Delete only Admin cookie.
-   Customer cookie stays untouched.
 ===================================== */
 
 const logout = asyncHandler(async (_req, res) => {
@@ -136,6 +133,8 @@ const logout = asyncHandler(async (_req, res) => {
 
 /* =====================================
    ADMIN DASHBOARD
+
+   CASHFREE + RAZORPAY INCLUDED
 ===================================== */
 
 const dashboard = asyncHandler(async (_req, res) => {
@@ -190,8 +189,19 @@ const dashboard = asyncHandler(async (_req, res) => {
       }
     ]),
 
+    /*
+      FIXED:
+      Count successful online payments
+      from both Cashfree and Razorpay.
+    */
+
     Order.countDocuments({
-      paymentMethod: 'RAZORPAY',
+      paymentMethod: {
+        $in: [
+          'CASHFREE',
+          'RAZORPAY'
+        ]
+      },
       paymentStatus: 'SUCCESS'
     }),
 
@@ -770,7 +780,6 @@ const updateOrder = asyncHandler(async (req, res) => {
 
     await session.withTransaction(async () => {
 
-      // Read fresh order inside transaction.
       order = await Order.findById(
         req.params.id
       ).session(session);
@@ -805,10 +814,8 @@ const updateOrder = asyncHandler(async (req, res) => {
       }
 
       /*
-       Paid online orders require
-       a separate refund workflow.
-
-       Protect Cashfree and Razorpay.
+       Online orders require separate
+       payment reconciliation/refund flow.
       */
 
       if (
