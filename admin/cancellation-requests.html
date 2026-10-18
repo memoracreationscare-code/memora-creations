@@ -29,254 +29,146 @@
       color: #302117;
     }
 
-    .mc-page-header {
-      padding: 28px 0;
+    .cr-header {
+      margin: 28px 0;
     }
 
-    .mc-page-header h1 {
-      margin: 0 0 10px;
-      font-size: clamp(26px, 4vw, 38px);
+    .cr-header h1 {
+      margin-bottom: 10px;
     }
 
-    .mc-page-header p {
-      margin: 0;
-      color: #85746a;
+    .cr-header p {
+      color: #806e61;
       line-height: 1.7;
     }
 
-    .mc-panel {
-      background: white;
-      border: 1px solid #e9ddd1;
-      border-radius: 20px;
-      padding: 24px;
-      box-shadow: 0 10px 35px #3421160b;
-    }
-
-    .mc-toolbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 15px;
+    .cr-panel {
+      background: #fff;
+      border: 1px solid #eaded2;
+      border-radius: 18px;
+      padding: 22px;
       margin-bottom: 20px;
     }
 
-    .mc-toolbar h2 {
-      margin: 0 0 6px;
-      font-size: 21px;
+    .cr-toolbar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
     }
 
-    .mc-toolbar p {
-      margin: 0;
-      font-size: 12px;
-      color: #85746a;
-    }
-
-    .mc-counter {
-      border-radius: 99px;
-      padding: 9px 14px;
-      background: #fff0de;
-      color: #895117;
-      font-weight: 800;
-      font-size: 12px;
-    }
-
-    .mc-search {
-      width: min(350px, 100%);
-      padding: 12px 15px;
-      border: 1px solid #e4d5c8;
-      border-radius: 11px;
-      background: #fffdfa;
+    .cr-search {
+      padding: 12px;
+      border: 1px solid #dccbbb;
+      border-radius: 10px;
+      width: min(330px, 100%);
       font: inherit;
     }
 
-    .mc-table-wrap {
-      width: 100%;
+    .cr-table-wrap {
       overflow-x: auto;
-      border: 1px solid #eee2d6;
-      border-radius: 15px;
     }
 
-    .mc-table {
+    .cr-table {
       width: 100%;
-      min-width: 1000px;
+      min-width: 850px;
       border-collapse: collapse;
     }
 
-    .mc-table th {
-      padding: 15px;
-      background: #f6eee6;
-      color: #654732;
-      font-size: 12px;
+    .cr-table th,
+    .cr-table td {
+      padding: 14px;
+      border-bottom: 1px solid #eee4db;
       text-align: left;
-    }
-
-    .mc-table td {
-      padding: 16px;
-      border-bottom: 1px solid #f0e8e0;
-      font-size: 13px;
       vertical-align: middle;
-      overflow-wrap: anywhere;
+      font-size: 13px;
     }
 
-    .mc-table small {
+    .cr-table th {
+      background: #f5ede6;
+    }
+
+    .cr-table small {
       display: block;
       margin-top: 5px;
-      color: #85746a;
-      line-height: 1.5;
+      color: #826e60;
     }
 
-    .mc-badge {
-      display: inline-flex;
-      padding: 7px 11px;
-      border-radius: 99px;
-      font-size: 11px;
-      font-weight: 800;
+    .cr-button {
+      border: 0;
+      border-radius: 10px;
+      padding: 11px 14px;
+      background: #176534;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 12px;
     }
 
-    .mc-pending {
-      background: #fff2d8;
-      color: #946100;
+    .cr-button:disabled {
+      opacity: .5;
+      cursor: not-allowed;
     }
 
-    .mc-success {
-      background: #e8f7ed;
+    .cr-approve {
+      background: #97532e;
+      margin-top: 14px;
+    }
+
+    .cr-alert {
+      padding: 15px;
+      border-radius: 12px;
+      margin: 15px 0;
+      line-height: 1.7;
+      font-size: 13px;
+      background: #fff3de;
+      color: #805519;
+    }
+
+    .cr-alert.success {
+      background: #e9f7ed;
       color: #166534;
     }
 
-    .mc-failed {
-      background: #fceae7;
-      color: #b42318;
+    .cr-alert.danger {
+      background: #fdebea;
+      color: #a12620;
     }
 
-    .mc-neutral {
-      background: #edf0f3;
-      color: #59616d;
-    }
-
-    .mc-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      min-width: 145px;
-    }
-
-    .mc-verify {
-      padding: 11px 13px;
-      border: 0;
-      border-radius: 10px;
-      background: #166534;
-      color: white;
-      font-size: 12px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .mc-verify:hover {
-      background: #14532d;
-    }
-
-    .mc-verify:disabled {
-      opacity: .55;
-      cursor: wait;
-    }
-
-    .mc-review-link {
-      display: inline-block;
-      padding: 10px 13px;
-      border-radius: 10px;
-      background: #865535;
-      color: white;
-      text-decoration: none;
-      text-align: center;
-      font-size: 12px;
-      font-weight: 800;
-    }
-
-    .mc-result {
-      margin-top: 20px;
-      padding: 20px;
-      border: 1px solid #d7c8b9;
-      border-radius: 16px;
-      background: #fcfaf7;
-    }
-
-    .mc-result h3 {
-      margin: 0 0 15px;
-      font-size: 20px;
-    }
-
-    .mc-result-grid {
+    .cr-grid {
       display: grid;
       grid-template-columns:
         repeat(auto-fit, minmax(180px, 1fr));
-      gap: 14px;
+      gap: 12px;
     }
 
-    .mc-result-item {
-      padding: 13px;
-      border-radius: 11px;
-      background: white;
+    .cr-detail {
+      background: #fcfaf8;
       border: 1px solid #eee3d8;
+      border-radius: 10px;
+      padding: 13px;
     }
 
-    .mc-result-item span {
+    .cr-detail small {
       display: block;
-      color: #88766a;
-      font-size: 11px;
+      color: #806e61;
       margin-bottom: 7px;
     }
 
-    .mc-result-item strong {
-      font-size: 13px;
+    .cr-detail strong {
       overflow-wrap: anywhere;
     }
 
-    .mc-message {
-      margin-top: 15px;
-      border-radius: 12px;
-      padding: 15px;
-      font-size: 13px;
-      line-height: 1.8;
+    .cr-status {
+      font-weight: 800;
     }
 
-    .mc-message.warning {
-      background: #fff3da;
-      color: #875600;
-    }
-
-    .mc-message.danger {
-      background: #fdecea;
-      color: #a3271b;
-    }
-
-    .mc-message.success {
-      background: #eaf7ee;
-      color: #166534;
-    }
-
-    .mc-notice {
-      margin-top: 20px;
-      padding: 17px;
-      background: #fff7e8;
-      color: #805b2c;
-      border: 1px solid #efd9b6;
-      border-radius: 13px;
-      font-size: 13px;
-      line-height: 1.8;
-    }
-
-    .mc-empty {
+    .cr-empty {
+      padding: 25px;
       text-align: center;
-      padding: 30px;
-      color: #81746a;
-    }
-
-    .mc-footer {
-      margin: 30px 0;
-      text-align: center;
-      color: #97877b;
-      font-size: 12px;
+      color: #806e61;
     }
 
     [hidden] {
@@ -284,30 +176,17 @@
     }
 
     @media (max-width: 650px) {
-      .mc-panel {
+      .cr-panel {
         padding: 14px;
-      }
-
-      .mc-toolbar {
-        align-items: stretch;
-        flex-direction: column;
-      }
-
-      .mc-search {
-        width: 100%;
       }
     }
   </style>
-
 </head>
 
 <body>
 
-  <!-- ADMIN NAVIGATION -->
-
   <nav class="adminnav">
     <div class="container">
-
       <b>MEMORA ADMIN</b>
 
       <a href="/memora-creations/admin/dashboard.html">
@@ -322,10 +201,7 @@
         Orders
       </a>
 
-      <a
-        href="/memora-creations/admin/cancellation-requests.html"
-        aria-current="page"
-      >
+      <a href="/memora-creations/admin/cancellation-requests.html">
         Cancel Requests
       </a>
 
@@ -340,60 +216,41 @@
       >
         Logout
       </button>
-
     </div>
   </nav>
 
-  <!-- MAIN -->
-
   <main class="container adminmain">
 
-    <section class="mc-page-header">
-
-      <h1>Cancellation Requests</h1>
-
+    <header class="cr-header">
+      <h1>Cashfree Cancellation Requests</h1>
       <p>
-        Review customer cancellation requests
-        and verify Cashfree payments safely.
+        Verify customer payment status and review
+        cancellation requests safely.
       </p>
+    </header>
 
-    </section>
+    <section class="cr-panel">
 
-    <section class="mc-panel">
-
-      <div class="mc-toolbar">
-
+      <div class="cr-toolbar">
         <div>
           <h2>Customer Requests</h2>
-
-          <p id="loadingStatus">
-            Loading requests...
-          </p>
+          <p id="loadStatus">Loading...</p>
         </div>
 
-        <span
-          id="requestCount"
-          class="mc-counter"
-        >
+        <strong id="requestCount">
           0 Requests
-        </span>
+        </strong>
 
         <input
-          id="requestSearch"
-          class="mc-search"
-          type="search"
+          id="search"
+          class="cr-search"
           placeholder="Search Order ID or Customer"
-          aria-label="Search requests"
+          type="search"
         >
-
       </div>
 
-      <!-- REQUEST TABLE -->
-
-      <div class="mc-table-wrap">
-
-        <table class="mc-table">
-
+      <div class="cr-table-wrap">
+        <table class="cr-table">
           <thead>
             <tr>
               <th>Order</th>
@@ -406,146 +263,137 @@
             </tr>
           </thead>
 
-          <tbody id="requestRows">
-
+          <tbody id="rows">
             <tr>
-              <td
-                colspan="7"
-                class="mc-empty"
-              >
-                Loading cancellation requests...
+              <td colspan="7" class="cr-empty">
+                Loading requests...
               </td>
             </tr>
-
           </tbody>
-
         </table>
-
-      </div>
-
-      <!-- CASHFREE VERIFICATION RESULT -->
-
-      <section
-        id="verificationResult"
-        class="mc-result"
-        hidden
-        aria-live="polite"
-      >
-
-        <h3>Cashfree Payment Verification</h3>
-
-        <div
-          id="verificationDetails"
-          class="mc-result-grid"
-        ></div>
-
-        <div
-          id="verificationMessage"
-          class="mc-message warning"
-        ></div>
-
-      </section>
-
-      <!-- WARNING -->
-
-      <div class="mc-notice">
-
-        <strong>Important Payment Safety</strong>
-
-        <p>
-          Verify Payment sirf Cashfree se
-          Payment Status check karta hai.
-        </p>
-
-        <p>
-          Is button se Order Cancel,
-          Refund ya Stock Release
-          nahi hota.
-        </p>
-
-        <p>
-          Payment SUCCESS hone par
-          Refund Review zaroori hai.
-          Pending Payment par cancellation
-          approve na karein.
-        </p>
-
       </div>
 
     </section>
 
-    <div class="mc-footer">
-      © MEMORA CREATIONS — Cancellation Review
+    <section
+      id="resultPanel"
+      class="cr-panel"
+      hidden
+    >
+
+      <h2>Cashfree Payment Verification</h2>
+
+      <div
+        id="resultGrid"
+        class="cr-grid"
+      ></div>
+
+      <div
+        id="resultMessage"
+        class="cr-alert"
+        aria-live="polite"
+      ></div>
+
+      <div
+        id="approvalArea"
+        hidden
+      >
+        <div class="cr-alert">
+          <strong>Sandbox Approval Only</strong>
+
+          <p>
+            Approval can cancel an order and release
+            reserved product stock. It is blocked
+            by the backend unless the Sandbox
+            approval feature is enabled.
+          </p>
+        </div>
+
+        <button
+          id="approveButton"
+          class="cr-button cr-approve"
+          type="button"
+        >
+          Approve Sandbox Cancellation
+        </button>
+      </div>
+
+    </section>
+
+    <div class="cr-alert">
+      <strong>Payment Safety:</strong>
+      Verify Payment is read-only. A successful
+      payment requires refund review. Never
+      approve a cancellation solely because
+      one payment attempt failed.
     </div>
 
   </main>
-
-  <!-- COMMON API -->
 
   <script
     src="/memora-creations/frontend/js/app.js?v=10"
   ></script>
 
-  <!-- ADMIN AUTH -->
-
   <script
     src="/memora-creations/admin/js/auth.js?v=5"
   ></script>
 
-  <!-- REQUEST MANAGEMENT -->
-
   <script>
-
     (() => {
       'use strict';
 
       const MARKER =
         'CUSTOMER_CASHFREE_CANCEL_REQUEST';
 
-      const rowsBox =
-        document.getElementById('requestRows');
+      const rows =
+        document.getElementById('rows');
 
-      const searchInput =
-        document.getElementById('requestSearch');
+      const search =
+        document.getElementById('search');
 
-      const countBox =
+      const count =
         document.getElementById('requestCount');
 
-      const statusBox =
-        document.getElementById('loadingStatus');
+      const loadStatus =
+        document.getElementById('loadStatus');
 
-      const resultBox =
-        document.getElementById('verificationResult');
+      const resultPanel =
+        document.getElementById('resultPanel');
 
-      const detailsBox =
-        document.getElementById('verificationDetails');
+      const resultGrid =
+        document.getElementById('resultGrid');
 
-      const messageBox =
-        document.getElementById('verificationMessage');
+      const resultMessage =
+        document.getElementById('resultMessage');
+
+      const approvalArea =
+        document.getElementById('approvalArea');
+
+      const approveButton =
+        document.getElementById('approveButton');
 
       let allRequests = [];
 
-      let verifying = false;
+      let verifiedOrder = null;
+
+      let busy = false;
 
 
-      /* =========================
-         SAFE TEXT HELPERS
-      ========================= */
+      function create(tag, value) {
+        const el = document.createElement(tag);
+        el.textContent = String(value ?? '');
+        return el;
+      }
 
-      function textElement(tag, value) {
 
-        const element =
-          document.createElement(tag);
-
-        element.textContent =
-          String(value ?? '');
-
-        return element;
+      function money(value) {
+        return window.MC.money(
+          Number(value || 0)
+        );
       }
 
 
       function formatDate(value) {
-
         if (!value) return '-';
 
         const date = new Date(value);
@@ -556,678 +404,449 @@
       }
 
 
-      function money(value) {
+      function addDetail(label, value) {
+        const item = create('div', '');
+        item.className = 'cr-detail';
 
-        return window.MC.money(
-          Number(value || 0)
+        item.append(
+          create('small', label),
+          create('strong', value)
         );
+
+        resultGrid.appendChild(item);
       }
 
 
-      /* =========================
-         PAYMENT BADGE
-      ========================= */
+      function showMessage(message, type = '') {
+        resultMessage.className =
+          'cr-alert ' + type;
 
-      function createPaymentBadge(status) {
-
-        const value =
-          String(status || 'UNKNOWN')
-            .toUpperCase();
-
-        const badge =
-          textElement('span', value);
-
-        badge.className = 'mc-badge';
-
-        if (value === 'SUCCESS') {
-
-          badge.classList.add('mc-success');
-
-        } else if (value === 'PENDING') {
-
-          badge.classList.add('mc-pending');
-
-        } else if (
-          value === 'FAILED' ||
-          value === 'CANCELLED'
-        ) {
-
-          badge.classList.add('mc-failed');
-
-        } else {
-
-          badge.classList.add('mc-neutral');
-
-        }
-
-        return badge;
+        resultMessage.textContent = message;
       }
 
-
-      /* =========================
-         EXTRACT CUSTOMER REQUESTS
-      ========================= */
 
       function extractRequests(orders) {
+        return orders
+          .filter(order => {
+            if (order.paymentMethod !== 'CASHFREE') {
+              return false;
+            }
 
-        const result = [];
-
-        for (const order of orders) {
-
-          if (
-            order.paymentMethod !== 'CASHFREE'
-          ) {
-            continue;
-          }
-
-          const history =
-            Array.isArray(order.statusHistory)
-              ? order.statusHistory
-              : [];
-
-          const requests =
-            history.filter(item =>
-
-              String(
-                item.note || ''
-              ).startsWith(MARKER)
-
+            return (
+              Array.isArray(order.statusHistory) &&
+              order.statusHistory.some(item =>
+                String(item.note || '')
+                  .startsWith(MARKER)
+              )
             );
+          })
+          .map(order => {
+            const request = order.statusHistory
+              .filter(item =>
+                String(item.note || '')
+                  .startsWith(MARKER)
+              )
+              .pop();
 
-          if (!requests.length) {
-            continue;
-          }
-
-          const latest =
-            requests[requests.length - 1];
-
-          result.push({
-            order,
-
-            requestDate:
-              latest.changedAt ||
-              order.updatedAt
-          });
-        }
-
-        result.sort(
-          (a, b) =>
-
-            new Date(b.requestDate || 0) -
-            new Date(a.requestDate || 0)
-
-        );
-
-        return result;
+            return {
+              order,
+              requestedAt:
+                request?.changedAt || order.updatedAt
+            };
+          })
+          .sort((a, b) =>
+            new Date(b.requestedAt || 0) -
+            new Date(a.requestedAt || 0)
+          );
       }
 
 
-      /* =========================
-         RENDER REQUEST LIST
-      ========================= */
+      function render() {
+        const term = search.value
+          .trim()
+          .toLowerCase();
 
-      function renderRequests() {
+        const filtered = allRequests.filter(item => {
+          const order = item.order;
 
-        const search =
-          searchInput.value
-            .trim()
-            .toLowerCase();
+          const customer =
+            order.user?.fullName ||
+            order.customer?.fullName ||
+            '';
 
-        const filtered =
-          allRequests.filter(item => {
+          return (
+            String(order.orderId || '')
+              .toLowerCase().includes(term) ||
+            String(customer)
+              .toLowerCase().includes(term)
+          );
+        });
 
-            const order = item.order;
+        rows.replaceChildren();
 
-            const customer =
-              order.user?.fullName ||
-              order.customer?.fullName ||
-              '';
-
-            const mobile =
-              order.user?.mobile ||
-              order.customer?.mobile ||
-              '';
-
-            return [
-
-              order.orderId,
-              customer,
-              mobile
-
-            ].some(value =>
-
-              String(value || '')
-                .toLowerCase()
-                .includes(search)
-
-            );
-
-          });
-
-        rowsBox.replaceChildren();
-
-        countBox.textContent =
-          allRequests.length +
-          ' Requests';
+        count.textContent =
+          allRequests.length + ' Requests';
 
         if (!filtered.length) {
+          const tr = create('tr', '');
+          const td = create(
+            'td',
+            'No matching cancellation requests.'
+          );
 
-          const row =
-            document.createElement('tr');
+          td.colSpan = 7;
+          td.className = 'cr-empty';
 
-          const cell =
-            textElement(
-              'td',
-              allRequests.length
-                ? 'No matching requests.'
-                : 'No cancellation requests found among the loaded orders.'
-            );
-
-          cell.colSpan = 7;
-          cell.className = 'mc-empty';
-
-          row.appendChild(cell);
-
-          rowsBox.appendChild(row);
-
+          tr.appendChild(td);
+          rows.appendChild(tr);
           return;
         }
 
         for (const item of filtered) {
-
           const order = item.order;
-
-          const row =
-            document.createElement('tr');
+          const tr = create('tr', '');
 
           const customer =
             order.user?.fullName ||
             order.customer?.fullName ||
             'Customer';
 
-          const mobile =
-            order.user?.mobile ||
-            order.customer?.mobile ||
-            '';
-
-          // Order ID
-
-          const orderCell =
-            document.createElement('td');
-
-          orderCell.append(
-            textElement(
-              'strong',
-              order.orderId || '-'
-            ),
-            textElement(
-              'small',
-              'Cancellation Requested'
-            )
+          const orderCell = create(
+            'td',
+            order.orderId
           );
 
-          // Customer
-
-          const customerCell =
-            document.createElement('td');
-
-          customerCell.append(
-            textElement(
-              'strong',
-              customer
-            ),
-            textElement(
-              'small',
-              mobile
-            )
+          const customerCell = create(
+            'td',
+            customer
           );
 
-          // Amount
-
-          const totalCell =
-            textElement(
-              'td',
-              money(order.grandTotal)
-            );
-
-          // Payment
-
-          const paymentCell =
-            document.createElement('td');
-
-          paymentCell.appendChild(
-            createPaymentBadge(
-              order.paymentStatus
-            )
+          const totalCell = create(
+            'td',
+            money(order.grandTotal)
           );
 
-          // Order Status
+          const paymentCell = create(
+            'td',
+            order.paymentStatus
+          );
 
-          const orderStatusCell =
-            textElement(
-              'td',
-              order.orderStatus || '-'
-            );
+          const statusCell = create(
+            'td',
+            order.orderStatus
+          );
 
-          // Request Date
+          const dateCell = create(
+            'td',
+            formatDate(item.requestedAt)
+          );
 
-          const dateCell =
-            textElement(
-              'td',
-              formatDate(item.requestDate)
-            );
+          const actionCell = create('td', '');
 
-          // Actions
+          const button = create(
+            'button',
+            'Verify Payment'
+          );
 
-          const actionCell =
-            document.createElement('td');
+          button.type = 'button';
+          button.className = 'cr-button';
 
-          const actionBox =
-            document.createElement('div');
-
-          actionBox.className = 'mc-actions';
-
-          const verifyButton =
-            document.createElement('button');
-
-          verifyButton.type = 'button';
-
-          verifyButton.className =
-            'mc-verify';
-
-          verifyButton.textContent =
-            '✓ Verify Payment';
-
-          verifyButton.dataset.id =
-            String(order._id || '');
-
-          verifyButton.addEventListener(
+          button.addEventListener(
             'click',
-            () => verifyPayment(
-              verifyButton,
-              order
-            )
+            () => verify(order)
           );
 
-          const reviewLink =
-            document.createElement('a');
+          actionCell.appendChild(button);
 
-          reviewLink.className =
-            'mc-review-link';
-
-          reviewLink.href =
-            '/memora-creations/admin/orders.html';
-
-          reviewLink.textContent =
-            'Review Order →';
-
-          actionBox.append(
-            verifyButton,
-            reviewLink
-          );
-
-          actionCell.appendChild(
-            actionBox
-          );
-
-          row.append(
+          tr.append(
             orderCell,
             customerCell,
             totalCell,
             paymentCell,
-            orderStatusCell,
+            statusCell,
             dateCell,
             actionCell
           );
 
-          rowsBox.appendChild(row);
-
+          rows.appendChild(tr);
         }
       }
 
 
-      /* =========================
-         VERIFICATION RESULT HELPERS
-      ========================= */
+      async function verify(order) {
+        if (busy) return;
 
-      function addResultItem(
-        label,
-        value
-      ) {
+        busy = true;
+        verifiedOrder = null;
+        approvalArea.hidden = true;
+        resultPanel.hidden = false;
 
-        const box =
-          document.createElement('div');
+        resultGrid.replaceChildren();
 
-        box.className =
-          'mc-result-item';
-
-        box.append(
-          textElement('span', label),
-          textElement('strong', value)
+        showMessage(
+          'Checking payment directly with Cashfree...'
         );
-
-        detailsBox.appendChild(box);
-      }
-
-
-      function showVerificationResult(data) {
-
-        resultBox.hidden = false;
-
-        detailsBox.replaceChildren();
-
-        const order =
-          data.order || {};
-
-        const cashfree =
-          data.cashfree || {};
-
-        const review =
-          data.review || {};
-
-        addResultItem(
-          'Order ID',
-          order.orderId || '-'
-        );
-
-        addResultItem(
-          'Order Amount',
-          money(order.grandTotal)
-        );
-
-        addResultItem(
-          'Database Payment Status',
-          order.paymentStatus || '-'
-        );
-
-        addResultItem(
-          'Cashfree Order Status',
-          cashfree.environmentOrderStatus ||
-          '-'
-        );
-
-        addResultItem(
-          'Payment Confirmed',
-          cashfree.paymentConfirmed
-            ? 'YES'
-            : 'NO'
-        );
-
-        addResultItem(
-          'Total Attempts',
-          cashfree.totalAttempts ?? '-'
-        );
-
-        addResultItem(
-          'Successful Attempts',
-          cashfree.successfulAttempts ?? '-'
-        );
-
-        addResultItem(
-          'Pending Attempts',
-          cashfree.pendingAttempts ?? '-'
-        );
-
-        addResultItem(
-          'Failed Attempts',
-          cashfree.failedAttempts ?? '-'
-        );
-
-        addResultItem(
-          'Stock Reserved',
-          order.stockReserved
-            ? 'YES'
-            : 'NO'
-        );
-
-        addResultItem(
-          'Verification Result',
-          review.recommendation ||
-          'MANUAL_REVIEW_REQUIRED'
-        );
-
-        messageBox.className =
-          'mc-message warning';
-
-        if (
-          review.recommendation ===
-          'REFUND_REVIEW_REQUIRED'
-        ) {
-
-          messageBox.className =
-            'mc-message danger';
-
-        } else if (
-          review.recommendation ===
-          'ELIGIBLE_FOR_MANUAL_REVIEW'
-        ) {
-
-          messageBox.className =
-            'mc-message success';
-
-        }
-
-        messageBox.textContent =
-          (review.message ||
-            'Manual review required.') +
-          ' No order, payment or stock changes were made.';
-
-        resultBox.scrollIntoView({
-          behavior: 'smooth',
-          block: 'nearest'
-        });
-      }
-
-
-      /* =========================
-         VERIFY PAYMENT VIA CASHFREE
-      ========================= */
-
-      async function verifyPayment(
-        button,
-        order
-      ) {
-
-        if (verifying) {
-          return;
-        }
-
-        const orderId =
-          button.dataset.id;
-
-        if (!orderId) {
-          return;
-        }
-
-        verifying = true;
-
-        button.disabled = true;
-
-        const previousText =
-          button.textContent;
-
-        button.textContent =
-          'Verifying...';
-
-        resultBox.hidden = false;
-
-        detailsBox.replaceChildren();
-
-        messageBox.className =
-          'mc-message warning';
-
-        messageBox.textContent =
-          'Contacting Cashfree. Please wait...';
 
         try {
-
-          const response =
-            await window.MC.api(
-
-              '/admin/orders/' +
-              encodeURIComponent(orderId) +
-              '/cashfree/verify'
-
-            );
-
-          /*
-            Strict result check.
-            An incomplete response must
-            not be treated as verified.
-          */
-
-          if (
-            !response ||
-            !response.review ||
-            !response.cashfree ||
-            response.cashfree.identityVerified !== true
-          ) {
-
-            throw new Error(
-              'Cashfree verification response is incomplete.'
-            );
-
-          }
-
-          showVerificationResult(
-            response
+          const result = await window.MC.api(
+            '/admin/orders/' +
+            encodeURIComponent(order._id) +
+            '/cashfree/verify'
           );
 
-          window.MC.toast(
-            'Cashfree verification completed.',
+          if (
+            !result?.cashfree ||
+            !result?.review ||
+            result.cashfree.identityVerified !== true
+          ) {
+            throw new Error(
+              'Cashfree verification incomplete.'
+            );
+          }
+
+          const local = result.order || {};
+          const gateway = result.cashfree;
+          const review = result.review;
+
+          addDetail(
+            'Order ID',
+            local.orderId || '-'
+          );
+
+          addDetail(
+            'Order Amount',
+            money(local.grandTotal)
+          );
+
+          addDetail(
+            'Database Payment',
+            local.paymentStatus || '-'
+          );
+
+          addDetail(
+            'Order Status',
+            local.orderStatus || '-'
+          );
+
+          addDetail(
+            'Cashfree Status',
+            gateway.environmentOrderStatus || '-'
+          );
+
+          addDetail(
+            'Successful Attempts',
+            gateway.successfulAttempts ?? '-'
+          );
+
+          addDetail(
+            'Pending Attempts',
+            gateway.pendingAttempts ?? '-'
+          );
+
+          addDetail(
+            'Failed Attempts',
+            gateway.failedAttempts ?? '-'
+          );
+
+          addDetail(
+            'Stock Reserved',
+            local.stockReserved ? 'YES' : 'NO'
+          );
+
+          addDetail(
+            'Recommendation',
+            review.recommendation || '-'
+          );
+
+          showMessage(
+            review.message || 'Manual review required.',
+            review.recommendation ===
+              'ELIGIBLE_FOR_MANUAL_REVIEW'
+              ? 'success'
+              : 'danger'
+          );
+
+          const eligible =
+            review.recommendation ===
+              'ELIGIBLE_FOR_MANUAL_REVIEW' &&
+            local.paymentStatus === 'PENDING' &&
+            local.stockReserved === true &&
+            ['Order Placed', 'Confirmed']
+              .includes(local.orderStatus) &&
+            ['EXPIRED', 'TERMINATED']
+              .includes(
+                gateway.environmentOrderStatus
+              ) &&
+            gateway.paymentConfirmed === false &&
+            Number(gateway.successfulAttempts) === 0 &&
+            Number(gateway.pendingAttempts) === 0 &&
+            local.orderId === order.orderId;
+
+          if (eligible) {
+            verifiedOrder = {
+              id: order._id,
+              orderId: order.orderId
+            };
+
+            approvalArea.hidden = false;
+          }
+
+        } catch (err) {
+          showMessage(
+            err.message || 'Verification failed.',
+            'danger'
+          );
+        } finally {
+          busy = false;
+        }
+      }
+
+
+      async function approve() {
+        if (busy || !verifiedOrder) return;
+
+        const selected = {
+          ...verifiedOrder
+        };
+
+        /*
+          This is deliberate confirmation.
+
+          The server remains the final
+          authority and rechecks Cashfree.
+        */
+
+        const typed = window.prompt(
+          'Sandbox cancellation will change the order ' +
+          'and release stock.\n\n' +
+          'Type the exact Order ID to confirm:\n' +
+          selected.orderId
+        );
+
+        if (typed !== selected.orderId) {
+          showMessage(
+            'Approval cancelled. Order ID did not match.',
+            'warning'
+          );
+          return;
+        }
+
+        const confirmed = window.confirm(
+          'FINAL CONFIRMATION\n\n' +
+          'Cancel sandbox order ' +
+          selected.orderId +
+          ' and release reserved stock?'
+        );
+
+        if (!confirmed) return;
+
+        busy = true;
+        approveButton.disabled = true;
+
+        try {
+          const result = await window.MC.api(
+            '/admin/orders/' +
+            encodeURIComponent(selected.id) +
+            '/cashfree/approve',
+            {
+              method: 'POST',
+              body: JSON.stringify({
+                confirmed: true
+              })
+            }
+          );
+
+          if (
+            result.orderStatus !== 'Cancelled' ||
+            result.paymentStatus !== 'CANCELLED' ||
+            result.stockReserved !== false
+          ) {
+            throw new Error(
+              'Approval response requires manual verification.'
+            );
+          }
+
+          showMessage(
+            'Sandbox cancellation completed for ' +
+            selected.orderId +
+            '. Verify product stock in Admin Products.',
             'success'
           );
 
+          verifiedOrder = null;
+          approvalArea.hidden = true;
+
+          await loadRequests();
+
         } catch (err) {
-
-          console.error(
-            'Cashfree verification failed:',
-            err
+          showMessage(
+            err.message ||
+            'Cancellation approval failed.',
+            'danger'
           );
-
-          resultBox.hidden = false;
-
-          detailsBox.replaceChildren();
-
-          messageBox.className =
-            'mc-message danger';
-
-          messageBox.textContent =
-            'Verification failed for ' +
-            String(order.orderId || 'this order') +
-            '. No cancellation was performed. ' +
-            String(
-              err.message ||
-              'Please try again.'
-            );
-
-          window.MC.toast(
-            'Payment verification failed.',
-            'error'
-          );
-
         } finally {
-
-          verifying = false;
-
-          button.disabled = false;
-
-          button.textContent =
-            previousText;
-
+          busy = false;
+          approveButton.disabled = false;
         }
       }
 
 
-      /* =========================
-         LOAD REQUESTS FROM ADMIN API
-      ========================= */
-
       async function loadRequests() {
-
         try {
-
-          const response =
-            await window.MC.api(
-              '/admin/orders'
-            );
+          const response = await window.MC.api(
+            '/admin/orders'
+          );
 
           const orders =
             Array.isArray(response.orders)
               ? response.orders
               : [];
 
-          allRequests =
-            extractRequests(orders);
+          allRequests = extractRequests(orders);
 
-          statusBox.textContent =
-            'Requests from the latest ' +
+          loadStatus.textContent =
+            'Showing requests from the latest ' +
             orders.length +
-            ' loaded orders.';
+            ' orders.';
 
-          renderRequests();
+          render();
 
         } catch (err) {
-
-          console.error(
-            'Requests loading failed:',
-            err
-          );
-
-          statusBox.textContent =
+          loadStatus.textContent =
             'Unable to load requests.';
 
-          rowsBox.replaceChildren();
+          rows.replaceChildren();
 
-          const row =
-            document.createElement('tr');
+          const tr = create('tr', '');
+          const td = create(
+            'td',
+            err.message || 'Please refresh.'
+          );
 
-          const cell =
-            textElement(
-              'td',
-              err.message ||
-              'Please refresh and try again.'
-            );
-
-          cell.colSpan = 7;
-          cell.className = 'mc-empty';
-
-          row.appendChild(cell);
-
-          rowsBox.appendChild(row);
+          td.colSpan = 7;
+          tr.appendChild(td);
+          rows.appendChild(tr);
         }
       }
 
 
-      /* =========================
-         SEARCH
-      ========================= */
+      search.addEventListener('input', render);
 
-      searchInput.addEventListener(
-        'input',
-        renderRequests
+      approveButton.addEventListener(
+        'click',
+        approve
       );
 
 
-      /* =========================
-         ADMIN AUTH + START
-      ========================= */
-
       async function start() {
-
         if (
-          typeof window.requireAdmin !==
-          'function'
-        ) {
-          return;
-        }
+          typeof window.requireAdmin !== 'function'
+        ) return;
 
         const admin =
           await window.requireAdmin();
 
-        if (!admin) {
-          return;
-        }
+        if (!admin) return;
 
         await loadRequests();
       }
@@ -1235,7 +854,6 @@
       start();
 
     })();
-
   </script>
 
 </body>
