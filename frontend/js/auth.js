@@ -390,16 +390,22 @@ bindAuthForm(
       );
 
 
-      const next =
-        new URLSearchParams(
-          location.search
-        )
-          .get('next');
+      const rawNext = new URLSearchParams(location.search).get('next');
+      const fallback = '/memora-creations/frontend/index.html';
+      let destination = fallback;
 
-
-      const destination =
-        next ||
-        '/memora-creations/frontend/index.html';
+      if (rawNext && rawNext.startsWith('/') &&
+          !rawNext.startsWith('//') && !rawNext.includes('\\')) {
+        try {
+          const candidate = new URL(rawNext, location.origin);
+          if (candidate.origin === location.origin &&
+              candidate.pathname.startsWith('/memora-creations/frontend/')) {
+            destination = candidate.pathname + candidate.search + candidate.hash;
+          }
+        } catch (_) {
+          destination = fallback;
+        }
+      }
 
 
       showStatusPopup({
