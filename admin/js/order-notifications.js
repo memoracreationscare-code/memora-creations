@@ -4,15 +4,19 @@
  MEMORA CREATIONS
  ADMIN ORDER NOTIFICATIONS
 
- FEATURES
+ FEATURES:
  - Today's Orders
  - Unseen Orders
- - New Order Alert
- - Notification Sound
- - Enable / Mute Sound
+ - New Order Sound Alert
+ - Persistent Sound ON/OFF
+ - Auto Audio Resume
  - Mark as Seen
  - View Orders
  - Auto Refresh Every 30 Seconds
+
+ SOUND RULE:
+ Sound preference stays ON until
+ the admin manually switches it OFF.
 =========================================
 */
 
@@ -33,17 +37,42 @@
   let orders = [];
   let previousIds = null;
   let loading = false;
-
   let audioContext = null;
   let soundUnlocked = false;
+  let unlockPending = false;
 
-  let soundEnabled = false;
+  /* =====================================
+     PERSISTENT SOUND PREFERENCE
+  ===================================== */
 
-  try {
-    soundEnabled =
-      localStorage.getItem(SOUND_KEY) === 'true';
-  } catch (_) {
-    soundEnabled = false;
+  function readSoundPreference() {
+    try {
+      return localStorage.getItem(
+        SOUND_KEY
+      ) === 'true';
+    } catch (_) {
+      return false;
+    }
+  }
+
+  let soundEnabled = readSoundPreference();
+
+  function saveSoundPreference(enabled) {
+    soundEnabled = Boolean(enabled);
+
+    try {
+      localStorage.setItem(
+        SOUND_KEY,
+        String(soundEnabled)
+      );
+    } catch (error) {
+      console.warn(
+        'Could not save sound preference:',
+        error
+      );
+    }
+
+    updateSoundButton();
   }
 
   /* =====================================
@@ -51,7 +80,8 @@
   ===================================== */
 
   function make(tag, value) {
-    const element = document.createElement(tag);
+    const element =
+      document.createElement(tag);
 
     if (value !== undefined) {
       element.textContent = String(value);
@@ -82,7 +112,9 @@
     ).formatToParts(date);
 
     const get = type =>
-      parts.find(p => p.type === type)?.value || '';
+      parts.find(
+        part => part.type === type
+      )?.value || '';
 
     return (
       get('year') + '-' +
@@ -92,13 +124,15 @@
   }
 
   /* =====================================
-     READ SEEN ORDERS
+     SEEN ORDERS
   ===================================== */
 
   function readSeen() {
     try {
       const saved = JSON.parse(
-        localStorage.getItem(STORAGE_KEY) || '{}'
+        localStorage.getItem(
+          STORAGE_KEY
+        ) || '{}'
       );
 
       return new Set(
@@ -106,15 +140,10 @@
           ? saved.ids.map(String)
           : []
       );
-
     } catch (_) {
       return new Set();
     }
   }
-
-  /* =====================================
-     MARK ORDERS AS SEEN
-  ===================================== */
 
   function markSeen() {
     try {
@@ -130,13 +159,14 @@
         STORAGE_KEY,
         JSON.stringify({
           ids: [...seen].slice(-1000),
-          updatedAt: new Date().toISOString()
+          updatedAt:
+            new Date().toISOString()
         })
       );
 
       render();
 
-    } catch (_) {
+    } catch (error) {
       showStatus(
         'Browser storage unavailable.'
       );
@@ -145,37 +175,64 @@
 
   /* =====================================
      SOUND ENGINE
-
-     Sound is generated locally.
-     No audio file is required.
   ===================================== */
 
-  async function unlockAudio() {
-    const AudioContextClass =
+  function getAudioContextClass() {
+    return (
       window.AudioContext ||
-      window.webkitAudioContext;
+      window.webkitAudioContext
+    );
+  }
+
+  async function unlockAudio() {
+    if (!soundEnabled) {
+      return false;
+    }
+
+    if (unlockPending) {
+      return false;
+    }
+
+    const AudioContextClass =
+      getAudioContextClass();
 
     if (!AudioContextClass) {
-      throw new Error(
-        'Sound is not supported in this browser.'
+      soundUnlocked = false;
+      updateSoundButton();
+      return false;
+    }
+
+    unlockPending = true;
+
+    try {
+      if (!audioContext ||
+          audioContext.state === 'closed') {
+        audioContext =
+          new AudioContextClass();
+      }
+
+      if (audioContext.state !== 'running') {
+        await audioContext.resume();
+      }
+
+      soundUnlocked =
+        audioContext.state === 'running';
+
+      return soundUnlocked;
+
+    } catch (error) {
+      soundUnlocked = false;
+
+      console.warn(
+        'Audio activation blocked:',
+        error
       );
-    }
 
-    if (!audioContext) {
-      audioContext = new AudioContextClass();
-    }
+      return false;
 
-    if (audioContext.state !== 'running') {
-      await audioContext.resume();
-    }
-
-    soundUnlocked =
-      audioContext.state === 'running';
-
-    if (!soundUnlocked) {
-      throw new Error(
-        'Browser blocked notification sound.'
-      );
+    } finally {
+      unlockPending = false;
+      updateSoundButton();
     }
   }
 
@@ -223,7 +280,10 @@
     );
 
     oscillator.connect(gain);
-    gain.connect(audioContext.destination);
+
+    gain.connect(
+      audioContext.destination
+    );
 
     oscillator.start(startTime);
 
@@ -233,34 +293,36 @@
   }
 
   function playNotificationSound() {
-    if (
-      !soundEnabled ||
-      !soundUnlocked ||
-      !audioContext ||
-      audioContext.state !== 'running'
-    ) {
+    if (!soundEnabled) {
       return;
     }
 
+    if (
+      !audioContext ||
+      audioContext.state !== 'running'
+    ) {
+      soundUnlocked = false;
+      updateSoundButton();
+      return;
+    }
+
+    soundUnlocked = true;
+
     try {
-      // Three-tone order notification.
-
       playTone(660, 0, 0.18);
-
       playTone(880, 0.20, 0.18);
-
       playTone(1046, 0.42, 0.30);
 
-    } catch (err) {
+    } catch (error) {
       console.error(
         'Notification sound failed:',
-        err
+        error
       );
     }
   }
 
   /* =====================================
-     UPDATE SOUND BUTTON
+     SOUND BUTTON
   ===================================== */
 
   function updateSoundButton() {
@@ -270,28 +332,57 @@
 
     if (!button) return;
 
-    if (soundEnabled && soundUnlocked) {
-      button.textContent = '🔊 Sound ON';
+    if (soundEnabled) {
+      if (soundUnlocked) {
+        button.textContent =
+          '🔊 Sound ON';
 
-      button.style.background = '#e8f7ee';
-      button.style.color = '#166534';
+        button.title =
+          'Click to mute notification sound';
 
-    } else if (soundEnabled) {
-      button.textContent = '🔔 Enable Sound';
+      } else {
+        button.textContent =
+          '🔊 Sound ON';
 
-      button.style.background = '#fff1db';
-      button.style.color = '#8c4e2b';
+        button.title =
+          'Sound preference is ON. ' +
+          'Browser audio may activate ' +
+          'after your next interaction.';
+      }
+
+      button.style.background =
+        '#e8f7ee';
+
+      button.style.color =
+        '#166534';
+
+      button.setAttribute(
+        'aria-pressed',
+        'true'
+      );
 
     } else {
-      button.textContent = '🔇 Sound OFF';
+      button.textContent =
+        '🔇 Sound OFF';
 
-      button.style.background = '#f0f0f0';
-      button.style.color = '#555';
+      button.title =
+        'Click to enable notification sound';
+
+      button.style.background =
+        '#f0f0f0';
+
+      button.style.color =
+        '#555';
+
+      button.setAttribute(
+        'aria-pressed',
+        'false'
+      );
     }
   }
 
   /* =====================================
-     ENABLE / DISABLE SOUND
+     MANUAL SOUND CONTROL
   ===================================== */
 
   async function toggleSound() {
@@ -304,19 +395,45 @@
     }
 
     try {
-      if (soundEnabled && soundUnlocked) {
-        soundEnabled = false;
-        soundUnlocked = false;
+      /*
+        If sound is already enabled
+        but browser audio is not active,
+        first click activates audio.
 
-        localStorage.setItem(
-          SOUND_KEY,
-          'false'
-        );
+        It does NOT switch preference OFF.
+      */
 
-        updateSoundButton();
+      if (soundEnabled && !soundUnlocked) {
+        const active = await unlockAudio();
 
-        window.MC.toast(
-          'Notification sound disabled.',
+        if (active) {
+          playNotificationSound();
+
+          notify(
+            'Notification sound activated!',
+            'success'
+          );
+        } else {
+          notify(
+            'Sound is ON. Click again ' +
+            'if browser audio is blocked.',
+            'error'
+          );
+        }
+
+        return;
+      }
+
+      /*
+        Only an explicit button click
+        can switch Sound OFF.
+      */
+
+      if (soundEnabled) {
+        saveSoundPreference(false);
+
+        notify(
+          'Notification sound muted.',
           'success'
         );
 
@@ -324,58 +441,158 @@
       }
 
       /*
-        Browser requires a user click
-        before audio playback.
+        Manual enabling.
       */
 
-      await unlockAudio();
+      saveSoundPreference(true);
 
-      soundEnabled = true;
+      const active = await unlockAudio();
 
-      localStorage.setItem(
-        SOUND_KEY,
-        'true'
-      );
+      if (active) {
+        playNotificationSound();
 
-      updateSoundButton();
-
-      // Play a sample sound immediately.
-
-      playNotificationSound();
-
-      window.MC.toast(
-        'Notification sound enabled!',
-        'success'
-      );
-
-    } catch (err) {
-      soundEnabled = false;
-      soundUnlocked = false;
-
-      try {
-        localStorage.setItem(
-          SOUND_KEY,
-          'false'
+        notify(
+          'Notification sound enabled!',
+          'success'
         );
-      } catch (_) {}
-
-      updateSoundButton();
-
-      window.MC.toast(
-        err.message ||
-        'Sound could not be enabled.',
-        'error'
-      );
+      } else {
+        notify(
+          'Sound preference saved as ON. ' +
+          'Browser audio needs activation.',
+          'error'
+        );
+      }
 
     } finally {
       if (button) {
         button.disabled = false;
       }
+
+      updateSoundButton();
+    }
+  }
+
+  function notify(message, type) {
+    if (
+      window.MC &&
+      typeof window.MC.toast === 'function'
+    ) {
+      window.MC.toast(
+        message,
+        type || 'success'
+      );
     }
   }
 
   /* =====================================
-     SHOW STATUS
+     RESTORE AUDIO AFTER TAB CHANGE
+  ===================================== */
+
+  function attemptAudioRestore() {
+    if (!soundEnabled) return;
+
+    /*
+      Do not modify localStorage here.
+      Browser audio state and user
+      preference are separate things.
+    */
+
+    unlockAudio().catch(error => {
+      console.warn(
+        'Audio resume error:',
+        error
+      );
+    });
+  }
+
+  /*
+    When admin interacts with the page,
+    browser may permit audio again.
+
+    Ignore the sound button here,
+    because it handles its own clicks.
+  */
+
+  function onUserInteraction(event) {
+    if (!soundEnabled) return;
+
+    const button = document.getElementById(
+      'mcNotificationSoundButton'
+    );
+
+    if (
+      button &&
+      (
+        event.target === button ||
+        button.contains(event.target)
+      )
+    ) {
+      return;
+    }
+
+    if (
+      soundUnlocked &&
+      audioContext &&
+      audioContext.state === 'running'
+    ) {
+      return;
+    }
+
+    attemptAudioRestore();
+  }
+
+  document.addEventListener(
+    'pointerdown',
+    onUserInteraction,
+    true
+  );
+
+  document.addEventListener(
+    'keydown',
+    onUserInteraction,
+    true
+  );
+
+  document.addEventListener(
+    'visibilitychange',
+    function () {
+      if (!document.hidden) {
+        attemptAudioRestore();
+        checkOrders();
+      }
+    }
+  );
+
+  window.addEventListener(
+    'focus',
+    attemptAudioRestore
+  );
+
+  /*
+    Keep preference in sync
+    across open browser tabs.
+  */
+
+  window.addEventListener(
+    'storage',
+    function (event) {
+      if (event.key !== SOUND_KEY) {
+        return;
+      }
+
+      soundEnabled =
+        event.newValue === 'true';
+
+      updateSoundButton();
+
+      if (soundEnabled) {
+        attemptAudioRestore();
+      }
+    }
+  );
+
+  /* =====================================
+     STATUS TEXT
   ===================================== */
 
   function showStatus(message) {
@@ -389,7 +606,7 @@
   }
 
   /* =====================================
-     RENDER NOTIFICATIONS
+     RENDER ORDER SUMMARY
   ===================================== */
 
   function render() {
@@ -401,9 +618,10 @@
 
     const seen = readSeen();
 
-    const unseen = orders.filter(order =>
-      order._id &&
-      !seen.has(String(order._id))
+    const unseen = orders.filter(
+      order =>
+        order._id &&
+        !seen.has(String(order._id))
     );
 
     const today = indianDate(new Date());
@@ -431,7 +649,9 @@
 
     const latestText = latest
       ? ' Latest: ' +
-        String(latest.orderId || 'New Order')
+        String(
+          latest.orderId || 'New Order'
+        )
       : '';
 
     showStatus(
@@ -448,7 +668,7 @@
   }
 
   /* =====================================
-     BUILD NOTIFICATION BAR
+     CREATE NOTIFICATION BAR
   ===================================== */
 
   function buildBar() {
@@ -462,7 +682,8 @@
 
     const bar = make('section');
 
-    bar.id = 'mcAdminNotifications';
+    bar.id =
+      'mcAdminNotifications';
 
     bar.setAttribute(
       'aria-label',
@@ -492,7 +713,9 @@
     );
 
     heading.style.cssText =
-      'display:block;color:#302117;font-size:16px';
+      'display:block;' +
+      'color:#302117;' +
+      'font-size:16px';
 
     const status = make(
       'p',
@@ -508,9 +731,14 @@
     );
 
     status.style.cssText =
-      'margin:7px 0 0;color:#805e43;font-size:13px';
+      'margin:7px 0 0;' +
+      'color:#805e43;' +
+      'font-size:13px';
 
-    info.append(heading, status);
+    info.append(
+      heading,
+      status
+    );
 
     const controls = make('div');
 
@@ -521,7 +749,7 @@
       'flex-wrap:wrap'
     ].join(';');
 
-    /* NEW ORDERS BADGE */
+    /* NEW ORDER COUNT */
 
     const badge = make(
       'span',
@@ -540,11 +768,11 @@
       'font-size:12px'
     ].join(';');
 
-    /* SOUND BUTTON */
+    /* PERSISTENT SOUND BUTTON */
 
     const soundButton = make(
       'button',
-      '🔔 Enable Sound'
+      '🔇 Sound OFF'
     );
 
     soundButton.id =
@@ -554,8 +782,6 @@
 
     soundButton.style.cssText = [
       'border:1px solid #dcc1a7',
-      'background:#fff1db',
-      'color:#8c4e2b',
       'border-radius:10px',
       'padding:10px 12px',
       'font-weight:800',
@@ -619,17 +845,20 @@
       link
     );
 
-    bar.append(info, controls);
+    bar.append(
+      info,
+      controls
+    );
 
-    const nav =
-      document.querySelector('.adminnav');
+    const nav = document.querySelector(
+      '.adminnav'
+    );
 
     if (nav) {
       nav.insertAdjacentElement(
         'afterend',
         bar
       );
-
     } else {
       document.body.prepend(bar);
     }
@@ -667,22 +896,27 @@
       const ids = new Set(
         orders
           .filter(order => order._id)
-          .map(order => String(order._id))
+          .map(
+            order => String(order._id)
+          )
       );
 
       /*
-        First load establishes baseline.
-        Never play sound for old orders.
+        First check establishes baseline.
+        Do not alert for existing orders.
       */
 
       if (previousIds !== null) {
-        const fresh = orders.filter(order =>
-          order._id &&
-          !previousIds.has(String(order._id))
+        const fresh = orders.filter(
+          order =>
+            order._id &&
+            !previousIds.has(
+              String(order._id)
+            )
         );
 
         if (fresh.length > 0) {
-          window.MC.toast(
+          notify(
             '🔔 ' +
             fresh.length +
             ' new customer order(s)!',
@@ -697,15 +931,15 @@
 
       render();
 
-    } catch (err) {
+    } catch (error) {
       showStatus(
         'Orders notification check failed. ' +
         'Refresh or login again.'
       );
 
       console.error(
-        'Admin notifications error:',
-        err
+        'Admin notification error:',
+        error
       );
 
     } finally {
@@ -733,27 +967,27 @@
 
     buildBar();
 
+    /*
+      Restore saved Sound ON preference.
+      Never reset it on page reload.
+    */
+
+    if (soundEnabled) {
+      attemptAudioRestore();
+    }
+
     await checkOrders();
 
     window.setInterval(
       checkOrders,
       POLL_INTERVAL
     );
-
-    document.addEventListener(
-      'visibilitychange',
-      () => {
-        if (!document.hidden) {
-          checkOrders();
-        }
-      }
-    );
   }
 
-  start().catch(err => {
+  start().catch(error => {
     console.error(
       'Notification startup error:',
-      err
+      error
     );
   });
 
