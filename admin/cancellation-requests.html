@@ -82,18 +82,11 @@
       padding: 14px;
       border-bottom: 1px solid #eee4db;
       text-align: left;
-      vertical-align: middle;
       font-size: 13px;
     }
 
     .cr-table th {
       background: #f5ede6;
-    }
-
-    .cr-table small {
-      display: block;
-      margin-top: 5px;
-      color: #826e60;
     }
 
     .cr-button {
@@ -108,7 +101,8 @@
     }
 
     .cr-button:disabled {
-      opacity: .5;
+      background: #aaa;
+      opacity: .65;
       cursor: not-allowed;
     }
 
@@ -161,10 +155,6 @@
       overflow-wrap: anywhere;
     }
 
-    .cr-status {
-      font-weight: 800;
-    }
-
     .cr-empty {
       padding: 25px;
       text-align: center;
@@ -187,6 +177,7 @@
 
   <nav class="adminnav">
     <div class="container">
+
       <b>MEMORA ADMIN</b>
 
       <a href="/memora-creations/admin/dashboard.html">
@@ -216,6 +207,7 @@
       >
         Logout
       </button>
+
     </div>
   </nav>
 
@@ -224,14 +216,15 @@
     <header class="cr-header">
       <h1>Cashfree Cancellation Requests</h1>
       <p>
-        Verify customer payment status and review
-        cancellation requests safely.
+        Verify payments and safely review
+        customer cancellation requests.
       </p>
     </header>
 
     <section class="cr-panel">
 
       <div class="cr-toolbar">
+
         <div>
           <h2>Customer Requests</h2>
           <p id="loadStatus">Loading...</p>
@@ -247,10 +240,12 @@
           placeholder="Search Order ID or Customer"
           type="search"
         >
+
       </div>
 
       <div class="cr-table-wrap">
         <table class="cr-table">
+
           <thead>
             <tr>
               <th>Order</th>
@@ -270,6 +265,7 @@
               </td>
             </tr>
           </tbody>
+
         </table>
       </div>
 
@@ -294,38 +290,42 @@
         aria-live="polite"
       ></div>
 
-      <div
-        id="approvalArea"
-        hidden
-      >
-        <div class="cr-alert">
-          <strong>Sandbox Approval Only</strong>
+      <div id="approvalArea" hidden>
 
-          <p>
-            Approval can cancel an order and release
-            reserved product stock. It is blocked
-            by the backend unless the Sandbox
-            approval feature is enabled.
-          </p>
+        <div
+          id="approvalStatus"
+          class="cr-alert"
+          aria-live="polite"
+        >
+          Checking approval availability...
         </div>
 
         <button
           id="approveButton"
           class="cr-button cr-approve"
           type="button"
+          disabled
         >
-          Approve Sandbox Cancellation
+          Approval Disabled
         </button>
+
       </div>
 
     </section>
 
     <div class="cr-alert">
+
       <strong>Payment Safety:</strong>
-      Verify Payment is read-only. A successful
-      payment requires refund review. Never
-      approve a cancellation solely because
-      one payment attempt failed.
+
+      Verify Payment is read-only.
+
+      Cancellation requires an eligible
+      Cashfree payment state, Admin
+      confirmation and backend approval.
+
+      Successful payments require
+      separate refund review.
+
     </div>
 
   </main>
@@ -369,13 +369,14 @@
       const approvalArea =
         document.getElementById('approvalArea');
 
+      const approvalStatus =
+        document.getElementById('approvalStatus');
+
       const approveButton =
         document.getElementById('approveButton');
 
       let allRequests = [];
-
       let verifiedOrder = null;
-
       let busy = false;
 
 
@@ -422,6 +423,78 @@
           'cr-alert ' + type;
 
         resultMessage.textContent = message;
+      }
+
+
+      function disableApproval(message) {
+        approveButton.disabled = true;
+
+        approveButton.textContent =
+          'Approval Disabled';
+
+        approvalStatus.className =
+          'cr-alert';
+
+        approvalStatus.textContent =
+          message ||
+          'Cancellation approval is disabled.';
+      }
+
+
+      /*
+        READ-ONLY BACKEND STATUS
+
+        Fail closed:
+        Missing/invalid API response
+        means approval is unavailable.
+      */
+
+      async function checkApprovalStatus() {
+        disableApproval(
+          'Checking backend approval status...'
+        );
+
+        try {
+          const response = await window.MC.api(
+            '/admin/cashfree/approval-status'
+          );
+
+          const enabled =
+            response?.success === true &&
+            response?.sandboxOnly === true &&
+            response?.approvalEnabled === true;
+
+          if (!enabled) {
+            disableApproval(
+              'Cancellation approval is currently disabled in Render.'
+            );
+
+            return false;
+          }
+
+          approvalStatus.className =
+            'cr-alert success';
+
+          approvalStatus.textContent =
+            'Sandbox approval is enabled. ' +
+            'The backend will verify payment again ' +
+            'before any cancellation.';
+
+          approveButton.disabled = false;
+
+          approveButton.textContent =
+            'Approve Sandbox Cancellation';
+
+          return true;
+
+        } catch (err) {
+          disableApproval(
+            'Unable to check backend approval status. ' +
+            'Approval remains disabled.'
+          );
+
+          return false;
+        }
       }
 
 
@@ -578,9 +651,11 @@
 
         busy = true;
         verifiedOrder = null;
-        approvalArea.hidden = true;
-        resultPanel.hidden = false;
 
+        approvalArea.hidden = true;
+        disableApproval();
+
+        resultPanel.hidden = false;
         resultGrid.replaceChildren();
 
         showMessage(
@@ -689,6 +764,14 @@
             };
 
             approvalArea.hidden = false;
+
+            /*
+              UI approval starts disabled.
+              Backend status must explicitly
+              enable it.
+            */
+
+            await checkApprovalStatus();
           }
 
         } catch (err) {
@@ -696,6 +779,10 @@
             err.message || 'Verification failed.',
             'danger'
           );
+
+          verifiedOrder = null;
+          approvalArea.hidden = true;
+
         } finally {
           busy = false;
         }
@@ -703,47 +790,59 @@
 
 
       async function approve() {
-        if (busy || !verifiedOrder) return;
-
-        const selected = {
-          ...verifiedOrder
-        };
-
-        /*
-          This is deliberate confirmation.
-
-          The server remains the final
-          authority and rechecks Cashfree.
-        */
-
-        const typed = window.prompt(
-          'Sandbox cancellation will change the order ' +
-          'and release stock.\n\n' +
-          'Type the exact Order ID to confirm:\n' +
-          selected.orderId
-        );
-
-        if (typed !== selected.orderId) {
-          showMessage(
-            'Approval cancelled. Order ID did not match.',
-            'warning'
-          );
+        if (
+          busy ||
+          !verifiedOrder ||
+          approveButton.disabled
+        ) {
           return;
         }
-
-        const confirmed = window.confirm(
-          'FINAL CONFIRMATION\n\n' +
-          'Cancel sandbox order ' +
-          selected.orderId +
-          ' and release reserved stock?'
-        );
-
-        if (!confirmed) return;
 
         busy = true;
         approveButton.disabled = true;
 
         try {
+          /*
+            Recheck immediately before
+            asking for confirmation.
+          */
+
+          const enabled =
+            await checkApprovalStatus();
+
+          if (!enabled) {
+            return;
+          }
+
+          approveButton.disabled = true;
+
+          const selected = {
+            ...verifiedOrder
+          };
+
+          const typed = window.prompt(
+            'Sandbox cancellation can change ' +
+            'the order and release stock.\n\n' +
+            'Type the exact Order ID:\n' +
+            selected.orderId
+          );
+
+          if (typed !== selected.orderId) {
+            showMessage(
+              'Approval cancelled. Order ID did not match.'
+            );
+            return;
+          }
+
+          const confirmed = window.confirm(
+            'FINAL CONFIRMATION\n\n' +
+            'Cancel sandbox order ' +
+            selected.orderId +
+            ' and release reserved stock?'
+          );
+
+          if (!confirmed) return;
+
           const result = await window.MC.api(
             '/admin/orders/' +
             encodeURIComponent(selected.id) +
@@ -767,9 +866,9 @@
           }
 
           showMessage(
-            'Sandbox cancellation completed for ' +
+            'Cancellation completed for ' +
             selected.orderId +
-            '. Verify product stock in Admin Products.',
+            '. Verify stock in Admin Products.',
             'success'
           );
 
@@ -784,9 +883,20 @@
             'Cancellation approval failed.',
             'danger'
           );
+
         } finally {
           busy = false;
-          approveButton.disabled = false;
+
+          /*
+            Never keep approval enabled
+            using a stale status.
+            Verify Payment again for
+            further approval actions.
+          */
+
+          disableApproval(
+            'Verify Payment again before another approval.'
+          );
         }
       }
 
@@ -841,7 +951,9 @@
       async function start() {
         if (
           typeof window.requireAdmin !== 'function'
-        ) return;
+        ) {
+          return;
+        }
 
         const admin =
           await window.requireAdmin();
