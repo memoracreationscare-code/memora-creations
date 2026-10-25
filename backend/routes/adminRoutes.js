@@ -10,6 +10,7 @@
  ORDERS
  COD PAYMENT
  CASHFREE VERIFICATION
+ CASHFREE APPROVAL STATUS
  SANDBOX CANCELLATION APPROVAL
  CLOUDINARY
  SHIPROCKET
@@ -68,6 +69,8 @@ router.post(
 
 /* =====================================
    ADMIN SECURITY
+
+   ALL ROUTES BELOW REQUIRE ADMIN
 ===================================== */
 
 router.use(requireAdmin);
@@ -84,7 +87,79 @@ router.get(
 
 
 /* =====================================
+   CASHFREE APPROVAL CONFIGURATION
+
+   Single source of truth for the
+   approval status and route guard.
+
+   Disabled by default.
+===================================== */
+
+function isSandboxApprovalEnabled() {
+
+  const environment = String(
+    process.env.CASHFREE_ENV || 'sandbox'
+  ).trim().toLowerCase();
+
+  const enabled =
+    process.env
+      .CASHFREE_CANCELLATION_APPROVAL_ENABLED
+      === 'true';
+
+  return (
+    environment === 'sandbox' &&
+    enabled
+  );
+
+}
+
+
+/* =====================================
+   CASHFREE APPROVAL STATUS
+
+   READ ONLY
+
+   GET:
+   /api/admin/cashfree/approval-status
+
+   This endpoint never:
+   - Cancels an order
+   - Changes a payment
+   - Releases stock
+   - Initiates a refund
+
+   ADMIN LOGIN REQUIRED
+===================================== */
+
+router.get(
+  '/cashfree/approval-status',
+  (req, res) => {
+
+    const enabled =
+      isSandboxApprovalEnabled();
+
+    return res.status(200).json({
+
+      success: true,
+
+      approvalEnabled: enabled,
+
+      sandboxOnly: true,
+
+      message: enabled
+        ? 'Sandbox cancellation approval is enabled.'
+        : 'Cashfree cancellation approval is disabled.'
+
+    });
+
+  }
+);
+
+
+/* =====================================
    CASHFREE PENDING INSPECTION
+
+   READ ONLY
 ===================================== */
 
 router.get(
@@ -106,11 +181,13 @@ router.get(
         minutes < 1 ||
         minutes > 10080
       ) {
+
         return res.status(400).json({
           success: false,
           message:
             'Minutes must be between 1 and 10080.'
         });
+
       }
 
       if (
@@ -118,11 +195,13 @@ router.get(
         limit < 1 ||
         limit > 100
       ) {
+
         return res.status(400).json({
           success: false,
           message:
             'Limit must be between 1 and 100.'
         });
+
       }
 
       const report =
@@ -152,6 +231,7 @@ router.get(
       });
 
     }
+
   }
 );
 
@@ -230,6 +310,9 @@ router.put(
    CASHFREE VERIFY PAYMENT
 
    READ ONLY
+
+   GET:
+   /api/admin/orders/:id/cashfree/verify
 ===================================== */
 
 router.get(
@@ -242,41 +325,32 @@ router.get(
 /* =====================================
    SANDBOX APPROVAL SECURITY
 
-   CONDITIONS:
-
-   1. Admin must be logged in
-   2. Cashfree environment = sandbox
-   3. Explicit server-side enable required
-
-   Disabled by default.
-   Never enabled in production.
+   1. Admin login required
+   2. Sandbox mode required
+   3. Explicit approval enabled
 ===================================== */
 
-function requireSandboxApproval(req, res, next) {
+function requireSandboxApproval(
+  req,
+  res,
+  next
+) {
 
-  const environment = String(
-    process.env.CASHFREE_ENV || 'sandbox'
-  ).trim().toLowerCase();
-
-  const enabled =
-    process.env
-      .CASHFREE_CANCELLATION_APPROVAL_ENABLED
-      === 'true';
-
-  if (
-    environment !== 'sandbox' ||
-    !enabled
-  ) {
+  if (!isSandboxApprovalEnabled()) {
 
     return res.status(403).json({
+
       success: false,
+
       message:
         'Cashfree cancellation approval is disabled.'
+
     });
 
   }
 
   return next();
+
 }
 
 
@@ -293,8 +367,8 @@ function requireSandboxApproval(req, res, next) {
      "confirmed": true
    }
 
-   Additional payment checks happen
-   inside the approval controller.
+   Controller verifies Cashfree and
+   performs the database transaction.
 ===================================== */
 
 router.post(
@@ -331,6 +405,7 @@ router.get(
           message:
             'Shiprocket credentials are not configured.'
         });
+
       }
 
       await getShiprocketToken();
@@ -356,6 +431,7 @@ router.get(
       });
 
     }
+
   }
 );
 
