@@ -1801,7 +1801,7 @@
   <!-- LOGIN JS -->
 
   <script
-    src="/memora-creations/frontend/js/auth.js?v=10"
+    src="/memora-creations/frontend/js/auth.js?v=11"
   ></script>
 
 
@@ -1873,16 +1873,22 @@
       }
 
 
-      const next =
-        new URLSearchParams(
-          location.search
-        )
-          .get('next');
-
-
-      location.href =
-        next ||
-        '/memora-creations/frontend/index.html';
+      const rawNext = new URLSearchParams(location.search).get('next');
+      const fallback = '/memora-creations/frontend/index.html';
+      let destination = fallback;
+      if (rawNext && rawNext.startsWith('/') &&
+          !rawNext.startsWith('//') && !rawNext.includes('\\')) {
+        try {
+          const url = new URL(rawNext, location.origin);
+          if (url.origin === location.origin &&
+              url.pathname.startsWith('/memora-creations/frontend/')) {
+            destination = url.pathname + url.search + url.hash;
+          }
+        } catch (_) {
+          destination = fallback;
+        }
+      }
+      location.href = destination;
 
     })();
 
