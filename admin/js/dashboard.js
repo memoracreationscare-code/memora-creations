@@ -1,1306 +1,205 @@
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1">
-
-  <title>Admin Dashboard | Memora Creations</title>
-
-  <link rel="stylesheet"
-        href="/memora-creations/admin/css/style.css?v=4">
-
-  <style>
-    :root {
-      --mc-dark: #231b17;
-      --mc-brown: #946343;
-      --mc-bg: #f7f5f2;
-      --mc-border: #eae4dc;
-      --mc-muted: #817970;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      background: var(--mc-bg);
-      color: var(--mc-dark);
-    }
-
-    .adminnav { display: none !important; }
-
-    .mc-layout {
-      display: flex;
-      min-height: 100vh;
-    }
-
-    .mc-sidebar {
-      width: 260px;
-      min-width: 260px;
-      background: #241b16;
-      color: white;
-      min-height: 100vh;
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      padding: 26px 16px;
-      display: flex;
-      flex-direction: column;
-      z-index: 20;
-    }
-
-    .mc-brand {
-      padding: 10px 12px 30px;
-      border-bottom: 1px solid #493b32;
-      margin-bottom: 25px;
-    }
-
-    .mc-brand h2 {
-      margin: 0;
-      color: white;
-      font-size: 20px;
-      letter-spacing: 1px;
-    }
-
-    .mc-brand span {
-      display: block;
-      color: #d0a782;
-      font-size: 11px;
-      letter-spacing: 3px;
-      margin-top: 7px;
-    }
-
-    .mc-nav-title {
-      color: #9b8e83;
-      font-size: 11px;
-      letter-spacing: 2px;
-      margin: 10px 12px 14px;
-    }
-
-    .mc-menu {
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-    }
-
-    .mc-menu a {
-      color: #d5ccc5;
-      display: flex;
-      align-items: center;
-      gap: 13px;
-      text-decoration: none;
-      padding: 14px 16px;
-      border-radius: 12px;
-      font-size: 14px;
-      font-weight: 600;
-      transition: .2s;
-    }
-
-    .mc-menu a:hover,
-    .mc-menu a.active {
-      background: #9b613c;
-      color: white;
-    }
-
-    .mc-menu svg {
-      width: 19px;
-      height: 19px;
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 1.8;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      flex-shrink: 0;
-    }
-
-    .mc-sidebar-bottom {
-      margin-top: auto;
-      padding-top: 20px;
-    }
-
-    .mc-logout {
-      width: 100%;
-      border: 1px solid #665347;
-      background: transparent;
-      color: white;
-      padding: 14px;
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: 700;
-    }
-
-    .mc-logout:hover {
-      background: #50392e;
-    }
-
-    .mc-content {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .mc-topbar {
-      height: 82px;
-      background: white;
-      border-bottom: 1px solid var(--mc-border);
-      padding: 0 32px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 15px;
-    }
-
-    .mc-topbar-left strong {
-      display: block;
-      font-size: 17px;
-    }
-
-    .mc-topbar-left small {
-      color: var(--mc-muted);
-      font-size: 12px;
-    }
-
-    .mc-admin-avatar {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .mc-avatar {
-      height: 42px;
-      width: 42px;
-      background: #efe0d2;
-      color: #7b4a2b;
-      border-radius: 14px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-weight: 900;
-    }
-
-    .mc-admin-avatar strong {
-      font-size: 13px;
-    }
-
-    .mc-admin-avatar small {
-      color: var(--mc-muted);
-      display: block;
-      font-size: 11px;
-    }
-
-    .mc-page {
-      max-width: 1500px;
-      padding: 34px 32px 70px;
-      margin: auto;
-    }
-
-    .mc-heading {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 20px;
-      margin-bottom: 28px;
-    }
-
-    .mc-heading h1 {
-      font-size: clamp(26px, 3vw, 36px);
-      margin: 0 0 8px;
-      font-weight: 900;
-    }
-
-    .mc-heading p {
-      margin: 0;
-      color: var(--mc-muted);
-      font-size: 14px;
-    }
-
-    .mc-visit {
-      display: inline-flex;
-      padding: 12px 20px;
-      align-items: center;
-      background: #291e17;
-      border-radius: 12px;
-      color: white;
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    #stats.stats {
-      display: grid;
-      grid-template-columns:
-        repeat(4, minmax(0, 1fr));
-      gap: 17px;
-      margin-bottom: 32px;
-    }
-
-    #stats .stat {
-      min-width: 0;
-      border: 1px solid var(--mc-border);
-      background: white;
-      border-radius: 18px;
-      padding: 24px 20px;
-      box-shadow: 0 5px 25px
-        rgba(32,23,17,.025);
-    }
-
-    #stats .stat h3 {
-      margin: 0 0 16px;
-      color: var(--mc-muted);
-      font-size: 13px;
-    }
-
-    #stats .stat strong {
-      display: block;
-      font-size: clamp(24px,2.4vw,32px);
-      color: #2c211b;
-      font-weight: 900;
-      word-break: break-word;
-    }
-
-    #stats .stat:nth-child(4) {
-      background: #302117;
-      border-color: #302117;
-    }
-
-    #stats .stat:nth-child(4) h3 {
-      color: #dcc4b0;
-    }
-
-    #stats .stat:nth-child(4) strong {
-      color: white;
-    }
-
-    .mc-section-title {
-      font-size: 20px;
-      font-weight: 850;
-      margin: 0 0 20px;
-    }
-
-    .mc-actions {
-      display: grid;
-      grid-template-columns:
-        repeat(3, minmax(0,1fr));
-      gap: 16px;
-      margin-bottom: 34px;
-    }
-
-    .mc-action {
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      text-decoration: none;
-      background: white;
-      border: 1px solid var(--mc-border);
-      border-radius: 18px;
-      padding: 23px;
-      transition: .2s;
-    }
-
-    .mc-action:hover {
-      transform: translateY(-3px);
-      border-color: #b68c6c;
-    }
-
-    .mc-action-icon { font-size: 28px; }
-
-    .mc-action strong {
-      color: #302219;
-      font-size: 16px;
-    }
-
-    .mc-action p {
-      font-size: 12px;
-      color: var(--mc-muted);
-      line-height: 1.6;
-      margin: 0;
-    }
-
-    .mc-integrations,
-    .mc-cashfree-panel {
-      background: white;
-      border: 1px solid var(--mc-border);
-      padding: 26px;
-      border-radius: 20px;
-      margin-bottom: 25px;
-    }
-
-    .mc-integrations h2,
-    .mc-cashfree-panel h2 {
-      margin: 0 0 8px;
-      font-size: 20px;
-    }
-
-    .mc-integrations p,
-    .mc-cashfree-panel p {
-      color: var(--mc-muted);
-      line-height: 1.6;
-      font-size: 13px;
-    }
-
-    #testShiprocket,
-    #checkCashfree {
-      background: #946343;
-      border: 0;
-      color: white;
-      padding: 13px 20px;
-      border-radius: 11px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    #testShiprocket:hover,
-    #checkCashfree:hover {
-      background: #775034;
-    }
-
-    #checkCashfree:disabled {
-      opacity: .6;
-      cursor: wait;
-    }
-
-    #shiprocketResult {
-      overflow-wrap: anywhere;
-    }
-
-    .mc-cashfree-controls {
-      display: flex;
-      align-items: end;
-      gap: 15px;
-      flex-wrap: wrap;
-      margin-top: 20px;
-    }
-
-    .mc-field {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .mc-field label {
-      font-size: 12px;
-      font-weight: 750;
-      color: #584638;
-    }
-
-    .mc-field select {
-      min-width: 165px;
-      padding: 12px;
-      border: 1px solid #d9cfc6;
-      border-radius: 11px;
-      background: white;
-      color: #302219;
-      font-size: 13px;
-    }
-
-    .mc-cashfree-result {
-      margin-top: 24px;
-    }
-
-    .mc-cashfree-status {
-      font-size: 13px;
-      font-weight: 700;
-      margin-bottom: 15px;
-    }
-
-    .mc-report-stats {
-      display: grid;
-      grid-template-columns:
-        repeat(4,minmax(0,1fr));
-      gap: 12px;
-      margin-bottom: 18px;
-    }
-
-    .mc-report-stat {
-      border: 1px solid #e7ddd4;
-      border-radius: 13px;
-      padding: 17px;
-      background: #faf8f6;
-    }
-
-    .mc-report-stat span {
-      display: block;
-      font-size: 12px;
-      color: #7f736b;
-      margin-bottom: 8px;
-    }
-
-    .mc-report-stat strong {
-      font-size: 25px;
-      font-weight: 900;
-    }
-
-    .mc-report-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .mc-report-item {
-      border: 1px solid #e8e0d8;
-      border-radius: 13px;
-      padding: 17px;
-      background: white;
-      overflow-wrap: anywhere;
-    }
-
-    .mc-report-item strong {
-      display: block;
-      color: #302219;
-      font-size: 14px;
-      margin-bottom: 9px;
-    }
-
-    .mc-report-item p {
-      margin: 7px 0;
-    }
-
-    .mc-readonly {
-      margin-top: 15px;
-      font-size: 12px;
-      background: #f6f0ea;
-      border: 1px solid #e5d5c7;
-      padding: 13px;
-      border-radius: 11px;
-      color: #704e37;
-      line-height: 1.6;
-    }
-
-    .mc-footer {
-      text-align: center;
-      color: #9a9188;
-      margin-top: 36px;
-      font-size: 12px;
-    }
-
-    /* Notification bar inside Dashboard */
-
-    #mcAdminNotifications {
-      max-width: none !important;
-      margin: 0 0 26px !important;
-    }
-
-    @media(max-width:1100px) {
-      #stats.stats,
-      .mc-report-stats {
-        grid-template-columns:
-          repeat(2,minmax(0,1fr));
-      }
-    }
-
-    @media(max-width:800px) {
-      .mc-layout { display: block; }
-
-      .mc-sidebar {
-        position: relative;
-        width: 100%;
-        min-width: 0;
-        height: auto;
-        min-height: 0;
-        padding: 13px;
-      }
-
-      .mc-brand {
-        padding: 5px 8px 14px;
-        margin-bottom: 13px;
-      }
-
-      .mc-brand h2 { font-size: 17px; }
-
-      .mc-nav-title,
-      .mc-sidebar-bottom {
-        display: none;
-      }
-
-      .mc-menu {
-        display: grid;
-        grid-template-columns:
-          repeat(4,minmax(0,1fr));
-        gap: 5px;
-      }
-
-      .mc-menu a {
-        padding: 12px 4px;
-        font-size: 11px;
-        text-align: center;
-        flex-direction: column;
-        gap: 6px;
-      }
-
-      .mc-topbar {
-        height: 70px;
-        padding: 0 18px;
-      }
-
-      .mc-page {
-        padding: 24px 16px 50px;
-      }
-
-      .mc-actions {
-        grid-template-columns: 1fr;
-      }
-
-      .mc-heading {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-    }
-
-    @media(max-width:480px) {
-      #stats.stats {
-        grid-template-columns:
-          repeat(2,minmax(0,1fr));
-        gap: 10px;
-      }
-
-      #stats .stat { padding: 17px 13px; }
-      #stats .stat h3 { font-size: 11px; }
-      #stats .stat strong { font-size: 22px; }
-
-      .mc-admin-avatar strong,
-      .mc-admin-avatar small {
-        display: none;
-      }
-
-      .mc-integrations,
-      .mc-cashfree-panel {
-        padding: 18px;
-      }
-
-      .mc-report-stats { gap: 8px; }
-      .mc-report-stat { padding: 12px; }
-      .mc-report-stat strong { font-size: 20px; }
-
-      .mc-cashfree-controls {
-        align-items: stretch;
-        flex-direction: column;
-      }
-
-      .mc-field select,
-      #checkCashfree {
-        width: 100%;
-      }
-    }
-  </style>
-</head>
-
-<body>
-
-  <div class="mc-layout">
-
-    <!-- SIDEBAR -->
-
-    <aside class="mc-sidebar">
-
-      <div class="mc-brand">
-        <h2>MEMORA</h2>
-        <span>CREATIONS ADMIN</span>
-      </div>
-
-      <div class="mc-nav-title">
-        MAIN MENU
-      </div>
-
-      <nav class="mc-menu">
-
-        <a class="active"
-           href="/memora-creations/admin/dashboard.html">
-          <svg viewBox="0 0 24 24">
-            <rect x="3" y="3" width="8"
-                  height="8" rx="1"/>
-            <rect x="13" y="3" width="8"
-                  height="8" rx="1"/>
-            <rect x="3" y="13" width="8"
-                  height="8" rx="1"/>
-            <rect x="13" y="13" width="8"
-                  height="8" rx="1"/>
-          </svg>
-          Dashboard
-        </a>
-
-        <a href="/memora-creations/admin/products.html">
-          <svg viewBox="0 0 24 24">
-            <path d="m3 7 9-4 9 4-9 4-9-4Z"/>
-            <path d="M3 7v10l9 4 9-4V7"/>
-            <path d="M12 11v10"/>
-          </svg>
-          Products
-        </a>
-
-        <a href="/memora-creations/admin/orders.html">
-          <svg viewBox="0 0 24 24">
-            <path d="M4 6h2l2 11h11l2-8H7"/>
-            <circle cx="10" cy="20" r="1"/>
-            <circle cx="18" cy="20" r="1"/>
-          </svg>
-          Orders
-        </a>
-
-        <a href="/memora-creations/admin/users.html">
-          <svg viewBox="0 0 24 24">
-            <circle cx="9" cy="8" r="4"/>
-            <path d="M2 21v-2a7 7 0 0 1 14 0v2"/>
-            <path d="M17 4a4 4 0 0 1 0 8"/>
-            <path d="M18 15a6 6 0 0 1 4 6"/>
-          </svg>
-          Customers
-        </a>
-
-      </nav>
-
-      <div class="mc-sidebar-bottom">
-        <button type="button"
-                id="logout"
-                class="mc-logout">
-          Logout
-        </button>
-      </div>
-
-    </aside>
-
-    <!-- MAIN CONTENT -->
-
-    <div class="mc-content">
-
-      <header class="mc-topbar">
-
-        <div class="mc-topbar-left">
-          <strong>Admin Control Center</strong>
-          <small>Memora Creations</small>
-        </div>
-
-        <div class="mc-admin-avatar">
-          <div>
-            <strong>Administrator</strong>
-            <small>Store Management</small>
-          </div>
-          <div class="mc-avatar">MC</div>
-        </div>
-
-        <button id="mobileLogout"
-                type="button"
-                class="btn secondary"
-                style="display:none">
-          Logout
-        </button>
-
-      </header>
-
-      <main class="mc-page">
-
-        <!-- NEW ORDER NOTIFICATIONS -->
-
-        <div id="mcDashboardNotifications"></div>
-
-        <!-- HEADING -->
-
-        <div class="mc-heading">
-
-          <div>
-            <h1>Dashboard Overview</h1>
-            <p>
-              Monitor your store performance
-              and manage your business.
-            </p>
-          </div>
-
-          <a class="mc-visit"
-             href="/memora-creations/frontend/index.html"
-             target="_blank"
-             rel="noopener noreferrer">
-            Visit Store ↗
-          </a>
-
-        </div>
-
-        <!-- DASHBOARD STATS -->
-
-        <h2 class="mc-section-title">
-          Business Overview
-        </h2>
-
-        <div id="stats" class="stats">
-          <p>Loading dashboard statistics...</p>
-        </div>
-
-        <!-- QUICK ACTIONS -->
-
-        <h2 class="mc-section-title">
-          Quick Actions
-        </h2>
-
-        <div class="mc-actions">
-
-          <a class="mc-action"
-             href="/memora-creations/admin/products.html">
-            <span class="mc-action-icon">📦</span>
-            <strong>Manage Products →</strong>
-            <p>
-              Add products, update prices,
-              images and stock.
-            </p>
-          </a>
-
-          <a class="mc-action"
-             href="/memora-creations/admin/orders.html">
-            <span class="mc-action-icon">🛒</span>
-            <strong>Manage Orders →</strong>
-            <p>
-              View orders, payments
-              and delivery status.
-            </p>
-          </a>
-
-          <a class="mc-action"
-             href="/memora-creations/admin/users.html">
-            <span class="mc-action-icon">👥</span>
-            <strong>Manage Customers →</strong>
-            <p>
-              View customers and manage
-              account status.
-            </p>
-          </a>
-
-        </div>
-
-        <!-- CASHFREE INSPECTION -->
-
-        <h2 class="mc-section-title">
-          Payment Monitoring
-        </h2>
-
-        <section class="mc-cashfree-panel"
-                 aria-labelledby="cashfreeHeading">
-
-          <h2 id="cashfreeHeading">
-            💳 Cashfree Pending Payments
-          </h2>
-
-          <p>
-            Inspect old Cashfree Pending and
-            Failed Orders directly from the
-            Admin Dashboard.
-          </p>
-
-          <p>
-            The report checks the Cashfree
-            gateway status and payment attempts.
-            No order or stock is changed.
-          </p>
-
-          <div class="mc-cashfree-controls">
-
-            <div class="mc-field">
-              <label for="cashfreeMinutes">
-                Orders older than
-              </label>
-
-              <select id="cashfreeMinutes">
-                <option value="15">15 Minutes</option>
-                <option value="30">30 Minutes</option>
-                <option value="60" selected>1 Hour</option>
-                <option value="180">3 Hours</option>
-                <option value="1440">24 Hours</option>
-                <option value="10080">7 Days</option>
-              </select>
-            </div>
-
-            <div class="mc-field">
-              <label for="cashfreeLimit">
-                Maximum Orders
-              </label>
-
-              <select id="cashfreeLimit">
-                <option value="10">10 Orders</option>
-                <option value="20" selected>20 Orders</option>
-                <option value="50">50 Orders</option>
-                <option value="100">100 Orders</option>
-              </select>
-            </div>
-
-            <button id="checkCashfree"
-                    type="button">
-              Check Pending Payments
-            </button>
-
-          </div>
-
-          <div class="mc-cashfree-result"
-               id="cashfreeResult"
-               aria-live="polite">
-
-            <p class="mc-cashfree-status">
-              Click the button to inspect
-              pending payments.
-            </p>
-
-          </div>
-
-          <div class="mc-readonly">
-            🔒 Read-only Inspection Mode.
-            This tool does not cancel orders,
-            change payment status or release stock.
-            REVIEW_FOR_RELEASE is not an
-            authorization to release stock.
-          </div>
-
-        </section>
-
-        <!-- SHIPROCKET -->
-
-        <h2 class="mc-section-title">
-          Integrations
-        </h2>
-
-        <section class="mc-integrations">
-
-          <h2>🚚 Shiprocket Integration</h2>
-
-          <p>
-            Check the connection between
-            Memora Creations and Shiprocket.
-          </p>
-
-          <button id="testShiprocket"
-                  type="button">
-            Test Shiprocket Connection
-          </button>
-
-          <p id="shiprocketResult"
-             style="font-weight:700;margin-top:15px">
-          </p>
-
-        </section>
-
-        <!-- FOOTER -->
-
-        <div class="mc-footer">
-          © MEMORA CREATIONS
-          — Admin Management System
-        </div>
-
-      </main>
-
-    </div>
-
-  </div>
-
-  <!-- =====================================
-       COMMON API HELPERS
-  ===================================== -->
-
-  <script
-    src="/memora-creations/frontend/js/app.js?v=4"
-  ></script>
-
-  <!-- ADMIN AUTHENTICATION -->
-
-  <script
-    src="/memora-creations/admin/js/auth.js?v=4"
-  ></script>
-
-  <!-- UPDATED DASHBOARD STATISTICS -->
-
-  <script
-    src="/memora-creations/admin/js/dashboard.js?v=5"
-  ></script>
-
-  <!-- =====================================
-       NEW ORDER NOTIFICATIONS + SOUND
-  ===================================== -->
-
-  <script
-    src="/memora-creations/admin/js/order-notifications.js?v=2"
-  ></script>
-
-  <!-- MOVE NOTIFICATION BAR INSIDE DASHBOARD -->
-
-  <script>
-    (function () {
-      const target = document.getElementById(
-        'mcDashboardNotifications'
-      );
-
-      if (!target) return;
-
-      const observer = new MutationObserver(() => {
-        const bar = document.getElementById(
-          'mcAdminNotifications'
+/*
+=========================================
+ MEMORA CREATIONS
+ ADMIN DASHBOARD
+
+ FEATURES:
+ - Dashboard Statistics
+ - Revenue Overview
+ - Today's Orders
+ - Pending Orders
+ - Delivered Orders
+ - COD Orders
+ - Low Stock
+ - Shiprocket Connection Test
+
+ IMPORTANT:
+ Order Notification Sound is handled
+ by admin/js/order-notifications.js
+=========================================
+*/
+
+(async function () {
+  'use strict';
+
+  /* =====================================
+     CREATE STAT CARD
+  ===================================== */
+
+  function createStat(label, value) {
+    const card = document.createElement('div');
+
+    card.className = 'stat';
+
+    const heading = document.createElement('h3');
+
+    heading.textContent = label;
+
+    const number = document.createElement('strong');
+
+    number.textContent = String(
+      value === undefined || value === null
+        ? 0
+        : value
+    );
+
+    card.append(heading, number);
+
+    return card;
+  }
+
+  /* =====================================
+     LOAD DASHBOARD STATISTICS
+  ===================================== */
+
+  async function loadDashboard() {
+    try {
+      const stats = await window.requireAdmin();
+
+      if (!stats) return;
+
+      const statsBox =
+        document.getElementById('stats');
+
+      if (!statsBox) return;
+
+      const items = [
+        [
+          'Total Products',
+          stats.totalProducts
+        ],
+        [
+          'Total Orders',
+          stats.totalOrders
+        ],
+        [
+          'Total Customers',
+          stats.totalCustomers
+        ],
+        [
+          'Total Revenue',
+          window.MC.money(stats.totalSales ?? 0)
+        ],
+        [
+          'Today Orders',
+          stats.todayOrders
+        ],
+        [
+          'Pending Orders',
+          stats.pendingOrders
+        ],
+        [
+          'Delivered Orders',
+          stats.deliveredOrders
+        ],
+        [
+          'Cancelled Orders',
+          stats.cancelledOrders
+        ],
+        [
+          'Online Payments',
+          stats.onlinePayments
+        ],
+        [
+          'COD Orders',
+          stats.codOrders
+        ],
+        [
+          'Low Stock',
+          stats.lowStockProducts
+        ]
+      ];
+
+      statsBox.replaceChildren();
+
+      items.forEach(([label, value]) => {
+        statsBox.appendChild(
+          createStat(label, value)
         );
-
-        if (bar && !target.contains(bar)) {
-          target.appendChild(bar);
-          observer.disconnect();
-        }
       });
 
-      observer.observe(document.body, {
-        childList: true,
-        subtree: true
-      });
-
-      const existing = document.getElementById(
-        'mcAdminNotifications'
-      );
-
-      if (existing) {
-        target.appendChild(existing);
-        observer.disconnect();
-      }
-    })();
-  </script>
-
-  <!-- =====================================
-       CASHFREE PAYMENT INSPECTION
-       READ ONLY
-  ===================================== -->
-
-  <script>
-    (function () {
-      'use strict';
-
-      const button = document.getElementById(
-        'checkCashfree'
-      );
-
-      const resultBox = document.getElementById(
-        'cashfreeResult'
-      );
-
-      const minutesSelect = document.getElementById(
-        'cashfreeMinutes'
-      );
-
-      const limitSelect = document.getElementById(
-        'cashfreeLimit'
+    } catch (error) {
+      console.error(
+        'Dashboard loading error:',
+        error
       );
 
       if (
-        !button ||
-        !resultBox ||
-        !minutesSelect ||
-        !limitSelect
+        window.MC &&
+        typeof window.MC.toast === 'function'
       ) {
-        return;
-      }
-
-      function make(tag, text, className) {
-        const node = document.createElement(tag);
-
-        if (className) {
-          node.className = className;
-        }
-
-        if (text !== undefined) {
-          node.textContent = String(text);
-        }
-
-        return node;
-      }
-
-      function showMessage(message) {
-        resultBox.replaceChildren(
-          make('p', message, 'mc-cashfree-status')
+        window.MC.toast(
+          error.message ||
+          'Dashboard load failed.',
+          'error'
         );
       }
+    }
+  }
 
-      function addStat(container, label, value) {
-        const card = make(
-          'div',
-          undefined,
-          'mc-report-stat'
+  await loadDashboard();
+
+})();
+
+
+/* =====================================
+   SHIPROCKET CONNECTION TEST
+
+   EXISTING FEATURE PRESERVED
+===================================== */
+
+document
+  .querySelector('#testShiprocket')
+  ?.addEventListener(
+    'click',
+    async () => {
+
+      const result =
+        document.getElementById(
+          'shiprocketResult'
         );
 
-        card.append(
-          make('span', label),
-          make('strong', value)
-        );
-
-        container.appendChild(card);
+      if (result) {
+        result.textContent =
+          'Testing Shiprocket connection...';
       }
 
-      function addDetail(container, label, value) {
-        container.appendChild(
-          make('p', label + ': ' + String(value))
-        );
-      }
-
-      function renderReport(data) {
-        resultBox.replaceChildren();
-
-        const results = Array.isArray(data.results)
-          ? data.results
-          : [];
-
-        const counts = {
-          WAIT: 0,
-          REVIEW: 0,
-          REVIEW_FOR_RELEASE: 0,
-          VERIFY_PAYMENT: 0,
-          KEEP: 0,
-          SKIP: 0,
-          ERROR: 0
-        };
-
-        results.forEach(item => {
-          const action = String(
-            item.action || 'ERROR'
-          );
-
-          if (
-            Object.prototype.hasOwnProperty.call(
-              counts,
-              action
-            )
-          ) {
-            counts[action]++;
-          }
-        });
-
-        if (data.mode !== 'INSPECTION_ONLY') {
-          showMessage(
-            'Unexpected inspection mode. ' +
-            'Please contact the developer.'
-          );
-          return;
-        }
-
-        resultBox.appendChild(
-          make(
-            'p',
-            'Inspection completed.',
-            'mc-cashfree-status'
-          )
+      try {
+        const data = await window.MC.api(
+          '/admin/shiprocket/test'
         );
 
-        const stats = make(
-          'div',
-          undefined,
-          'mc-report-stats'
-        );
-
-        addStat(
-          stats,
-          'Orders Inspected',
-          data.inspected ?? results.length
-        );
-
-        addStat(
-          stats,
-          'Waiting',
-          counts.WAIT
-        );
-
-        addStat(
-          stats,
-          'Need Review',
-          counts.REVIEW +
-          counts.REVIEW_FOR_RELEASE +
-          counts.VERIFY_PAYMENT +
-          counts.ERROR
-        );
-
-        addStat(
-          stats,
-          'Stock Released',
-          data.stockReleased ?? 0
-        );
-
-        resultBox.appendChild(stats);
-
-        addDetail(
-          resultBox,
-          'Mode',
-          data.mode
-        );
-
-        if (results.length === 0) {
-          resultBox.appendChild(
-            make(
-              'p',
-              'No matching old pending or ' +
-              'failed Cashfree orders were found.'
-            )
-          );
-          return;
-        }
-
-        const list = make(
-          'div',
-          undefined,
-          'mc-report-list'
-        );
-
-        results.forEach(item => {
-          const card = make(
-            'div',
-            undefined,
-            'mc-report-item'
-          );
-
-          card.appendChild(
-            make(
-              'strong',
-              'Order: ' +
-              String(item.orderId || 'Unknown')
-            )
-          );
-
-          addDetail(
-            card,
-            'Action',
-            item.action || 'UNKNOWN'
-          );
-
-          addDetail(
-            card,
-            'Reason',
-            item.reason || 'No reason provided.'
-          );
-
-          if (item.cashfreeOrderId) {
-            addDetail(
-              card,
-              'Cashfree Reference',
-              item.cashfreeOrderId
+        if (result) {
+          result.textContent =
+            '✅ ' +
+            (
+              data.message ||
+              'Shiprocket connected successfully.'
             );
-          }
-
-          list.appendChild(card);
-        });
-
-        resultBox.appendChild(list);
-      }
-
-      async function inspectPayments() {
-        if (
-          !window.MC ||
-          typeof window.MC.api !== 'function'
-        ) {
-          showMessage(
-            'Admin API is not available. ' +
-            'Please refresh the page.'
-          );
-          return;
         }
 
-        const minutes = Number(
-          minutesSelect.value
+        window.MC.toast(
+          'Shiprocket connected successfully.',
+          'success'
         );
 
-        const limit = Number(
-          limitSelect.value
-        );
-
-        if (
-          !Number.isInteger(minutes) ||
-          minutes < 1 ||
-          minutes > 10080 ||
-          !Number.isInteger(limit) ||
-          limit < 1 ||
-          limit > 100
-        ) {
-          showMessage(
-            'Invalid inspection settings.'
-          );
-          return;
-        }
-
-        button.disabled = true;
-
-        button.textContent =
-          'Checking Payments...';
-
-        showMessage(
-          'Contacting Cashfree. Please wait...'
-        );
-
-        try {
-          const path =
-            '/admin/cashfree/inspect' +
-            '?minutes=' + minutes +
-            '&limit=' + limit;
-
-          const data = await window.MC.api(
-            path
-          );
-
-          if (
-            !data ||
-            data.success === false
-          ) {
-            throw new Error(
-              data?.message || 'Inspection failed.'
-            );
-          }
-
-          renderReport(data);
-
-        } catch (error) {
-          console.error(
-            'Cashfree inspection error:',
-            error
-          );
-
-          showMessage(
-            'Cashfree inspection failed: ' +
+      } catch (error) {
+        if (result) {
+          result.textContent =
+            '❌ ' +
             (
               error.message ||
-              'Unknown error.'
-            )
-          );
-
-        } finally {
-          button.disabled = false;
-          button.textContent =
-            'Check Pending Payments';
+              'Shiprocket connection failed.'
+            );
         }
-      }
 
-      button.addEventListener(
-        'click',
-        inspectPayments
-      );
-    })();
-  </script>
-
-  <!-- MOBILE LOGOUT -->
-
-  <script>
-    (function () {
-      const mobileBtn = document.getElementById(
-        'mobileLogout'
-      );
-
-      const desktopBtn = document.getElementById(
-        'logout'
-      );
-
-      function syncLogout() {
-        if (!mobileBtn) return;
-
-        mobileBtn.style.display =
-          window.innerWidth <= 800
-            ? 'inline-block'
-            : 'none';
-      }
-
-      if (mobileBtn && desktopBtn) {
-        mobileBtn.addEventListener(
-          'click',
-          () => desktopBtn.click()
+        window.MC.toast(
+          error.message ||
+          'Shiprocket connection failed.',
+          'error'
         );
       }
 
-      window.addEventListener(
-        'resize',
-        syncLogout
-      );
-
-      syncLogout();
-    })();
-  </script>
-
-</body>
-</html>
+    }
+  );
