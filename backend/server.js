@@ -103,6 +103,76 @@ app.use(
 
 
 /* =========================================
+   MEMORA ORIGIN-BASED CSRF PROTECTION
+
+   Reject state-changing requests originating
+   from unapproved browser origins.
+
+   Webhooks are mounted above this middleware:
+   their signature verification remains intact.
+
+   This is a browser CSRF mitigation, not a
+   substitute for authentication or webhook
+   signature verification.
+========================================= */
+
+app.use('/api', (req, res, next) => {
+  const safeMethods = new Set(['GET', 'HEAD', 'OPTIONS']);
+
+  if (safeMethods.has(req.method)) {
+    return next();
+  }
+
+  // Health endpoints and webhook routes are not
+  // browser-authenticated mutation endpoints.
+  // Webhooks are already mounted before this middleware.
+  const browserOrigin = req.get('origin');
+  const fetchSite = req.get('sec-fetch-site');
+
+  if (fetchSite === 'cross-site' && !browserOrigin) {
+    return res.status(403).json({
+      success: false,
+      message: 'Cross-site request blocked.'
+    });
+  }
+
+  if (browserOrigin && !allowedOrigins.has(browserOrigin)) {
+    return res.status(403).json({
+      success: false,
+      message: 'Untrusted request origin.'
+    });
+  }
+
+  // Browsers normally provide Origin on cross-origin POSTs.
+  // When absent, additionally reject an untrusted Referer.
+  if (!browserOrigin) {
+    const referer = req.get('referer');
+    if (referer) {
+      try {
+        const refererOrigin = new URL(referer).origin;
+        const ownOrigin = req.protocol + '://' + req.get('host');
+
+        if (!allowedOrigins.has(refererOrigin) &&
+            refererOrigin !== ownOrigin) {
+          return res.status(403).json({
+            success: false,
+            message: 'Untrusted request referer.'
+          });
+        }
+      } catch (_) {
+        return res.status(403).json({
+          success: false,
+          message: 'Invalid request referer.'
+        });
+      }
+    }
+  }
+
+  next();
+});
+
+
+/* =========================================
    RAZORPAY WEBHOOK
    PRESERVED FOR EXISTING ORDERS
 ========================================= */
