@@ -1,0 +1,1004 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>
+    Manage Announcement | Memora Creations
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="/memora-creations/admin/css/style.css?v=4"
+  >
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family:
+        Arial, Helvetica, sans-serif;
+      background: #f7f5f2;
+      color: #302219;
+    }
+
+    .announcement-layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* SIDEBAR */
+
+    .announcement-sidebar {
+      width: 250px;
+      min-width: 250px;
+      background: #241b16;
+      color: white;
+      padding: 28px 16px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand {
+      padding: 12px;
+      margin-bottom: 28px;
+      border-bottom:
+        1px solid #493b32;
+    }
+
+    .brand h2 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: 1px;
+      color: white;
+    }
+
+    .brand small {
+      display: block;
+      margin-top: 8px;
+      font-size: 11px;
+      color: #d0a782;
+      letter-spacing: 2px;
+    }
+
+    .admin-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .admin-menu a {
+      display: block;
+      padding: 14px 16px;
+      text-decoration: none;
+      color: #e7d9cc;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .admin-menu a:hover,
+    .admin-menu a.active {
+      background: #946343;
+      color: white;
+    }
+
+    #logout {
+      margin-top: auto;
+      padding: 14px;
+      background: transparent;
+      border: 1px solid #665347;
+      border-radius: 10px;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* MAIN CONTENT */
+
+    .announcement-main {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .topbar {
+      background: white;
+      border-bottom: 1px solid #eae4dc;
+      padding: 22px 30px;
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .announcement-content {
+      width: min(1100px, 100%);
+      margin: 0 auto;
+      padding: 34px 26px 60px;
+    }
+
+    .page-heading {
+      margin-bottom: 28px;
+    }
+
+    .page-heading h1 {
+      margin: 0 0 10px;
+      font-size: 30px;
+    }
+
+    .page-heading p {
+      color: #817970;
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .editor-grid {
+      display: grid;
+      grid-template-columns:
+        minmax(0, 1.1fr)
+        minmax(0, 0.9fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel {
+      padding: 28px;
+      background: white;
+      border: 1px solid #eae4dc;
+      border-radius: 20px;
+      box-shadow:
+        0 10px 30px rgba(0, 0, 0, .035);
+    }
+
+    .panel h2 {
+      margin: 0 0 22px;
+      font-size: 20px;
+    }
+
+    /* FORM */
+
+    .form-group {
+      margin-bottom: 23px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 750;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      border: 1px solid #d9cfc6;
+      border-radius: 12px;
+      padding: 14px;
+      font: inherit;
+      font-size: 14px;
+      background: #fff;
+      color: #302219;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: 2px solid #c29a7b;
+      border-color: #946343;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 160px;
+      line-height: 1.65;
+    }
+
+    .field-help {
+      margin-top: 7px;
+      color: #817970;
+      font-size: 12px;
+    }
+
+    .switch-row {
+      display: flex;
+      gap: 13px;
+      align-items: center;
+      padding: 17px;
+      background: #faf6f2;
+      border: 1px solid #eadfd5;
+      border-radius: 14px;
+      margin-bottom: 24px;
+    }
+
+    .switch-row input {
+      width: 21px;
+      height: 21px;
+      accent-color: #946343;
+      cursor: pointer;
+    }
+
+    .switch-row label {
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .switch-row small {
+      display: block;
+      margin-top: 5px;
+      font-size: 12px;
+      font-weight: 400;
+      color: #817970;
+    }
+
+    /* BUTTONS */
+
+    .save-btn {
+      width: 100%;
+      padding: 16px;
+      border: 0;
+      border-radius: 12px;
+      background: #302117;
+      color: white;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .save-btn:hover {
+      background: #946343;
+    }
+
+    .save-btn:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    .message {
+      margin: 17px 0 0;
+      padding: 13px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.6;
+      display: none;
+    }
+
+    .message.success {
+      display: block;
+      color: #166534;
+      background: #e8f7ee;
+    }
+
+    .message.error {
+      display: block;
+      color: #991b1b;
+      background: #fee2e2;
+    }
+
+    .message.info {
+      display: block;
+      color: #704e37;
+      background: #fff1db;
+    }
+
+    /* LIVE PREVIEW */
+
+    .preview-stage {
+      padding: 32px 17px;
+      background:
+        linear-gradient(
+          135deg,
+          #f5eadf,
+          #fdf8f4
+        );
+      border-radius: 16px;
+      border: 1px solid #eadfd5;
+    }
+
+    .preview-popup {
+      background: white;
+      border-radius: 20px;
+      padding: 28px 20px;
+      text-align: center;
+      box-shadow:
+        0 20px 50px rgba(0, 0, 0, .12);
+      overflow-wrap: anywhere;
+    }
+
+    .preview-icon {
+      font-size: 37px;
+      margin-bottom: 13px;
+    }
+
+    .preview-popup h3 {
+      margin: 0 0 14px;
+      font-size: 21px;
+      color: #302117;
+    }
+
+    .preview-popup p {
+      white-space: pre-wrap;
+      line-height: 1.75;
+      font-size: 14px;
+      color: #74665c;
+      margin-bottom: 23px;
+    }
+
+    .preview-close {
+      width: 100%;
+      padding: 13px;
+      border-radius: 11px;
+      background: #302117;
+      color: white;
+      border: 0;
+      font-weight: 800;
+    }
+
+    .preview-note {
+      font-size: 12px;
+      color: #817970;
+      line-height: 1.6;
+      margin-top: 16px;
+    }
+
+    .status-pill {
+      display: inline-block;
+      padding: 8px 13px;
+      border-radius: 30px;
+      background: #ececec;
+      color: #555;
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 20px;
+    }
+
+    .status-pill.enabled {
+      background: #e8f7ee;
+      color: #166534;
+    }
+
+    .visit-site {
+      display: inline-block;
+      margin-top: 15px;
+      color: #946343;
+      font-weight: 800;
+      text-decoration: none;
+      font-size: 13px;
+    }
+
+    @media (max-width: 900px) {
+      .editor-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .announcement-sidebar {
+        width: 200px;
+        min-width: 200px;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .announcement-layout {
+        display: block;
+      }
+
+      .announcement-sidebar {
+        width: 100%;
+        min-width: 0;
+        padding: 15px;
+      }
+
+      .brand {
+        margin-bottom: 13px;
+      }
+
+      .admin-menu {
+        display: grid;
+        grid-template-columns:
+          repeat(2, 1fr);
+      }
+
+      .admin-menu a {
+        font-size: 12px;
+        text-align: center;
+        padding: 12px 7px;
+      }
+
+      #logout {
+        margin-top: 14px;
+        width: 100%;
+      }
+
+      .topbar {
+        padding: 17px;
+      }
+
+      .announcement-content {
+        padding: 24px 15px 50px;
+      }
+
+      .panel {
+        padding: 22px 17px;
+      }
+
+      .page-heading h1 {
+        font-size: 25px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="announcement-layout">
+
+    <!-- ADMIN SIDEBAR -->
+
+    <aside class="announcement-sidebar">
+
+      <div class="brand">
+        <h2>MEMORA</h2>
+        <small>CREATIONS ADMIN</small>
+      </div>
+
+      <nav class="admin-menu">
+
+        <a
+          href="/memora-creations/admin/dashboard.html"
+        >
+          Dashboard
+        </a>
+
+        <a
+          href="/memora-creations/admin/products.html"
+        >
+          Products
+        </a>
+
+        <a
+          href="/memora-creations/admin/orders.html"
+        >
+          Orders
+        </a>
+
+        <a
+          href="/memora-creations/admin/users.html"
+        >
+          Customers
+        </a>
+
+        <a
+          class="active"
+          href="/memora-creations/admin/announcement.html"
+        >
+          🔔 Announcement
+        </a>
+
+      </nav>
+
+      <button
+        type="button"
+        id="logout"
+      >
+        Logout
+      </button>
+
+    </aside>
+
+    <!-- MAIN -->
+
+    <div class="announcement-main">
+
+      <header class="topbar">
+        🔔 Website Announcement Manager
+      </header>
+
+      <main class="announcement-content">
+
+        <div class="page-heading">
+
+          <h1>
+            Manage Website Popup
+          </h1>
+
+          <p>
+            Control the announcement shown
+            to customers when they visit
+            your website homepage.
+          </p>
+
+        </div>
+
+        <div class="editor-grid">
+
+          <!-- EDITOR -->
+
+          <section class="panel">
+
+            <h2>
+              Edit Announcement
+            </h2>
+
+            <form id="announcementForm">
+
+              <!-- ENABLE / DISABLE -->
+
+              <div class="switch-row">
+
+                <input
+                  type="checkbox"
+                  id="announcementEnabled"
+                >
+
+                <label for="announcementEnabled">
+                  Enable Website Popup
+
+                  <small>
+                    Turn ON to show the popup
+                    to customers.
+                  </small>
+
+                </label>
+
+              </div>
+
+              <!-- TITLE -->
+
+              <div class="form-group">
+
+                <label for="announcementTitle">
+                  Popup Title
+                </label>
+
+                <input
+                  id="announcementTitle"
+                  type="text"
+                  maxlength="120"
+                  placeholder="Enter announcement title"
+                  required
+                >
+
+                <div class="field-help">
+                  Maximum 120 characters.
+                </div>
+
+              </div>
+
+              <!-- MESSAGE -->
+
+              <div class="form-group">
+
+                <label for="announcementMessage">
+                  Popup Message
+                </label>
+
+                <textarea
+                  id="announcementMessage"
+                  maxlength="1000"
+                  placeholder="Write your customer announcement..."
+                  required
+                ></textarea>
+
+                <div class="field-help">
+                  Maximum 1000 characters.
+                </div>
+
+              </div>
+
+              <!-- SAVE -->
+
+              <button
+                type="submit"
+                class="save-btn"
+                id="saveAnnouncement"
+                disabled
+              >
+                Loading Announcement...
+              </button>
+
+              <p
+                id="announcementStatus"
+                class="message info"
+                role="status"
+                aria-live="polite"
+              >
+                Loading saved announcement...
+              </p>
+
+            </form>
+
+          </section>
+
+          <!-- PREVIEW -->
+
+          <section class="panel">
+
+            <h2>
+              Customer Popup Preview
+            </h2>
+
+            <div
+              id="popupStatus"
+              class="status-pill"
+            >
+              Popup OFF
+            </div>
+
+            <div class="preview-stage">
+
+              <div class="preview-popup">
+
+                <div class="preview-icon">
+                  📢
+                </div>
+
+                <h3 id="previewTitle">
+                  Special Announcement
+                </h3>
+
+                <p id="previewMessage">
+                  Your announcement
+                  will appear here.
+                </p>
+
+                <button
+                  type="button"
+                  class="preview-close"
+                  disabled
+                >
+                  Close
+                </button>
+
+              </div>
+
+            </div>
+
+            <p class="preview-note">
+              This is a live preview.
+              Customers will see the
+              saved announcement after
+              the website popup feature
+              is connected.
+            </p>
+
+            <a
+              class="visit-site"
+              href="/memora-creations/frontend/index.html"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Visit Customer Website →
+            </a>
+
+          </section>
+
+        </div>
+
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- COMMON API -->
+
+  <script
+    src="/memora-creations/frontend/js/app.js?v=10"
+  ></script>
+
+  <!-- ADMIN AUTH -->
+
+  <script
+    src="/memora-creations/admin/js/auth.js?v=5"
+  ></script>
+
+  <!-- ANNOUNCEMENT MANAGER -->
+
+  <script>
+    (async function () {
+      'use strict';
+
+      const API_PATH =
+        '/announcement/manage';
+
+      const form =
+        document.getElementById(
+          'announcementForm'
+        );
+
+      const enabledInput =
+        document.getElementById(
+          'announcementEnabled'
+        );
+
+      const titleInput =
+        document.getElementById(
+          'announcementTitle'
+        );
+
+      const messageInput =
+        document.getElementById(
+          'announcementMessage'
+        );
+
+      const saveButton =
+        document.getElementById(
+          'saveAnnouncement'
+        );
+
+      const statusBox =
+        document.getElementById(
+          'announcementStatus'
+        );
+
+      const previewTitle =
+        document.getElementById(
+          'previewTitle'
+        );
+
+      const previewMessage =
+        document.getElementById(
+          'previewMessage'
+        );
+
+      const popupStatus =
+        document.getElementById(
+          'popupStatus'
+        );
+
+      function setStatus(
+        message,
+        type
+      ) {
+        statusBox.textContent = message;
+
+        statusBox.className =
+          'message ' +
+          (type || 'info');
+      }
+
+      function updatePreview() {
+        previewTitle.textContent =
+          titleInput.value.trim() ||
+          'Special Announcement';
+
+        previewMessage.textContent =
+          messageInput.value.trim() ||
+          'Your announcement will appear here.';
+
+        if (enabledInput.checked) {
+          popupStatus.textContent =
+            'Popup ON';
+
+          popupStatus.className =
+            'status-pill enabled';
+        } else {
+          popupStatus.textContent =
+            'Popup OFF';
+
+          popupStatus.className =
+            'status-pill';
+        }
+      }
+
+      titleInput.addEventListener(
+        'input',
+        updatePreview
+      );
+
+      messageInput.addEventListener(
+        'input',
+        updatePreview
+      );
+
+      enabledInput.addEventListener(
+        'change',
+        updatePreview
+      );
+
+      async function loadAnnouncement() {
+        saveButton.disabled = true;
+
+        try {
+          const data =
+            await window.MC.api(
+              API_PATH
+            );
+
+          if (
+            !data ||
+            data.success === false
+          ) {
+            throw new Error(
+              data?.message ||
+              'Could not load announcement.'
+            );
+          }
+
+          const announcement =
+            data.announcement || {};
+
+          enabledInput.checked =
+            announcement.enabled === true;
+
+          titleInput.value =
+            announcement.title || '';
+
+          messageInput.value =
+            announcement.message || '';
+
+          updatePreview();
+
+          setStatus(
+            'Saved announcement loaded.',
+            'success'
+          );
+
+          saveButton.disabled = false;
+
+          saveButton.textContent =
+            'Save Announcement';
+
+        } catch (error) {
+          console.error(
+            'Announcement loading error:',
+            error
+          );
+
+          setStatus(
+            error.message ||
+            'Could not load announcement.',
+            'error'
+          );
+
+          saveButton.textContent =
+            'Unable to Load';
+        }
+      }
+
+      form.addEventListener(
+        'submit',
+        async function (event) {
+          event.preventDefault();
+
+          const payload = {
+            enabled:
+              enabledInput.checked,
+
+            title:
+              titleInput.value.trim(),
+
+            message:
+              messageInput.value.trim()
+          };
+
+          if (
+            payload.enabled &&
+            (
+              !payload.title ||
+              !payload.message
+            )
+          ) {
+            setStatus(
+              'Enter both title and message before enabling the popup.',
+              'error'
+            );
+
+            return;
+          }
+
+          saveButton.disabled = true;
+
+          saveButton.textContent =
+            'Saving...';
+
+          setStatus(
+            'Saving announcement...',
+            'info'
+          );
+
+          try {
+            const data =
+              await window.MC.api(
+                API_PATH,
+                {
+                  method: 'PUT',
+                  body: JSON.stringify(
+                    payload
+                  )
+                }
+              );
+
+            if (
+              !data ||
+              data.success === false
+            ) {
+              throw new Error(
+                data?.message ||
+                'Save failed.'
+              );
+            }
+
+            const saved =
+              data.announcement || payload;
+
+            enabledInput.checked =
+              saved.enabled === true;
+
+            titleInput.value =
+              saved.title || '';
+
+            messageInput.value =
+              saved.message || '';
+
+            updatePreview();
+
+            setStatus(
+              '✅ Announcement saved successfully!',
+              'success'
+            );
+
+          } catch (error) {
+            console.error(
+              'Announcement saving error:',
+              error
+            );
+
+            setStatus(
+              error.message ||
+              'Announcement could not be saved.',
+              'error'
+            );
+
+          } finally {
+            saveButton.disabled = false;
+
+            saveButton.textContent =
+              'Save Announcement';
+          }
+        }
+      );
+
+      try {
+        if (
+          !window.MC ||
+          typeof window.MC.api !== 'function' ||
+          typeof window.requireAdmin !== 'function'
+        ) {
+          throw new Error(
+            'Admin scripts not loaded.'
+          );
+        }
+
+        const admin =
+          await window.requireAdmin();
+
+        if (!admin) return;
+
+        await loadAnnouncement();
+
+      } catch (error) {
+        console.error(
+          'Announcement manager error:',
+          error
+        );
+
+        setStatus(
+          error.message ||
+          'Announcement manager unavailable.',
+          'error'
+        );
+      }
+    })();
+  </script>
+
+</body>
+</html>
