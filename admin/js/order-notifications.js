@@ -4,14 +4,15 @@
  MEMORA CREATIONS
  ADMIN ORDER NOTIFICATIONS
 
- Reusable across Admin pages.
-
- - Today's orders
- - Unseen order badge
- - Auto refresh every 30 seconds
+ FEATURES
+ - Today's Orders
+ - Unseen Orders
+ - New Order Alert
+ - Notification Sound
+ - Enable / Mute Sound
  - Mark as Seen
  - View Orders
- - Admin authentication required
+ - Auto Refresh Every 30 Seconds
 =========================================
 */
 
@@ -24,11 +25,30 @@
   const STORAGE_KEY =
     'mc_admin_orders_seen_v1';
 
+  const SOUND_KEY =
+    'mc_admin_notification_sound_v1';
+
   const POLL_INTERVAL = 30000;
 
   let orders = [];
   let previousIds = null;
   let loading = false;
+
+  let audioContext = null;
+  let soundUnlocked = false;
+
+  let soundEnabled = false;
+
+  try {
+    soundEnabled =
+      localStorage.getItem(SOUND_KEY) === 'true';
+  } catch (_) {
+    soundEnabled = false;
+  }
+
+  /* =====================================
+     ELEMENT HELPER
+  ===================================== */
 
   function make(tag, value) {
     const element = document.createElement(tag);
@@ -39,6 +59,10 @@
 
     return element;
   }
+
+  /* =====================================
+     INDIA DATE
+  ===================================== */
 
   function indianDate(value) {
     const date = new Date(value);
@@ -67,6 +91,10 @@
     );
   }
 
+  /* =====================================
+     READ SEEN ORDERS
+  ===================================== */
+
   function readSeen() {
     try {
       const saved = JSON.parse(
@@ -84,14 +112,12 @@
     }
   }
 
+  /* =====================================
+     MARK ORDERS AS SEEN
+  ===================================== */
+
   function markSeen() {
     try {
-      /*
-        Preserve IDs previously seen,
-        including older orders outside
-        the most recent 200 results.
-      */
-
       const seen = readSeen();
 
       orders.forEach(order => {
@@ -117,6 +143,241 @@
     }
   }
 
+  /* =====================================
+     SOUND ENGINE
+
+     Sound is generated locally.
+     No audio file is required.
+  ===================================== */
+
+  async function unlockAudio() {
+    const AudioContextClass =
+      window.AudioContext ||
+      window.webkitAudioContext;
+
+    if (!AudioContextClass) {
+      throw new Error(
+        'Sound is not supported in this browser.'
+      );
+    }
+
+    if (!audioContext) {
+      audioContext = new AudioContextClass();
+    }
+
+    if (audioContext.state !== 'running') {
+      await audioContext.resume();
+    }
+
+    soundUnlocked =
+      audioContext.state === 'running';
+
+    if (!soundUnlocked) {
+      throw new Error(
+        'Browser blocked notification sound.'
+      );
+    }
+  }
+
+  function playTone(
+    frequency,
+    delay,
+    duration
+  ) {
+    if (
+      !audioContext ||
+      audioContext.state !== 'running'
+    ) {
+      return;
+    }
+
+    const oscillator =
+      audioContext.createOscillator();
+
+    const gain =
+      audioContext.createGain();
+
+    const startTime =
+      audioContext.currentTime + delay;
+
+    oscillator.type = 'sine';
+
+    oscillator.frequency.setValueAtTime(
+      frequency,
+      startTime
+    );
+
+    gain.gain.setValueAtTime(
+      0.0001,
+      startTime
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+      0.18,
+      startTime + 0.025
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+      0.0001,
+      startTime + duration
+    );
+
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+
+    oscillator.start(startTime);
+
+    oscillator.stop(
+      startTime + duration + 0.02
+    );
+  }
+
+  function playNotificationSound() {
+    if (
+      !soundEnabled ||
+      !soundUnlocked ||
+      !audioContext ||
+      audioContext.state !== 'running'
+    ) {
+      return;
+    }
+
+    try {
+      // Three-tone order notification.
+
+      playTone(660, 0, 0.18);
+
+      playTone(880, 0.20, 0.18);
+
+      playTone(1046, 0.42, 0.30);
+
+    } catch (err) {
+      console.error(
+        'Notification sound failed:',
+        err
+      );
+    }
+  }
+
+  /* =====================================
+     UPDATE SOUND BUTTON
+  ===================================== */
+
+  function updateSoundButton() {
+    const button = document.getElementById(
+      'mcNotificationSoundButton'
+    );
+
+    if (!button) return;
+
+    if (soundEnabled && soundUnlocked) {
+      button.textContent = '🔊 Sound ON';
+
+      button.style.background = '#e8f7ee';
+      button.style.color = '#166534';
+
+    } else if (soundEnabled) {
+      button.textContent = '🔔 Enable Sound';
+
+      button.style.background = '#fff1db';
+      button.style.color = '#8c4e2b';
+
+    } else {
+      button.textContent = '🔇 Sound OFF';
+
+      button.style.background = '#f0f0f0';
+      button.style.color = '#555';
+    }
+  }
+
+  /* =====================================
+     ENABLE / DISABLE SOUND
+  ===================================== */
+
+  async function toggleSound() {
+    const button = document.getElementById(
+      'mcNotificationSoundButton'
+    );
+
+    if (button) {
+      button.disabled = true;
+    }
+
+    try {
+      if (soundEnabled && soundUnlocked) {
+        soundEnabled = false;
+        soundUnlocked = false;
+
+        localStorage.setItem(
+          SOUND_KEY,
+          'false'
+        );
+
+        updateSoundButton();
+
+        window.MC.toast(
+          'Notification sound disabled.',
+          'success'
+        );
+
+        return;
+      }
+
+      /*
+        Browser requires a user click
+        before audio playback.
+      */
+
+      await unlockAudio();
+
+      soundEnabled = true;
+
+      localStorage.setItem(
+        SOUND_KEY,
+        'true'
+      );
+
+      updateSoundButton();
+
+      // Play a sample sound immediately.
+
+      playNotificationSound();
+
+      window.MC.toast(
+        'Notification sound enabled!',
+        'success'
+      );
+
+    } catch (err) {
+      soundEnabled = false;
+      soundUnlocked = false;
+
+      try {
+        localStorage.setItem(
+          SOUND_KEY,
+          'false'
+        );
+      } catch (_) {}
+
+      updateSoundButton();
+
+      window.MC.toast(
+        err.message ||
+        'Sound could not be enabled.',
+        'error'
+      );
+
+    } finally {
+      if (button) {
+        button.disabled = false;
+      }
+    }
+  }
+
+  /* =====================================
+     SHOW STATUS
+  ===================================== */
+
   function showStatus(message) {
     const status = document.getElementById(
       'mcAdminNotificationStatus'
@@ -127,6 +388,10 @@
     }
   }
 
+  /* =====================================
+     RENDER NOTIFICATIONS
+  ===================================== */
+
   function render() {
     const badge = document.getElementById(
       'mcAdminNotificationBadge'
@@ -136,16 +401,16 @@
 
     const seen = readSeen();
 
-    const unseen = orders.filter(
-      order =>
-        order._id &&
-        !seen.has(String(order._id))
+    const unseen = orders.filter(order =>
+      order._id &&
+      !seen.has(String(order._id))
     );
 
     const today = indianDate(new Date());
 
     const todayOrders = orders.filter(
-      order => indianDate(order.createdAt) === today
+      order =>
+        indianDate(order.createdAt) === today
     );
 
     badge.textContent =
@@ -178,7 +443,13 @@
       '.' +
       latestText
     );
+
+    updateSoundButton();
   }
+
+  /* =====================================
+     BUILD NOTIFICATION BAR
+  ===================================== */
 
   function buildBar() {
     if (
@@ -190,6 +461,7 @@
     }
 
     const bar = make('section');
+
     bar.id = 'mcAdminNotifications';
 
     bar.setAttribute(
@@ -249,7 +521,12 @@
       'flex-wrap:wrap'
     ].join(';');
 
-    const badge = make('span', '0 New');
+    /* NEW ORDERS BADGE */
+
+    const badge = make(
+      'span',
+      '0 New'
+    );
 
     badge.id =
       'mcAdminNotificationBadge';
@@ -262,6 +539,36 @@
       'font-weight:800',
       'font-size:12px'
     ].join(';');
+
+    /* SOUND BUTTON */
+
+    const soundButton = make(
+      'button',
+      '🔔 Enable Sound'
+    );
+
+    soundButton.id =
+      'mcNotificationSoundButton';
+
+    soundButton.type = 'button';
+
+    soundButton.style.cssText = [
+      'border:1px solid #dcc1a7',
+      'background:#fff1db',
+      'color:#8c4e2b',
+      'border-radius:10px',
+      'padding:10px 12px',
+      'font-weight:800',
+      'font-size:12px',
+      'cursor:pointer'
+    ].join(';');
+
+    soundButton.addEventListener(
+      'click',
+      toggleSound
+    );
+
+    /* MARK AS SEEN */
 
     const markButton = make(
       'button',
@@ -286,6 +593,8 @@
       markSeen
     );
 
+    /* VIEW ORDERS */
+
     const link = make(
       'a',
       'View Orders →'
@@ -305,16 +614,12 @@
 
     controls.append(
       badge,
+      soundButton,
       markButton,
       link
     );
 
     bar.append(info, controls);
-
-    /*
-      Insert below the standard
-      Admin navigation bar.
-    */
 
     const nav =
       document.querySelector('.adminnav');
@@ -328,7 +633,13 @@
     } else {
       document.body.prepend(bar);
     }
+
+    updateSoundButton();
   }
+
+  /* =====================================
+     CHECK NEW ORDERS
+  ===================================== */
 
   async function checkOrders() {
     if (
@@ -354,19 +665,20 @@
       orders = result.orders;
 
       const ids = new Set(
-        orders.map(order => String(order._id))
+        orders
+          .filter(order => order._id)
+          .map(order => String(order._id))
       );
 
       /*
-        Alert only when an order was
-        added after a previous check.
+        First load establishes baseline.
+        Never play sound for old orders.
       */
 
-      if (previousIds) {
-        const fresh = orders.filter(
-          order =>
-            order._id &&
-            !previousIds.has(String(order._id))
+      if (previousIds !== null) {
+        const fresh = orders.filter(order =>
+          order._id &&
+          !previousIds.has(String(order._id))
         );
 
         if (fresh.length > 0) {
@@ -376,6 +688,8 @@
             ' new customer order(s)!',
             'success'
           );
+
+          playNotificationSound();
         }
       }
 
@@ -399,12 +713,11 @@
     }
   }
 
-  async function start() {
-    /*
-      Never fetch admin orders
-      without checking login.
-    */
+  /* =====================================
+     START NOTIFICATION SYSTEM
+  ===================================== */
 
+  async function start() {
     if (
       !window.MC ||
       typeof window.MC.api !== 'function' ||
