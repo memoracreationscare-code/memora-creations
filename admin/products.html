@@ -3,7 +3,6 @@
 <html lang="en">
 
 <head>
-
   <meta charset="UTF-8">
 
   <meta
@@ -15,20 +14,17 @@
     Product Management | Memora Creations
   </title>
 
-  <!-- EXISTING ADMIN CSS -->
+  <!-- ADMIN CSS -->
 
   <link
     rel="stylesheet"
     href="/memora-creations/admin/css/style.css?v=5"
   >
 
-  <!-- PREMIUM PRODUCTS PAGE DESIGN -->
-
   <style>
-
     /* =====================================
        MEMORA CREATIONS
-       PREMIUM PRODUCTS MANAGEMENT
+       PRODUCTS MANAGEMENT
     ===================================== */
 
     :root {
@@ -51,7 +47,6 @@
     body {
       margin: 0;
       min-height: 100vh;
-
       background:
         radial-gradient(
           circle at top right,
@@ -64,13 +59,10 @@
           transparent 35%
         ),
         var(--mc-cream);
-
       color: var(--mc-primary);
     }
 
-    /* =====================================
-       ADMIN NAVIGATION
-    ===================================== */
+    /* ADMIN NAVIGATION */
 
     .adminnav {
       background: #241a14;
@@ -129,37 +121,26 @@
       margin-left: 6px;
     }
 
-    /* =====================================
-       MAIN LAYOUT
-    ===================================== */
+    /* MAIN LAYOUT */
 
     .adminmain {
       padding-top: 34px;
       padding-bottom: 75px;
     }
 
-    /* =====================================
-       PREMIUM HERO
-    ===================================== */
+    /* HERO */
 
     .products-hero {
       position: relative;
       overflow: hidden;
-
       display: flex;
       align-items: center;
       justify-content: space-between;
-
       gap: 24px;
-
       padding: 38px;
-
       margin-bottom: 28px;
-
       border-radius: 27px;
-
       color: #ffffff;
-
       background:
         linear-gradient(
           125deg,
@@ -167,27 +148,20 @@
           #4f3020 65%,
           #845539 100%
         );
-
       box-shadow:
         0 20px 45px rgba(48,33,23,.17);
     }
 
     .products-hero::after {
       content: "";
-
       position: absolute;
-
       width: 260px;
       height: 260px;
-
       right: -75px;
       bottom: -135px;
-
       border-radius: 50%;
-
       border:
         45px solid rgba(255,255,255,.045);
-
       pointer-events: none;
     }
 
@@ -198,11 +172,8 @@
 
     .hero-eyebrow {
       display: inline-block;
-
       margin-bottom: 14px;
-
       color: #eac5a2;
-
       font-size: 11px;
       font-weight: 900;
       letter-spacing: 2.5px;
@@ -210,23 +181,17 @@
 
     .products-hero h1 {
       margin: 0 0 12px;
-
       color: #ffffff;
-
       font-size:
         clamp(29px, 4vw, 43px);
-
       font-weight: 900;
       line-height: 1.15;
     }
 
     .products-hero p {
       margin: 0;
-
       max-width: 650px;
-
       color: #e7d6c8;
-
       font-size: 14px;
       line-height: 1.7;
     }
@@ -234,43 +199,29 @@
     .hero-illustration {
       width: 84px;
       height: 84px;
-
       display: flex;
       align-items: center;
       justify-content: center;
-
       flex-shrink: 0;
-
       border-radius: 24px;
-
       background:
         rgba(255,255,255,.11);
-
       border:
         1px solid rgba(255,255,255,.15);
-
       font-size: 40px;
-
       position: relative;
       z-index: 1;
     }
 
-    /* =====================================
-       MAIN FORM CARD
-    ===================================== */
+    /* PRODUCT FORM CARD */
 
     .product-form-card {
       padding: 32px;
-
       background: #ffffff;
-
       border:
         1px solid var(--mc-border);
-
       border-radius: 26px;
-
       box-shadow: var(--mc-shadow);
-
       margin-bottom: 35px;
     }
 
@@ -278,31 +229,23 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-
       gap: 18px;
-
       padding-bottom: 24px;
-
       margin-bottom: 28px;
-
       border-bottom:
         1px solid #eee6de;
     }
 
     .product-card-heading h2 {
       margin: 0 0 8px;
-
       font-size: 25px;
       font-weight: 900;
-
       color: var(--mc-primary);
     }
 
     .product-card-heading p {
       margin: 0;
-
       color: var(--mc-muted);
-
       font-size: 13px;
       line-height: 1.6;
     }
@@ -310,32 +253,22 @@
     .heading-icon {
       width: 57px;
       height: 57px;
-
       display: flex;
       align-items: center;
       justify-content: center;
-
       border-radius: 17px;
-
       background: #f5e8dd;
-
       color: #8b5b3a;
-
       font-size: 26px;
-
       flex-shrink: 0;
     }
 
-    /* =====================================
-       FORM GRID
-    ===================================== */
+    /* FORM GRID */
 
     #productForm .formgrid {
       display: grid;
-
       grid-template-columns:
         repeat(2, minmax(0, 1fr));
-
       gap: 23px 20px;
     }
 
@@ -349,14 +282,10 @@
 
     .premium-field > label {
       display: block;
-
       margin-bottom: 10px;
-
       color: #4a3629;
-
       font-size: 13px;
       font-weight: 800;
-
       letter-spacing: .02em;
     }
 
@@ -364,39 +293,26 @@
       color: #c34848;
     }
 
-    /* =====================================
-       PREMIUM INPUTS
-    ===================================== */
+    /* FORM INPUTS */
 
     #productForm .input,
     #productForm .select {
       display: block;
-
       width: 100%;
       min-width: 0;
-
       min-height: 54px;
-
       padding: 14px 17px;
-
       border:
         1px solid #e5d8cc;
-
       border-radius: 14px;
-
       background: #fffdfb;
-
       color: #302117;
-
       font-size: 14px;
       font-weight: 500;
-
       outline: none;
-
       transition:
         border-color .2s ease,
-        box-shadow .2s ease,
-        background .2s ease;
+        box-shadow .2s ease;
     }
 
     #productForm .input::placeholder {
@@ -406,9 +322,7 @@
     #productForm .input:focus,
     #productForm .select:focus {
       border-color: #a8734e;
-
       background: #ffffff;
-
       box-shadow:
         0 0 0 4px
         rgba(168,115,78,.10);
@@ -416,32 +330,23 @@
 
     #productForm textarea.input {
       min-height: 142px;
-
       resize: vertical;
-
       line-height: 1.7;
     }
 
-    /* =====================================
-       IMAGE UPLOAD
-    ===================================== */
+    /* PRODUCT IMAGE UPLOAD */
 
     .image-upload-area {
       padding: 25px;
-
       background:
         linear-gradient(
           135deg,
           #fffcf9,
           #f9f2eb
         );
-
       border:
         2px dashed #d9c1ad;
-
       border-radius: 19px;
-
-      transition: .2s ease;
     }
 
     .image-upload-area:hover {
@@ -451,71 +356,49 @@
     .upload-icon {
       width: 57px;
       height: 57px;
-
       display: flex;
       align-items: center;
       justify-content: center;
-
       background: #f0e1d3;
-
       border-radius: 17px;
-
       font-size: 27px;
-
       margin-bottom: 15px;
     }
 
     .upload-title {
       color: #38271c;
-
       font-size: 15px;
       font-weight: 900;
-
       margin-bottom: 7px;
     }
 
     .upload-description {
       color: #82756a;
-
       font-size: 12px;
       line-height: 1.6;
-
       margin-bottom: 17px;
     }
 
     #images {
       display: block;
-
       width: 100%;
-
       border:
         1px solid #e5d6c9;
-
       border-radius: 12px;
-
       padding: 12px;
-
       background: #ffffff;
-
       color: #49372a;
-
       font-size: 13px;
     }
 
     #images::file-selector-button {
       padding: 10px 14px;
-
       margin-right: 13px;
-
       border: 0;
-
       border-radius: 9px;
-
       background: #8b5b3a;
       color: #ffffff;
-
       font-weight: 800;
-
       cursor: pointer;
     }
 
@@ -523,85 +406,56 @@
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-
       margin-top: 15px;
     }
 
-    /* =====================================
-       CHECKBOX CARDS
-    ===================================== */
+    /* CHECKBOX OPTIONS */
 
     .premium-option {
       position: relative;
-
       display: flex;
       align-items: center;
-
       gap: 15px;
-
       min-height: 87px;
-
       padding: 19px;
-
       border:
         1px solid #e9ddd2;
-
       border-radius: 18px;
-
       background: #fffaf6;
-
       cursor: pointer;
-
-      transition: .2s ease;
     }
 
     .premium-option:hover {
       border-color: #bf9a7d;
-
       background: #f9f0e8;
     }
 
     .premium-option input[type="checkbox"] {
       appearance: none;
       -webkit-appearance: none;
-
       width: 46px;
       height: 27px;
-
       flex-shrink: 0;
-
       margin: 0;
-
       border: 0;
       border-radius: 30px;
-
       background: #dfd4cb;
-
       cursor: pointer;
-
       position: relative;
-
       transition: background .2s ease;
     }
 
     .premium-option input[type="checkbox"]::after {
       content: "";
-
       position: absolute;
-
       width: 19px;
       height: 19px;
-
       left: 4px;
       top: 4px;
-
       border-radius: 50%;
-
       background: #ffffff;
-
       box-shadow:
         0 2px 6px rgba(0,0,0,.15);
-
       transition: transform .2s ease;
     }
 
@@ -616,7 +470,6 @@
     .premium-option input[type="checkbox"]:focus-visible {
       outline:
         3px solid rgba(139,91,58,.3);
-
       outline-offset: 3px;
     }
 
@@ -628,43 +481,33 @@
 
     .option-copy strong {
       color: #302117;
-
       font-size: 14px;
       font-weight: 900;
     }
 
     .option-copy small {
       color: #81776f;
-
       font-size: 11px;
       line-height: 1.5;
     }
 
-    /* =====================================
-       SUBMIT BAR
-    ===================================== */
+    /* SAVE BUTTONS */
 
     .product-form-footer {
       display: flex;
       align-items: center;
       justify-content: space-between;
-
       gap: 20px;
-
       flex-wrap: wrap;
-
       border-top:
         1px solid #eee5dd;
-
       margin-top: 30px;
       padding-top: 25px;
     }
 
     .form-helper-text {
       max-width: 420px;
-
       color: #80746a;
-
       font-size: 12px;
       line-height: 1.6;
     }
@@ -677,140 +520,87 @@
 
     .product-save-button {
       min-height: 52px !important;
-
       padding: 14px 26px !important;
-
       border-radius: 13px !important;
-
       background:
         linear-gradient(
           135deg,
           #a36e4a,
           #77472c
         ) !important;
-
       color: #ffffff !important;
-
       font-size: 14px !important;
       font-weight: 900 !important;
-
-      box-shadow:
-        0 10px 24px
-        rgba(139,91,58,.22);
-    }
-
-    .product-save-button:hover {
-      background:
-        linear-gradient(
-          135deg,
-          #8b5b3a,
-          #633923
-        ) !important;
     }
 
     .product-clear-button {
       min-height: 52px !important;
-
       padding: 14px 22px !important;
-
       border-radius: 13px !important;
     }
 
-    /* =====================================
-       SECTION HEADING
-    ===================================== */
+    /* PRODUCT LIST */
 
     .management-section-heading {
       display: flex;
       align-items: center;
       justify-content: space-between;
-
       gap: 18px;
-
       margin: 35px 0 19px;
     }
 
     .management-section-heading h2 {
       margin: 0 0 7px;
-
       color: #302117;
-
       font-size: 25px;
       font-weight: 900;
     }
 
     .management-section-heading p {
       margin: 0;
-
       color: #81776f;
-
       font-size: 13px;
     }
 
     .management-section-icon {
       width: 48px;
       height: 48px;
-
       display: flex;
       align-items: center;
       justify-content: center;
-
       background: #eee0d3;
-
       border-radius: 15px;
-
       font-size: 23px;
     }
 
-    /* =====================================
-       PRODUCT LIST
-    ===================================== */
-
     #products.grid {
       display: grid;
-
       grid-template-columns:
         repeat(3, minmax(0, 1fr));
-
       gap: 19px;
-
       margin-bottom: 37px;
     }
 
     #products .card {
       overflow: hidden;
-
       background: #ffffff;
-
       border:
         1px solid #e9dfd6;
-
       border-radius: 21px;
-
       box-shadow:
         0 10px 30px rgba(48,33,23,.055);
-
-      transition:
-        transform .2s ease,
-        box-shadow .2s ease;
     }
 
     #products .card:hover {
-      transform: translateY(-4px);
-
       box-shadow:
         0 18px 40px rgba(48,33,23,.11);
     }
 
     #products .productimg {
       display: block;
-
       width: 100%;
-
       aspect-ratio: 1 / 1;
-
       object-fit: cover;
-
       background: #f3eee9;
     }
 
@@ -820,22 +610,16 @@
 
     #products .cardbody h3 {
       margin: 0 0 13px;
-
       min-height: 42px;
-
       color: #302117;
-
       font-size: 15px;
       font-weight: 850;
-
       line-height: 1.5;
     }
 
     #products .cardbody p {
       margin: 0 0 17px;
-
       color: #76695e;
-
       font-size: 13px;
     }
 
@@ -849,36 +633,26 @@
       border-radius: 11px;
     }
 
-    /* =====================================
-       CATEGORIES CARD
-    ===================================== */
+    /* CATEGORIES */
 
     .categories-card {
       padding: 29px;
-
       background: #ffffff;
-
       border:
         1px solid var(--mc-border);
-
       border-radius: 24px;
-
       box-shadow: var(--mc-shadow);
     }
 
     .categories-card h2 {
       margin: 0 0 8px;
-
       font-size: 24px;
-
       color: #302117;
     }
 
     .categories-card > p {
       margin: 0 0 24px;
-
       color: #81776f;
-
       font-size: 13px;
       line-height: 1.6;
     }
@@ -892,36 +666,25 @@
 
     #categoryName {
       flex: 1;
-
       min-width: 180px;
-
       min-height: 50px;
-
       padding: 12px 16px;
-
       border:
         1px solid #e3d6ca;
-
       border-radius: 13px;
-
       background: #fffdfb;
     }
 
     #categoryName:focus {
       outline: none;
-
       border-color: #a8734e;
-
       box-shadow:
-        0 0 0 4px
-        rgba(168,115,78,.10);
+        0 0 0 4px rgba(168,115,78,.10);
     }
 
     .category-add-button {
       min-height: 50px !important;
-
       padding: 12px 23px !important;
-
       border-radius: 13px !important;
     }
 
@@ -929,62 +692,43 @@
       display: flex;
       align-items: center;
       flex-wrap: wrap;
-
       gap: 12px;
-
       margin-top: 23px;
     }
 
     #categories .pill {
       display: inline-flex;
       align-items: center;
-
       gap: 5px;
-
       padding: 6px;
-
       border:
         1px solid #e8ddd3;
-
       border-radius: 14px;
-
       background: #f5eee8;
-
       font-size: 12px;
     }
 
     #categories .btn {
       padding: 9px 12px;
-
       min-height: 36px;
-
       border-radius: 10px;
     }
 
-    /* =====================================
-       FOOTER
-    ===================================== */
+    /* FOOTER */
 
     .products-page-footer {
       margin-top: 38px;
-
       padding-top: 20px;
-
       border-top:
         1px solid #e9dfd6;
-
       color: #9a8d82;
-
       font-size: 12px;
       text-align: center;
     }
 
-    /* =====================================
-       TABLET
-    ===================================== */
+    /* RESPONSIVE */
 
     @media (max-width: 1000px) {
-
       #products.grid {
         grid-template-columns:
           repeat(2, minmax(0, 1fr));
@@ -993,15 +737,9 @@
       .products-hero {
         padding: 28px;
       }
-
     }
 
-    /* =====================================
-       MOBILE
-    ===================================== */
-
     @media (max-width: 700px) {
-
       .adminnav .container {
         gap: 7px;
         justify-content: center;
@@ -1025,22 +763,18 @@
       .products-hero {
         flex-direction: column;
         align-items: flex-start;
-
         padding: 25px 20px;
-
         border-radius: 21px;
       }
 
       .hero-illustration {
         width: 60px;
         height: 60px;
-
         font-size: 29px;
       }
 
       .product-form-card {
         padding: 20px 16px;
-
         border-radius: 20px;
       }
 
@@ -1054,7 +788,6 @@
 
       #productForm .formgrid {
         grid-template-columns: 1fr;
-
         gap: 18px;
       }
 
@@ -1087,11 +820,9 @@
       .management-section-heading h2 {
         font-size: 22px;
       }
-
     }
 
     @media (max-width: 480px) {
-
       #products.grid {
         grid-template-columns: 1fr;
       }
@@ -1112,22 +843,17 @@
       .products-hero h1 {
         font-size: 29px;
       }
-
     }
 
     @media (prefers-reduced-motion: reduce) {
-
       #products .card,
       .premium-option {
         transition: none;
       }
-
     }
-
   </style>
 
 </head>
-
 
 <body>
 
@@ -1140,24 +866,15 @@
     <div class="container">
 
       <div class="admin-brand">
-
-        <strong>
-          MEMORA CREATIONS
-        </strong>
-
-        <span>
-          ADMIN CONTROL CENTER
-        </span>
-
+        <strong>MEMORA CREATIONS</strong>
+        <span>ADMIN CONTROL CENTER</span>
       </div>
-
 
       <a
         href="/memora-creations/admin/dashboard.html"
       >
         Dashboard
       </a>
-
 
       <a
         class="active"
@@ -1167,20 +884,17 @@
         Products
       </a>
 
-
       <a
         href="/memora-creations/admin/orders.html"
       >
         Orders
       </a>
 
-
       <a
         href="/memora-creations/admin/users.html"
       >
         Customers
       </a>
-
 
       <button
         id="logout"
@@ -1194,17 +908,13 @@
 
   </nav>
 
-
   <!-- =====================================
        MAIN CONTENT
   ===================================== -->
 
   <main class="container adminmain">
 
-
-    <!-- =====================================
-         HERO
-    ===================================== -->
+    <!-- PRODUCT HERO -->
 
     <section class="products-hero">
 
@@ -1214,9 +924,7 @@
           MEMORA CREATIONS ADMIN
         </span>
 
-        <h1>
-          Products Management
-        </h1>
+        <h1>Products Management</h1>
 
         <p>
           Add beautiful products, manage prices,
@@ -1227,7 +935,6 @@
 
       </div>
 
-
       <div
         class="hero-illustration"
         aria-hidden="true"
@@ -1237,21 +944,17 @@
 
     </section>
 
-
     <!-- =====================================
          ADD / EDIT PRODUCT
     ===================================== -->
 
     <section class="product-form-card">
 
-
       <div class="product-card-heading">
 
         <div>
 
-          <h2>
-            Product Details
-          </h2>
+          <h2>Product Details</h2>
 
           <p>
             Complete the product information
@@ -1259,7 +962,6 @@
           </p>
 
         </div>
-
 
         <div
           class="heading-icon"
@@ -1270,22 +972,16 @@
 
       </div>
 
-
-      <!-- EXISTING PRODUCT FORM ID PRESERVED -->
+      <!-- PRODUCT FORM -->
 
       <form id="productForm">
-
-
-        <!-- IMPORTANT FOR EDITING PRODUCTS -->
 
         <input
           type="hidden"
           id="editId"
         >
 
-
         <div class="formgrid">
-
 
           <!-- PRODUCT NAME -->
 
@@ -1306,7 +1002,6 @@
 
           </div>
 
-
           <!-- CATEGORY -->
 
           <div class="premium-field">
@@ -1316,12 +1011,6 @@
               <span class="required-mark">*</span>
             </label>
 
-            <!--
-              Categories load automatically
-              from existing admin/products.js.
-              Do not add static options.
-            -->
-
             <select
               id="category"
               class="select"
@@ -1329,7 +1018,6 @@
             ></select>
 
           </div>
-
 
           <!-- DESCRIPTION -->
 
@@ -1349,7 +1037,6 @@
             ></textarea>
 
           </div>
-
 
           <!-- ORIGINAL PRICE -->
 
@@ -1372,7 +1059,6 @@
 
           </div>
 
-
           <!-- SELLING PRICE -->
 
           <div class="premium-field">
@@ -1393,7 +1079,6 @@
             >
 
           </div>
-
 
           <!-- STOCK -->
 
@@ -1416,7 +1101,6 @@
 
           </div>
 
-
           <!-- KEYWORDS -->
 
           <div class="premium-field">
@@ -1434,7 +1118,6 @@
 
           </div>
 
-
           <!-- PRODUCT IMAGES -->
 
           <div class="premium-field full">
@@ -1442,7 +1125,6 @@
             <label for="images">
               Product Images
             </label>
-
 
             <div class="image-upload-area">
 
@@ -1462,7 +1144,6 @@
                 images from your computer.
               </p>
 
-
               <input
                 id="images"
                 type="file"
@@ -1470,8 +1151,7 @@
                 multiple
               >
 
-
-              <!-- EXISTING PREVIEW ID PRESERVED -->
+              <!-- IMAGE PREVIEW -->
 
               <div
                 id="preview"
@@ -1482,8 +1162,7 @@
 
           </div>
 
-
-          <!-- FEATURED -->
+          <!-- FEATURED PRODUCT -->
 
           <div class="premium-field">
 
@@ -1510,7 +1189,6 @@
             </label>
 
           </div>
-
 
           <!-- BEST SELLER -->
 
@@ -1542,7 +1220,6 @@
 
         </div>
 
-
         <!-- SAVE BUTTONS -->
 
         <div class="product-form-footer">
@@ -1557,7 +1234,6 @@
 
           </div>
 
-
           <div class="form-action-buttons">
 
             <button
@@ -1566,7 +1242,6 @@
             >
               Save Product
             </button>
-
 
             <button
               type="button"
@@ -1584,21 +1259,17 @@
 
     </section>
 
-
     <!-- =====================================
-         PRODUCT COLLECTION
+         YOUR PRODUCTS
     ===================================== -->
 
     <section>
-
 
       <div class="management-section-heading">
 
         <div>
 
-          <h2>
-            Your Products
-          </h2>
+          <h2>Your Products</h2>
 
           <p>
             View, edit and manage
@@ -1606,7 +1277,6 @@
           </p>
 
         </div>
-
 
         <div
           class="management-section-icon"
@@ -1617,9 +1287,6 @@
 
       </div>
 
-
-      <!-- EXISTING PRODUCTS ID PRESERVED -->
-
       <div
         id="products"
         class="grid"
@@ -1627,31 +1294,23 @@
 
     </section>
 
-
     <!-- =====================================
          CATEGORY MANAGEMENT
     ===================================== -->
 
     <section class="categories-card">
 
-
-      <h2>
-        Category Management
-      </h2>
+      <h2>Category Management</h2>
 
       <p>
         Add new categories or manage
         existing product collections.
       </p>
 
-
-      <!-- EXISTING CATEGORY FORM PRESERVED -->
-
       <form
         id="categoryForm"
         class="actions"
       >
-
 
         <input
           id="categoryName"
@@ -1660,7 +1319,6 @@
           placeholder="Enter category name"
           required
         >
-
 
         <button
           type="submit"
@@ -1671,9 +1329,6 @@
 
       </form>
 
-
-      <!-- EXISTING CATEGORY LIST ID PRESERVED -->
-
       <div
         id="categories"
         class="actions"
@@ -1681,45 +1336,44 @@
 
     </section>
 
-
     <!-- FOOTER -->
 
     <footer class="products-page-footer">
-
       © MEMORA CREATIONS
       — Product Management System
-
     </footer>
 
   </main>
-
 
   <!-- =====================================
        EXISTING JAVASCRIPT
        DO NOT REMOVE
   ===================================== -->
 
+  <!-- COMMON API -->
+
   <script
     src="/memora-creations/frontend/js/app.js?v=10"
   ></script>
 
+  <!-- ADMIN AUTH -->
 
   <script
     src="/memora-creations/admin/js/auth.js?v=5"
   ></script>
 
+  <!-- PRODUCT MANAGEMENT -->
 
   <script
-    src="/memora-creations/admin/js/products.js?v=5
-    
-<!-- =====================================
-     ADMIN ORDER NOTIFICATIONS
-===================================== -->
+    src="/memora-creations/admin/js/products.js?v=5"
+  ></script>
 
-<script
-  src="/memora-creations/admin/js/order-notifications.js?v=1"
-></script>
+  <!-- =====================================
+       NEW ORDER NOTIFICATION BAR
+  ===================================== -->
 
+  <script
+    src="/memora-creations/admin/js/order-notifications.js?v=1"
   ></script>
 
 </body>
