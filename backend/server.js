@@ -24,6 +24,13 @@ const cashfreeRoutes = require('./routes/cashfreeRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 
 /* =========================================
+   WEBSITE ANNOUNCEMENT API
+========================================= */
+
+const announcementRoutes =
+  require('./routes/announcementRoutes');
+
+/* =========================================
    PAYMENT WEBHOOK CONTROLLERS
 ========================================= */
 
@@ -256,6 +263,20 @@ app.use(
 app.use(
   '/api/admin',
   adminRoutes
+);
+
+
+/* =========================================
+   WEBSITE ANNOUNCEMENT ROUTES
+
+   GET /api/announcement
+   GET /api/announcement/manage
+   PUT /api/announcement/manage
+========================================= */
+
+app.use(
+  '/api/announcement',
+  announcementRoutes
 );
 
 
