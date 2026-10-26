@@ -1,3 +1,83 @@
+
+/* =========================
+   MC_WISHLIST_V1
+   Account-synced wishlist buttons
+========================= */
+const mcWishlistIds = new Set();
+let mcWishlistLoaded = false;
+let mcWishlistLoading = null;
+
+(function mcWishlistStyle() {
+  if (document.getElementById('mc-wishlist-style')) return;
+  const style = document.createElement('style');
+  style.id = 'mc-wishlist-style';
+  style.textContent = "\n    .premium-product-card { position: relative; }\n    .mc-wish-toggle {\n      cursor:pointer; border:1px solid #e7d6ce;\n      background:#fff; color:#71412c; border-radius:999px;\n      font-weight:700; box-shadow:0 3px 12px #0002;\n      min-height:42px; transition:transform .15s,background .15s;\n    }\n    .mc-wish-toggle:focus-visible { outline:3px solid #9b613c; outline-offset:3px; }\n    .mc-wish-toggle:hover { transform:scale(1.04); }\n    .mc-wish-toggle[aria-pressed=\"true\"] { color:#bd2649; border-color:#e5a4b1; background:#fff4f6; }\n    .mc-wish-toggle:disabled { opacity:.6; cursor:wait; }\n    .mc-wish-card { position:absolute; top:12px; right:12px; z-index:4;\n      width:44px; height:44px; font-size:29px; line-height:1; }\n    .mc-wish-single { padding:10px 18px; font-size:15px; }\n  ";
+  document.head.appendChild(style);
+})();
+
+function mcWishlistRefreshButtons() {
+  document.querySelectorAll('.mc-wish-toggle[data-wish-id]').forEach(button => {
+    const saved = mcWishlistIds.has(button.dataset.wishId);
+    button.setAttribute('aria-pressed', String(saved));
+    button.setAttribute('aria-label', saved ? 'Remove from wishlist' : 'Add to wishlist');
+    button.textContent = button.classList.contains('mc-wish-card')
+      ? (saved ? '♥' : '♡')
+      : (saved ? '♥ Saved to Wishlist' : '♡ Save to Wishlist');
+  });
+}
+
+async function mcWishlistLoad() {
+  if (mcWishlistLoading) return mcWishlistLoading;
+  mcWishlistLoading = (async () => {
+    try {
+      const result = await window.MC.api('/wishlist');
+      mcWishlistIds.clear();
+      for (const product of result.products || []) {
+        if (product && product._id) mcWishlistIds.add(String(product._id));
+      }
+      mcWishlistLoaded = true;
+      mcWishlistRefreshButtons();
+    } catch (error) {
+      if (error.status !== 401 && error.status !== 403) {
+        console.warn('Wishlist availability:', error.message);
+      }
+    }
+  })();
+  try { await mcWishlistLoading; } finally { mcWishlistLoading = null; }
+}
+
+document.addEventListener('click', async event => {
+  const button = event.target.closest('.mc-wish-toggle[data-wish-id]');
+  if (!button || button.disabled) return;
+  event.preventDefault();
+  event.stopPropagation();
+  const id = button.dataset.wishId;
+  if (!id) return;
+  button.disabled = true;
+  try {
+    const isSaved = mcWishlistIds.has(id);
+    await window.MC.api(isSaved ? '/wishlist/' + encodeURIComponent(id) : '/wishlist', {
+      method: isSaved ? 'DELETE' : 'POST',
+      ...(isSaved ? {} : {body: JSON.stringify({productId:id})})
+    });
+    if (isSaved) mcWishlistIds.delete(id); else mcWishlistIds.add(id);
+    mcWishlistLoaded = true;
+    mcWishlistRefreshButtons();
+    window.MC.toast(isSaved ? 'Wishlist se remove ho gaya' : 'Wishlist mein save ho gaya');
+  } catch (error) {
+    if (error.status === 401 || error.status === 403) {
+      const next = encodeURIComponent(location.pathname + location.search);
+      location.href = '/memora-creations/frontend/login.html?next=' + next;
+      return;
+    }
+    window.MC.toast(error.message || 'Wishlist update nahi ho payi', 'error');
+  } finally {
+    button.disabled = false;
+  }
+});
+mcWishlistLoad();
+
+
 const PRODUCTS_BASE =
   '/memora-creations';
 
@@ -623,6 +703,11 @@ function productCard(
       </button>
 
 
+
+      <button type="button" class="mc-wish-toggle mc-wish-card"
+        data-wish-id="${window.MC.esc(product._id)}"
+        aria-label="Add to wishlist" aria-pressed="false" title="Save to wishlist">♡</button>
+
       <div class="premium-card-actions">
 
         <button
@@ -871,6 +956,7 @@ async function loadProducts() {
 
 
     bindProductButtons();
+    mcWishlistRefreshButtons();
 
 
   } catch (error) {
@@ -1365,6 +1451,11 @@ async function loadSingleProduct() {
 
           <div class="actions">
 
+            <button type="button" class="mc-wish-toggle mc-wish-single"
+              data-wish-id="${window.MC.esc(product._id)}"
+              aria-label="Add to wishlist" aria-pressed="false">♡ Save to Wishlist</button>
+
+
             <button
               class="btn"
               id="addBtn"
@@ -1403,8 +1494,10 @@ async function loadSingleProduct() {
     `;
 
 
+    mcWishlistRefreshButtons();
+
     window.MC
-      .$$(
+      .$(
         '.thumbs img'
       )
       .forEach(
