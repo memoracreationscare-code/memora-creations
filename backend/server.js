@@ -103,6 +103,41 @@ app.use(
 
 
 /* =========================================
+   RAZORPAY WEBHOOK
+   PRESERVED FOR EXISTING ORDERS
+========================================= */
+
+app.post(
+  '/api/payment/webhook',
+  express.raw({
+    type: 'application/json',
+    limit: '1mb'
+  }),
+  webhook
+);
+
+
+/* =========================================
+   CASHFREE WEBHOOK
+
+   IMPORTANT:
+   Register before express.json().
+
+   Cashfree signature validation
+   requires the original raw body.
+========================================= */
+
+app.post(
+  '/api/cashfree/webhook',
+  express.raw({
+    type: 'application/json',
+    limit: '1mb'
+  }),
+  cashfreeWebhook
+);
+
+
+/* =========================================
    MEMORA ORIGIN-BASED CSRF PROTECTION
 
    Reject state-changing requests originating
@@ -170,41 +205,6 @@ app.use('/api', (req, res, next) => {
 
   next();
 });
-
-
-/* =========================================
-   RAZORPAY WEBHOOK
-   PRESERVED FOR EXISTING ORDERS
-========================================= */
-
-app.post(
-  '/api/payment/webhook',
-  express.raw({
-    type: 'application/json',
-    limit: '1mb'
-  }),
-  webhook
-);
-
-
-/* =========================================
-   CASHFREE WEBHOOK
-
-   IMPORTANT:
-   Register before express.json().
-
-   Cashfree signature validation
-   requires the original raw body.
-========================================= */
-
-app.post(
-  '/api/cashfree/webhook',
-  express.raw({
-    type: 'application/json',
-    limit: '1mb'
-  }),
-  cashfreeWebhook
-);
 
 
 /* =========================================
