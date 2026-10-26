@@ -22,6 +22,7 @@ const orderRoutes = require('./routes/orderRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const cashfreeRoutes = require('./routes/cashfreeRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const wishlistRoutes = require('./routes/wishlistRoutes');
 
 /* =========================================
    WEBSITE ANNOUNCEMENT API
@@ -333,6 +334,11 @@ app.use(
 app.use(
   '/api/admin',
   adminRoutes
+);
+
+app.use(
+  '/api/wishlist',
+  wishlistRoutes
 );
 
 
