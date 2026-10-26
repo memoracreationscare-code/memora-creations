@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Wishlist | MEMORA CREATIONS</title>
+  <link rel="stylesheet" href="/memora-creations/frontend/css/style.css?v=13">
+  <style>
+    :root{--wish-brown:#845237;--wish-cream:#faf6f1;--wish-border:#e9dfd7}
+    .wishlist-wrap{max-width:1150px;margin:auto;padding:42px 18px 100px;min-height:65vh}
+    .wishlist-hero{text-align:center;margin-bottom:32px}
+    .wishlist-hero span{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#92664e}
+    .wishlist-hero h1{font-family:Georgia,serif;font-size:clamp(34px,5vw,56px);margin:12px 0;color:#302117}
+    .wishlist-hero p{color:#786b62;margin:0}
+    .wishlist-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:22px}
+    .wishlist-card{border:1px solid var(--wish-border);border-radius:19px;overflow:hidden;background:#fff;box-shadow:0 6px 22px #4225120d}
+    .wishlist-picture{display:block;aspect-ratio:1/1;background:var(--wish-cream);overflow:hidden}
+    .wishlist-picture img{width:100%;height:100%;object-fit:cover}
+    .wishlist-card-body{padding:18px}
+    .wishlist-name{color:#302117;font-weight:700;text-decoration:none;line-height:1.45;display:block;min-height:42px}
+    .wishlist-price{font-size:20px;font-weight:800;color:#754229;margin:12px 0 8px}
+    .wishlist-old{color:#9a918b;text-decoration:line-through;font-size:13px;font-weight:400;margin-left:8px}
+    .wishlist-stock{color:#3d7954;font-size:13px;margin-bottom:16px}
+    .wishlist-stock.out{color:#b44141}
+    .wishlist-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+    .wishlist-actions button,.wishlist-back{min-height:43px;border:0;border-radius:10px;cursor:pointer;font-weight:700;font-size:12px;padding:10px}
+    .wishlist-add{background:var(--wish-brown);color:#fff}
+    .wishlist-buy{background:#f0e9e3;color:#3b281e}
+    .wishlist-remove{margin-top:10px;width:100%;background:transparent;color:#a33e51;border:1px solid #e9ced4!important}
+    .wishlist-actions button:disabled{opacity:.55;cursor:not-allowed}
+    .wishlist-message{text-align:center;background:white;border:1px solid var(--wish-border);border-radius:20px;padding:42px 18px;color:#6c5a4f;max-width:670px;margin:35px auto}
+    .wishlist-message h2{font-family:Georgia,serif;color:#342319}
+    .wishlist-back{display:inline-block;text-decoration:none;margin-top:16px;background:var(--wish-brown);color:white;padding:13px 20px}
+  </style>
+</head>
+<body>
+  <header id="nav" class="topbar"></header>
+  <main class="wishlist-wrap">
+    <div class="wishlist-hero"><span>Saved with love</span><h1>My Wishlist ♥</h1><p id="wishlistCount">Your favorite Memora Creations products</p></div>
+    <section id="wishlistContent" aria-live="polite"><div class="wishlist-message">Loading your favorites...</div></section>
+  </main>
+  <nav id="bottomNav" class="bottomnav"></nav>
+  <script src="/memora-creations/frontend/js/app.js?v=10"></script>
+  <script>
+    (() => {
+      'use strict';
+      const BASE='/memora-creations/frontend';
+      const content=document.getElementById('wishlistContent');
+      const count=document.getElementById('wishlistCount');
+      const escapeHtml=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+      const home=BASE+'/products.html';
+      const showMessage=(title,message,login=false)=>{
+        content.innerHTML=`<div class="wishlist-message"><h2>${escapeHtml(title)}</h2><p>${escapeHtml(message)}</p><a class="wishlist-back" href="${login?BASE+'/login.html?next='+encodeURIComponent(location.pathname):home}">${login?'Login to continue':'Explore Products'}</a></div>`;
+      };
+      async function loadWishlist(){
+        try{
+          const data=await window.MC.api('/wishlist');
+          const products=(data.products||[]).filter(p=>p&&p._id);
+          count.textContent=`${products.length} saved ${products.length===1?'product':'products'}`;
+          if(!products.length){showMessage('Your wishlist is empty','Tap the heart on products you love to save them here.');return;}
+          content.innerHTML='<div class="wishlist-grid">'+products.map(p=>{
+            const id=escapeHtml(p._id),name=escapeHtml(p.name),image=escapeHtml(p.images?.[0]?.url||'https://placehold.co/600x600?text=Memora');
+            const price=Number(p.sellingPrice||0),oldPrice=Number(p.originalPrice||0),stock=Number(p.stock||0);
+            const url=BASE+'/product.html?id='+encodeURIComponent(p._id);
+            return `<article class="wishlist-card" data-product="${id}"><a class="wishlist-picture" href="${url}"><img src="${image}" alt="${name}" loading="lazy"></a><div class="wishlist-card-body"><a class="wishlist-name" href="${url}">${name}</a><div class="wishlist-price">${window.MC.money(price)}${oldPrice>price?`<span class="wishlist-old">${window.MC.money(oldPrice)}</span>`:''}</div><div class="wishlist-stock ${stock>0?'':'out'}">${stock>0?`In stock (${stock})`:'Out of stock'}</div><div class="wishlist-actions"><button class="wishlist-add" data-action="cart" ${stock>0?'':'disabled'}>Add to Cart</button><button class="wishlist-buy" data-action="buy" ${stock>0?'':'disabled'}>Order Now</button></div><button class="wishlist-remove" data-action="remove">♥ Remove from Wishlist</button></div></article>`;
+          }).join('')+'</div>';
+        }catch(error){
+          if(error.status===401||error.status===403){showMessage('Login to view your wishlist','Your favorites are saved to your account.',true);return;}
+          showMessage('Unable to load wishlist',error.message||'Please try again later.');
+        }
+      }
+      content.addEventListener('click',async e=>{
+        const btn=e.target.closest('button[data-action]');if(!btn||btn.disabled)return;
+        const card=btn.closest('[data-product]');if(!card)return;
+        const id=card.dataset.product;const action=btn.dataset.action;
+        if(action==='buy'){location.href=BASE+'/checkout.html?buyNow='+encodeURIComponent(id)+'&qty=1';return;}
+        btn.disabled=true;
+        try{
+          if(action==='remove'){
+            await window.MC.api('/wishlist/'+encodeURIComponent(id),{method:'DELETE'});
+            window.MC.toast('Wishlist se remove ho gaya');
+            await loadWishlist();
+          }else if(action==='cart'){
+            await window.MC.api('/cart',{method:'POST',body:JSON.stringify({productId:id,quantity:1})});
+            window.MC.toast('Added to Cart');
+            if(typeof window.MC.updateCartCount==='function')window.MC.updateCartCount();
+          }
+        }catch(error){
+          if(error.status===401||error.status===403){location.href=BASE+'/login.html?next='+encodeURIComponent(location.pathname);return;}
+          window.MC.toast(error.message||'Action failed','error');
+        }finally{btn.disabled=false;}
+      });
+      loadWishlist();
+    })();
+  </script>
+</body>
+</html>
