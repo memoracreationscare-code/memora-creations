@@ -23,6 +23,7 @@ const paymentRoutes = require('./routes/paymentRoutes');
 const cashfreeRoutes = require('./routes/cashfreeRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const wishlistRoutes = require('./routes/wishlistRoutes');
+const couponRoutes = require('./routes/couponRoutes');
 
 /* =========================================
    WEBSITE ANNOUNCEMENT API
@@ -339,6 +340,12 @@ app.use(
 app.use(
   '/api/wishlist',
   wishlistRoutes
+);
+
+// Customer Coupon Validation API
+app.use(
+  '/api/coupons',
+  couponRoutes
 );
 
 
