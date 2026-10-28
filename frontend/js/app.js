@@ -745,6 +745,9 @@ async function nav() {
           user
             ? `
 
+               <!-- MC_WISHLIST_NAV_V1 -->
+               <a href="${BASE}/frontend/wishlist.html" aria-label="My Wishlist">♥ Wishlist</a>
+
               <a
                 href="${BASE}/frontend/orders.html"
               >
@@ -1144,6 +1147,17 @@ async function bottomNav() {
 
           </a>
 
+
+          <!-- MC_WISHLIST_NAV_V1 -->
+          <a href="${BASE}/frontend/wishlist.html"
+             class="${active('/frontend/wishlist.html') ? 'active' : ''}"
+             aria-label="My Wishlist">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.8 4.6a5.6 5.6 0 0 0-7.9 0L12 5.5l-.9-.9a5.6 5.6 0 1 0-7.9 7.9L12 21l8.8-8.5a5.6 5.6 0 0 0 0-7.9Z"></path>
+            </svg>
+            <span>Wishlist</span>
+          </a>
 
           <a
             href="${BASE}/frontend/profile.html"
