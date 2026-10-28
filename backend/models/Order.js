@@ -180,6 +180,14 @@ const orderSchema = new mongoose.Schema({
     maxlength: 30
   },
 
+  // True only while this order holds a coupon usage reservation.
+  // Update with order/payment status inside the same transaction.
+  couponUsageReserved: {
+    type: Boolean,
+    default: false,
+    index: true
+  },
+
   // Coupon discount is recorded in the existing discount field.
   // Coupon usage will be handled by the order/payment integration.
 
