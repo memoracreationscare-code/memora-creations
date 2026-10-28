@@ -165,6 +165,24 @@ const orderSchema = new mongoose.Schema({
     default: 0
   },
 
+  // Applied coupon details (optional for existing orders)
+  coupon: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Coupon',
+    default: null
+  },
+
+  couponCode: {
+    type: String,
+    trim: true,
+    uppercase: true,
+    default: null,
+    maxlength: 30
+  },
+
+  // Coupon discount is recorded in the existing discount field.
+  // Coupon usage will be handled by the order/payment integration.
+
   grandTotal: {
     type: Number,
     required: true,
