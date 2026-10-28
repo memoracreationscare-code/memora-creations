@@ -1,11 +1,11 @@
 
 const router = require('express').Router();
-
 const mongoose = require('mongoose');
 
 const {
   Wishlist,
-  Product
+  Product,
+  WishlistSettings
 } = require('../models');
 
 const {
@@ -18,7 +18,28 @@ const {
   ok
 } = require('../utils/http');
 
-// All wishlist operations require customer login.
+// Get wishlist availability.
+async function wishlistEnabled() {
+  const settings = await WishlistSettings.findOne({
+    key: 'wishlist'
+  }).select('enabled').lean();
+
+  // Enabled by default until Admin changes it.
+  return settings ? settings.enabled === true : true;
+}
+
+// Public configuration endpoint.
+// GET /api/wishlist/config
+router.get(
+  '/config',
+  asyncHandler(async (req, res) => {
+    return ok(res, {
+      enabled: await wishlistEnabled()
+    });
+  })
+);
+
+// Customer authentication for all routes below.
 router.use(requireUser);
 
 // GET /api/wishlist
@@ -31,13 +52,29 @@ router.get(
       .populate({
         path: 'products',
         match: { isActive: true },
-        select: 'name slug productId images originalPrice sellingPrice stock discountPercent isActive'
+        select:
+          'name slug productId images originalPrice sellingPrice stock discountPercent isActive'
       })
       .lean();
 
     return ok(res, {
-      products: wishlist?.products || []
+      products: wishlist?.products || [],
+      enabled: await wishlistEnabled()
     });
+  })
+);
+
+// Disable modifications when Admin turns Wishlist OFF.
+router.use(
+  asyncHandler(async (req, res, next) => {
+    if (!(await wishlistEnabled())) {
+      throw error(
+        403,
+        'Wishlist is temporarily disabled by Admin.'
+      );
+    }
+
+    next();
   })
 );
 
@@ -99,7 +136,9 @@ router.delete(
       { user: req.user._id },
       {
         $pull: {
-          products: new mongoose.Types.ObjectId(productId)
+          products: new mongoose.Types.ObjectId(
+            productId
+          )
         }
       },
       { new: true }
