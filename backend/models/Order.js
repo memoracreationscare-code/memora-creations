@@ -188,8 +188,16 @@ const orderSchema = new mongoose.Schema({
     index: true
   },
 
-  // Coupon discount is recorded in the existing discount field.
-  // Coupon usage will be handled by the order/payment integration.
+  // Legacy discount field remains unchanged (product MRP savings).
+  // Coupon usage and payment integration are handled separately.
+
+  // Coupon-specific savings, separate from existing MRP savings.
+  couponDiscount: {
+    type: Number,
+    required: true,
+    min: 0,
+    default: 0
+  },
 
   grandTotal: {
     type: Number,
