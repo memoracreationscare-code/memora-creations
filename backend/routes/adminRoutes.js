@@ -75,6 +75,17 @@ router.post(
 
 router.use(requireAdmin);
 
+// ================================
+// ADMIN COUPON MANAGEMENT
+// GET /api/admin/coupons
+// GET /api/admin/coupons/report
+// POST /api/admin/coupons
+// PUT /api/admin/coupons/:id
+// PATCH /api/admin/coupons/:id/status
+// ================================
+
+router.use('/coupons', require('./couponAdminRoutes'));
+
 
 /* =====================================
    DASHBOARD
