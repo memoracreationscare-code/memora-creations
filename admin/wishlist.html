@@ -1,0 +1,352 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
+
+  <title>Wishlist Management | Memora Creations</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: #f7f5f2;
+      color: #30241e;
+      font-family: Arial, sans-serif;
+    }
+
+    header {
+      background: #241b16;
+      color: white;
+      padding: 20px;
+    }
+
+    header a {
+      color: #f3c69d;
+      text-decoration: none;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: auto;
+      padding: 25px 16px;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #e9e0d7;
+      border-radius: 14px;
+      padding: 22px;
+      margin-bottom: 20px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns:
+        repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+    }
+
+    .number {
+      font-size: 32px;
+      font-weight: bold;
+      color: #946343;
+    }
+
+    button {
+      border: 0;
+      border-radius: 8px;
+      padding: 12px 20px;
+      cursor: pointer;
+      background: #946343;
+      color: white;
+      font-weight: bold;
+    }
+
+    button:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    .switch-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .status {
+      font-weight: bold;
+    }
+
+    .on { color: green; }
+    .off { color: #b42318; }
+
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 13px;
+      border-bottom: 1px solid #eee;
+    }
+
+    th { background: #faf6f1; }
+
+    #message {
+      min-height: 24px;
+      margin: 12px 0;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h2>MEMORA CREATIONS</h2>
+    <a href="/memora-creations/admin/dashboard.html">
+      Back to Admin Dashboard
+    </a>
+  </header>
+
+  <main>
+    <h1>Wishlist Management</h1>
+    <p>Manage customer wishlists and view reports.</p>
+
+    <div id="message" role="status"></div>
+
+    <section class="card">
+      <h2>Wishlist Settings</h2>
+
+      <div class="switch-row">
+        <div>
+          <strong>Customer Wishlist</strong>
+          <p id="wishlistStatus" class="status">
+            Loading...
+          </p>
+        </div>
+
+        <button id="toggleBtn" disabled>
+          Loading...
+        </button>
+      </div>
+    </section>
+
+    <section class="stats">
+      <div class="card">
+        <h3>Wishlist Users</h3>
+        <div id="totalUsers" class="number">—</div>
+      </div>
+
+      <div class="card">
+        <h3>Total Saves</h3>
+        <div id="totalSaves" class="number">—</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="switch-row">
+        <h2>Most Saved Products</h2>
+        <button id="refreshBtn">Refresh</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Price</th>
+              <th>Saves</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="popularProducts">
+            <tr>
+              <td colspan="4">Loading...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const API =
+      'https://memora-creations.onrender.com/api';
+
+    let enabled = true;
+    let loaded = false;
+
+    const $ = id => document.getElementById(id);
+
+    function message(text, isError = false) {
+      $('message').textContent = text;
+      $('message').style.color =
+        isError ? '#b42318' : '#28743a';
+    }
+
+    function escapeHTML(value) {
+      return String(value ?? '').replace(
+        /[&<>"']/g,
+        char => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        })[char]
+      );
+    }
+
+    async function request(path, options = {}) {
+      const response = await fetch(API + path, {
+        ...options,
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(options.headers || {})
+        }
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || data.success === false) {
+        if (response.status === 401 ||
+            response.status === 403) {
+          throw new Error(
+            'Admin session unavailable. Please login again.'
+          );
+        }
+
+        throw new Error(
+          data.message || 'Request failed.'
+        );
+      }
+
+      return data;
+    }
+
+    function renderSettings() {
+      const status = $('wishlistStatus');
+      const button = $('toggleBtn');
+
+      status.textContent =
+        enabled ? 'Enabled' : 'Disabled';
+
+      status.className =
+        'status ' + (enabled ? 'on' : 'off');
+
+      button.textContent =
+        enabled ? 'Disable Wishlist' : 'Enable Wishlist';
+
+      button.disabled = !loaded;
+    }
+
+    async function loadReport() {
+      message('');
+
+      $('refreshBtn').disabled = true;
+
+      try {
+        const data = await request(
+          '/wishlist/admin/report'
+        );
+
+        enabled = data.settings.enabled;
+        loaded = true;
+
+        renderSettings();
+
+        $('totalUsers').textContent =
+          data.summary.totalUsers;
+
+        $('totalSaves').textContent =
+          data.summary.totalSaves;
+
+        const products = data.popularProducts || [];
+
+        $('popularProducts').innerHTML =
+          products.length
+            ? products.map(product => `
+                <tr>
+                  <td>${escapeHTML(product.name)}</td>
+                  <td>₹${Number(
+                    product.sellingPrice || 0
+                  ).toLocaleString('en-IN')}</td>
+                  <td>${Number(product.saves || 0)}</td>
+                  <td>
+                    ${product.isActive
+                      ? 'Active'
+                      : 'Inactive'}
+                  </td>
+                </tr>
+              `).join('')
+            : '<tr><td colspan="4">No saved products yet.</td></tr>';
+
+      } catch (err) {
+        loaded = false;
+        $('toggleBtn').disabled = true;
+        message(err.message, true);
+      } finally {
+        $('refreshBtn').disabled = false;
+      }
+    }
+
+    async function toggleWishlist() {
+      if (!loaded) return;
+
+      const next = !enabled;
+
+      if (!confirm(
+        next
+          ? 'Enable customer wishlist?'
+          : 'Disable customer wishlist?'
+      )) return;
+
+      $('toggleBtn').disabled = true;
+
+      try {
+        const data = await request(
+          '/wishlist/admin/settings',
+          {
+            method: 'PUT',
+            body: JSON.stringify({
+              enabled: next
+            })
+          }
+        );
+
+        enabled = data.settings.enabled;
+        message(data.message);
+        renderSettings();
+
+        await loadReport();
+
+      } catch (err) {
+        message(err.message, true);
+      } finally {
+        $('toggleBtn').disabled = !loaded;
+      }
+    }
+
+    $('toggleBtn').addEventListener(
+      'click',
+      toggleWishlist
+    );
+
+    $('refreshBtn').addEventListener(
+      'click',
+      loadReport
+    );
+
+    loadReport();
+  </script>
+</body>
+</html>
