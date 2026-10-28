@@ -6,5 +6,6 @@ module.exports = {
   Product: require('./Product'),
   Cart: require('./Cart'),
   Order: require('./Order'),
-  Wishlist: require('./Wishlist')
+  Wishlist: require('./Wishlist'),
+  WishlistSettings: require('./WishlistSettings')
 };
