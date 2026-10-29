@@ -850,6 +850,8 @@ async function createCashfreePendingOrder({
   address,
   items,
   cashfreeOrderId,
+  // MC_CASHFREE_COUPON_PASS_V1
+  couponCode = null,
   clearCart = false
 
 }) {
@@ -883,6 +885,8 @@ async function createCashfreePendingOrder({
           'CASHFREE',
 
         cashfreeOrderId,
+
+        couponCode,
 
         clearCartOnPayment:
           clearCart,
