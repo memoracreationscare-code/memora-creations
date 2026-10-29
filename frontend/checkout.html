@@ -214,6 +214,17 @@
           <h2>Order Summary</h2>
         </div>
 
+        <!-- MC_COUPON_CHECKOUT_UI_V1 -->
+        <section id="mcCouponArea" hidden aria-label="Apply coupon" style="margin:18px 0;padding:16px;border:1px solid #e4d3c3;background:#fffaf5;border-radius:13px">
+          <label for="mcCouponInput" style="display:block;font-weight:750;color:#593922;margin-bottom:8px">Have a coupon code?</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <input id="mcCouponInput" type="text" maxlength="30" autocomplete="off" placeholder="WELCOME10" style="min-width:135px;flex:1;padding:12px;border:1px solid #dfcdbd;border-radius:9px;text-transform:uppercase">
+            <button type="button" id="mcCouponApply" style="border:0;border-radius:9px;background:#805338;color:white;font-weight:700;padding:12px 17px">Apply</button>
+            <button type="button" id="mcCouponRemove" hidden style="border:1px solid #d7c5b5;border-radius:9px;background:white;color:#72492c;font-weight:700;padding:12px 15px">Remove</button>
+          </div>
+          <p id="mcCouponMessage" role="status" style="margin:8px 0 0;font-size:13px;color:#766252"></p>
+        </section>
+
         <div id="summary" class="checkout-summary">
           <div class="checkout-loading">
             Loading order...
