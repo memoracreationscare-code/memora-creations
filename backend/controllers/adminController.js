@@ -787,6 +787,9 @@ const listOrders = asyncHandler(async (req, res) => {
    UPDATE ORDER
 ===================================== */
 
+// Admin COD Coupon Release service
+const { releaseCoupon } = require('../services/couponUsageService');
+
 const updateOrder = asyncHandler(async (req, res) => {
 
   const status = req.body.orderStatus;
@@ -891,6 +894,24 @@ const updateOrder = asyncHandler(async (req, res) => {
           order,
           session
         );
+
+        // MC_ADMIN_COD_COUPON_RELEASE_V1
+        // Release reserved coupon once, inside order transaction.
+        if (
+          order.paymentMethod === 'COD' &&
+          order.couponUsageReserved === true
+        ) {
+          if (!order.coupon) {
+            throw error(409, 'Order coupon reservation is incomplete.');
+          }
+
+          await releaseCoupon({
+            couponId: order.coupon,
+            session
+          });
+
+          order.couponUsageReserved = false;
+        }
 
         if (order.paymentMethod === 'COD') {
           order.paymentStatus = 'CANCELLED';
