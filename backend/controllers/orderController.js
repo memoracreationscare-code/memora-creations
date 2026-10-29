@@ -14,6 +14,9 @@
 
 const mongoose = require('mongoose');
 
+// MC_COD_COUPON_RELEASE_V1
+const { releaseCoupon } = require('../services/couponUsageService');
+
 const {
   Order
 } = require('../models');
@@ -425,6 +428,23 @@ const cancelOrder = asyncHandler(async (req, res) => {
         session
       );
 
+
+      /* =================================
+         RELEASE COUPON ONCE
+         Only for reserved COD coupons.
+         Part of the same transaction as stock and cancellation.
+      ================================= */
+
+      if (freshOrder.couponUsageReserved === true) {
+        if (!freshOrder.coupon) {
+          throw error(409, 'Order coupon reservation is incomplete.');
+        }
+        await releaseCoupon({
+          couponId: freshOrder.coupon,
+          session
+        });
+        freshOrder.couponUsageReserved = false;
+      }
 
       /* =================================
          UPDATE ORDER
