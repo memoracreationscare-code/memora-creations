@@ -31,6 +31,8 @@ const {
   validateAddress
 } = require('../utils/validation');
 
+const { calculateCouponPricing } = require('../services/couponPricingService'); // MC_COUPON_PREVIEW_V1
+
 const {
   getTrustedItems,
   totals,
@@ -49,7 +51,14 @@ const preview = asyncHandler(async (req, res) => {
     req.body.items
   );
 
-  const amountDetails = totals(trustedItems);
+  // When coupon is supplied, validate using trusted database prices.
+  const amountDetails = req.body?.couponCode
+    ? await calculateCouponPricing({
+        items: req.body.items,
+        couponCode: req.body.couponCode,
+        userId: req.user._id
+      })
+    : totals(trustedItems);
 
   const items = trustedItems.map(item => ({
 
