@@ -115,6 +115,12 @@ const createCod = asyncHandler(async (req, res) => {
     items:
       req.body.items,
 
+    // MC_COD_COUPON_CONTROLLER_V1
+    // Optional coupon; pricing is recalculated by the backend.
+    couponCode: typeof req.body?.couponCode === 'string'
+      ? req.body.couponCode.trim().toUpperCase()
+      : null,
+
     clearCart:
       req.body.clearCart === true
 
