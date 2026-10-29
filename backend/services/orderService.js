@@ -27,6 +27,9 @@ const {
   error
 } = require('../utils/http');
 
+// COUPON_COD_ORDER_SERVICE_V1
+const { reserveCoupon } = require('./couponUsageService');
+
 
 /* =====================================
    ORDER STATUSES
@@ -358,6 +361,7 @@ async function buildOrderDocument({
   paymentMethod,
   razorpayOrderId,
   cashfreeOrderId,
+  couponCode = null,
   clearCartOnPayment = false,
   session
 
@@ -409,6 +413,24 @@ async function buildOrderDocument({
   );
 
   const amount = totals(trusted);
+
+  // Reserve coupon atomically together with the local order.
+  // No coupon? All legacy pricing remains unchanged.
+  const couponReservation = couponCode
+    ? await reserveCoupon({
+        code: couponCode,
+        subtotal: amount.subtotal,
+        userId: user._id,
+        session
+      })
+    : null;
+
+  const appliedCouponDiscount =
+    couponReservation ? money(couponReservation.couponDiscount) : 0;
+
+  const payableTotal = money(
+    Math.max(0, amount.grandTotal - appliedCouponDiscount)
+  );
 
   const orderItems = trusted.map(
     ({ product, quantity }) => ({
@@ -471,8 +493,20 @@ async function buildOrderDocument({
     discount:
       amount.discount,
 
+    coupon:
+      couponReservation?.couponId || null,
+
+    couponCode:
+      couponReservation?.couponCode || null,
+
+    couponDiscount:
+      appliedCouponDiscount,
+
+    couponUsageReserved:
+      Boolean(couponReservation),
+
     grandTotal:
-      amount.grandTotal,
+      payableTotal,
 
     paymentMethod,
 
@@ -667,6 +701,7 @@ async function createCodOrder({
   user,
   address,
   items,
+  couponCode = null,
   clearCart = false
 
 }) {
@@ -688,6 +723,8 @@ async function createCodOrder({
         items,
 
         paymentMethod: 'COD',
+
+        couponCode,
 
         session
 
