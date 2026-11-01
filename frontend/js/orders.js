@@ -268,7 +268,7 @@ function canRequestCashfreeCancel(order) {
 
   return (
     order.paymentMethod === 'CASHFREE' &&
-    order.paymentStatus === 'PENDING' &&
+    ['PENDING', 'SUCCESS'].includes(order.paymentStatus) &&
     isEarlyOrderStatus(order.orderStatus) &&
     !hasCashfreeCancelRequest(order)
   );
@@ -450,7 +450,7 @@ function orderActionsHtml(order) {
         type="button"
         data-id="${safeId}"
       >
-        Request Cancellation
+        ${order.paymentStatus === 'SUCCESS' ? 'Request Cancellation / Refund' : 'Request Cancellation'}
       </button>
     `;
 
@@ -951,13 +951,12 @@ async function requestCashfreeCancellation(
   if (orderActionRunning) return;
 
   const confirmed = await askOrderConfirmation({
-    title: 'Request Cancellation?',
+    // MC_PAID_CASHFREE_REQUEST_V1
+    title: 'Request Cancellation / Refund Review?',
     message:
-      'Cashfree order ke liye cancellation ' +
-      'request bheji jayegi. Payment aur ' +
-      'stock verify hone ke baad hi ' +
-      'cancellation process hogi. ' +
-      'Order turant cancel nahi hoga.',
+      'Request admin ko bheji jayegi. Paid order ka refund ' +
+      'automatic nahi hoga. Payment/refund verification ke baad ' +
+      'hi koi cancellation process hogi.',
     confirmText: 'Submit Request'
   });
 
@@ -995,8 +994,8 @@ async function requestCashfreeCancellation(
     }
 
     orderUI.toast(
-      'Cancellation request submitted. ' +
-      'Order is not cancelled yet.',
+      'Request submitted for admin review. ' +
+      'Order is not cancelled and no refund is initiated.',
       'success'
     );
 
