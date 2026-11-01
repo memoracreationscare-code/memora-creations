@@ -23,5 +23,7 @@ module.exports = {
 
   WishlistSettings: require('./WishlistSettings'),
 
-  Coupon: require('./Coupon')
+  Coupon: require('./Coupon'),
+
+  CouponUserUsage: require('./CouponUserUsage')
 };
