@@ -6,8 +6,13 @@ const { getCashfreeRefunds, fetchCashfreeOrder, isCashfreePaymentSuccessful } = 
 
 const inspectRefunds = asyncHandler(async (req, res) => {
   const id = String(req.params.id || '');
-  if (!mongoose.isValidObjectId(id)) throw error(400, 'Valid order ID is required.');
-  const order = await Order.findById(id).select('orderId cashfreeOrderId paymentMethod paymentStatus orderStatus grandTotal couponCode couponDiscount').lean();
+  // MC_REFUND_ORDER_NUMBER_V1: accept public merchant number or MongoDB ObjectId.
+  const identifier = id.trim();
+  if (!/^[A-Za-z0-9_-]{3,100}$/.test(identifier)) throw error(400, 'Valid order number is required.');
+  const lookup = mongoose.isValidObjectId(identifier)
+    ? { $or: [{ _id: identifier }, { orderId: identifier }] }
+    : { orderId: identifier };
+  const order = await Order.findOne(lookup).select('orderId cashfreeOrderId paymentMethod paymentStatus orderStatus grandTotal couponCode couponDiscount').lean();
   if (!order) throw error(404, 'Order not found.');
   if (order.paymentMethod !== 'CASHFREE' || !order.cashfreeOrderId) {
     throw error(400, 'This is not a Cashfree order.');
