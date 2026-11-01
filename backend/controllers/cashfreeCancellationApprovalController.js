@@ -37,6 +37,9 @@ const {
   releaseStock
 } = require('../services/orderService');
 
+// MC_CASHFREE_COUPON_CANCEL_RELEASE_V1
+const { releaseCoupon } = require('../services/couponUsageService');
+
 const REQUEST_MARKER =
   'CUSTOMER_CASHFREE_CANCEL_REQUEST';
 
@@ -398,6 +401,19 @@ const approveCancellation =
             freshOrder,
             session
           );
+
+           // Release coupon only after terminal Cashfree verification.
+           if (freshOrder.couponUsageReserved === true) {
+             if (!freshOrder.coupon || !freshOrder.user) {
+               throw error(409, 'Coupon reservation is incomplete.');
+             }
+             await releaseCoupon({
+               couponId: freshOrder.coupon,
+               userId: freshOrder.user,
+               session
+             });
+             freshOrder.couponUsageReserved = false;
+           }
 
           freshOrder.orderStatus =
             'Cancelled';
