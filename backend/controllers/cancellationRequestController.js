@@ -84,7 +84,7 @@ const requestCancellation = asyncHandler(
 
         paymentMethod: 'CASHFREE',
 
-        paymentStatus: 'PENDING',
+        paymentStatus: { $in: ['PENDING', 'SUCCESS'] },
 
         orderStatus: {
           $in: [
@@ -111,9 +111,10 @@ const requestCancellation = asyncHandler(
 
             note:
               REQUEST_MARKER +
-              ': Customer requested cancellation. ' +
-              'Admin must verify Cashfree payment ' +
-              'before any refund or stock release.',
+              ': MC_PAID_CASHFREE_REQUEST_V1. ' +
+              'Customer requested cancellation/refund review. ' +
+              'Admin must independently verify Cashfree payment ' +
+              'and any refund before changing order or stock.',
 
             changedAt: new Date()
           }
@@ -129,8 +130,8 @@ const requestCancellation = asyncHandler(
 
       return ok(res, {
         message:
-          'Cancellation request submitted. ' +
-          'The order has not been cancelled yet.',
+          'Request submitted for admin review. ' +
+          'No cancellation or refund has been performed.',
 
         requestStatus: 'REQUESTED',
 
@@ -188,16 +189,6 @@ const requestCancellation = asyncHandler(
         orderId: existing.orderId
       });
 
-    }
-
-    if (
-      existing.paymentStatus === 'SUCCESS'
-    ) {
-      throw error(
-        409,
-        'Payment is successful. ' +
-        'Cancellation requires refund review.'
-      );
     }
 
     if (
