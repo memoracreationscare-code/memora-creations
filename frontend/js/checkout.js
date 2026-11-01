@@ -17,6 +17,9 @@
   let user = null;
   let fromCart = false;
   let submitting = false;
+  // MC_COD_COUPON_CHECKOUT_V1
+  let appliedCouponCode = null;
+  let previewSequence = 0;
 
   const $ = (selector) => document.querySelector(selector);
 
@@ -124,9 +127,105 @@
         item.lineTotal);
     }
     line('Delivery', preview.deliveryCharge);
-    line('You Save', preview.discount);
+    line('You Save', preview.productSavings ?? preview.discount ?? 0);
+    if (Number(preview.couponDiscount || 0) > 0) {
+      line('Coupon Discount', -Number(preview.couponDiscount));
+    }
     line('Total', preview.grandTotal, true);
   }
+
+  function chosenMethod() {
+    return $('input[name="paymentMethod"]:checked')?.value || '';
+  }
+
+  function couponMessage(text, isError = false) {
+    const el = $('#mcCouponMessage');
+    if (el) {
+      el.textContent = text;
+      el.style.color = isError ? '#aa4438' : '#24734c';
+    }
+  }
+
+  function updateCouponControls() {
+    const area = $('#mcCouponArea');
+    if (area) area.hidden = chosenMethod() !== 'COD';
+    const remove = $('#mcCouponRemove');
+    if (remove) remove.hidden = !appliedCouponCode;
+    const input = $('#mcCouponInput');
+    if (input) input.value = appliedCouponCode || input.value;
+  }
+
+  async function refreshCouponPreview(code = null) {
+    const seq = ++previewSequence;
+    const data = await MC.api('/orders/preview', {
+      method: 'POST',
+      body: JSON.stringify({
+        items,
+        ...(code ? { couponCode: code } : {})
+      })
+    });
+    if (seq === previewSequence) drawSummary(data);
+    return data;
+  }
+
+  async function applyCoupon() {
+    if (submitting || chosenMethod() !== 'COD') return;
+    const code = String($('#mcCouponInput')?.value || '').trim().toUpperCase();
+    if (!/^[A-Z0-9_-]{3,30}$/.test(code)) {
+      couponMessage('Valid coupon code enter karein.', true);
+      return;
+    }
+    const apply = $('#mcCouponApply');
+    if (apply) apply.disabled = true;
+    couponMessage('Coupon check ho raha hai...');
+    try {
+      const data = await refreshCouponPreview(code);
+      if (!data.couponApplied || data.couponCode !== code) {
+        throw new Error('Coupon verify nahi hua.');
+      }
+      appliedCouponCode = code;
+      couponMessage('Coupon applied! Discount order summary me dikh raha hai.');
+      updateCouponControls();
+    } catch (err) {
+      couponMessage(err.message || 'Coupon invalid hai.', true);
+    } finally {
+      if (apply) apply.disabled = false;
+    }
+  }
+
+  async function removeCoupon() {
+    if (submitting) return;
+    appliedCouponCode = null;
+    const input = $('#mcCouponInput');
+    if (input) input.value = '';
+    couponMessage('Coupon removed.');
+    updateCouponControls();
+    try {
+      await refreshCouponPreview();
+    } catch (err) {
+      couponMessage(err.message || 'Summary refresh nahi hua.', true);
+    }
+  }
+
+  $('#mcCouponApply')?.addEventListener('click', applyCoupon);
+  $('#mcCouponRemove')?.addEventListener('click', removeCoupon);
+  $('#mcCouponInput')?.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      applyCoupon();
+    }
+  });
+
+  document.querySelectorAll('input[name="paymentMethod"]').forEach(input => {
+    input.addEventListener('change', async () => {
+      if (chosenMethod() !== 'COD' && appliedCouponCode) {
+        // Online coupon payments are not integrated yet.
+        await removeCoupon();
+        couponMessage('Online payment me coupon filhal available nahi hai.');
+      }
+      updateCouponControls();
+    });
+  });
 
   async function initialize() {
     user = await MC.requireLogin();
@@ -160,12 +259,8 @@
       return;
     }
 
-    const preview = await MC.api('/orders/preview', {
-      method: 'POST',
-      body: JSON.stringify({ items })
-    });
-
-    drawSummary(preview);
+    await refreshCouponPreview();
+    updateCouponControls();
     populateAddress();
   }
 
@@ -173,13 +268,16 @@
     return {
       items,
       address: addressData(),
-      clearCart: fromCart
+      clearCart: fromCart,
+      ...(appliedCouponCode && chosenMethod() === 'COD'
+        ? { couponCode: appliedCouponCode } : {})
     };
   }
 
   async function placeCodOrder() {
     setLoading(true);
     try {
+      if (appliedCouponCode) await refreshCouponPreview(appliedCouponCode);
       const data = await MC.api('/orders/cod', {
         method: 'POST',
         body: JSON.stringify(payload())
@@ -204,6 +302,7 @@
     let orderId = null;
 
     try {
+      if (appliedCouponCode) throw new Error('Online payment ke liye pehle coupon remove karein.');
       if (typeof window.Cashfree !== 'function') {
         throw new Error('Cashfree SDK load nahi hua. Page refresh karein.');
       }
