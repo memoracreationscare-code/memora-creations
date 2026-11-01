@@ -4,11 +4,15 @@
  MEMORA CREATIONS
  COUPON USAGE SERVICE
 
- Atomic Coupon Reservation
+ Atomic Total and Per-Customer
+ Coupon Reservation
 ========================================
 */
 
-const { Coupon } = require('../models');
+const {
+  Coupon,
+  CouponUserUsage
+} = require('../models');
 
 const { error } = require('../utils/http');
 
@@ -21,11 +25,11 @@ const {
 ========================================
  RESERVE COUPON
 
- Must be called inside the SAME MongoDB
- transaction used to save the order.
+ This function MUST be called inside
+ the order creation transaction.
 
- Reservation is rolled back if the
- transaction fails.
+ Both counters and the order must
+ commit or roll back together.
 ========================================
 */
 
@@ -58,6 +62,11 @@ async function reserveCoupon({
 
   const now = new Date();
 
+  /*
+   Reserve one slot in the coupon's
+   total usage counter.
+  */
+
   const coupon = await Coupon.findOneAndUpdate(
     {
       _id: validated.couponId,
@@ -67,10 +76,6 @@ async function reserveCoupon({
       startsAt: { $lte: now },
 
       expiresAt: { $gt: now },
-
-      usedCount: {
-        $lt: Number.MAX_SAFE_INTEGER
-      },
 
       $expr: {
         $lt: [
@@ -97,9 +102,84 @@ async function reserveCoupon({
     );
   }
 
+  /*
+   Reserve one slot for this customer.
+
+   The compound unique index on
+   {coupon, user} prevents duplicate
+   counter documents.
+
+   This uses the SAME transaction as
+   the global coupon reservation.
+  */
+
+  try {
+    const customerUsage =
+      await CouponUserUsage.findOneAndUpdate(
+        {
+          coupon: coupon._id,
+
+          user: userId,
+
+          usedCount: {
+            $lt: coupon.perUserLimit
+          }
+        },
+        {
+          $inc: {
+            usedCount: 1
+          },
+
+          $setOnInsert: {
+            coupon: coupon._id,
+            user: userId
+          }
+        },
+        {
+          new: true,
+          upsert: true,
+          runValidators: true,
+          session
+        }
+      );
+
+    if (
+      !customerUsage ||
+      customerUsage.usedCount >
+        coupon.perUserLimit
+    ) {
+      throw error(
+        409,
+        'You have reached your coupon usage limit.'
+      );
+    }
+
+  } catch (err) {
+    /*
+     A duplicate key can occur when
+     the customer already has a usage
+     document at the allowed limit.
+
+     Do not manually release the global
+     counter here: the surrounding
+     transaction must roll back.
+    */
+
+    if (err && err.code === 11000) {
+      throw error(
+        409,
+        'You have reached your coupon usage limit.'
+      );
+    }
+
+    throw err;
+  }
+
   return {
     couponId: coupon._id,
+
     couponCode: coupon.code,
+
     couponDiscount: validated.discount
   };
 }
@@ -108,17 +188,21 @@ async function reserveCoupon({
 ========================================
  RELEASE COUPON RESERVATION
 
- Call only after the corresponding order
- reservation is confirmed eligible for
- release, inside a transaction.
+ Called on eligible COD cancellation.
 
- The order workflow must guarantee that
- each reservation is released once only.
+ The caller MUST:
+ 1. Check couponUsageReserved.
+ 2. Call inside the same transaction.
+ 3. Set couponUsageReserved = false.
+ 4. Save the cancelled order.
+
+ Never call twice for one reservation.
 ========================================
 */
 
 async function releaseCoupon({
   couponId,
+  userId,
   session
 }) {
   if (!session) {
@@ -131,17 +215,60 @@ async function releaseCoupon({
     return;
   }
 
+  if (!userId) {
+    throw new Error(
+      'Customer ID is required to release coupon usage.'
+    );
+  }
+
+  /*
+   Release one global coupon slot.
+  */
+
   await Coupon.updateOne(
     {
       _id: couponId,
-      usedCount: { $gt: 0 }
+
+      usedCount: {
+        $gt: 0
+      }
     },
     {
       $inc: {
         usedCount: -1
       }
     },
-    { session }
+    {
+      session
+    }
+  );
+
+  /*
+   Release one customer coupon slot.
+
+   The document may be absent for
+   historical orders created before
+   customer counters were introduced.
+  */
+
+  await CouponUserUsage.updateOne(
+    {
+      coupon: couponId,
+
+      user: userId,
+
+      usedCount: {
+        $gt: 0
+      }
+    },
+    {
+      $inc: {
+        usedCount: -1
+      }
+    },
+    {
+      session
+    }
   );
 }
 
