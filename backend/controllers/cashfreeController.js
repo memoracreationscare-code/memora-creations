@@ -35,6 +35,8 @@ const {
   createCashfreePendingOrder
 } = require('../services/orderService');
 
+const { calculateCouponPricing } = require('../services/couponPricingService');
+
 const {
   getCashfreeConfig,
   createCashfreeOrder,
@@ -69,11 +71,15 @@ const createOrder = asyncHandler(
       from the database.
     */
 
-    const trustedItems =
-      await getTrustedItems(items);
+    const couponCode = typeof req.body?.couponCode === 'string'
+      ? req.body.couponCode.trim().toUpperCase()
+      : null;
 
-    const amountDetails =
-      totals(trustedItems);
+    const amountDetails = await calculateCouponPricing({
+      items,
+      couponCode,
+      userId: req.user._id
+    });
 
     const amount =
       amountDetails.grandTotal;
@@ -152,6 +158,15 @@ const createOrder = asyncHandler(
       );
     }
 
+    // Refuse a gateway amount different from the requested amount.
+    if (
+      Math.round(Number(cashfreeOrder.order_amount) * 100) !==
+        Math.round(amount * 100) ||
+      cashfreeOrder.order_currency !== 'INR'
+    ) {
+      throw error(502, 'Cashfree gateway amount mismatch.');
+    }
+
     /*
       Create local pending order and
       reserve stock inside transaction.
@@ -174,6 +189,10 @@ const createOrder = asyncHandler(
         items,
 
         cashfreeOrderId,
+
+        couponCode,
+
+        expectedAmount: amount,
 
         clearCart:
           req.body.clearCart === true
