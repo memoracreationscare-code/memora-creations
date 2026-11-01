@@ -448,8 +448,10 @@ const cancelOrder = asyncHandler(async (req, res) => {
         if (!freshOrder.coupon) {
           throw error(409, 'Order coupon reservation is incomplete.');
         }
+        // MC_CUSTOMER_COUPON_RELEASE_USER_V1
         await releaseCoupon({
           couponId: freshOrder.coupon,
+          userId: freshOrder.user,
           session
         });
         freshOrder.couponUsageReserved = false;
