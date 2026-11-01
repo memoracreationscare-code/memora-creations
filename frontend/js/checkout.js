@@ -148,7 +148,7 @@
 
   function updateCouponControls() {
     const area = $('#mcCouponArea');
-    if (area) area.hidden = chosenMethod() !== 'COD';
+    if (area) area.hidden = !['COD', 'CASHFREE'].includes(chosenMethod());
     const remove = $('#mcCouponRemove');
     if (remove) remove.hidden = !appliedCouponCode;
     const input = $('#mcCouponInput');
@@ -169,7 +169,7 @@
   }
 
   async function applyCoupon() {
-    if (submitting || chosenMethod() !== 'COD') return;
+    if (submitting || !['COD', 'CASHFREE'].includes(chosenMethod())) return;
     const code = String($('#mcCouponInput')?.value || '').trim().toUpperCase();
     if (!/^[A-Z0-9_-]{3,30}$/.test(code)) {
       couponMessage('Valid coupon code enter karein.', true);
@@ -218,12 +218,11 @@
 
   document.querySelectorAll('input[name="paymentMethod"]').forEach(input => {
     input.addEventListener('change', async () => {
-      if (chosenMethod() !== 'COD' && appliedCouponCode) {
-        // Online coupon payments are not integrated yet.
-        await removeCoupon();
-        couponMessage('Online payment me coupon filhal available nahi hai.');
-      }
       updateCouponControls();
+      if (appliedCouponCode) {
+        try { await refreshCouponPreview(appliedCouponCode); }
+        catch (e) { couponMessage(e.message || 'Coupon validate nahi hua.', true); }
+      }
     });
   });
 
@@ -269,7 +268,7 @@
       items,
       address: addressData(),
       clearCart: fromCart,
-      ...(appliedCouponCode && chosenMethod() === 'COD'
+      ...(appliedCouponCode && ['COD', 'CASHFREE'].includes(chosenMethod())
         ? { couponCode: appliedCouponCode } : {})
     };
   }
@@ -302,7 +301,7 @@
     let orderId = null;
 
     try {
-      if (appliedCouponCode) throw new Error('Online payment ke liye pehle coupon remove karein.');
+      if (appliedCouponCode) await refreshCouponPreview(appliedCouponCode);
       if (typeof window.Cashfree !== 'function') {
         throw new Error('Cashfree SDK load nahi hua. Page refresh karein.');
       }
