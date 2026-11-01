@@ -852,6 +852,7 @@ async function createCashfreePendingOrder({
   cashfreeOrderId,
   // MC_CASHFREE_COUPON_PASS_V1
   couponCode = null,
+  expectedAmount = null,
   clearCart = false
 
 }) {
@@ -894,6 +895,16 @@ async function createCashfreePendingOrder({
         session
 
       });
+
+      // Cashfree gateway amount must match the committed order exactly.
+      // Price/coupon changes abort the transaction and never expose the session.
+      if (
+        !Number.isFinite(Number(expectedAmount)) ||
+        Math.round(Number(order.grandTotal) * 100) !==
+          Math.round(Number(expectedAmount) * 100)
+      ) {
+        throw error(409, 'Prices or coupon changed. Please retry checkout.');
+      }
 
       await reserveStock(
         order,
