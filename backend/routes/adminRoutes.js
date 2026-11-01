@@ -86,6 +86,9 @@ router.use(requireAdmin);
 
 router.use('/coupons', require('./couponAdminRoutes'));
 
+// MC_REFUND_VERIFY_ROUTE_V1 — admin-authenticated, read-only
+router.get('/orders/:id/cashfree/refunds', require('../controllers/cashfreeRefundController').inspectRefunds);
+
 
 /* =====================================
    DASHBOARD
