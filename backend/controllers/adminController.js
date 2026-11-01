@@ -907,6 +907,7 @@ const updateOrder = asyncHandler(async (req, res) => {
 
           await releaseCoupon({
             couponId: order.coupon,
+            userId: order.user,
             session
           });
 
