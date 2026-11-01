@@ -9,7 +9,8 @@
 
 const {
   Coupon,
-  Order
+  Order,
+  CouponUserUsage
 } = require('../models');
 
 const {
@@ -115,6 +116,16 @@ async function validateCoupon({
   }
 
   if (userId) {
+    // MC_COUPON_COUNTER_PREVIEW_V1: count both legacy orders and atomic reservations.
+    const customerUsage = await CouponUserUsage.findOne({
+      coupon: coupon._id,
+      user: userId
+    }).select('usedCount').lean();
+
+    if (Number(customerUsage?.usedCount || 0) >= coupon.perUserLimit) {
+      throw error(400, 'You have reached your coupon usage limit.');
+    }
+
     const previousUses = await Order.countDocuments({
       user: userId,
       couponCode: couponCode,
