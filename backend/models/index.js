@@ -29,6 +29,9 @@ module.exports = {
 
   Coupon: require('./Coupon'),
 
-  CouponUserUsage: require('./CouponUserUsage')
+  CouponUserUsage: require('./CouponUserUsage'),
+
+  // WHATSAPP ORDER NOTIFICATIONS
+  WhatsAppNotification: require('./WhatsAppNotification')
 
 };
