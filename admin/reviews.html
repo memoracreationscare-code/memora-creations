@@ -11,7 +11,7 @@
   >
 
   <title>
-    Reviews Management | MEMORA CREATIONS
+    Customer Reviews | MEMORA CREATIONS
   </title>
 
   <link
@@ -26,6 +26,7 @@
 
     body {
       margin: 0;
+      min-height: 100vh;
       background: #f8f5f0;
       color: #302117;
       font-family: Arial, sans-serif;
@@ -33,12 +34,12 @@
 
     .reviews-header {
       background: #261b15;
-      color: white;
+      color: #fff;
       padding: 20px;
     }
 
     .reviews-header-inner {
-      max-width: 1150px;
+      max-width: 1200px;
       margin: auto;
       display: flex;
       align-items: center;
@@ -50,212 +51,359 @@
     .brand {
       font-size: 19px;
       font-weight: 900;
-      color: white;
+      color: #fff;
       text-decoration: none;
+      letter-spacing: 1px;
     }
 
     .back-link {
+      display: inline-block;
       color: white;
       text-decoration: none;
-      padding: 11px 16px;
+      padding: 12px 17px;
       background: #765138;
-      border-radius: 10px;
+      border-radius: 11px;
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 800;
     }
 
-    .reviews-container {
-      width: min(1150px, 94%);
+    .container-reviews {
+      width: min(1200px, 94%);
       margin: 32px auto 70px;
     }
 
-    .page-heading {
-      margin-bottom: 25px;
-    }
-
-    .page-heading h1 {
+    .page-title h1 {
       margin: 0 0 10px;
       font-size: clamp(27px, 4vw, 38px);
     }
 
-    .page-heading p {
+    .page-title p {
       color: #80756d;
+      font-size: 14px;
       line-height: 1.6;
     }
 
-    .reviews-toolbar {
+    .review-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin: 25px 0;
+    }
+
+    .stat-card {
+      padding: 23px;
+      background: #fff;
+      border: 1px solid #e9dfd4;
+      border-radius: 17px;
+    }
+
+    .stat-card span {
+      display: block;
+      color: #80756d;
+      font-size: 13px;
+    }
+
+    .stat-card strong {
+      display: block;
+      margin-top: 10px;
+      font-size: 31px;
+      font-weight: 900;
+      color: #302117;
+    }
+
+    .review-toolbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 15px;
-      background: white;
-      border: 1px solid #eadfd5;
-      border-radius: 18px;
-      padding: 20px;
-      margin-bottom: 22px;
+      padding: 18px;
+      background: #fff;
+      border: 1px solid #e9dfd4;
+      border-radius: 17px;
+      margin-bottom: 23px;
     }
 
-    .pending-count {
-      font-size: 16px;
+    .review-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .review-tab {
+      border: 1px solid #e0d3c7;
+      border-radius: 11px;
+      background: #f8f5f0;
+      color: #604633;
+      padding: 12px 15px;
+      cursor: pointer;
+      font-size: 12px;
       font-weight: 800;
+    }
+
+    .review-tab.active {
+      background: #8b5b3a;
+      color: #fff;
+      border-color: #8b5b3a;
     }
 
     .refresh-btn {
+      background: #302117;
+      color: white;
       border: 0;
       border-radius: 11px;
-      background: #8b5b3a;
-      color: white;
-      padding: 12px 20px;
-      cursor: pointer;
+      padding: 12px 18px;
+      font-size: 12px;
       font-weight: 800;
+      cursor: pointer;
     }
 
-    .refresh-btn:disabled {
-      opacity: .55;
+    .refresh-btn:disabled,
+    .action-btn:disabled {
       cursor: not-allowed;
+      opacity: .55;
+    }
+
+    .results-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .results-heading h2 {
+      margin: 0;
+      font-size: 21px;
+    }
+
+    #reviewCount {
+      color: #81776f;
+      font-size: 13px;
+      font-weight: 700;
     }
 
     .review-card {
-      background: white;
+      background: #fff;
       border: 1px solid #e7dbcf;
       border-radius: 20px;
-      padding: 25px;
+      padding: 24px;
       margin-bottom: 18px;
       box-shadow:
         0 10px 28px rgba(48, 33, 23, .05);
     }
 
-    .review-top {
+    .review-card-top {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 15px;
     }
 
     .product-name {
       font-size: 19px;
       font-weight: 900;
+      line-height: 1.5;
     }
 
     .customer-name {
-      margin-top: 9px;
+      margin-top: 8px;
       color: #62574f;
       font-size: 14px;
     }
 
-    .rating {
-      color: #e2a32b;
-      font-size: 26px;
+    .order-id {
+      margin-top: 7px;
+      font-size: 12px;
+      color: #81776f;
+    }
+
+    .rating-stars {
+      color: #dda124;
+      font-size: 25px;
       letter-spacing: 2px;
     }
 
-    .verified {
-      display: inline-block;
-      margin-top: 11px;
-      color: #237448;
-      background: #eaf7ef;
-      padding: 7px 11px;
-      border-radius: 9px;
+    .rating-number {
+      color: #604633;
       font-size: 12px;
+      font-weight: 800;
+      margin-top: 5px;
+    }
+
+    .review-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 15px 0;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      padding: 8px 11px;
+      border-radius: 9px;
+      font-size: 11px;
       font-weight: 800;
     }
 
+    .status-pending {
+      background: #fff1d5;
+      color: #956100;
+    }
+
+    .status-approved {
+      background: #e8f6ed;
+      color: #166534;
+    }
+
+    .status-rejected {
+      background: #fff0ef;
+      color: #b42318;
+    }
+
+    .verified-badge {
+      background: #e8f6ed;
+      color: #166534;
+    }
+
     .review-title {
-      margin: 20px 0 8px;
       font-size: 17px;
+      margin: 19px 0 9px;
     }
 
     .review-comment {
-      color: #50443b;
-      line-height: 1.7;
       white-space: pre-wrap;
       overflow-wrap: anywhere;
+      line-height: 1.7;
+      color: #51453c;
+      font-size: 14px;
     }
 
-    .review-images {
+    .review-photos {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 11px;
       margin: 18px 0;
     }
 
-    .review-images img {
-      width: 125px;
-      height: 125px;
-      object-fit: cover;
+    .review-photos img {
+      width: 115px;
+      height: 115px;
       border-radius: 12px;
       border: 1px solid #eee;
+      object-fit: cover;
     }
 
     .review-date {
       color: #93867c;
       font-size: 12px;
-      margin: 15px 0;
+      margin-top: 14px;
     }
 
     .review-actions {
       display: flex;
-      gap: 12px;
+      gap: 11px;
       flex-wrap: wrap;
       border-top: 1px solid #eee4dc;
-      padding-top: 20px;
+      padding-top: 18px;
+      margin-top: 18px;
     }
 
     .action-btn {
-      padding: 13px 24px;
+      padding: 13px 23px;
       border-radius: 11px;
-      border: none;
+      border: 0;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .approve-btn {
+      color: white;
+      background: #237448;
+    }
+
+    .reject-btn {
+      color: #b42318;
+      background: #fff0ef;
+      border: 1px solid #f0cbc8;
+    }
+
+    .message-box {
+      padding: 30px 20px;
+      background: white;
+      border: 1px solid #e9dfd4;
+      border-radius: 17px;
+      color: #81776f;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .message-box.error {
+      color: #b42318;
+    }
+
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding: 22px 0;
+    }
+
+    .pagination button {
+      border: 1px solid #dfd2c6;
+      background: white;
+      border-radius: 11px;
+      padding: 11px 19px;
       cursor: pointer;
       font-weight: 800;
     }
 
-    .approve-btn {
-      background: #237448;
-      color: white;
-    }
-
-    .reject-btn {
-      background: #fff0ef;
-      color: #b42318;
-      border: 1px solid #f0cbc8;
-    }
-
-    .action-btn:disabled {
-      opacity: .5;
+    .pagination button:disabled {
+      opacity: .45;
       cursor: not-allowed;
     }
 
-    .message-box {
-      background: white;
-      border: 1px solid #e7dbcf;
-      border-radius: 17px;
-      padding: 25px;
-      text-align: center;
-      color: #77685c;
-      line-height: 1.6;
-    }
-
-    .error-message {
-      color: #b42318;
+    #pageInfo {
+      font-size: 13px;
+      font-weight: 800;
     }
 
     .page-footer {
       text-align: center;
-      padding: 25px;
-      color: #8a8078;
+      color: #93867c;
+      padding: 30px;
       font-size: 12px;
     }
 
+    @media (max-width: 800px) {
+      .review-stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
     @media (max-width: 600px) {
+      .container-reviews {
+        margin-top: 22px;
+      }
+
       .review-card {
         padding: 17px;
       }
 
-      .review-images img {
-        width: 95px;
-        height: 95px;
+      .review-toolbar {
+        padding: 13px;
+      }
+
+      .review-tab {
+        flex: 1;
+      }
+
+      .review-photos img {
+        width: 90px;
+        height: 90px;
       }
 
       .action-btn {
@@ -263,6 +411,7 @@
       }
     }
   </style>
+
 </head>
 
 <body>
@@ -284,53 +433,128 @@
         class="back-link"
         href="/memora-creations/admin/dashboard.html"
       >
-        ← Back to Dashboard
+        ← Dashboard
       </a>
 
     </div>
 
   </header>
 
-  <!-- MAIN -->
+  <main class="container-reviews">
 
-  <main class="reviews-container">
+    <!-- PAGE TITLE -->
 
-    <div class="page-heading">
+    <section class="page-title">
 
       <h1>
-        Customer Reviews Management
+        Customer Reviews
       </h1>
 
       <p>
-        Review customer ratings, written feedback
-        and uploaded product photos before
-        publishing them.
+        Manage customer product reviews,
+        star ratings, uploaded photos
+        and complete review history.
       </p>
 
-    </div>
+    </section>
 
-    <!-- TOOLBAR -->
+    <!-- REVIEW STATISTICS -->
 
-    <section class="reviews-toolbar">
+    <section class="review-stats">
+
+      <div class="stat-card">
+        <span>Total Reviews</span>
+        <strong id="totalReviews">—</strong>
+      </div>
+
+      <div class="stat-card">
+        <span>Pending</span>
+        <strong id="pendingReviews">—</strong>
+      </div>
+
+      <div class="stat-card">
+        <span>Approved</span>
+        <strong id="approvedReviews">—</strong>
+      </div>
+
+      <div class="stat-card">
+        <span>Rejected</span>
+        <strong id="rejectedReviews">—</strong>
+      </div>
+
+    </section>
+
+    <!-- REVIEW FILTERS -->
+
+    <section class="review-toolbar">
 
       <div
-        id="pendingCount"
-        class="pending-count"
+        class="review-tabs"
+        role="group"
+        aria-label="Review status filter"
       >
-        Loading reviews...
+
+        <button
+          type="button"
+          class="review-tab active"
+          data-status="ALL"
+          aria-pressed="true"
+        >
+          All Reviews
+        </button>
+
+        <button
+          type="button"
+          class="review-tab"
+          data-status="PENDING"
+          aria-pressed="false"
+        >
+          Pending
+        </button>
+
+        <button
+          type="button"
+          class="review-tab"
+          data-status="APPROVED"
+          aria-pressed="false"
+        >
+          Approved
+        </button>
+
+        <button
+          type="button"
+          class="review-tab"
+          data-status="REJECTED"
+          aria-pressed="false"
+        >
+          Rejected
+        </button>
+
       </div>
 
       <button
+        type="button"
         id="refreshReviews"
         class="refresh-btn"
-        type="button"
       >
-        Refresh Reviews
+        Refresh
       </button>
 
     </section>
 
-    <!-- REVIEWS LIST -->
+    <!-- REVIEW LIST -->
+
+    <section class="results-heading">
+
+      <h2 id="resultsTitle">
+        All Customer Reviews
+      </h2>
+
+      <span id="reviewCount">
+        Loading...
+      </span>
+
+    </section>
 
     <section
       id="reviewsList"
@@ -338,15 +562,44 @@
     >
 
       <div class="message-box">
-        Loading pending customer reviews...
+        Loading customer reviews...
       </div>
 
     </section>
 
+    <!-- PAGINATION -->
+
+    <nav
+      class="pagination"
+      aria-label="Review pages"
+    >
+
+      <button
+        type="button"
+        id="previousPage"
+        disabled
+      >
+        Previous
+      </button>
+
+      <span id="pageInfo">
+        Page 1
+      </span>
+
+      <button
+        type="button"
+        id="nextPage"
+        disabled
+      >
+        Next
+      </button>
+
+    </nav>
+
   </main>
 
   <footer class="page-footer">
-    © MEMORA CREATIONS — Reviews Management
+    © MEMORA CREATIONS — Customer Reviews Management
   </footer>
 
   <!-- COMMON API -->
@@ -355,13 +608,13 @@
     src="/memora-creations/frontend/js/app.js?v=11"
   ></script>
 
-  <!-- ADMIN LOGIN CHECK -->
+  <!-- ADMIN AUTH -->
 
   <script
     src="/memora-creations/admin/js/auth.js?v=5"
   ></script>
 
-  <!-- REVIEWS ADMIN SCRIPT -->
+  <!-- CUSTOMER REVIEWS MANAGEMENT -->
 
   <script>
     (function () {
@@ -371,67 +624,142 @@
         document.querySelector(selector);
 
       const list = $('#reviewsList');
-      const count = $('#pendingCount');
-      const refresh = $('#refreshReviews');
 
-      let busy = false;
+      let activeStatus = 'ALL';
+      let currentPage = 1;
+      let totalPages = 1;
+      let requestNumber = 0;
+      let actionBusy = false;
 
-      function create(tag, className, content) {
-        const element = document.createElement(tag);
+      const PAGE_LIMIT = 20;
+
+      const titles = {
+        ALL: 'All Customer Reviews',
+        PENDING: 'Pending Reviews',
+        APPROVED: 'Approved Reviews',
+        REJECTED: 'Rejected Reviews'
+      };
+
+      function element(tag, className, value) {
+
+        const node = document.createElement(tag);
 
         if (className) {
-          element.className = className;
+          node.className = className;
         }
 
-        if (content !== undefined) {
-          element.textContent = String(content);
+        if (value !== undefined) {
+          node.textContent = String(value);
         }
 
-        return element;
+        return node;
       }
 
-      function showMessage(message, isError = false) {
-        const box = create(
-          'div',
-          'message-box' +
-            (isError ? ' error-message' : ''),
-          message
-        );
+      function showMessage(message, error = false) {
 
-        list.replaceChildren(box);
+        list.replaceChildren(
+          element(
+            'div',
+            'message-box' + (error ? ' error' : ''),
+            message
+          )
+        );
       }
 
       function formatDate(value) {
-        if (!value) return '-';
+
+        if (!value) return '—';
 
         const date = new Date(value);
 
         if (Number.isNaN(date.getTime())) {
-          return '-';
+          return '—';
         }
 
-        return date.toLocaleString('en-IN');
+        return date.toLocaleString('en-IN', {
+          dateStyle: 'medium',
+          timeStyle: 'short'
+        });
       }
 
-      function stars(rating) {
-        const value = Math.max(
+      function formatRating(rating) {
+
+        const number = Math.max(
           0,
-          Math.min(5, Math.round(Number(rating) || 0))
+          Math.min(
+            5,
+            Math.round(Number(rating) || 0)
+          )
         );
 
-        return '★'.repeat(value) +
-          '☆'.repeat(5 - value);
+        return {
+          number,
+          stars:
+            '★'.repeat(number) +
+            '☆'.repeat(5 - number)
+        };
+      }
+
+      function badge(text, className) {
+
+        return element(
+          'span',
+          'status-badge ' + className,
+          text
+        );
+      }
+
+      function updateTabs() {
+
+        document.querySelectorAll(
+          '.review-tab'
+        ).forEach(button => {
+
+          const selected =
+            button.dataset.status === activeStatus;
+
+          button.classList.toggle(
+            'active',
+            selected
+          );
+
+          button.setAttribute(
+            'aria-pressed',
+            String(selected)
+          );
+        });
+
+        $('#resultsTitle').textContent =
+          titles[activeStatus];
+      }
+
+      function updateSummary(summary = {}) {
+
+        $('#totalReviews').textContent =
+          Number(summary.totalReviews || 0);
+
+        $('#pendingReviews').textContent =
+          Number(summary.pending || 0);
+
+        $('#approvedReviews').textContent =
+          Number(summary.approved || 0);
+
+        $('#rejectedReviews').textContent =
+          Number(summary.rejected || 0);
       }
 
       /*
       ==========================================
-       APPROVE OR REJECT
+       REVIEW APPROVAL
       ==========================================
       */
 
-      async function updateStatus(review, status, card) {
+      async function updateReviewStatus(
+        review,
+        status
+      ) {
 
-        if (busy) return;
+        if (actionBusy) return;
 
         const action =
           status === 'APPROVED'
@@ -439,20 +767,12 @@
             : 'Reject';
 
         if (!window.confirm(
-          action + ' this review?'
+          action + ' this customer review?'
         )) {
           return;
         }
 
-        busy = true;
-
-        const buttons = card.querySelectorAll(
-          '.action-btn'
-        );
-
-        buttons.forEach(button => {
-          button.disabled = true;
-        });
+        actionBusy = true;
 
         try {
 
@@ -471,105 +791,145 @@
           window.MC.toast(
             'Review ' +
               (status === 'APPROVED'
-                ? 'approved.'
-                : 'rejected.'),
+                ? 'approved successfully.'
+                : 'rejected successfully.'),
             'success'
           );
 
-          card.remove();
-
-          const remaining =
-            list.querySelectorAll(
-              '.review-card'
-            ).length;
-
-          count.textContent =
-            remaining + ' pending reviews';
-
-          if (!remaining) {
-            showMessage(
-              'No pending reviews. All caught up!'
-            );
-          }
+          await loadReviews();
 
         } catch (err) {
 
           window.MC.toast(
             err.message ||
-              'Review status update failed.',
+              'Unable to update review.',
             'error'
           );
 
-          buttons.forEach(button => {
-            button.disabled = false;
-          });
-
         } finally {
-          busy = false;
+
+          actionBusy = false;
         }
       }
 
       /*
       ==========================================
-       CREATE REVIEW CARD
+       REVIEW CARD
       ==========================================
       */
 
       function renderReview(review) {
 
-        const card = create(
+        const card = element(
           'article',
           'review-card'
         );
 
-        const top = create(
+        const top = element(
           'div',
-          'review-top'
+          'review-card-top'
         );
 
-        const details = create('div');
+        const information = element('div');
 
-        const productName = create(
-          'div',
-          'product-name',
-          review.product?.name ||
-            'Product unavailable'
+        information.append(
+          element(
+            'div',
+            'product-name',
+            review.product?.name ||
+              'Product unavailable'
+          ),
+
+          element(
+            'div',
+            'customer-name',
+            'Customer: ' +
+              (review.user?.fullName || 'Customer')
+          ),
+
+          element(
+            'div',
+            'order-id',
+            'Order: ' +
+              (review.order?.orderId || 'Unavailable')
+          )
         );
 
-        const customerName = create(
-          'div',
-          'customer-name',
-          'Customer: ' +
-            (review.user?.fullName || 'Customer')
+        const ratingBox = element('div');
+
+        const rating = formatRating(
+          review.rating
         );
 
-        details.append(
-          productName,
-          customerName
+        ratingBox.append(
+          element(
+            'div',
+            'rating-stars',
+            rating.stars
+          ),
+
+          element(
+            'div',
+            'rating-number',
+            rating.number + '/5 Stars'
+          )
         );
 
-        const rating = create(
-          'div',
-          'rating',
-          stars(review.rating)
-        );
-
-        top.append(details, rating);
+        top.append(information, ratingBox);
 
         card.append(top);
 
-        if (review.verifiedPurchase) {
-          card.append(
-            create(
-              'div',
-              'verified',
-              '✓ Verified Purchase'
+        const badges = element(
+          'div',
+          'review-badges'
+        );
+
+        const status = String(
+          review.status || 'PENDING'
+        ).toUpperCase();
+
+        if (status === 'APPROVED') {
+
+          badges.append(
+            badge(
+              '✓ Approved',
+              'status-approved'
+            )
+          );
+
+        } else if (status === 'REJECTED') {
+
+          badges.append(
+            badge(
+              '✕ Rejected',
+              'status-rejected'
+            )
+          );
+
+        } else {
+
+          badges.append(
+            badge(
+              'Awaiting Approval',
+              'status-pending'
             )
           );
         }
 
+        if (review.verifiedPurchase) {
+
+          badges.append(
+            badge(
+              '✓ Verified Purchase',
+              'verified-badge'
+            )
+          );
+        }
+
+        card.append(badges);
+
         card.append(
-          create(
+          element(
             'h3',
             'review-title',
             review.title || 'Product Review'
@@ -577,49 +937,66 @@
         );
 
         card.append(
-          create(
+          element(
             'p',
             'review-comment',
             review.comment || ''
           )
         );
 
-        const gallery = create(
+        /*
+          CUSTOMER REVIEW PHOTOS
+        */
+
+        const gallery = element(
           'div',
-          'review-images'
+          'review-photos'
         );
 
-        for (const url of review.photos || []) {
+        for (const photo of review.photos || []) {
+
+          if (typeof photo !== 'string') {
+            continue;
+          }
+
+          let url;
+
+          try {
+            url = new URL(photo);
+          } catch {
+            continue;
+          }
 
           if (
-            typeof url !== 'string' ||
-            !url.startsWith(
-              'https://res.cloudinary.com/'
-            )
+            url.protocol !== 'https:' ||
+            url.hostname !== 'res.cloudinary.com'
           ) {
             continue;
           }
 
-          const link = create('a');
+          const link = element('a');
 
-          link.href = url;
+          link.href = url.href;
           link.target = '_blank';
           link.rel = 'noopener noreferrer';
 
-          const image = create('img');
+          const image = element('img');
 
-          image.src = url;
+          image.src = url.href;
           image.alt = 'Customer review photo';
           image.loading = 'lazy';
 
           link.append(image);
+
           gallery.append(link);
         }
 
-        card.append(gallery);
+        if (gallery.childElementCount) {
+          card.append(gallery);
+        }
 
         card.append(
-          create(
+          element(
             'div',
             'review-date',
             'Submitted: ' +
@@ -627,132 +1004,262 @@
           )
         );
 
-        const actions = create(
-          'div',
-          'review-actions'
-        );
+        if (status === 'APPROVED') {
 
-        const approve = create(
-          'button',
-          'action-btn approve-btn',
-          '✓ Approve Review'
-        );
+          card.append(
+            element(
+              'div',
+              'review-date',
+              'Approved: ' +
+                formatDate(review.approvedAt)
+            )
+          );
+        }
 
-        approve.type = 'button';
+        /*
+          SHOW ACTION BUTTONS
+          FOR PENDING REVIEWS ONLY
+        */
 
-        approve.addEventListener(
-          'click',
-          () => updateStatus(
-            review,
-            'APPROVED',
-            card
-          )
-        );
+        if (status === 'PENDING') {
 
-        const reject = create(
-          'button',
-          'action-btn reject-btn',
-          '✕ Reject Review'
-        );
+          const actions = element(
+            'div',
+            'review-actions'
+          );
 
-        reject.type = 'button';
+          const approve = element(
+            'button',
+            'action-btn approve-btn',
+            '✓ Approve'
+          );
 
-        reject.addEventListener(
-          'click',
-          () => updateStatus(
-            review,
-            'REJECTED',
-            card
-          )
-        );
+          approve.type = 'button';
 
-        actions.append(approve, reject);
+          approve.addEventListener(
+            'click',
+            () => updateReviewStatus(
+              review,
+              'APPROVED'
+            )
+          );
 
-        card.append(actions);
+          const reject = element(
+            'button',
+            'action-btn reject-btn',
+            '✕ Reject'
+          );
+
+          reject.type = 'button';
+
+          reject.addEventListener(
+            'click',
+            () => updateReviewStatus(
+              review,
+              'REJECTED'
+            )
+          );
+
+          actions.append(approve, reject);
+
+          card.append(actions);
+        }
 
         return card;
       }
 
       /*
       ==========================================
-       LOAD PENDING REVIEWS
+       LOAD REVIEW HISTORY
       ==========================================
       */
 
       async function loadReviews() {
 
+        const requestId = ++requestNumber;
+
+        const refresh = $('#refreshReviews');
+
         refresh.disabled = true;
 
-        count.textContent =
-          'Loading pending reviews...';
+        $('#reviewCount').textContent =
+          'Loading...';
 
-        showMessage('Loading reviews...');
+        showMessage(
+          'Loading customer reviews...'
+        );
 
         try {
 
           const admin =
             await window.requireAdmin();
 
-          if (!admin) return;
+          if (!admin) {
+            return;
+          }
+
+          const query =
+            '?status=' +
+            encodeURIComponent(activeStatus) +
+            '&page=' +
+            currentPage +
+            '&limit=' +
+            PAGE_LIMIT;
 
           const data = await window.MC.api(
-            '/reviews/admin/pending'
+            '/reviews/admin/history' + query
           );
+
+          if (requestId !== requestNumber) {
+            return;
+          }
 
           const reviews =
             Array.isArray(data.reviews)
               ? data.reviews
               : [];
 
-          count.textContent =
-            reviews.length + ' pending reviews';
+          updateSummary(data.summary);
+
+          const pagination =
+            data.pagination || {};
+
+          totalPages = Math.max(
+            1,
+            Number(pagination.pages) || 1
+          );
+
+          $('#reviewCount').textContent =
+            (Number(pagination.total) || 0) +
+            ' reviews';
+
+          $('#pageInfo').textContent =
+            'Page ' +
+            currentPage +
+            ' of ' +
+            totalPages;
+
+          $('#previousPage').disabled =
+            currentPage <= 1;
+
+          $('#nextPage').disabled =
+            currentPage >= totalPages;
 
           list.replaceChildren();
 
           if (!reviews.length) {
 
             showMessage(
-              'No pending reviews. All caught up!'
+              activeStatus === 'ALL'
+                ? 'No customer reviews found.'
+                : 'No ' +
+                  activeStatus.toLowerCase() +
+                  ' reviews found.'
             );
 
             return;
           }
 
-          for (const review of reviews) {
+          reviews.forEach(review => {
             list.append(
               renderReview(review)
             );
-          }
+          });
 
         } catch (err) {
 
-          count.textContent =
+          if (requestId !== requestNumber) {
+            return;
+          }
+
+          $('#reviewCount').textContent =
             'Unable to load reviews';
 
           showMessage(
             err.message ||
-              'Failed to load reviews.',
+              'Review history could not be loaded.',
             true
           );
 
         } finally {
 
-          refresh.disabled = false;
-
+          if (requestId === requestNumber) {
+            refresh.disabled = false;
+          }
         }
       }
 
       /*
       ==========================================
-       START
+       FILTER BUTTONS
       ==========================================
       */
 
-      refresh.addEventListener(
+      document.querySelectorAll(
+        '.review-tab'
+      ).forEach(button => {
+
+        button.addEventListener(
+          'click',
+          () => {
+
+            activeStatus =
+              button.dataset.status;
+
+            currentPage = 1;
+
+            updateTabs();
+            loadReviews();
+          }
+        );
+      });
+
+      /*
+      ==========================================
+       REFRESH
+      ==========================================
+      */
+
+      $('#refreshReviews').addEventListener(
         'click',
         loadReviews
       );
 
+      /*
+      ==========================================
+       PAGINATION
+      ==========================================
+      */
+
+      $('#previousPage').addEventListener(
+        'click',
+        () => {
+
+          if (currentPage <= 1) return;
+
+          currentPage--;
+          loadReviews();
+        }
+      );
+
+      $('#nextPage').addEventListener(
+        'click',
+        () => {
+
+          if (currentPage >= totalPages) return;
+
+          currentPage++;
+          loadReviews();
+        }
+      );
+
+      /*
+      ==========================================
+       INITIALIZE
+      ==========================================
+      */
+
+      updateTabs();
       loadReviews();
 
     })();
