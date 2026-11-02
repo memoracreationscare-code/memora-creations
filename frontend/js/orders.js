@@ -5,23 +5,42 @@
  CUSTOMER MY ORDERS
 
  COD + CASHFREE + RAZORPAY
-
  COD CANCEL ORDER
  CASHFREE CANCEL REQUEST
  ORDER TRACKING
  PRODUCT DETAILS
  PAYMENT STATUS
+
+ NEW:
+ VERIFIED DELIVERED PRODUCT REVIEWS
+ 1-5 STAR RATING
+ REVIEW PHOTOS
+ ADMIN APPROVAL
+
+ REVIEW CONDITION:
+ orderStatus === 'Delivered'
+ paymentStatus === 'SUCCESS'
 =========================================
 */
 
 const ORDERS_BASE = '/memora-creations';
 
+const ORDERS_API =
+  'https://memora-creations.onrender.com/api';
+
 const orderUI = window.MC;
 
 let orderActionRunning = false;
 
+let orderReviewRunning = false;
+
 const CASHFREE_REQUEST_MARKER =
   'CUSTOMER_CASHFREE_CANCEL_REQUEST';
+
+const REVIEW_MAX_PHOTOS = 3;
+
+const REVIEW_MAX_FILE_SIZE =
+  5 * 1024 * 1024;
 
 
 /* =====================================
@@ -39,6 +58,7 @@ function installOrderActionStyles() {
   style.id = 'mc-order-action-css';
 
   style.textContent = `
+
     .mc-cancel-request-btn {
       display: inline-flex;
       align-items: center;
@@ -108,12 +128,175 @@ function installOrderActionStyles() {
       gap: 10px;
     }
 
+    /* =============================
+       VERIFIED PRODUCT REVIEWS
+    ============================= */
+
+    .mc-order-review-area {
+      margin-top: 14px;
+      padding: 14px;
+      background: #faf6f2;
+      border: 1px solid #eadccd;
+      border-radius: 14px;
+    }
+
+    .mc-review-verified {
+      display: block;
+      color: #237448;
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .mc-write-review {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 11px 18px;
+      background: #8b5b3a;
+      color: white;
+      border: 0;
+      border-radius: 11px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .mc-write-review:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
+    .mc-review-form {
+      padding: 18px;
+      margin-top: 14px;
+      border: 1px solid #e9dbce;
+      border-radius: 14px;
+      background: white;
+    }
+
+    .mc-review-form h4 {
+      margin: 0 0 13px;
+      font-size: 17px;
+      color: #302117;
+    }
+
+    .mc-review-form label {
+      display: block;
+      font-weight: 800;
+      font-size: 13px;
+      margin: 13px 0 7px;
+      color: #49382e;
+    }
+
+    .mc-review-form input[type="text"],
+    .mc-review-form textarea {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #dacfc4;
+      border-radius: 11px;
+      background: white;
+      color: #302117;
+      font: inherit;
+    }
+
+    .mc-review-form textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .mc-review-form input[type="file"] {
+      max-width: 100%;
+      font-size: 12px;
+    }
+
+    .mc-review-stars {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .mc-review-star {
+      border: 0;
+      background: transparent;
+      padding: 3px;
+      font-size: 34px;
+      color: #cfc5b9;
+      cursor: pointer;
+    }
+
+    .mc-review-star.selected {
+      color: #e2a32b;
+    }
+
+    .mc-review-form-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .mc-review-submit {
+      padding: 12px 20px;
+      border: 0;
+      border-radius: 11px;
+      background: #237448;
+      color: white;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .mc-review-cancel {
+      padding: 12px 20px;
+      border: 1px solid #e0d3c8;
+      border-radius: 11px;
+      background: #f5efea;
+      color: #302117;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .mc-review-submit:disabled,
+    .mc-review-cancel:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
+    .mc-review-message {
+      display: block;
+      margin-top: 10px;
+      font-size: 12px;
+      color: #805b40;
+      line-height: 1.5;
+    }
+
+    .mc-review-complete {
+      display: inline-block;
+      padding: 10px 13px;
+      color: #166534;
+      background: #e9f7ee;
+      border: 1px solid #bddcc9;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
     @media (max-width: 600px) {
+
       .order-actions > a,
       .order-actions > button,
       .order-actions > span {
         width: 100%;
         justify-content: center;
+      }
+
+      .mc-review-form {
+        padding: 13px;
+      }
+
+      .mc-review-form-actions > button {
+        flex: 1;
       }
     }
   `;
@@ -276,6 +459,97 @@ function canRequestCashfreeCancel(order) {
 
 
 /* =====================================
+   REVIEW ELIGIBILITY
+
+   STRICT:
+   SUCCESSFULLY DELIVERED
+   AND PAYMENT SUCCESS
+
+   NEVER SHOW ON:
+   PENDING
+   CONFIRMED
+   PACKED
+   SHIPPED
+   OUT FOR DELIVERY
+   CANCELLED
+   UNPAID
+===================================== */
+
+function canReviewDeliveredOrder(order) {
+
+  return (
+    order.orderStatus === 'Delivered' &&
+    order.paymentStatus === 'SUCCESS' &&
+    [
+      'COD',
+      'CASHFREE',
+      'RAZORPAY'
+    ].includes(order.paymentMethod)
+  );
+}
+
+
+/* =====================================
+   VALID PRODUCT ID
+===================================== */
+
+function getReviewProductId(item) {
+
+  const product = item?.product;
+
+  const id =
+    typeof product === 'string'
+      ? product
+      : product?._id || '';
+
+  const result = String(id);
+
+  return /^[a-fA-F0-9]{24}$/.test(result)
+    ? result
+    : '';
+}
+
+
+/* =====================================
+   REVIEW BUTTON PER DELIVERED PRODUCT
+===================================== */
+
+function deliveredReviewHtml(order, item) {
+
+  if (!canReviewDeliveredOrder(order)) {
+    return '';
+  }
+
+  const productId = getReviewProductId(item);
+
+  if (!productId) {
+    return '';
+  }
+
+  return `
+    <div class="mc-order-review-area"
+      data-review-product="${orderUI.esc(productId)}">
+
+      <span class="mc-review-verified">
+        ✓ Successfully Delivered · Payment Confirmed
+      </span>
+
+      <button
+        type="button"
+        class="mc-write-review"
+        data-product-id="${orderUI.esc(productId)}"
+      >
+        ⭐ Write Review
+      </button>
+
+      <div class="mc-review-form-holder"></div>
+
+    </div>
+  `;
+}
+
+
+/* =====================================
    ORDER PRODUCTS HTML
 ===================================== */
 
@@ -336,6 +610,9 @@ function orderProductsHtml(order) {
             </span>
 
           </div>
+
+          ${deliveredReviewHtml(order, item)}
+
         </div>
 
         <div class="order-product-total">
@@ -648,6 +925,7 @@ async function loadOrdersPage() {
       .join('');
 
     bindOrderActionButtons();
+    bindDeliveredReviewButtons();
 
   } catch (error) {
 
@@ -726,12 +1004,6 @@ function askOrderConfirmation({
 
     overlay.className =
       'cancel-popup-overlay';
-
-    /*
-      Message strings below are
-      controlled by our own code,
-      never supplied by customer data.
-    */
 
     overlay.innerHTML = `
       <div class="cancel-popup"
@@ -951,7 +1223,6 @@ async function requestCashfreeCancellation(
   if (orderActionRunning) return;
 
   const confirmed = await askOrderConfirmation({
-    // MC_PAID_CASHFREE_REQUEST_V1
     title: 'Request Cancellation / Refund Review?',
     message:
       'Request admin ko bheji jayegi. Paid order ka refund ' +
@@ -1024,7 +1295,7 @@ async function requestCashfreeCancellation(
 
 
 /* =====================================
-   BIND ORDER ACTION BUTTONS
+   BIND ORIGINAL ORDER ACTION BUTTONS
 ===================================== */
 
 function bindOrderActionButtons() {
@@ -1064,6 +1335,605 @@ function bindOrderActionButtons() {
 
     }
   );
+}
+
+
+/* =====================================
+   DELIVERED REVIEW HELPERS
+===================================== */
+
+function reviewMessage(holder, message) {
+
+  holder.replaceChildren();
+
+  const box = document.createElement('div');
+
+  box.className = 'mc-review-message';
+
+  box.textContent = message;
+
+  holder.appendChild(box);
+}
+
+
+function markProductReviewed(productId) {
+
+  document.querySelectorAll(
+    '.mc-write-review'
+  ).forEach(button => {
+
+    if (button.dataset.productId !== productId) {
+      return;
+    }
+
+    button.textContent = '✓ Review Submitted';
+    button.disabled = true;
+
+    const area = button.closest(
+      '.mc-order-review-area'
+    );
+
+    const holder = area?.querySelector(
+      '.mc-review-form-holder'
+    );
+
+    if (holder) {
+      reviewMessage(
+        holder,
+        'Review submitted for admin approval.'
+      );
+    }
+
+  });
+}
+
+
+/* =====================================
+   REVIEW STAR FORM
+
+   APPEARS ONLY AFTER BACKEND
+   ELIGIBILITY CONFIRMATION
+===================================== */
+
+function showDeliveredReviewForm(
+  button,
+  productId
+) {
+
+  const area = button.closest(
+    '.mc-order-review-area'
+  );
+
+  const holder = area?.querySelector(
+    '.mc-review-form-holder'
+  );
+
+  if (!holder) return;
+
+  if (holder.querySelector('form')) {
+    holder.replaceChildren();
+    return;
+  }
+
+  holder.innerHTML = `
+    <form class="mc-review-form">
+
+      <h4>
+        Rate Your Delivered Product
+      </h4>
+
+      <label>
+        Star Rating *
+      </label>
+
+      <div
+        class="mc-review-stars"
+        role="group"
+        aria-label="Choose product rating"
+      >
+
+        ${[1, 2, 3, 4, 5].map(number => `
+
+          <button
+            type="button"
+            class="mc-review-star"
+            data-rating="${number}"
+            aria-label="${number} stars"
+            aria-pressed="false"
+          >
+            ★
+          </button>
+
+        `).join('')}
+
+      </div>
+
+      <input
+        type="hidden"
+        name="rating"
+        value="0"
+      >
+
+      <label>
+        Review Title
+      </label>
+
+      <input
+        type="text"
+        name="title"
+        maxlength="120"
+        placeholder="Great product"
+      >
+
+      <label>
+        Your Review *
+      </label>
+
+      <textarea
+        name="comment"
+        minlength="10"
+        maxlength="1500"
+        placeholder="Product kaisa laga? Apna experience likhein..."
+        required
+      ></textarea>
+
+      <label>
+        Product Photos (Optional)
+      </label>
+
+      <input
+        type="file"
+        name="photos"
+        accept="image/jpeg,image/png,image/webp"
+        multiple
+      >
+
+      <p class="mc-review-message">
+        Maximum 3 photos, each up to 5 MB.
+      </p>
+
+      <div class="mc-review-form-actions">
+
+        <button
+          type="submit"
+          class="mc-review-submit"
+        >
+          Submit Review
+        </button>
+
+        <button
+          type="button"
+          class="mc-review-cancel"
+        >
+          Close
+        </button>
+
+      </div>
+
+      <p
+        class="mc-review-message mc-review-progress"
+        role="status"
+        aria-live="polite"
+      ></p>
+
+    </form>
+  `;
+
+  const form = holder.querySelector('form');
+
+  const ratingInput = form.querySelector(
+    '[name="rating"]'
+  );
+
+  const stars = form.querySelectorAll(
+    '.mc-review-star'
+  );
+
+  stars.forEach(star => {
+
+    star.addEventListener('click', () => {
+
+      const selected = Number(
+        star.dataset.rating
+      );
+
+      ratingInput.value = String(selected);
+
+      stars.forEach(item => {
+
+        const number = Number(
+          item.dataset.rating
+        );
+
+        item.classList.toggle(
+          'selected',
+          number <= selected
+        );
+
+        item.setAttribute(
+          'aria-pressed',
+          String(number === selected)
+        );
+
+      });
+
+    });
+
+  });
+
+  form.querySelector(
+    '.mc-review-cancel'
+  ).addEventListener('click', () => {
+
+    if (orderReviewRunning) return;
+
+    holder.replaceChildren();
+
+  });
+
+  form.addEventListener('submit', async event => {
+
+    event.preventDefault();
+
+    await submitDeliveredReview(
+      form,
+      productId
+    );
+
+  });
+}
+
+
+/* =====================================
+   UPLOAD REVIEW PHOTO
+===================================== */
+
+async function uploadDeliveredReviewPhoto(
+  productId,
+  file
+) {
+
+  const form = new FormData();
+
+  form.append('photo', file);
+
+  const response = await fetch(
+    ORDERS_API +
+    '/reviews/product/' +
+    encodeURIComponent(productId) +
+    '/photo',
+    {
+      method: 'POST',
+      credentials: 'include',
+      body: form
+    }
+  );
+
+  const result = await response.json()
+    .catch(() => ({}));
+
+  if (!response.ok || !result.url) {
+
+    throw new Error(
+      result.message ||
+      'Photo upload failed.'
+    );
+
+  }
+
+  return result.url;
+}
+
+
+/* =====================================
+   SUBMIT DELIVERED PRODUCT REVIEW
+
+   SERVER RECHECKS VERIFIED PURCHASE
+===================================== */
+
+async function submitDeliveredReview(
+  form,
+  productId
+) {
+
+  if (orderReviewRunning) {
+    return;
+  }
+
+  const rating = Number(
+    form.querySelector('[name="rating"]').value
+  );
+
+  const title = form.querySelector(
+    '[name="title"]'
+  ).value.trim();
+
+  const comment = form.querySelector(
+    '[name="comment"]'
+  ).value.trim();
+
+  const files = Array.from(
+    form.querySelector('[name="photos"]').files || []
+  );
+
+  if (
+    !Number.isInteger(rating) ||
+    rating < 1 ||
+    rating > 5
+  ) {
+
+    orderUI.toast(
+      'Please select 1 to 5 stars.',
+      'error'
+    );
+
+    return;
+  }
+
+  if (
+    comment.length < 10 ||
+    comment.length > 1500
+  ) {
+
+    orderUI.toast(
+      'Review must contain 10 to 1500 characters.',
+      'error'
+    );
+
+    return;
+  }
+
+  if (files.length > REVIEW_MAX_PHOTOS) {
+
+    orderUI.toast(
+      'Maximum 3 photos allowed.',
+      'error'
+    );
+
+    return;
+  }
+
+  for (const file of files) {
+
+    if (
+      ![
+        'image/jpeg',
+        'image/png',
+        'image/webp'
+      ].includes(file.type) ||
+      file.size > REVIEW_MAX_FILE_SIZE
+    ) {
+
+      orderUI.toast(
+        'Only JPG, PNG and WebP under 5 MB allowed.',
+        'error'
+      );
+
+      return;
+    }
+
+  }
+
+  orderReviewRunning = true;
+
+  const submitButton = form.querySelector(
+    '.mc-review-submit'
+  );
+
+  const closeButton = form.querySelector(
+    '.mc-review-cancel'
+  );
+
+  const progress = form.querySelector(
+    '.mc-review-progress'
+  );
+
+  submitButton.disabled = true;
+  closeButton.disabled = true;
+
+  try {
+
+    /*
+      Recheck eligibility before uploading.
+    */
+
+    const eligibility = await orderUI.api(
+      '/reviews/product/' +
+      encodeURIComponent(productId) +
+      '/eligibility'
+    );
+
+    if (!eligibility.eligible) {
+
+      throw new Error(
+        eligibility.message ||
+        'Review not allowed for this product.'
+      );
+
+    }
+
+    const photos = [];
+
+    for (
+      let index = 0;
+      index < files.length;
+      index++
+    ) {
+
+      progress.textContent =
+        'Uploading photo ' +
+        (index + 1) +
+        ' of ' +
+        files.length +
+        '...';
+
+      const photo = await uploadDeliveredReviewPhoto(
+        productId,
+        files[index]
+      );
+
+      photos.push(photo);
+    }
+
+    progress.textContent =
+      'Submitting your review...';
+
+    await orderUI.api(
+      '/reviews/product/' +
+      encodeURIComponent(productId),
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          rating,
+          title,
+          comment,
+          photos
+        })
+      }
+    );
+
+    markProductReviewed(productId);
+
+    orderUI.toast(
+      'Review submitted for admin approval.',
+      'success'
+    );
+
+  } catch (error) {
+
+    progress.textContent =
+      error.message ||
+      'Review submission failed.';
+
+    orderUI.toast(
+      progress.textContent,
+      'error'
+    );
+
+  } finally {
+
+    orderReviewRunning = false;
+
+    if (submitButton.isConnected) {
+      submitButton.disabled = false;
+    }
+
+    if (closeButton.isConnected) {
+      closeButton.disabled = false;
+    }
+
+  }
+}
+
+
+/* =====================================
+   REVIEW BUTTON
+
+   SHOWS ONLY WHEN:
+   DELIVERED + SUCCESS
+
+   SERVER VALIDATES PURCHASE AGAIN
+===================================== */
+
+function bindDeliveredReviewButtons() {
+
+  const buttons = document.querySelectorAll(
+    '.mc-write-review'
+  );
+
+  buttons.forEach(button => {
+
+    button.addEventListener('click', async () => {
+
+      if (
+        button.disabled ||
+        orderReviewRunning
+      ) {
+        return;
+      }
+
+      const productId =
+        button.dataset.productId;
+
+      if (!productId) return;
+
+      const area = button.closest(
+        '.mc-order-review-area'
+      );
+
+      const holder = area?.querySelector(
+        '.mc-review-form-holder'
+      );
+
+      if (!holder) return;
+
+      /*
+        Close currently open form.
+      */
+
+      if (holder.querySelector('form')) {
+        holder.replaceChildren();
+        return;
+      }
+
+      button.disabled = true;
+
+      const previousText = button.textContent;
+
+      button.textContent =
+        'Checking Purchase...';
+
+      try {
+
+        const data = await orderUI.api(
+          '/reviews/product/' +
+          encodeURIComponent(productId) +
+          '/eligibility'
+        );
+
+        if (data.alreadyReviewed) {
+
+          markProductReviewed(productId);
+
+          return;
+        }
+
+        if (!data.eligible) {
+
+          reviewMessage(
+            holder,
+            data.message ||
+            'Review not available.'
+          );
+
+          return;
+        }
+
+        showDeliveredReviewForm(
+          button,
+          productId
+        );
+
+      } catch (error) {
+
+        reviewMessage(
+          holder,
+          error.message ||
+          'Could not verify this purchase.'
+        );
+
+      } finally {
+
+        if (button.isConnected && !button.textContent.includes('Review Submitted')) {
+          button.disabled = false;
+          button.textContent = previousText;
+        }
+
+      }
+
+    });
+
+  });
 }
 
 
