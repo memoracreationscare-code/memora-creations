@@ -7,6 +7,7 @@
 */
 
 module.exports = {
+
   User: require('./User'),
 
   Admin: require('./Admin'),
@@ -19,6 +20,9 @@ module.exports = {
 
   Order: require('./Order'),
 
+  // PRODUCT REVIEWS & RATINGS
+  Review: require('./Review'),
+
   Wishlist: require('./Wishlist'),
 
   WishlistSettings: require('./WishlistSettings'),
@@ -26,4 +30,5 @@ module.exports = {
   Coupon: require('./Coupon'),
 
   CouponUserUsage: require('./CouponUserUsage')
+
 };
