@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -19,6 +20,48 @@
     rel="stylesheet"
     href="/memora-creations/frontend/css/checkout.css?v=1"
   >
+
+  <style>
+    .mc-whatsapp-consent {
+      display:flex;
+      align-items:flex-start;
+      gap:13px;
+      padding:17px;
+      margin:20px 0;
+      border:1px solid #d9e8dd;
+      border-radius:14px;
+      background:#f4faf5;
+    }
+
+    .mc-whatsapp-consent input {
+      width:19px;
+      height:19px;
+      margin:3px 0 0;
+      accent-color:#178b4b;
+      flex-shrink:0;
+    }
+
+    .mc-whatsapp-consent strong {
+      display:block;
+      color:#215b39;
+      font-size:14px;
+      margin-bottom:6px;
+    }
+
+    .mc-whatsapp-consent p {
+      color:#536b5b;
+      font-size:12px;
+      line-height:1.6;
+      margin:0;
+    }
+
+    .mc-whatsapp-consent small {
+      display:block;
+      color:#786853;
+      font-size:11px;
+      margin-top:8px;
+    }
+  </style>
 </head>
 
 <body class="checkout-body">
@@ -157,7 +200,9 @@
 
               <span class="payment-copy">
                 <strong>Cash on Delivery</strong>
-                <small>Pay when your order arrives</small>
+                <small>
+                  Pay when your order arrives
+                </small>
               </span>
             </label>
 
@@ -179,6 +224,51 @@
               </span>
             </label>
 
+          </div>
+
+        </div>
+
+        <!--
+        =====================================
+        WHATSAPP ORDER UPDATES
+
+        UI ONLY - NOT YET ACTIVE
+
+        Enable only after:
+        1. Backend consent persistence
+        2. Approved WhatsApp templates
+        3. Notification dispatch integration
+        =====================================
+        -->
+
+        <div class="mc-whatsapp-consent">
+
+          <input
+            type="checkbox"
+            id="whatsappOptIn"
+            name="whatsappOptIn"
+            value="true"
+            disabled
+          >
+
+          <div>
+            <label for="whatsappOptIn">
+              <strong>
+                WhatsApp Order Updates
+              </strong>
+            </label>
+
+            <p>
+              Get order confirmation, shipping
+              and delivery updates on WhatsApp
+              from Memora Creations.
+            </p>
+
+            <small>
+              Coming soon. This option will
+              be enabled after notification
+              setup is completed.
+            </small>
           </div>
 
         </div>
@@ -215,14 +305,57 @@
         </div>
 
         <!-- MC_COUPON_CHECKOUT_UI_V1 -->
-        <section id="mcCouponArea" hidden aria-label="Apply coupon" style="margin:18px 0;padding:16px;border:1px solid #e4d3c3;background:#fffaf5;border-radius:13px">
-          <label for="mcCouponInput" style="display:block;font-weight:750;color:#593922;margin-bottom:8px">Have a coupon code?</label>
+
+        <section
+          id="mcCouponArea"
+          hidden
+          aria-label="Apply coupon"
+          style="margin:18px 0;padding:16px;border:1px solid #e4d3c3;background:#fffaf5;border-radius:13px"
+        >
+
+          <label
+            for="mcCouponInput"
+            style="display:block;font-weight:750;color:#593922;margin-bottom:8px"
+          >
+            Have a coupon code?
+          </label>
+
           <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <input id="mcCouponInput" type="text" maxlength="30" autocomplete="off" placeholder="WELCOME10" style="min-width:135px;flex:1;padding:12px;border:1px solid #dfcdbd;border-radius:9px;text-transform:uppercase">
-            <button type="button" id="mcCouponApply" style="border:0;border-radius:9px;background:#805338;color:white;font-weight:700;padding:12px 17px">Apply</button>
-            <button type="button" id="mcCouponRemove" hidden style="border:1px solid #d7c5b5;border-radius:9px;background:white;color:#72492c;font-weight:700;padding:12px 15px">Remove</button>
+
+            <input
+              id="mcCouponInput"
+              type="text"
+              maxlength="30"
+              autocomplete="off"
+              placeholder="WELCOME10"
+              style="min-width:135px;flex:1;padding:12px;border:1px solid #dfcdbd;border-radius:9px;text-transform:uppercase"
+            >
+
+            <button
+              type="button"
+              id="mcCouponApply"
+              style="border:0;border-radius:9px;background:#805338;color:white;font-weight:700;padding:12px 17px"
+            >
+              Apply
+            </button>
+
+            <button
+              type="button"
+              id="mcCouponRemove"
+              hidden
+              style="border:1px solid #d7c5b5;border-radius:9px;background:white;color:#72492c;font-weight:700;padding:12px 15px"
+            >
+              Remove
+            </button>
+
           </div>
-          <p id="mcCouponMessage" role="status" style="margin:8px 0 0;font-size:13px;color:#766252"></p>
+
+          <p
+            id="mcCouponMessage"
+            role="status"
+            style="margin:8px 0 0;font-size:13px;color:#766252"
+          ></p>
+
         </section>
 
         <div id="summary" class="checkout-summary">
@@ -350,7 +483,10 @@
 
         document.body.appendChild(script);
       } catch (error) {
-        console.error("Checkout initialization failed:", error);
+        console.error(
+          "Checkout initialization failed:",
+          error
+        );
 
         document.getElementById("summary").textContent =
           "Checkout load nahi hua. Page refresh karein.";
