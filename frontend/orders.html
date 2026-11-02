@@ -25,6 +25,41 @@
     href="/memora-creations/frontend/css/orders.css?v=1"
   >
 
+  <style>
+    /*
+      Review status is checked automatically
+      when delivered orders are displayed.
+    */
+
+    .mc-write-review:disabled {
+      cursor: default;
+      opacity: 1;
+    }
+
+    .mc-write-review.mc-review-approved {
+      background: #e8f6ed !important;
+      color: #166534 !important;
+      border: 1px solid #b9ddc5 !important;
+    }
+
+    .mc-write-review.mc-review-pending {
+      background: #f5e9db !important;
+      color: #795035 !important;
+      border: 1px solid #e4cdb6 !important;
+    }
+
+    .mc-write-review.mc-review-rejected {
+      background: #fff0ef !important;
+      color: #a12a21 !important;
+      border: 1px solid #edc7c2 !important;
+    }
+
+    .mc-write-review.mc-review-checking {
+      opacity: .65;
+      cursor: progress;
+    }
+  </style>
+
 </head>
 
 <body class="orders-body">
@@ -65,7 +100,8 @@
 
           <p>
             Apne orders, products, payment
-            aur delivery status ko ek jagah track karein.
+            aur delivery status ko ek jagah
+            track karein.
           </p>
 
         </div>
@@ -142,14 +178,16 @@
 
       <p style="margin: 8px 0 0">
 
-        COD orders ko eligible status me directly
-        cancel kiya ja sakta hai.
+        COD orders ko eligible status me
+        directly cancel kiya ja sakta hai.
 
         Cashfree online payments ke liye
-        Cancellation Request submit kar sakte hain.
+        Cancellation Request submit kar
+        sakte hain.
 
         Request submit hone ka matlab
-        order cancel ya refund confirm hona nahi hai.
+        order cancel ya refund confirm
+        hona nahi hai.
 
         Payment verification ke baad hi
         aage ki cancellation process hogi.
@@ -174,7 +212,8 @@
 
         <p>
           Order status, payment ya delivery
-          se related help ke liye humse contact karein.
+          se related help ke liye humse
+          contact karein.
         </p>
 
       </div>
@@ -231,7 +270,6 @@
   <!-- SECURE CUSTOMER ORDERS -->
 
   <script>
-
     (async function secureOrdersPage() {
 
       try {
@@ -240,11 +278,9 @@
           !window.MC ||
           typeof window.MC.requireLogin !== 'function'
         ) {
-
           throw new Error(
             'Website authentication could not load.'
           );
-
         }
 
         const user =
@@ -255,23 +291,311 @@
         }
 
         /*
-          Load orders only after customer login.
+        ========================================
+         AUTOMATIC REVIEW STATUS CHECK
 
-          Version 14:
-          Delivered Product Reviews & Ratings
-          with existing order actions preserved.
+         The server is the source of truth.
+
+         Status is checked separately for
+         each unique delivered product.
+
+         Approved -> Review Approved
+         Pending  -> Review Submitted
+         Rejected -> Review Rejected
+         Eligible -> Write Review
+
+         Existing orders.js remains intact.
+        ========================================
+        */
+
+        const ordersBox =
+          document.getElementById('orders');
+
+        const reviewStatusCache = new Map();
+
+        const reviewStatusRequests = new Map();
+
+        function updateReviewButton(
+          button,
+          data
+        ) {
+
+          if (!button.isConnected) {
+            return;
+          }
+
+          button.classList.remove(
+            'mc-review-checking',
+            'mc-review-approved',
+            'mc-review-pending',
+            'mc-review-rejected'
+          );
+
+          const area = button.closest(
+            '.mc-order-review-area'
+          );
+
+          const holder = area?.querySelector(
+            '.mc-review-form-holder'
+          );
+
+          if (data.alreadyReviewed) {
+
+            button.disabled = true;
+
+            const status = String(
+              data.reviewStatus || ''
+            ).toUpperCase();
+
+            let label = '✓ Review Submitted';
+
+            let message =
+              'Your review has already been submitted.';
+
+            let className = 'mc-review-pending';
+
+            if (status === 'APPROVED') {
+
+              label = '✓ Review Approved';
+
+              message =
+                'Your review has been approved and published.';
+
+              className = 'mc-review-approved';
+
+            } else if (status === 'PENDING') {
+
+              label = '✓ Review Submitted';
+
+              message =
+                'Your review is waiting for admin approval.';
+
+            } else if (status === 'REJECTED') {
+
+              label = 'Review Rejected';
+
+              message =
+                'Your review was rejected by admin.';
+
+              className = 'mc-review-rejected';
+            }
+
+            button.textContent = label;
+
+            button.classList.add(className);
+
+            if (holder) {
+
+              holder.replaceChildren();
+
+              const info =
+                document.createElement('p');
+
+              info.className =
+                'mc-review-message';
+
+              info.textContent = message;
+
+              holder.appendChild(info);
+            }
+
+            return;
+          }
+
+          if (data.eligible) {
+
+            button.disabled = false;
+
+            button.textContent =
+              '⭐ Write Review';
+
+            return;
+          }
+
+          button.disabled = true;
+
+          button.textContent =
+            'Review Unavailable';
+
+          if (holder) {
+
+            holder.replaceChildren();
+
+            const info =
+              document.createElement('p');
+
+            info.className =
+              'mc-review-message';
+
+            info.textContent =
+              data.message ||
+              'Only successfully delivered and paid products can be reviewed.';
+
+            holder.appendChild(info);
+          }
+        }
+
+        async function getReviewStatus(productId) {
+
+          if (reviewStatusCache.has(productId)) {
+            return reviewStatusCache.get(productId);
+          }
+
+          if (reviewStatusRequests.has(productId)) {
+            return reviewStatusRequests.get(productId);
+          }
+
+          const request = window.MC.api(
+            '/reviews/product/' +
+            encodeURIComponent(productId) +
+            '/eligibility'
+          );
+
+          reviewStatusRequests.set(
+            productId,
+            request
+          );
+
+          try {
+
+            const data = await request;
+
+            reviewStatusCache.set(
+              productId,
+              data
+            );
+
+            return data;
+
+          } finally {
+
+            reviewStatusRequests.delete(
+              productId
+            );
+          }
+        }
+
+        async function checkReviewButton(button) {
+
+          if (
+            !button.isConnected ||
+            button.dataset.reviewAutoChecked
+          ) {
+            return;
+          }
+
+          const productId =
+            button.dataset.productId;
+
+          if (!productId) {
+            return;
+          }
+
+          button.dataset.reviewAutoChecked =
+            'true';
+
+          button.disabled = true;
+
+          button.classList.add(
+            'mc-review-checking'
+          );
+
+          button.textContent =
+            'Checking Review...';
+
+          try {
+
+            const data =
+              await getReviewStatus(productId);
+
+            updateReviewButton(
+              button,
+              data
+            );
+
+          } catch (error) {
+
+            console.error(
+              'Review status check failed:',
+              error
+            );
+
+            if (!button.isConnected) {
+              return;
+            }
+
+            button.classList.remove(
+              'mc-review-checking'
+            );
+
+            button.disabled = false;
+
+            button.textContent =
+              '⭐ Write Review';
+
+            /*
+              Clicking still performs the
+              original backend eligibility
+              check in orders.js.
+            */
+          }
+        }
+
+        function checkDisplayedReviewButtons() {
+
+          if (!ordersBox) {
+            return;
+          }
+
+          const buttons =
+            ordersBox.querySelectorAll(
+              '.mc-write-review:not([data-review-auto-checked])'
+            );
+
+          buttons.forEach(button => {
+            checkReviewButton(button);
+          });
+        }
+
+        /*
+          Observe new order cards created
+          by the existing orders.js.
+
+          This also handles re-rendering
+          after a customer order action.
+        */
+
+        if (ordersBox) {
+
+          const observer =
+            new MutationObserver(
+              checkDisplayedReviewButtons
+            );
+
+          observer.observe(
+            ordersBox,
+            {
+              childList: true,
+              subtree: true
+            }
+          );
+
+          checkDisplayedReviewButtons();
+        }
+
+        /*
+          Load existing orders functionality.
+
+          Cache-busted version 15.
         */
 
         const script =
           document.createElement('script');
 
         script.src =
-          '/memora-creations/frontend/js/orders.js?v=14';
+          '/memora-creations/frontend/js/orders.js?v=15';
 
         script.onerror = function () {
-
-          const ordersBox =
-            document.getElementById('orders');
 
           if (ordersBox) {
 
@@ -302,11 +626,9 @@
             'Please login ya refresh karke try karein.';
 
         }
-
       }
 
     })();
-
   </script>
 
 </body>
