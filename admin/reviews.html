@@ -1,0 +1,762 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>
+    Reviews Management | MEMORA CREATIONS
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="/memora-creations/admin/css/style.css?v=6"
+  >
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #f8f5f0;
+      color: #302117;
+      font-family: Arial, sans-serif;
+    }
+
+    .reviews-header {
+      background: #261b15;
+      color: white;
+      padding: 20px;
+    }
+
+    .reviews-header-inner {
+      max-width: 1150px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .brand {
+      font-size: 19px;
+      font-weight: 900;
+      color: white;
+      text-decoration: none;
+    }
+
+    .back-link {
+      color: white;
+      text-decoration: none;
+      padding: 11px 16px;
+      background: #765138;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .reviews-container {
+      width: min(1150px, 94%);
+      margin: 32px auto 70px;
+    }
+
+    .page-heading {
+      margin-bottom: 25px;
+    }
+
+    .page-heading h1 {
+      margin: 0 0 10px;
+      font-size: clamp(27px, 4vw, 38px);
+    }
+
+    .page-heading p {
+      color: #80756d;
+      line-height: 1.6;
+    }
+
+    .reviews-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 15px;
+      background: white;
+      border: 1px solid #eadfd5;
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 22px;
+    }
+
+    .pending-count {
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .refresh-btn {
+      border: 0;
+      border-radius: 11px;
+      background: #8b5b3a;
+      color: white;
+      padding: 12px 20px;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .refresh-btn:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    .review-card {
+      background: white;
+      border: 1px solid #e7dbcf;
+      border-radius: 20px;
+      padding: 25px;
+      margin-bottom: 18px;
+      box-shadow:
+        0 10px 28px rgba(48, 33, 23, .05);
+    }
+
+    .review-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .product-name {
+      font-size: 19px;
+      font-weight: 900;
+    }
+
+    .customer-name {
+      margin-top: 9px;
+      color: #62574f;
+      font-size: 14px;
+    }
+
+    .rating {
+      color: #e2a32b;
+      font-size: 26px;
+      letter-spacing: 2px;
+    }
+
+    .verified {
+      display: inline-block;
+      margin-top: 11px;
+      color: #237448;
+      background: #eaf7ef;
+      padding: 7px 11px;
+      border-radius: 9px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .review-title {
+      margin: 20px 0 8px;
+      font-size: 17px;
+    }
+
+    .review-comment {
+      color: #50443b;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .review-images {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 18px 0;
+    }
+
+    .review-images img {
+      width: 125px;
+      height: 125px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 1px solid #eee;
+    }
+
+    .review-date {
+      color: #93867c;
+      font-size: 12px;
+      margin: 15px 0;
+    }
+
+    .review-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      border-top: 1px solid #eee4dc;
+      padding-top: 20px;
+    }
+
+    .action-btn {
+      padding: 13px 24px;
+      border-radius: 11px;
+      border: none;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .approve-btn {
+      background: #237448;
+      color: white;
+    }
+
+    .reject-btn {
+      background: #fff0ef;
+      color: #b42318;
+      border: 1px solid #f0cbc8;
+    }
+
+    .action-btn:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    .message-box {
+      background: white;
+      border: 1px solid #e7dbcf;
+      border-radius: 17px;
+      padding: 25px;
+      text-align: center;
+      color: #77685c;
+      line-height: 1.6;
+    }
+
+    .error-message {
+      color: #b42318;
+    }
+
+    .page-footer {
+      text-align: center;
+      padding: 25px;
+      color: #8a8078;
+      font-size: 12px;
+    }
+
+    @media (max-width: 600px) {
+      .review-card {
+        padding: 17px;
+      }
+
+      .review-images img {
+        width: 95px;
+        height: 95px;
+      }
+
+      .action-btn {
+        flex: 1;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+
+  <header class="reviews-header">
+
+    <div class="reviews-header-inner">
+
+      <a
+        class="brand"
+        href="/memora-creations/admin/dashboard.html"
+      >
+        MEMORA CREATIONS
+      </a>
+
+      <a
+        class="back-link"
+        href="/memora-creations/admin/dashboard.html"
+      >
+        ← Back to Dashboard
+      </a>
+
+    </div>
+
+  </header>
+
+  <!-- MAIN -->
+
+  <main class="reviews-container">
+
+    <div class="page-heading">
+
+      <h1>
+        Customer Reviews Management
+      </h1>
+
+      <p>
+        Review customer ratings, written feedback
+        and uploaded product photos before
+        publishing them.
+      </p>
+
+    </div>
+
+    <!-- TOOLBAR -->
+
+    <section class="reviews-toolbar">
+
+      <div
+        id="pendingCount"
+        class="pending-count"
+      >
+        Loading reviews...
+      </div>
+
+      <button
+        id="refreshReviews"
+        class="refresh-btn"
+        type="button"
+      >
+        Refresh Reviews
+      </button>
+
+    </section>
+
+    <!-- REVIEWS LIST -->
+
+    <section
+      id="reviewsList"
+      aria-live="polite"
+    >
+
+      <div class="message-box">
+        Loading pending customer reviews...
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer class="page-footer">
+    © MEMORA CREATIONS — Reviews Management
+  </footer>
+
+  <!-- COMMON API -->
+
+  <script
+    src="/memora-creations/frontend/js/app.js?v=11"
+  ></script>
+
+  <!-- ADMIN LOGIN CHECK -->
+
+  <script
+    src="/memora-creations/admin/js/auth.js?v=5"
+  ></script>
+
+  <!-- REVIEWS ADMIN SCRIPT -->
+
+  <script>
+    (function () {
+      'use strict';
+
+      const $ = selector =>
+        document.querySelector(selector);
+
+      const list = $('#reviewsList');
+      const count = $('#pendingCount');
+      const refresh = $('#refreshReviews');
+
+      let busy = false;
+
+      function create(tag, className, content) {
+        const element = document.createElement(tag);
+
+        if (className) {
+          element.className = className;
+        }
+
+        if (content !== undefined) {
+          element.textContent = String(content);
+        }
+
+        return element;
+      }
+
+      function showMessage(message, isError = false) {
+        const box = create(
+          'div',
+          'message-box' +
+            (isError ? ' error-message' : ''),
+          message
+        );
+
+        list.replaceChildren(box);
+      }
+
+      function formatDate(value) {
+        if (!value) return '-';
+
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) {
+          return '-';
+        }
+
+        return date.toLocaleString('en-IN');
+      }
+
+      function stars(rating) {
+        const value = Math.max(
+          0,
+          Math.min(5, Math.round(Number(rating) || 0))
+        );
+
+        return '★'.repeat(value) +
+          '☆'.repeat(5 - value);
+      }
+
+      /*
+      ==========================================
+       APPROVE OR REJECT
+      ==========================================
+      */
+
+      async function updateStatus(review, status, card) {
+
+        if (busy) return;
+
+        const action =
+          status === 'APPROVED'
+            ? 'Approve'
+            : 'Reject';
+
+        if (!window.confirm(
+          action + ' this review?'
+        )) {
+          return;
+        }
+
+        busy = true;
+
+        const buttons = card.querySelectorAll(
+          '.action-btn'
+        );
+
+        buttons.forEach(button => {
+          button.disabled = true;
+        });
+
+        try {
+
+          await window.MC.api(
+            '/reviews/admin/' +
+              encodeURIComponent(review._id) +
+              '/status',
+            {
+              method: 'PATCH',
+              body: JSON.stringify({
+                status
+              })
+            }
+          );
+
+          window.MC.toast(
+            'Review ' +
+              (status === 'APPROVED'
+                ? 'approved.'
+                : 'rejected.'),
+            'success'
+          );
+
+          card.remove();
+
+          const remaining =
+            list.querySelectorAll(
+              '.review-card'
+            ).length;
+
+          count.textContent =
+            remaining + ' pending reviews';
+
+          if (!remaining) {
+            showMessage(
+              'No pending reviews. All caught up!'
+            );
+          }
+
+        } catch (err) {
+
+          window.MC.toast(
+            err.message ||
+              'Review status update failed.',
+            'error'
+          );
+
+          buttons.forEach(button => {
+            button.disabled = false;
+          });
+
+        } finally {
+          busy = false;
+        }
+      }
+
+      /*
+      ==========================================
+       CREATE REVIEW CARD
+      ==========================================
+      */
+
+      function renderReview(review) {
+
+        const card = create(
+          'article',
+          'review-card'
+        );
+
+        const top = create(
+          'div',
+          'review-top'
+        );
+
+        const details = create('div');
+
+        const productName = create(
+          'div',
+          'product-name',
+          review.product?.name ||
+            'Product unavailable'
+        );
+
+        const customerName = create(
+          'div',
+          'customer-name',
+          'Customer: ' +
+            (review.user?.fullName || 'Customer')
+        );
+
+        details.append(
+          productName,
+          customerName
+        );
+
+        const rating = create(
+          'div',
+          'rating',
+          stars(review.rating)
+        );
+
+        top.append(details, rating);
+
+        card.append(top);
+
+        if (review.verifiedPurchase) {
+          card.append(
+            create(
+              'div',
+              'verified',
+              '✓ Verified Purchase'
+            )
+          );
+        }
+
+        card.append(
+          create(
+            'h3',
+            'review-title',
+            review.title || 'Product Review'
+          )
+        );
+
+        card.append(
+          create(
+            'p',
+            'review-comment',
+            review.comment || ''
+          )
+        );
+
+        const gallery = create(
+          'div',
+          'review-images'
+        );
+
+        for (const url of review.photos || []) {
+
+          if (
+            typeof url !== 'string' ||
+            !url.startsWith(
+              'https://res.cloudinary.com/'
+            )
+          ) {
+            continue;
+          }
+
+          const link = create('a');
+
+          link.href = url;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+
+          const image = create('img');
+
+          image.src = url;
+          image.alt = 'Customer review photo';
+          image.loading = 'lazy';
+
+          link.append(image);
+          gallery.append(link);
+        }
+
+        card.append(gallery);
+
+        card.append(
+          create(
+            'div',
+            'review-date',
+            'Submitted: ' +
+              formatDate(review.createdAt)
+          )
+        );
+
+        const actions = create(
+          'div',
+          'review-actions'
+        );
+
+        const approve = create(
+          'button',
+          'action-btn approve-btn',
+          '✓ Approve Review'
+        );
+
+        approve.type = 'button';
+
+        approve.addEventListener(
+          'click',
+          () => updateStatus(
+            review,
+            'APPROVED',
+            card
+          )
+        );
+
+        const reject = create(
+          'button',
+          'action-btn reject-btn',
+          '✕ Reject Review'
+        );
+
+        reject.type = 'button';
+
+        reject.addEventListener(
+          'click',
+          () => updateStatus(
+            review,
+            'REJECTED',
+            card
+          )
+        );
+
+        actions.append(approve, reject);
+
+        card.append(actions);
+
+        return card;
+      }
+
+      /*
+      ==========================================
+       LOAD PENDING REVIEWS
+      ==========================================
+      */
+
+      async function loadReviews() {
+
+        refresh.disabled = true;
+
+        count.textContent =
+          'Loading pending reviews...';
+
+        showMessage('Loading reviews...');
+
+        try {
+
+          const admin =
+            await window.requireAdmin();
+
+          if (!admin) return;
+
+          const data = await window.MC.api(
+            '/reviews/admin/pending'
+          );
+
+          const reviews =
+            Array.isArray(data.reviews)
+              ? data.reviews
+              : [];
+
+          count.textContent =
+            reviews.length + ' pending reviews';
+
+          list.replaceChildren();
+
+          if (!reviews.length) {
+
+            showMessage(
+              'No pending reviews. All caught up!'
+            );
+
+            return;
+          }
+
+          for (const review of reviews) {
+            list.append(
+              renderReview(review)
+            );
+          }
+
+        } catch (err) {
+
+          count.textContent =
+            'Unable to load reviews';
+
+          showMessage(
+            err.message ||
+              'Failed to load reviews.',
+            true
+          );
+
+        } finally {
+
+          refresh.disabled = false;
+
+        }
+      }
+
+      /*
+      ==========================================
+       START
+      ==========================================
+      */
+
+      refresh.addEventListener(
+        'click',
+        loadReviews
+      );
+
+      loadReviews();
+
+    })();
+  </script>
+
+</body>
+</html>
