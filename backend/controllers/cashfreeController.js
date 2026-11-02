@@ -1,4 +1,6 @@
 
+'use strict';
+
 /*
 =========================================
  MEMORA CREATIONS
@@ -8,6 +10,7 @@
  PAYMENT VERIFICATION
  DUPLICATE PAYMENT PROTECTION
  ORDER SECURITY
+ WHATSAPP CONSENT SUPPORT
 =========================================
 */
 
@@ -35,7 +38,9 @@ const {
   createCashfreePendingOrder
 } = require('../services/orderService');
 
-const { calculateCouponPricing } = require('../services/couponPricingService');
+const {
+  calculateCouponPricing
+} = require('../services/couponPricingService');
 
 const {
   getCashfreeConfig,
@@ -71,15 +76,17 @@ const createOrder = asyncHandler(
       from the database.
     */
 
-    const couponCode = typeof req.body?.couponCode === 'string'
-      ? req.body.couponCode.trim().toUpperCase()
-      : null;
+    const couponCode =
+      typeof req.body?.couponCode === 'string'
+        ? req.body.couponCode.trim().toUpperCase()
+        : null;
 
-    const amountDetails = await calculateCouponPricing({
-      items,
-      couponCode,
-      userId: req.user._id
-    });
+    const amountDetails =
+      await calculateCouponPricing({
+        items,
+        couponCode,
+        userId: req.user._id
+      });
 
     const amount =
       amountDetails.grandTotal;
@@ -93,6 +100,19 @@ const createOrder = asyncHandler(
         'Invalid order amount.'
       );
     }
+
+    /*
+      WHATSAPP CUSTOMER CONSENT
+
+      Only explicit boolean true
+      means that the customer
+      granted permission.
+
+      Missing or false stays false.
+    */
+
+    const whatsappOptIn =
+      req.body?.whatsappOptIn === true;
 
     /*
       Unique Cashfree order reference.
@@ -158,24 +178,32 @@ const createOrder = asyncHandler(
       );
     }
 
-    // Refuse a gateway amount different from the requested amount.
+    /*
+      Refuse a gateway amount different
+      from the requested amount.
+    */
+
     if (
-      Math.round(Number(cashfreeOrder.order_amount) * 100) !==
-        Math.round(amount * 100) ||
+      Math.round(
+        Number(cashfreeOrder.order_amount) * 100
+      ) !== Math.round(amount * 100) ||
       cashfreeOrder.order_currency !== 'INR'
     ) {
-      throw error(502, 'Cashfree gateway amount mismatch.');
+      throw error(
+        502,
+        'Cashfree gateway amount mismatch.'
+      );
     }
 
     /*
       Create local pending order and
       reserve stock inside transaction.
 
-      Important:
       If the local transaction fails,
       the gateway session may remain.
-      It must be handled by a separate
-      reconciliation workflow.
+
+      A separate reconciliation workflow
+      must handle such sessions.
     */
 
     const order =
@@ -192,10 +220,21 @@ const createOrder = asyncHandler(
 
         couponCode,
 
-        expectedAmount: amount,
+        expectedAmount:
+          amount,
 
         clearCart:
-          req.body.clearCart === true
+          req.body.clearCart === true,
+
+        /*
+          NEW:
+          Save customer consent with
+          this Cashfree order.
+
+          This does NOT send WhatsApp.
+        */
+
+        whatsappOptIn
 
       });
 
@@ -526,6 +565,9 @@ const verifyPayment = asyncHandler(
 
     /*
       Payment confirmed.
+
+      WhatsApp dispatch is intentionally
+      not called here yet.
     */
 
     return ok(res, {
