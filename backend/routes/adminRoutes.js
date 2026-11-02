@@ -87,6 +87,14 @@ router.use(requireAdmin);
 router.use('/coupons', require('./couponAdminRoutes'));
 
 // MC_SANDBOX_REFUND_ROUTE_V1 — protected by router.use(requireAdmin), sandbox gate in controller
+// MC_REFUND_ENABLED_STATUS_V1: read-only, authenticated safety status.
+router.get('/cashfree/refunds/initiation-status', (req, res) => {
+  const enabled = process.env.CASHFREE_ENV === 'sandbox' &&
+    process.env.CASHFREE_SANDBOX_REFUNDS_ENABLED === 'true';
+  res.set('Cache-Control', 'no-store');
+  res.json({ success: true, enabled, sandboxOnly: true });
+});
+
 router.post('/orders/:id/cashfree/refunds/initiate', require('../controllers/cashfreeRefundInitiationController').initiateSandboxRefund);
 
 // MC_REFUND_VERIFY_ROUTE_V1 — admin-authenticated, read-only
