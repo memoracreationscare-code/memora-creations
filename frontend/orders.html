@@ -1,9 +1,7 @@
 
 <!doctype html>
 <html lang="en">
-
 <head>
-
   <meta charset="utf-8">
 
   <meta
@@ -11,9 +9,7 @@
     content="width=device-width, initial-scale=1"
   >
 
-  <title>
-    My Orders | MEMORA CREATIONS
-  </title>
+  <title>My Orders | MEMORA CREATIONS</title>
 
   <link
     rel="stylesheet"
@@ -27,13 +23,24 @@
 
   <style>
     /*
-      Review status is checked automatically
-      when delivered orders are displayed.
+      REVIEW STATUS AND STAR DISPLAY
     */
 
     .mc-write-review:disabled {
-      cursor: default;
       opacity: 1;
+      cursor: default;
+    }
+
+    .mc-write-review.mc-review-approved,
+    .mc-write-review.mc-review-pending,
+    .mc-write-review.mc-review-rejected {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+      padding: 12px 16px;
+      cursor: default;
+      text-align: left;
     }
 
     .mc-write-review.mc-review-approved {
@@ -58,8 +65,36 @@
       opacity: .65;
       cursor: progress;
     }
-  </style>
 
+    .mc-my-rating-stars {
+      display: block;
+      color: #e5a126;
+      font-size: 24px;
+      letter-spacing: 3px;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    .mc-my-rating-number {
+      display: block;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .mc-my-rating-status {
+      display: block;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.5;
+    }
+
+    .mc-review-status-note {
+      margin: 8px 0 0;
+      color: #735a47;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+  </style>
 </head>
 
 <body class="orders-body">
@@ -271,6 +306,7 @@
 
   <script>
     (async function secureOrdersPage() {
+      'use strict';
 
       try {
 
@@ -292,17 +328,15 @@
 
         /*
         ========================================
-         AUTOMATIC REVIEW STATUS CHECK
+         AUTOMATIC PRODUCT REVIEW STATUS
 
-         The server is the source of truth.
+         Already reviewed:
+         - Show actual 1-5 stars
+         - Disable Write Review
+         - Show admin approval status
 
-         Status is checked separately for
-         each unique delivered product.
-
-         Approved -> Review Approved
-         Pending  -> Review Submitted
-         Rejected -> Review Rejected
-         Eligible -> Write Review
+         Not reviewed:
+         - Show Write Review only if eligible
 
          Existing orders.js remains intact.
         ========================================
@@ -314,6 +348,61 @@
         const reviewStatusCache = new Map();
 
         const reviewStatusRequests = new Map();
+
+        /*
+        ========================================
+         CREATE TEXT ELEMENT SAFELY
+        ========================================
+        */
+
+        function makeText(
+          tag,
+          className,
+          value
+        ) {
+
+          const element =
+            document.createElement(tag);
+
+          element.className = className;
+
+          element.textContent =
+            String(value);
+
+          return element;
+        }
+
+        /*
+        ========================================
+         STAR RATING FORMAT
+        ========================================
+        */
+
+        function formatStars(value) {
+
+          const rating = Number(value);
+
+          if (
+            !Number.isInteger(rating) ||
+            rating < 1 ||
+            rating > 5
+          ) {
+            return null;
+          }
+
+          return {
+            rating,
+            stars:
+              '★'.repeat(rating) +
+              '☆'.repeat(5 - rating)
+          };
+        }
+
+        /*
+        ========================================
+         UPDATE SINGLE REVIEW BUTTON
+        ========================================
+        */
 
         function updateReviewButton(
           button,
@@ -339,6 +428,11 @@
             '.mc-review-form-holder'
           );
 
+          /*
+            A REVIEW ALREADY EXISTS.
+            SHOW ITS SAVED STAR RATING.
+          */
+
           if (data.alreadyReviewed) {
 
             button.disabled = true;
@@ -350,13 +444,13 @@
             let label = '✓ Review Submitted';
 
             let message =
-              'Your review has already been submitted.';
+              'You have already reviewed this product.';
 
             let className = 'mc-review-pending';
 
             if (status === 'APPROVED') {
 
-              label = '✓ Review Approved';
+              label = '✓ Your Review Approved';
 
               message =
                 'Your review has been approved and published.';
@@ -368,7 +462,9 @@
               label = '✓ Review Submitted';
 
               message =
-                'Your review is waiting for admin approval.';
+                'Waiting for admin approval.';
+
+              className = 'mc-review-pending';
 
             } else if (status === 'REJECTED') {
 
@@ -380,27 +476,72 @@
               className = 'mc-review-rejected';
             }
 
-            button.textContent = label;
-
             button.classList.add(className);
+
+            button.replaceChildren();
+
+            const ratingData = formatStars(
+              data.reviewRating
+            );
+
+            if (ratingData) {
+
+              const stars = makeText(
+                'span',
+                'mc-my-rating-stars',
+                ratingData.stars
+              );
+
+              const ratingNumber = makeText(
+                'span',
+                'mc-my-rating-number',
+                ratingData.rating + '/5 Stars'
+              );
+
+              button.append(
+                stars,
+                ratingNumber
+              );
+
+            }
+
+            const statusLabel = makeText(
+              'span',
+              'mc-my-rating-status',
+              label
+            );
+
+            button.appendChild(statusLabel);
+
+            button.setAttribute(
+              'aria-label',
+              ratingData
+                ? ratingData.rating +
+                  ' out of 5 stars. ' +
+                  label
+                : label
+            );
 
             if (holder) {
 
               holder.replaceChildren();
 
-              const info =
-                document.createElement('p');
-
-              info.className =
-                'mc-review-message';
-
-              info.textContent = message;
+              const info = makeText(
+                'p',
+                'mc-review-status-note',
+                message
+              );
 
               holder.appendChild(info);
             }
 
             return;
           }
+
+          /*
+            NEW ELIGIBLE CUSTOMER:
+            ALLOW FIRST REVIEW.
+          */
 
           if (data.eligible) {
 
@@ -409,8 +550,17 @@
             button.textContent =
               '⭐ Write Review';
 
+            button.removeAttribute(
+              'aria-label'
+            );
+
             return;
           }
+
+          /*
+            NOT ELIGIBLE:
+            DO NOT ALLOW REVIEW.
+          */
 
           button.disabled = true;
 
@@ -421,28 +571,41 @@
 
             holder.replaceChildren();
 
-            const info =
-              document.createElement('p');
-
-            info.className =
-              'mc-review-message';
-
-            info.textContent =
+            const info = makeText(
+              'p',
+              'mc-review-status-note',
               data.message ||
-              'Only successfully delivered and paid products can be reviewed.';
+              'Review available after confirmed delivery and payment.'
+            );
 
             holder.appendChild(info);
           }
         }
 
+        /*
+        ========================================
+         FETCH REVIEW STATUS FROM BACKEND
+        ========================================
+        */
+
         async function getReviewStatus(productId) {
 
-          if (reviewStatusCache.has(productId)) {
-            return reviewStatusCache.get(productId);
+          if (
+            reviewStatusCache.has(productId)
+          ) {
+
+            return reviewStatusCache.get(
+              productId
+            );
           }
 
-          if (reviewStatusRequests.has(productId)) {
-            return reviewStatusRequests.get(productId);
+          if (
+            reviewStatusRequests.has(productId)
+          ) {
+
+            return reviewStatusRequests.get(
+              productId
+            );
           }
 
           const request = window.MC.api(
@@ -460,10 +623,19 @@
 
             const data = await request;
 
-            reviewStatusCache.set(
-              productId,
-              data
-            );
+            /*
+              Cache only existing reviews.
+              A customer who has not reviewed
+              may submit while this page is open.
+            */
+
+            if (data.alreadyReviewed) {
+
+              reviewStatusCache.set(
+                productId,
+                data
+              );
+            }
 
             return data;
 
@@ -474,6 +646,12 @@
             );
           }
         }
+
+        /*
+        ========================================
+         CHECK EACH DELIVERED PRODUCT
+        ========================================
+        */
 
         async function checkReviewButton(button) {
 
@@ -505,8 +683,9 @@
 
           try {
 
-            const data =
-              await getReviewStatus(productId);
+            const data = await getReviewStatus(
+              productId
+            );
 
             updateReviewButton(
               button,
@@ -528,18 +707,50 @@
               'mc-review-checking'
             );
 
-            button.disabled = false;
+            /*
+              Keep the button disabled when
+              status cannot be confirmed.
+              Do not incorrectly show
+              another Review option.
+            */
+
+            button.disabled = true;
 
             button.textContent =
-              '⭐ Write Review';
+              'Review Status Unavailable';
 
-            /*
-              Clicking still performs the
-              original backend eligibility
-              check in orders.js.
-            */
+            const area = button.closest(
+              '.mc-order-review-area'
+            );
+
+            const holder = area?.querySelector(
+              '.mc-review-form-holder'
+            );
+
+            if (holder) {
+
+              holder.replaceChildren();
+
+              holder.appendChild(
+                makeText(
+                  'p',
+                  'mc-review-status-note',
+                  'Unable to verify review status. Please refresh this page.'
+                )
+              );
+            }
           }
         }
+
+        /*
+        ========================================
+         OBSERVE ORDER CARDS
+
+         Only delivered + paid products have
+         .mc-write-review elements because
+         orders.js applies that restriction.
+        ========================================
+        */
 
         function checkDisplayedReviewButtons() {
 
@@ -553,17 +764,11 @@
             );
 
           buttons.forEach(button => {
+
             checkReviewButton(button);
+
           });
         }
-
-        /*
-          Observe new order cards created
-          by the existing orders.js.
-
-          This also handles re-rendering
-          after a customer order action.
-        */
 
         if (ordersBox) {
 
@@ -584,9 +789,15 @@
         }
 
         /*
-          Load existing orders functionality.
+        ========================================
+         PRESERVE EXISTING ORDERS JS
 
-          Cache-busted version 15.
+         - COD Cancellation
+         - Cashfree Cancellation Requests
+         - Order Tracking
+         - Payment Status
+         - Review Submission
+        ========================================
         */
 
         const script =
@@ -604,7 +815,6 @@
               'Please refresh karke dobara try karein.';
 
           }
-
         };
 
         document.body.appendChild(script);
