@@ -26,6 +26,12 @@ const wishlistRoutes = require('./routes/wishlistRoutes');
 const couponRoutes = require('./routes/couponRoutes');
 
 /* =========================================
+   PRODUCT REVIEWS & RATINGS API
+========================================= */
+
+const reviewRoutes = require('./routes/reviewRoutes');
+
+/* =========================================
    WEBSITE ANNOUNCEMENT API
 ========================================= */
 
@@ -44,7 +50,6 @@ const {
   cashfreeWebhook
 } = require('./controllers/cashfreeWebhookController');
 
-
 /* =========================================
    EXPRESS APPLICATION
 ========================================= */
@@ -53,7 +58,6 @@ const app = express();
 
 app.disable('x-powered-by');
 app.set('trust proxy', 1);
-
 
 /* =========================================
    SECURITY HEADERS
@@ -64,7 +68,6 @@ app.use(
     contentSecurityPolicy: false
   })
 );
-
 
 /* =========================================
    ALLOWED CORS ORIGINS
@@ -103,7 +106,6 @@ app.use(
   })
 );
 
-
 /* =========================================
    RAZORPAY WEBHOOK
    PRESERVED FOR EXISTING ORDERS
@@ -117,7 +119,6 @@ app.post(
   }),
   webhook
 );
-
 
 /* =========================================
    CASHFREE WEBHOOK
@@ -138,7 +139,6 @@ app.post(
   cashfreeWebhook
 );
 
-
 /* =========================================
    MEMORA ORIGIN-BASED CSRF PROTECTION
 
@@ -154,7 +154,12 @@ app.post(
 ========================================= */
 
 app.use('/api', (req, res, next) => {
-  const safeMethods = new Set(['GET', 'HEAD', 'OPTIONS']);
+
+  const safeMethods = new Set([
+    'GET',
+    'HEAD',
+    'OPTIONS'
+  ]);
 
   if (safeMethods.has(req.method)) {
     return next();
@@ -163,6 +168,7 @@ app.use('/api', (req, res, next) => {
   // Health endpoints and webhook routes are not
   // browser-authenticated mutation endpoints.
   // Webhooks are already mounted before this middleware.
+
   const browserOrigin = req.get('origin');
   const fetchSite = req.get('sec-fetch-site');
 
@@ -173,7 +179,10 @@ app.use('/api', (req, res, next) => {
     });
   }
 
-  if (browserOrigin && !allowedOrigins.has(browserOrigin)) {
+  if (
+    browserOrigin &&
+    !allowedOrigins.has(browserOrigin)
+  ) {
     return res.status(403).json({
       success: false,
       message: 'Untrusted request origin.'
@@ -182,32 +191,43 @@ app.use('/api', (req, res, next) => {
 
   // Browsers normally provide Origin on cross-origin POSTs.
   // When absent, additionally reject an untrusted Referer.
+
   if (!browserOrigin) {
+
     const referer = req.get('referer');
+
     if (referer) {
       try {
-        const refererOrigin = new URL(referer).origin;
-        const ownOrigin = req.protocol + '://' + req.get('host');
 
-        if (!allowedOrigins.has(refererOrigin) &&
-            refererOrigin !== ownOrigin) {
+        const refererOrigin =
+          new URL(referer).origin;
+
+        const ownOrigin =
+          req.protocol + '://' + req.get('host');
+
+        if (
+          !allowedOrigins.has(refererOrigin) &&
+          refererOrigin !== ownOrigin
+        ) {
           return res.status(403).json({
             success: false,
             message: 'Untrusted request referer.'
           });
         }
+
       } catch (_) {
+
         return res.status(403).json({
           success: false,
           message: 'Invalid request referer.'
         });
+
       }
     }
   }
 
   next();
 });
-
 
 /* =========================================
    BODY PARSERS
@@ -227,7 +247,6 @@ app.use(
 );
 
 app.use(cookieParser());
-
 
 /* =========================================
    RATE LIMITING
@@ -274,6 +293,39 @@ app.use(
   authLimiter
 );
 
+/* =========================================
+   PRODUCT REVIEW RATE LIMITING
+
+   Limits customer review submission.
+   Public GET endpoints are unaffected.
+========================================= */
+
+const reviewLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 20,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message:
+      'Too many review requests. Please try later.'
+  }
+});
+
+app.use(
+  '/api/reviews',
+  (req, res, next) => {
+    if (
+      req.method === 'POST' ||
+      req.method === 'PATCH' ||
+      req.method === 'DELETE'
+    ) {
+      return reviewLimiter(req, res, next);
+    }
+
+    next();
+  }
+);
 
 /* =========================================
    HEALTH CHECK
@@ -291,7 +343,6 @@ app.get(
     });
   }
 );
-
 
 /* =========================================
    API ROUTES
@@ -343,11 +394,35 @@ app.use(
 );
 
 // Customer Coupon Validation API
+
 app.use(
   '/api/coupons',
   couponRoutes
 );
 
+/* =========================================
+   PRODUCT REVIEWS & RATINGS ROUTES
+
+   GET:
+   /api/reviews/product/:productId
+
+   GET:
+   /api/reviews/product/:productId/eligibility
+
+   POST:
+   /api/reviews/product/:productId
+
+   GET:
+   /api/reviews/admin/pending
+
+   PATCH:
+   /api/reviews/admin/:id/status
+========================================= */
+
+app.use(
+  '/api/reviews',
+  reviewRoutes
+);
 
 /* =========================================
    WEBSITE ANNOUNCEMENT ROUTES
@@ -362,7 +437,6 @@ app.use(
   announcementRoutes
 );
 
-
 /* =========================================
    STATIC FILES
 ========================================= */
@@ -372,7 +446,6 @@ app.use(
     path.join(__dirname, '..')
   )
 );
-
 
 /* =========================================
    API 404 HANDLER
@@ -387,7 +460,6 @@ app.use(
     });
   }
 );
-
 
 /* =========================================
    GLOBAL ERROR HANDLER
@@ -412,7 +484,6 @@ app.use(
 
   }
 );
-
 
 /* =========================================
    SERVER START
@@ -448,7 +519,6 @@ if (require.main === module) {
     });
 
 }
-
 
 /* =========================================
    EXPORT APP
