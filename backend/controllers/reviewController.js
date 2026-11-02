@@ -3,6 +3,10 @@
 ==========================================
  MEMORA CREATIONS
  PRODUCT REVIEWS & RATINGS CONTROLLER
+
+ VERIFIED PURCHASE
+ CUSTOMER STAR RATING
+ ADMIN APPROVAL
 ==========================================
 */
 
@@ -23,6 +27,7 @@ const {
 const MAX_PHOTOS = 3;
 const MAX_COMMENT = 1500;
 const MAX_TITLE = 120;
+
 
 /*
 ==========================================
@@ -122,6 +127,7 @@ async function findProduct(key) {
   return product;
 }
 
+
 /*
 ==========================================
  VERIFIED PURCHASE
@@ -160,6 +166,7 @@ async function findEligibleOrder(userId, productId) {
     .select('_id orderId')
     .lean();
 }
+
 
 /*
 ==========================================
@@ -252,15 +259,21 @@ const listProductReviews = asyncHandler(
   }
 );
 
+
 /*
 ==========================================
  CUSTOMER REVIEW ELIGIBILITY
+
+ IMPORTANT:
+ RETURN THE CUSTOMER'S ACTUAL RATING
+
  GET /api/reviews/product/:productId/eligibility
 ==========================================
 */
 
 const checkEligibility = asyncHandler(
   async (req, res) => {
+
     const product = await findProduct(
       req.params.productId
     );
@@ -268,27 +281,47 @@ const checkEligibility = asyncHandler(
     const existing = await Review.findOne({
       product: product._id,
       user: req.user._id
-    }).select('status rating');
+    })
+      .select('status rating')
+      .lean();
 
     const eligibleOrder = await findEligibleOrder(
       req.user._id,
       product._id
     );
 
+    const alreadyReviewed = Boolean(existing);
+
     return ok(res, {
+
       eligible: Boolean(
-        eligibleOrder && !existing
+        eligibleOrder && !alreadyReviewed
       ),
-      alreadyReviewed: Boolean(existing),
-      reviewStatus: existing?.status || null,
+
+      alreadyReviewed,
+
+      /*
+        Actual rating already saved
+        in the database.
+      */
+
+      reviewRating:
+        existing?.rating ?? null,
+
+      reviewStatus:
+        existing?.status || null,
+
       message: existing
         ? 'You already reviewed this product.'
         : eligibleOrder
           ? 'You can review this product.'
           : 'Review available after confirmed delivery and payment.'
+
     });
+
   }
 );
+
 
 /*
 ==========================================
@@ -380,7 +413,8 @@ const createReview = asyncHandler(
           message:
             'Review submitted for admin approval.',
           reviewId: review._id,
-          status: review.status
+          status: review.status,
+          reviewRating: review.rating
         },
         201
       );
@@ -397,6 +431,7 @@ const createReview = asyncHandler(
     }
   }
 );
+
 
 /*
 ==========================================
@@ -419,6 +454,7 @@ const listPendingReviews = asyncHandler(
     return ok(res, { reviews });
   }
 );
+
 
 /*
 ==========================================
@@ -476,6 +512,7 @@ const updateReviewStatus = asyncHandler(
     });
   }
 );
+
 
 /*
 ==========================================
