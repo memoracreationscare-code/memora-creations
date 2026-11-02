@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
    MEMORA CREATIONS
    ORDER MODEL
    RAZORPAY + CASHFREE + COD
+   WHATSAPP ORDER UPDATE CONSENT
 ========================================= */
 
 const orderItemSchema = new mongoose.Schema({
@@ -165,7 +166,10 @@ const orderSchema = new mongoose.Schema({
     default: 0
   },
 
-  // Applied coupon details (optional for existing orders)
+  /* =====================================
+     COUPON FIELDS
+  ===================================== */
+
   coupon: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Coupon',
@@ -180,18 +184,12 @@ const orderSchema = new mongoose.Schema({
     maxlength: 30
   },
 
-  // True only while this order holds a coupon usage reservation.
-  // Update with order/payment status inside the same transaction.
   couponUsageReserved: {
     type: Boolean,
     default: false,
     index: true
   },
 
-  // Legacy discount field remains unchanged (product MRP savings).
-  // Coupon usage and payment integration are handled separately.
-
-  // Coupon-specific savings, separate from existing MRP savings.
   couponDiscount: {
     type: Number,
     required: true,
@@ -207,7 +205,6 @@ const orderSchema = new mongoose.Schema({
 
   /* =====================================
      PAYMENT METHOD
-     CASHFREE ADDED
   ===================================== */
 
   paymentMethod: {
@@ -246,8 +243,7 @@ const orderSchema = new mongoose.Schema({
   },
 
   /* =====================================
-     EXISTING RAZORPAY FIELDS
-     PRESERVED FOR OLD ORDERS
+     RAZORPAY FIELDS
   ===================================== */
 
   razorpayOrderId: {
@@ -268,7 +264,7 @@ const orderSchema = new mongoose.Schema({
   },
 
   /* =====================================
-     NEW CASHFREE FIELDS
+     CASHFREE FIELDS
   ===================================== */
 
   cashfreeOrderId: {
@@ -288,6 +284,55 @@ const orderSchema = new mongoose.Schema({
   cashfreeEventId: {
     type: String,
     sparse: true
+  },
+
+  /* =====================================
+     WHATSAPP CUSTOMER CONSENT
+
+     Default is FALSE.
+
+     A customer must explicitly opt in
+     before notifications can be sent.
+
+     Never automatically infer consent
+     from having a mobile number.
+  ===================================== */
+
+  whatsappConsent: {
+
+    optedIn: {
+      type: Boolean,
+      default: false
+    },
+
+    optedInAt: {
+      type: Date,
+      default: null
+    },
+
+    source: {
+      type: String,
+      enum: [
+        'CHECKOUT',
+        'ACCOUNT',
+        'NONE'
+      ],
+      default: 'NONE'
+    },
+
+    /*
+      Consent disclosure version.
+      Useful for proving what the
+      customer agreed to.
+    */
+
+    disclosureVersion: {
+      type: String,
+      trim: true,
+      maxlength: 40,
+      default: null
+    }
+
   },
 
   /* =====================================
