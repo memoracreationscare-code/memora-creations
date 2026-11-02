@@ -7,6 +7,7 @@
  VERIFIED PURCHASE
  PHOTO UPLOAD
  ADMIN MODERATION
+ ADMIN REVIEW HISTORY
 =========================================
 */
 
@@ -103,7 +104,6 @@ const upload = multer({
     }
 
     callback(null, true);
-
   }
 
 });
@@ -112,8 +112,6 @@ const upload = multer({
 /*
 =========================================
  VERIFY IMAGE FILE CONTENT
-
- Do not rely on MIME type alone.
 =========================================
 */
 
@@ -123,8 +121,6 @@ function detectImageType(buffer) {
     return null;
   }
 
-  // JPEG
-
   if (
     buffer.length >= 3 &&
     buffer[0] === 0xFF &&
@@ -133,8 +129,6 @@ function detectImageType(buffer) {
   ) {
     return 'jpg';
   }
-
-  // PNG
 
   if (
     buffer.length >= 8 &&
@@ -147,8 +141,6 @@ function detectImageType(buffer) {
   ) {
     return 'png';
   }
-
-  // WEBP
 
   if (
     buffer.length >= 12 &&
@@ -165,13 +157,6 @@ function detectImageType(buffer) {
 /*
 =========================================
  VERIFY PRODUCT PURCHASE
-
- Customer must:
- - Be logged in
- - Have purchased the product
- - Have received the product
- - Have completed payment
- - Not have reviewed it already
 =========================================
 */
 
@@ -213,7 +198,6 @@ async function verifyReviewPurchase(
     'items.product': product._id,
 
     $or: [
-
       {
         paymentMethod: {
           $in: [
@@ -228,7 +212,6 @@ async function verifyReviewPurchase(
         paymentMethod: 'COD',
         paymentStatus: 'SUCCESS'
       }
-
     ]
 
   })
@@ -247,7 +230,6 @@ async function verifyReviewPurchase(
     eligible: true,
     order
   };
-
 }
 
 
@@ -297,7 +279,6 @@ function uploadToCloudinary(buffer) {
     stream.end(buffer);
 
   });
-
 }
 
 
@@ -306,9 +287,6 @@ function uploadToCloudinary(buffer) {
  UPLOAD REVIEW PHOTO
 
  POST /api/reviews/product/:productId/photo
-
- multipart/form-data
- field name: photo
 =========================================
 */
 
@@ -410,9 +388,7 @@ router.post(
       );
 
       return next(err);
-
     }
-
   }
 );
 
@@ -420,8 +396,6 @@ router.post(
 /*
 =========================================
  PUBLIC PRODUCT REVIEWS
-
- Anyone can view approved reviews.
 =========================================
 */
 
@@ -460,6 +434,8 @@ router.post(
 /*
 =========================================
  ADMIN PENDING REVIEWS
+
+ EXISTING ENDPOINT PRESERVED
 =========================================
 */
 
@@ -472,7 +448,177 @@ router.get(
 
 /*
 =========================================
+ NEW: ADMIN REVIEW HISTORY
+
+ GET /api/reviews/admin/history
+
+ Optional:
+ ?status=APPROVED
+ ?status=REJECTED
+ ?status=PENDING
+
+ Pagination:
+ ?page=1
+ ?limit=20
+
+ ADMIN ONLY
+ READ-ONLY
+ NO REVIEWS ARE DELETED OR MODIFIED
+=========================================
+*/
+
+router.get(
+  '/admin/history',
+  requireAdmin,
+  async (req, res, next) => {
+
+    try {
+
+      const status = String(
+        req.query.status || 'ALL'
+      ).trim().toUpperCase();
+
+      const allowedStatuses = [
+        'ALL',
+        'PENDING',
+        'APPROVED',
+        'REJECTED'
+      ];
+
+      if (!allowedStatuses.includes(status)) {
+
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid review status.'
+        });
+      }
+
+      const parsedPage = Number(
+        req.query.page || 1
+      );
+
+      const parsedLimit = Number(
+        req.query.limit || 20
+      );
+
+      if (
+        !Number.isInteger(parsedPage) ||
+        parsedPage < 1 ||
+        !Number.isInteger(parsedLimit) ||
+        parsedLimit < 1
+      ) {
+
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid pagination values.'
+        });
+      }
+
+      const page = Math.min(
+        parsedPage,
+        100000
+      );
+
+      const limit = Math.min(
+        parsedLimit,
+        50
+      );
+
+      const filter =
+        status === 'ALL'
+          ? {}
+          : { status };
+
+      const [
+        reviews,
+        total,
+        pendingCount,
+        approvedCount,
+        rejectedCount
+      ] = await Promise.all([
+
+        Review.find(filter)
+          .populate(
+            'product',
+            'name productId slug'
+          )
+          .populate(
+            'user',
+            'fullName'
+          )
+          .populate(
+            'order',
+            'orderId'
+          )
+          .sort({
+            updatedAt: -1,
+            _id: -1
+          })
+          .skip(
+            (page - 1) * limit
+          )
+          .limit(limit)
+          .lean(),
+
+        Review.countDocuments(filter),
+
+        Review.countDocuments({
+          status: 'PENDING'
+        }),
+
+        Review.countDocuments({
+          status: 'APPROVED'
+        }),
+
+        Review.countDocuments({
+          status: 'REJECTED'
+        })
+
+      ]);
+
+      return res.status(200).json({
+
+        success: true,
+
+        reviews,
+
+        summary: {
+          totalReviews:
+            pendingCount +
+            approvedCount +
+            rejectedCount,
+
+          pending: pendingCount,
+          approved: approvedCount,
+          rejected: rejectedCount
+        },
+
+        pagination: {
+          page,
+          limit,
+          total,
+          pages: Math.ceil(
+            total / limit
+          )
+        },
+
+        filter: status
+
+      });
+
+    } catch (err) {
+
+      return next(err);
+    }
+  }
+);
+
+
+/*
+=========================================
  ADMIN APPROVE / REJECT REVIEW
+
+ EXISTING ENDPOINT PRESERVED
 =========================================
 */
 
