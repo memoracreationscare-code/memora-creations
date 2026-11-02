@@ -1,4 +1,6 @@
 
+'use strict';
+
 /*
 =========================================
  MEMORA CREATIONS
@@ -9,13 +11,16 @@
  Safe Order Management
  Payment Protection
  Stock Protection
+ Coupon Protection
+ WhatsApp Consent Support
 =========================================
 */
 
 const mongoose = require('mongoose');
 
-// MC_COD_COUPON_RELEASE_V1
-const { releaseCoupon } = require('../services/couponUsageService');
+const {
+  releaseCoupon
+} = require('../services/couponUsageService');
 
 const {
   Order
@@ -31,7 +36,9 @@ const {
   validateAddress
 } = require('../utils/validation');
 
-const { calculateCouponPricing } = require('../services/couponPricingService'); // MC_COUPON_PREVIEW_V1
+const {
+  calculateCouponPricing
+} = require('../services/couponPricingService');
 
 const {
   getTrustedItems,
@@ -51,7 +58,7 @@ const preview = asyncHandler(async (req, res) => {
     req.body.items
   );
 
-  // When coupon is supplied, validate using trusted database prices.
+  // Validate coupons using trusted database prices.
   const amountDetails = req.body?.couponCode
     ? await calculateCouponPricing({
         items: req.body.items,
@@ -86,11 +93,8 @@ const preview = asyncHandler(async (req, res) => {
   }));
 
   return ok(res, {
-
     ...amountDetails,
-
     items
-
   });
 
 });
@@ -98,6 +102,7 @@ const preview = asyncHandler(async (req, res) => {
 
 /* =====================================
    CREATE COD ORDER
+   WHATSAPP CONSENT SUPPORT
 ===================================== */
 
 const createCod = asyncHandler(async (req, res) => {
@@ -109,13 +114,23 @@ const createCod = asyncHandler(async (req, res) => {
   );
 
   if (validationMessage) {
-
     throw error(
       400,
       validationMessage
     );
-
   }
+
+  /*
+    Accept only explicit boolean true.
+
+    The customer must actively opt in
+    through the checkout interface.
+
+    Missing or false consent remains false.
+  */
+
+  const whatsappOptIn =
+    req.body.whatsappOptIn === true;
 
   const order = await createCodOrder({
 
@@ -127,16 +142,27 @@ const createCod = asyncHandler(async (req, res) => {
     items:
       req.body.items,
 
-    // MC_COD_COUPON_CONTROLLER_V1
-    // Optional coupon; pricing is recalculated by the backend.
-    couponCode: typeof req.body?.couponCode === 'string'
-      ? req.body.couponCode.trim().toUpperCase()
-      : null,
+    // Existing coupon support preserved.
+    couponCode:
+      typeof req.body?.couponCode === 'string'
+        ? req.body.couponCode.trim().toUpperCase()
+        : null,
 
     clearCart:
-      req.body.clearCart === true
+      req.body.clearCart === true,
+
+    // NEW: Save WhatsApp consent with order.
+    whatsappOptIn
 
   });
+
+  /*
+    No notification is sent here yet.
+
+    Notification dispatch will be
+    connected after the complete consent
+    and Meta API setup is ready.
+  */
 
   return ok(
     res,
@@ -170,9 +196,7 @@ const listOrders = asyncHandler(async (req, res) => {
     .lean();
 
   return ok(res, {
-
     orders
-
   });
 
 });
@@ -195,18 +219,14 @@ const getOrder = asyncHandler(async (req, res) => {
   }).lean();
 
   if (!order) {
-
     throw error(
       404,
       'Order not found.'
     );
-
   }
 
   return ok(res, {
-
     order
-
   });
 
 });
@@ -247,12 +267,10 @@ const cancelOrder = asyncHandler(async (req, res) => {
   });
 
   if (!order) {
-
     throw error(
       404,
       'Order not found.'
     );
-
   }
 
 
@@ -263,12 +281,10 @@ const cancelOrder = asyncHandler(async (req, res) => {
   if (
     order.orderStatus === 'Cancelled'
   ) {
-
     throw error(
       409,
       'This order is already cancelled.'
     );
-
   }
 
   if (
@@ -277,12 +293,10 @@ const cancelOrder = asyncHandler(async (req, res) => {
       'Confirmed'
     ].includes(order.orderStatus)
   ) {
-
     throw error(
       400,
       'This order can no longer be cancelled.'
     );
-
   }
 
 
@@ -290,19 +304,17 @@ const cancelOrder = asyncHandler(async (req, res) => {
      CASHFREE PROTECTION
 
      Customer-side cancellation is
-     temporarily disabled to prevent
-     late-payment race conditions.
+     disabled to prevent late-payment
+     race conditions.
   ================================= */
 
   if (
     order.paymentMethod === 'CASHFREE'
   ) {
-
     throw error(
       409,
       'Cashfree orders require support-assisted cancellation. Please contact customer care.'
     );
-
   }
 
 
@@ -313,12 +325,10 @@ const cancelOrder = asyncHandler(async (req, res) => {
   if (
     order.paymentMethod === 'RAZORPAY'
   ) {
-
     throw error(
       409,
       'Online payment orders require support-assisted cancellation.'
     );
-
   }
 
 
@@ -329,12 +339,10 @@ const cancelOrder = asyncHandler(async (req, res) => {
   if (
     order.paymentMethod !== 'COD'
   ) {
-
     throw error(
       400,
       'Unsupported payment method.'
     );
-
   }
 
 
@@ -345,12 +353,10 @@ const cancelOrder = asyncHandler(async (req, res) => {
   if (
     order.paymentStatus !== 'COD_PENDING'
   ) {
-
     throw error(
       409,
       'This COD order cannot be cancelled automatically.'
     );
-
   }
 
 
@@ -367,8 +373,8 @@ const cancelOrder = asyncHandler(async (req, res) => {
     await session.withTransaction(async () => {
 
       /*
-       Read fresh order inside transaction
-       to avoid using stale status.
+        Read fresh order inside transaction
+        to avoid using stale status.
       */
 
       const freshOrder = await Order.findOne({
@@ -383,12 +389,10 @@ const cancelOrder = asyncHandler(async (req, res) => {
 
 
       if (!freshOrder) {
-
         throw error(
           404,
           'Order not found.'
         );
-
       }
 
 
@@ -402,12 +406,10 @@ const cancelOrder = asyncHandler(async (req, res) => {
           'Confirmed'
         ].includes(freshOrder.orderStatus)
       ) {
-
         throw error(
           409,
           'Order status has changed. Please refresh.'
         );
-
       }
 
 
@@ -419,12 +421,10 @@ const cancelOrder = asyncHandler(async (req, res) => {
         freshOrder.paymentMethod !== 'COD' ||
         freshOrder.paymentStatus !== 'COD_PENDING'
       ) {
-
         throw error(
           409,
           'Payment details changed. Cancellation stopped.'
         );
-
       }
 
 
@@ -440,22 +440,29 @@ const cancelOrder = asyncHandler(async (req, res) => {
 
       /* =================================
          RELEASE COUPON ONCE
+
          Only for reserved COD coupons.
-         Part of the same transaction as stock and cancellation.
+         Part of the same transaction.
       ================================= */
 
       if (freshOrder.couponUsageReserved === true) {
+
         if (!freshOrder.coupon) {
-          throw error(409, 'Order coupon reservation is incomplete.');
+          throw error(
+            409,
+            'Order coupon reservation is incomplete.'
+          );
         }
-        // MC_CUSTOMER_COUPON_RELEASE_USER_V1
+
         await releaseCoupon({
           couponId: freshOrder.coupon,
           userId: freshOrder.user,
           session
         });
+
         freshOrder.couponUsageReserved = false;
       }
+
 
       /* =================================
          UPDATE ORDER
@@ -491,13 +498,10 @@ const cancelOrder = asyncHandler(async (req, res) => {
       ================================= */
 
       await freshOrder.save({
-
         session
-
       });
 
-      cancelledOrder =
-        freshOrder;
+      cancelledOrder = freshOrder;
 
     });
 
