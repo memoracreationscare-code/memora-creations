@@ -255,18 +255,18 @@
         }
 
         /*
-          Load the updated Customer Orders JS
-          only after successful login.
+          Load orders only after customer login.
 
-          Version 12 prevents an old cached
-          orders.js from being reused.
+          Version 14:
+          Delivered Product Reviews & Ratings
+          with existing order actions preserved.
         */
 
         const script =
           document.createElement('script');
 
         script.src =
-          '/memora-creations/frontend/js/orders.js?v=13';
+          '/memora-creations/frontend/js/orders.js?v=14';
 
         script.onerror = function () {
 
