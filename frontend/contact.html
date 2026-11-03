@@ -1,0 +1,436 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <meta
+    name="description"
+    content="Contact Memora Creations for product enquiries, orders, delivery questions and customer support."
+  >
+
+  <title>Contact Us | Memora Creations</title>
+
+  <link
+    rel="stylesheet"
+    href="/memora-creations/frontend/css/style.css?v=13"
+  >
+
+  <style>
+    :root {
+      --contact-brown: #8a5a3b;
+      --contact-dark: #2d2119;
+      --contact-muted: #766b61;
+      --contact-border: #e9dfd5;
+    }
+
+    .contact-page {
+      padding-top: 32px;
+      padding-bottom: 75px;
+    }
+
+    .contact-hero {
+      padding: clamp(35px, 6vw, 70px);
+      border-radius: 28px;
+      border: 1px solid #e7d6c8;
+      background:
+        radial-gradient(
+          circle at 90% 10%,
+          rgba(183, 131, 93, .20),
+          transparent 40%
+        ),
+        linear-gradient(135deg, #fffaf4, #f2e4d7);
+      margin-bottom: 28px;
+    }
+
+    .contact-eyebrow {
+      color: var(--contact-brown);
+      font-size: 12px;
+      letter-spacing: .19em;
+      text-transform: uppercase;
+      font-weight: 900;
+      display: block;
+      margin-bottom: 18px;
+    }
+
+    .contact-hero h1 {
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--contact-dark);
+      font-size: clamp(42px, 6vw, 70px);
+      line-height: 1.12;
+      letter-spacing: -.03em;
+      margin: 0 0 20px;
+    }
+
+    .contact-hero h1 span {
+      color: var(--contact-brown);
+    }
+
+    .contact-hero p {
+      color: #675a50;
+      font-size: 16px;
+      line-height: 1.8;
+      max-width: 680px;
+      margin: 0;
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+      margin-bottom: 25px;
+    }
+
+    .contact-card {
+      background: #fff;
+      border: 1px solid var(--contact-border);
+      border-radius: 22px;
+      padding: clamp(25px, 4vw, 38px);
+    }
+
+    .contact-icon {
+      width: 58px;
+      height: 58px;
+      border-radius: 17px;
+      background: #f4ebe3;
+      display: grid;
+      place-items: center;
+      font-size: 27px;
+      margin-bottom: 19px;
+    }
+
+    .contact-card h2 {
+      font-family: Georgia, serif;
+      font-size: 27px;
+      color: var(--contact-dark);
+      margin: 0 0 13px;
+    }
+
+    .contact-card p {
+      color: var(--contact-muted);
+      line-height: 1.8;
+      font-size: 14px;
+      margin: 0 0 20px;
+    }
+
+    .contact-link {
+      color: var(--contact-brown);
+      overflow-wrap: anywhere;
+      font-size: 14px;
+      font-weight: 750;
+      display: block;
+      margin-bottom: 22px;
+    }
+
+    .contact-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 13px 22px;
+      min-height: 46px;
+      border-radius: 12px;
+      background: var(--contact-brown);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 800;
+      text-decoration: none;
+      transition: transform .2s;
+    }
+
+    .contact-button:hover {
+      transform: translateY(-2px);
+    }
+
+    .contact-button.whatsapp {
+      background: #187a47;
+    }
+
+    .contact-info {
+      background: #fff;
+      border: 1px solid var(--contact-border);
+      border-radius: 22px;
+      padding: clamp(25px, 4vw, 42px);
+      margin-bottom: 24px;
+    }
+
+    .contact-info h2 {
+      font-family: Georgia, serif;
+      font-size: 30px;
+      color: var(--contact-dark);
+      margin: 0 0 14px;
+    }
+
+    .contact-info p {
+      color: var(--contact-muted);
+      line-height: 1.85;
+      font-size: 15px;
+      margin: 0 0 16px;
+    }
+
+    .contact-help-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 13px;
+      margin-top: 23px;
+    }
+
+    .contact-help-item {
+      background: #faf7f3;
+      border: 1px solid #eee2d7;
+      border-radius: 13px;
+      padding: 17px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #604b3a;
+    }
+
+    .contact-order-help {
+      background: #2c2018;
+      color: white;
+      border-radius: 23px;
+      padding: clamp(30px, 5vw, 50px);
+      text-align: center;
+    }
+
+    .contact-order-help h2 {
+      font-family: Georgia, serif;
+      font-size: clamp(27px, 4vw, 38px);
+      margin: 0 0 15px;
+    }
+
+    .contact-order-help p {
+      color: #e4d2c4;
+      line-height: 1.8;
+      margin: 0 auto 23px;
+      max-width: 600px;
+    }
+
+    .contact-order-help .contact-button {
+      background: white;
+      color: #63432f;
+    }
+
+    .contact-footer {
+      background: #281e18;
+      color: white;
+      text-align: center;
+      padding: 30px 16px 95px;
+    }
+
+    .contact-footer strong {
+      display: block;
+      letter-spacing: .14em;
+      margin-bottom: 10px;
+    }
+
+    .contact-footer p {
+      color: #cbbcb1;
+      font-size: 13px;
+      margin: 0;
+      line-height: 1.7;
+    }
+
+    @media(max-width: 760px) {
+      .contact-page {
+        padding-top: 18px;
+      }
+
+      .contact-grid,
+      .contact-help-list {
+        grid-template-columns: 1fr;
+      }
+
+      .contact-hero {
+        border-radius: 20px;
+      }
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <header id="nav" class="topbar"></header>
+
+  <main class="container contact-page">
+
+    <!-- CONTACT HERO -->
+
+    <section class="contact-hero">
+
+      <span class="contact-eyebrow">
+        MEMORA CREATIONS SUPPORT
+      </span>
+
+      <h1>
+        We're Here
+        <span>To Help You.</span>
+      </h1>
+
+      <p>
+        Have a question about our home decor
+        products, your order, payment or delivery?
+
+        Get in touch with Memora Creations.
+        We welcome your questions and feedback.
+      </p>
+
+    </section>
+
+    <!-- SUPPORT CHANNELS -->
+
+    <div class="contact-grid">
+
+      <section class="contact-card">
+
+        <div class="contact-icon"
+          aria-hidden="true">💬</div>
+
+        <h2>WhatsApp Support</h2>
+
+        <p>
+          Chat with Memora Creations
+          about product enquiries,
+          ordering and shopping assistance.
+        </p>
+
+        <span class="contact-link">
+          +91 88740 50204
+        </span>
+
+        <a
+          class="contact-button whatsapp"
+          href="https://wa.me/918874050204?text=Namaste%20Memora%20Creations%2C%20mujhe%20customer%20support%20chahiye."
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Chat on WhatsApp
+        </a>
+
+      </section>
+
+      <section class="contact-card">
+
+        <div class="contact-icon"
+          aria-hidden="true">✉️</div>
+
+        <h2>Email Support</h2>
+
+        <p>
+          Send us your order questions,
+          product enquiries, suggestions
+          or customer service requests.
+        </p>
+
+        <a
+          class="contact-link"
+          href="mailto:memoracreations.care@gmail.com"
+        >
+          memoracreations.care@gmail.com
+        </a>
+
+        <a
+          class="contact-button"
+          href="mailto:memoracreations.care@gmail.com?subject=Customer%20Enquiry%20-%20Memora%20Creations"
+        >
+          Send an Email
+        </a>
+
+      </section>
+
+    </div>
+
+    <!-- HELP TOPICS -->
+
+    <section class="contact-info">
+
+      <span class="contact-eyebrow">
+        CUSTOMER ASSISTANCE
+      </span>
+
+      <h2>How Can We Help?</h2>
+
+      <p>
+        Contact our support team
+        for assistance with the
+        following topics.
+      </p>
+
+      <div class="contact-help-list">
+
+        <div class="contact-help-item">
+          📦 Order Status & Tracking
+        </div>
+
+        <div class="contact-help-item">
+          🛒 Product Information
+        </div>
+
+        <div class="contact-help-item">
+          💳 Payment Related Questions
+        </div>
+
+        <div class="contact-help-item">
+          ↩️ Cancellation & Refund Enquiries
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ORDER SUPPORT -->
+
+    <section class="contact-order-help">
+
+      <h2>
+        Need Help With an Existing Order?
+      </h2>
+
+      <p>
+        You can check your order details
+        in My Orders.
+
+        If you contact customer support,
+        please include your Order ID
+        so we can understand your request.
+        Never share your password or OTP.
+      </p>
+
+      <a
+        class="contact-button"
+        href="/memora-creations/frontend/orders.html"
+      >
+        View My Orders
+      </a>
+
+    </section>
+
+  </main>
+
+  <footer class="contact-footer">
+
+    <strong>
+      MEMORA CREATIONS
+    </strong>
+
+    <p>
+      Beautiful Decor • Thoughtful Gifts
+      • Memorable Spaces
+    </p>
+
+  </footer>
+
+  <nav id="bottomNav" class="bottomnav"></nav>
+
+  <script
+    src="/memora-creations/frontend/js/app.js?v=11"
+  ></script>
+
+</body>
+</html>
