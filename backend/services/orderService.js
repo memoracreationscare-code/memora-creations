@@ -6,13 +6,12 @@
  MEMORA CREATIONS
  ORDER SERVICE
 
- COD + CASHFREE + RAZORPAY
-
+ COD + CASHFREE + LEGACY RAZORPAY
  Stock Management
  Trusted Pricing
- Order Creation
- Safe Payment Handling
- WhatsApp Consent Support
+ Coupons
+ WhatsApp Consent
+ Gift Wrapping Preparation
 =========================================
 */
 
@@ -34,6 +33,10 @@ const {
 const {
   buildWhatsAppConsent
 } = require('./whatsappConsentService');
+
+const {
+  prepareGiftWrapping
+} = require('./giftWrappingService');
 
 
 /* =====================================
@@ -117,7 +120,10 @@ async function getTrustedItems(items) {
 
   for (const item of items) {
     if (!item || typeof item !== 'object') {
-      throw error(400, 'Invalid product details.');
+      throw error(
+        400,
+        'Invalid product details.'
+      );
     }
 
     const productId = String(
@@ -179,7 +185,10 @@ async function getTrustedItems(items) {
     const quantity = merged.get(id);
 
     if (!product) {
-      throw error(404, 'Product not found.');
+      throw error(
+        404,
+        'Product not found.'
+      );
     }
 
     if (
@@ -193,7 +202,9 @@ async function getTrustedItems(items) {
     }
 
     if (
-      !Number.isFinite(Number(product.sellingPrice)) ||
+      !Number.isFinite(
+        Number(product.sellingPrice)
+      ) ||
       Number(product.sellingPrice) < 0
     ) {
       throw error(
@@ -216,7 +227,8 @@ function totals(trustedItems) {
     trustedItems.reduce(
       (sum, item) =>
         sum +
-        item.product.sellingPrice * item.quantity,
+        item.product.sellingPrice *
+        item.quantity,
       0
     )
   );
@@ -234,16 +246,22 @@ function totals(trustedItems) {
   );
 
   const discount = money(
-    Math.max(0, original - subtotal)
+    Math.max(
+      0,
+      original - subtotal
+    )
   );
 
-  const deliveryCharge = deliveryFor(subtotal);
+  const deliveryCharge = deliveryFor(
+    subtotal
+  );
 
   return {
     subtotal,
     original,
     discount,
     deliveryCharge,
+
     grandTotal: money(
       subtotal + deliveryCharge
     )
@@ -268,6 +286,28 @@ function createOrderNumber() {
 
 
 /* =====================================
+   VALIDATE GIFT WRAPPING
+
+   Fee is calculated on server.
+
+   Disabled service accepts only
+   default / no gift wrapping.
+===================================== */
+
+function trustedGiftWrapping(value) {
+  try {
+    return prepareGiftWrapping(value);
+  } catch (err) {
+    throw error(
+      400,
+      err.message ||
+      'Invalid gift wrapping selection.'
+    );
+  }
+}
+
+
+/* =====================================
    BUILD ORDER DOCUMENT
 ===================================== */
 
@@ -280,10 +320,9 @@ async function buildOrderDocument({
   cashfreeOrderId,
   couponCode = null,
   clearCartOnPayment = false,
-
-  // Explicit consent from a validated
-  // checkout request. Defaults to false.
   whatsappOptIn = false,
+
+  giftWrapping = null,
 
   session
 }) {
@@ -293,8 +332,15 @@ async function buildOrderDocument({
     'CASHFREE'
   ];
 
-  if (!allowedMethods.includes(paymentMethod)) {
-    throw error(400, 'Invalid payment method.');
+  if (
+    !allowedMethods.includes(
+      paymentMethod
+    )
+  ) {
+    throw error(
+      400,
+      'Invalid payment method.'
+    );
   }
 
   if (
@@ -317,10 +363,29 @@ async function buildOrderDocument({
     );
   }
 
-  const trusted = await getTrustedItems(items);
+
+  /* TRUSTED PRODUCTS */
+
+  const trusted = await getTrustedItems(
+    items
+  );
+
   const amount = totals(trusted);
 
-  // Reserve coupon inside order transaction.
+
+  /* TRUSTED GIFT WRAPPING */
+
+  const gift = trustedGiftWrapping(
+    giftWrapping
+  );
+
+  const giftWrappingFee = money(
+    gift.fee
+  );
+
+
+  /* COUPON RESERVATION */
+
   const couponReservation = couponCode
     ? await reserveCoupon({
         code: couponCode,
@@ -332,48 +397,62 @@ async function buildOrderDocument({
 
   const appliedCouponDiscount =
     couponReservation
-      ? money(couponReservation.couponDiscount)
+      ? money(
+          couponReservation.couponDiscount
+        )
       : 0;
+
+
+  /* SERVER-CALCULATED TOTAL */
 
   const payableTotal = money(
     Math.max(
       0,
-      amount.grandTotal - appliedCouponDiscount
+      amount.grandTotal +
+      giftWrappingFee -
+      appliedCouponDiscount
     )
   );
+
+
+  /* ORDER ITEMS */
 
   const orderItems = trusted.map(
     ({ product, quantity }) => ({
       product: product._id,
       productId: product.productId,
       name: product.name,
-      imageUrl: product.images?.[0]?.url || '',
+      imageUrl:
+        product.images?.[0]?.url || '',
       quantity,
       unitPrice: product.sellingPrice,
+
       lineTotal: money(
         product.sellingPrice * quantity
       )
     })
   );
 
+
+  /* PAYMENT STATUS */
+
   const paymentStatus =
     paymentMethod === 'COD'
       ? 'COD_PENDING'
       : 'PENDING';
 
-  /*
-    Only an explicit boolean true
-    records customer consent.
 
-    Existing callers that do not pass
-    whatsappOptIn remain opted out.
-  */
+  /* WHATSAPP CONSENT */
 
   const whatsappConsent =
     buildWhatsAppConsent({
-      optedIn: whatsappOptIn === true,
+      optedIn:
+        whatsappOptIn === true,
       source: 'CHECKOUT'
     });
+
+
+  /* CREATE ORDER DOCUMENT */
 
   return new Order({
     orderId: createOrderNumber(),
@@ -383,29 +462,45 @@ async function buildOrderDocument({
     customer: {
       fullName:
         user.fullName || address.fullName,
+
       mobile:
         user.mobile || address.mobile,
+
       email:
         user.email || undefined
     },
 
     shippingAddress: address,
+
     items: orderItems,
 
     subtotal: amount.subtotal,
-    deliveryCharge: amount.deliveryCharge,
+
+    deliveryCharge:
+      amount.deliveryCharge,
+
     discount: amount.discount,
 
     coupon:
-      couponReservation?.couponId || null,
+      couponReservation?.couponId ||
+      null,
 
     couponCode:
-      couponReservation?.couponCode || null,
+      couponReservation?.couponCode ||
+      null,
 
-    couponDiscount: appliedCouponDiscount,
+    couponDiscount:
+      appliedCouponDiscount,
 
     couponUsageReserved:
       Boolean(couponReservation),
+
+    giftWrapping: {
+      selected: gift.selected,
+      type: gift.type,
+      fee: giftWrappingFee,
+      message: gift.message
+    },
 
     grandTotal: payableTotal,
 
@@ -421,7 +516,6 @@ async function buildOrderDocument({
 
     stockReserved: false,
 
-    // NEW: Persist consent with order.
     whatsappConsent,
 
     orderStatus: 'Order Placed',
@@ -438,7 +532,7 @@ async function buildOrderDocument({
 /* =====================================
    RESERVE STOCK
 
-   Must run inside MongoDB transaction.
+   Must run in MongoDB transaction.
 ===================================== */
 
 async function reserveStock(order, session) {
@@ -450,28 +544,39 @@ async function reserveStock(order, session) {
   }
 
   if (!order) {
-    throw error(400, 'Order is required.');
+    throw error(
+      400,
+      'Order is required.'
+    );
   }
 
   if (order.stockReserved === true) {
-    throw error(409, 'Stock already reserved.');
+    throw error(
+      409,
+      'Stock already reserved.'
+    );
   }
 
   for (const item of order.items) {
-    const updated = await Product.findOneAndUpdate(
-      {
-        _id: item.product,
-        isActive: true,
-        stock: { $gte: item.quantity }
-      },
-      {
-        $inc: { stock: -item.quantity }
-      },
-      {
-        new: true,
-        session
-      }
-    );
+    const updated =
+      await Product.findOneAndUpdate(
+        {
+          _id: item.product,
+          isActive: true,
+          stock: {
+            $gte: item.quantity
+          }
+        },
+        {
+          $inc: {
+            stock: -item.quantity
+          }
+        },
+        {
+          new: true,
+          session
+        }
+      );
 
     if (!updated) {
       throw error(
@@ -487,8 +592,6 @@ async function reserveStock(order, session) {
 
 /* =====================================
    RELEASE STOCK
-
-   Must run inside a safe transaction.
 ===================================== */
 
 async function releaseStock(order, session) {
@@ -507,13 +610,20 @@ async function releaseStock(order, session) {
   }
 
   for (const item of order.items) {
-    const result = await Product.updateOne(
-      { _id: item.product },
-      {
-        $inc: { stock: item.quantity }
-      },
-      { session }
-    );
+    const result =
+      await Product.updateOne(
+        {
+          _id: item.product
+        },
+        {
+          $inc: {
+            stock: item.quantity
+          }
+        },
+        {
+          session
+        }
+      );
 
     if (result.matchedCount !== 1) {
       throw error(
@@ -537,36 +647,61 @@ async function createCodOrder({
   items,
   couponCode = null,
   clearCart = false,
-  whatsappOptIn = false
+  whatsappOptIn = false,
+
+  giftWrapping = null
 }) {
-  const session = await mongoose.startSession();
+  const session =
+    await mongoose.startSession();
+
   let order;
 
   try {
-    await session.withTransaction(async () => {
-      order = await buildOrderDocument({
-        user,
-        address,
-        items,
-        paymentMethod: 'COD',
-        couponCode,
-        whatsappOptIn,
-        session
-      });
+    await session.withTransaction(
+      async () => {
+        order = await buildOrderDocument({
+          user,
+          address,
+          items,
 
-      await reserveStock(order, session);
-      await order.save({ session });
+          paymentMethod: 'COD',
 
-      if (clearCart === true) {
-        await Cart.updateOne(
-          { user: user._id },
-          { $set: { items: [] } },
-          { session }
+          couponCode,
+          whatsappOptIn,
+          giftWrapping,
+
+          session
+        });
+
+        await reserveStock(
+          order,
+          session
         );
+
+        await order.save({
+          session
+        });
+
+        if (clearCart === true) {
+          await Cart.updateOne(
+            {
+              user: user._id
+            },
+            {
+              $set: {
+                items: []
+              }
+            },
+            {
+              session
+            }
+          );
+        }
       }
-    });
+    );
 
     return order;
+
   } finally {
     await session.endSession();
   }
@@ -574,9 +709,7 @@ async function createCodOrder({
 
 
 /* =====================================
-   CREATE RAZORPAY PENDING ORDER
-
-   Legacy flow preserved.
+   CREATE LEGACY RAZORPAY ORDER
 ===================================== */
 
 async function createOnlinePendingOrder({
@@ -585,29 +718,49 @@ async function createOnlinePendingOrder({
   items,
   razorpayOrderId,
   clearCart = false,
-  whatsappOptIn = false
+  whatsappOptIn = false,
+
+  giftWrapping = null
 }) {
-  const session = await mongoose.startSession();
+  const session =
+    await mongoose.startSession();
+
   let order;
 
   try {
-    await session.withTransaction(async () => {
-      order = await buildOrderDocument({
-        user,
-        address,
-        items,
-        paymentMethod: 'RAZORPAY',
-        razorpayOrderId,
-        clearCartOnPayment: clearCart,
-        whatsappOptIn,
-        session
-      });
+    await session.withTransaction(
+      async () => {
+        order = await buildOrderDocument({
+          user,
+          address,
+          items,
 
-      await reserveStock(order, session);
-      await order.save({ session });
-    });
+          paymentMethod: 'RAZORPAY',
+
+          razorpayOrderId,
+
+          clearCartOnPayment:
+            clearCart,
+
+          whatsappOptIn,
+          giftWrapping,
+
+          session
+        });
+
+        await reserveStock(
+          order,
+          session
+        );
+
+        await order.save({
+          session
+        });
+      }
+    );
 
     return order;
+
   } finally {
     await session.endSession();
   }
@@ -624,13 +777,13 @@ async function createCashfreePendingOrder({
   items,
   cashfreeOrderId,
 
-  // Existing coupon and price
-  // verification preserved.
   couponCode = null,
   expectedAmount = null,
-  clearCart = false,
 
-  whatsappOptIn = false
+  clearCart = false,
+  whatsappOptIn = false,
+
+  giftWrapping = null
 }) {
   if (!cashfreeOrderId) {
     throw error(
@@ -639,40 +792,71 @@ async function createCashfreePendingOrder({
     );
   }
 
-  const session = await mongoose.startSession();
+  const session =
+    await mongoose.startSession();
+
   let order;
 
   try {
-    await session.withTransaction(async () => {
-      order = await buildOrderDocument({
-        user,
-        address,
-        items,
-        paymentMethod: 'CASHFREE',
-        cashfreeOrderId,
-        couponCode,
-        clearCartOnPayment: clearCart,
-        whatsappOptIn,
-        session
-      });
+    await session.withTransaction(
+      async () => {
+        order = await buildOrderDocument({
+          user,
+          address,
+          items,
 
-      // Protect payment and coupon totals.
-      if (
-        !Number.isFinite(Number(expectedAmount)) ||
-        Math.round(order.grandTotal * 100) !==
-          Math.round(Number(expectedAmount) * 100)
-      ) {
-        throw error(
-          409,
-          'Prices or coupon changed. Please retry checkout.'
+          paymentMethod: 'CASHFREE',
+
+          cashfreeOrderId,
+          couponCode,
+
+          clearCartOnPayment:
+            clearCart,
+
+          whatsappOptIn,
+          giftWrapping,
+
+          session
+        });
+
+
+        /*
+         Protect gateway amount.
+
+         No client-supplied gift fee
+         is accepted.
+        */
+
+        if (
+          !Number.isFinite(
+            Number(expectedAmount)
+          ) ||
+          Math.round(
+            order.grandTotal * 100
+          ) !==
+          Math.round(
+            Number(expectedAmount) * 100
+          )
+        ) {
+          throw error(
+            409,
+            'Prices or coupon changed. Please retry checkout.'
+          );
+        }
+
+        await reserveStock(
+          order,
+          session
         );
-      }
 
-      await reserveStock(order, session);
-      await order.save({ session });
-    });
+        await order.save({
+          session
+        });
+      }
+    );
 
     return order;
+
   } finally {
     await session.endSession();
   }
@@ -682,21 +866,21 @@ async function createCashfreePendingOrder({
 /* =====================================
    CANCEL PENDING ONLINE ORDER
 
-   Do not automatically release stock
-   for unresolved Cashfree/Razorpay
-   payments.
-
-   Gateway reconciliation required.
+   Payment reconciliation required.
 ===================================== */
 
-async function cancelPendingOnlineOrder(order) {
+async function cancelPendingOnlineOrder(
+  order
+) {
   if (!order) {
     return order;
   }
 
   if (
-    !['RAZORPAY', 'CASHFREE']
-      .includes(order.paymentMethod)
+    ![
+      'RAZORPAY',
+      'CASHFREE'
+    ].includes(order.paymentMethod)
   ) {
     return order;
   }
@@ -724,15 +908,26 @@ async function cancelPendingOnlineOrder(order) {
 
 module.exports = {
   ORDER_STATUSES,
+
   getTrustedItems,
+
   totals,
+
   buildOrderDocument,
+
   createCodOrder,
+
   createOnlinePendingOrder,
+
   createCashfreePendingOrder,
+
   cancelPendingOnlineOrder,
+
   reserveStock,
+
   releaseStock,
+
   deliveryFor,
+
   money
 };
