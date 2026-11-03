@@ -1,0 +1,110 @@
+
+name: Memora Creations Auto Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: memora-cloudflare-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy Memora Creations
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Latest Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Build Cloudflare Website
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Only public static website files.
+          # Never include backend or .env.
+
+          mkdir -p dist
+
+          cp -R frontend dist/frontend
+          cp -R admin dist/admin
+
+          # Convert GitHub Pages paths to
+          # Cloudflare Pages root paths.
+
+          python3 - <<'PY'
+          from pathlib import Path
+
+          root = Path("dist")
+
+          extensions = {
+              ".html",
+              ".css",
+              ".js"
+          }
+
+          for file in root.rglob("*"):
+              if not file.is_file():
+                  continue
+
+              if file.suffix.lower() not in extensions:
+                  continue
+
+              data = file.read_bytes()
+
+              updated = data.replace(
+                  b"/memora-creations/",
+                  b"/"
+              )
+
+              if updated != data:
+                  file.write_bytes(updated)
+
+          print("Cloudflare paths updated")
+          PY
+
+          # Main homepage at root URL.
+
+          cp dist/frontend/index.html dist/index.html
+
+          # Google site verification, when present.
+
+          for file in google*.html; do
+            if [ -f "$file" ]; then
+              cp "$file" dist/
+            fi
+          done
+
+          # Confirm required files exist.
+
+          test -f dist/index.html
+          test -f dist/frontend/products.html
+          test -f dist/frontend/js/app.js
+          test -f dist/admin/dashboard.html
+
+          echo "BUILD READY"
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=memora-creations --branch=main
+
+      - name: Deployment Completed
+        run: |
+          echo "Memora Creations deployment completed."
+          echo "Website: https://memora-creations.pages.dev/"
