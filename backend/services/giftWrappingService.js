@@ -6,48 +6,62 @@
  MEMORA CREATIONS
  GIFT WRAPPING SERVICE
 
- STEP 3 - BACKEND PREPARATION
+ STANDARD = INR 29
+ PREMIUM  = INR 59
+
+ SANDBOX TESTING ONLY
 
  Features:
- - Standard / Premium options
- - Personal gift message validation
- - Server-controlled pricing
- - Safe default for existing orders
-
- IMPORTANT:
- Gift wrapping is currently DISABLED.
- No additional charges will be applied.
+ - Server-controlled prices
+ - Gift message validation
+ - Production protection
+ - Backwards-compatible defaults
+ - No client-supplied fees accepted
 =========================================
 */
+
+
+/* =====================================
+   SANDBOX-ONLY FEATURE SWITCH
+
+   Both conditions must be true:
+
+   CASHFREE_ENV=sandbox
+   GIFT_WRAPPING_TEST_ENABLED=true
+
+   Production payment environment
+   always disables this feature.
+===================================== */
+
+const cashfreeEnvironment = String(
+  process.env.CASHFREE_ENV || ''
+).trim().toLowerCase();
+
+const testFlag = String(
+  process.env.GIFT_WRAPPING_TEST_ENABLED || ''
+).trim().toLowerCase();
+
+const GIFT_WRAPPING_ENABLED =
+  cashfreeEnvironment === 'sandbox' &&
+  testFlag === 'true';
 
 
 /* =====================================
    CONFIGURATION
 ===================================== */
 
-const GIFT_WRAPPING_ENABLED = false;
-
 const MAX_GIFT_MESSAGE_LENGTH = 180;
 
-
-/*
-  Prices are placeholders until
-  the business confirms actual fees.
-
-  Do not enable the feature until
-  COD, Cashfree, checkout preview
-  and order saving are integrated.
-*/
-
-const GIFT_WRAPPING_PRICES = Object.freeze({
-  NONE: 0,
-  STANDARD: 0,
-  PREMIUM: 0
-});
+const GIFT_WRAPPING_PRICES =
+  Object.freeze({
+    NONE: 0,
+    STANDARD: 29,
+    PREMIUM: 59
+  });
 
 
 /* =====================================
-   DEFAULT GIFT WRAPPING
+   DEFAULT PACKAGING
 ===================================== */
 
 function defaultGiftWrapping() {
@@ -61,11 +75,14 @@ function defaultGiftWrapping() {
 
 
 /* =====================================
-   NORMALIZE GIFT MESSAGE
+   NORMALIZE MESSAGE
 ===================================== */
 
 function normalizeGiftMessage(value) {
-  if (value === null || value === undefined) {
+  if (
+    value === undefined ||
+    value === null
+  ) {
     return '';
   }
 
@@ -77,9 +94,14 @@ function normalizeGiftMessage(value) {
 
   const message = value.trim();
 
-  if (message.length > MAX_GIFT_MESSAGE_LENGTH) {
+  if (
+    message.length >
+    MAX_GIFT_MESSAGE_LENGTH
+  ) {
     throw new Error(
-      `Gift message cannot exceed ${MAX_GIFT_MESSAGE_LENGTH} characters.`
+      'Gift message cannot exceed ' +
+      MAX_GIFT_MESSAGE_LENGTH +
+      ' characters.'
     );
   }
 
@@ -88,7 +110,7 @@ function normalizeGiftMessage(value) {
 
 
 /* =====================================
-   CHECK GIFT TYPE
+   NORMALIZE TYPE
 ===================================== */
 
 function normalizeGiftType(value) {
@@ -96,10 +118,12 @@ function normalizeGiftType(value) {
     value || 'NONE'
   ).trim().toUpperCase();
 
-  if (!Object.prototype.hasOwnProperty.call(
-    GIFT_WRAPPING_PRICES,
-    type
-  )) {
+  if (
+    !Object.prototype.hasOwnProperty.call(
+      GIFT_WRAPPING_PRICES,
+      type
+    )
+  ) {
     throw new Error(
       'Invalid gift wrapping option.'
     );
@@ -110,14 +134,14 @@ function normalizeGiftType(value) {
 
 
 /* =====================================
-   CALCULATE FEE
+   SERVER-SIDE FEE
 
-   Never accept gift fee sent by
-   the customer's browser.
+   Never trust fees from the browser.
 ===================================== */
 
 function calculateGiftWrappingFee(type) {
-  const normalizedType = normalizeGiftType(type);
+  const normalizedType =
+    normalizeGiftType(type);
 
   if (!GIFT_WRAPPING_ENABLED) {
     if (normalizedType !== 'NONE') {
@@ -129,16 +153,17 @@ function calculateGiftWrappingFee(type) {
     return 0;
   }
 
-  const fee = GIFT_WRAPPING_PRICES[
-    normalizedType
-  ];
+  const fee =
+    GIFT_WRAPPING_PRICES[
+      normalizedType
+    ];
 
   if (
     !Number.isFinite(fee) ||
     fee < 0
   ) {
     throw new Error(
-      'Gift wrapping price configuration is invalid.'
+      'Invalid gift wrapping price configuration.'
     );
   }
 
@@ -147,15 +172,20 @@ function calculateGiftWrappingFee(type) {
 
 
 /* =====================================
-   VALIDATE AND PREPARE GIFT WRAPPING
+   VALIDATE CUSTOMER SELECTION
 
-   Input from checkout is untrusted.
+   Existing customers:
+   Missing input => normal packaging.
 
-   Fee is always calculated here.
+   Invalid or unavailable wrapping:
+   Reject instead of silently charging.
 ===================================== */
 
 function prepareGiftWrapping(input = null) {
-  if (input === null || input === undefined) {
+  if (
+    input === null ||
+    input === undefined
+  ) {
     return defaultGiftWrapping();
   }
 
@@ -168,15 +198,30 @@ function prepareGiftWrapping(input = null) {
     );
   }
 
-  const selected = input.selected === true;
+  if (
+    input.selected !== undefined &&
+    typeof input.selected !== 'boolean'
+  ) {
+    throw new Error(
+      'Invalid gift wrapping selection.'
+    );
+  }
 
-  const type = normalizeGiftType(
-    input.type || 'NONE'
-  );
+  const selected =
+    input.selected === true;
 
-  const message = normalizeGiftMessage(
-    input.message
-  );
+  const type =
+    normalizeGiftType(
+      input.type || 'NONE'
+    );
+
+  const message =
+    normalizeGiftMessage(
+      input.message
+    );
+
+
+  /* FEATURE DISABLED */
 
   if (!GIFT_WRAPPING_ENABLED) {
     if (
@@ -192,9 +237,24 @@ function prepareGiftWrapping(input = null) {
     return defaultGiftWrapping();
   }
 
+
+  /* NORMAL PACKAGING */
+
   if (!selected) {
+    if (
+      type !== 'NONE' ||
+      message
+    ) {
+      throw new Error(
+        'Gift wrapping selection is inconsistent.'
+      );
+    }
+
     return defaultGiftWrapping();
   }
+
+
+  /* REQUIRE VALID PAID OPTION */
 
   if (type === 'NONE') {
     throw new Error(
@@ -202,27 +262,31 @@ function prepareGiftWrapping(input = null) {
     );
   }
 
+
+  /* TRUSTED FEE */
+
+  const fee =
+    calculateGiftWrappingFee(type);
+
   return {
     selected: true,
     type,
-    fee: calculateGiftWrappingFee(type),
+    fee,
     message
   };
 }
 
 
 /* =====================================
-   ADD GIFT FEE TO TRUSTED ORDER TOTAL
-
-   This helper will be connected
-   to server-side order pricing later.
+   TRUSTED TOTAL CALCULATION
 ===================================== */
 
 function addGiftWrappingToTotal(
   baseTotal,
-  giftWrapping
+  giftWrapping = null
 ) {
-  const baseAmount = Number(baseTotal);
+  const baseAmount =
+    Number(baseTotal);
 
   if (
     !Number.isFinite(baseAmount) ||
@@ -233,13 +297,15 @@ function addGiftWrappingToTotal(
     );
   }
 
-  const gift = prepareGiftWrapping(
-    giftWrapping
-  );
+  const gift =
+    prepareGiftWrapping(
+      giftWrapping
+    );
 
-  const grandTotal = Math.round(
-    (baseAmount + gift.fee) * 100
-  ) / 100;
+  const grandTotal =
+    Math.round(
+      (baseAmount + gift.fee) * 100
+    ) / 100;
 
   return {
     giftWrapping: gift,
