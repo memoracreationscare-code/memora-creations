@@ -1,0 +1,785 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <meta
+    name="description"
+    content="Read Memora Creations' shipping and delivery policy, including serviceability, shipping charges, tracking and delivery support."
+  >
+
+  <title>
+    Shipping & Delivery Policy | Memora Creations
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="/memora-creations/frontend/css/style.css?v=13"
+  >
+
+  <style>
+    :root {
+      --policy-dark: #302219;
+      --policy-brown: #8a5a3b;
+      --policy-muted: #746a62;
+      --policy-border: #e8ded4;
+    }
+
+    .policy-page {
+      padding-top: 30px;
+      padding-bottom: 75px;
+    }
+
+    .policy-hero {
+      background: linear-gradient(
+        135deg,
+        #fffaf5,
+        #f0dfd0
+      );
+      border: 1px solid #e7d5c5;
+      border-radius: 26px;
+      padding: clamp(32px, 6vw, 70px);
+      margin-bottom: 26px;
+    }
+
+    .policy-eyebrow {
+      display: block;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--policy-brown);
+      margin-bottom: 18px;
+    }
+
+    .policy-hero h1 {
+      font-family: Georgia, serif;
+      color: var(--policy-dark);
+      font-size: clamp(36px, 5vw, 60px);
+      line-height: 1.14;
+      letter-spacing: -.03em;
+      margin: 0 0 18px;
+      max-width: 850px;
+    }
+
+    .policy-hero p {
+      color: #67594f;
+      font-size: 16px;
+      line-height: 1.85;
+      max-width: 720px;
+      margin: 0;
+    }
+
+    .policy-highlights {
+      display: grid;
+      grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 27px;
+    }
+
+    .policy-highlight {
+      background: white;
+      border: 1px solid var(--policy-border);
+      padding: 23px;
+      border-radius: 17px;
+    }
+
+    .policy-highlight .symbol {
+      display: block;
+      font-size: 27px;
+      margin-bottom: 12px;
+    }
+
+    .policy-highlight strong {
+      display: block;
+      color: var(--policy-dark);
+      font-size: 15px;
+      margin-bottom: 9px;
+    }
+
+    .policy-highlight p {
+      color: var(--policy-muted);
+      font-size: 13px;
+      line-height: 1.75;
+      margin: 0;
+    }
+
+    .policy-layout {
+      display: grid;
+      grid-template-columns: 245px minmax(0, 1fr);
+      gap: 23px;
+      align-items: start;
+    }
+
+    .policy-sidebar {
+      background: #fff;
+      padding: 22px;
+      border: 1px solid var(--policy-border);
+      border-radius: 18px;
+      position: sticky;
+      top: 95px;
+    }
+
+    .policy-sidebar h2 {
+      font-size: 14px;
+      margin: 0 0 17px;
+      color: var(--policy-dark);
+    }
+
+    .policy-sidebar a {
+      display: block;
+      padding: 10px 0;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--policy-muted);
+      border-bottom: 1px solid #f1eae4;
+    }
+
+    .policy-sidebar a:hover {
+      color: var(--policy-brown);
+    }
+
+    .policy-content {
+      min-width: 0;
+    }
+
+    .policy-section {
+      background: white;
+      border: 1px solid var(--policy-border);
+      border-radius: 18px;
+      padding: clamp(22px, 4vw, 35px);
+      margin-bottom: 18px;
+      scroll-margin-top: 95px;
+    }
+
+    .policy-section h2 {
+      color: var(--policy-dark);
+      font-family: Georgia, serif;
+      font-size: clamp(23px, 3vw, 29px);
+      margin: 0 0 15px;
+    }
+
+    .policy-section p,
+    .policy-section li {
+      color: var(--policy-muted);
+      font-size: 14px;
+      line-height: 1.9;
+    }
+
+    .policy-section p {
+      margin: 0 0 15px;
+    }
+
+    .policy-section p:last-child {
+      margin-bottom: 0;
+    }
+
+    .policy-section ul {
+      padding-left: 22px;
+      margin: 10px 0;
+    }
+
+    .policy-section li {
+      margin-bottom: 8px;
+    }
+
+    .policy-section a {
+      color: var(--policy-brown);
+      font-weight: 750;
+      text-decoration: underline;
+    }
+
+    .policy-note {
+      border: 1px solid #e7d3bb;
+      background: #fff8ee;
+      border-radius: 13px;
+      padding: 16px;
+      margin-top: 18px;
+      color: #6b4a30;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .policy-support {
+      margin-top: 28px;
+      background: #2e2119;
+      color: white;
+      border-radius: 23px;
+      padding: clamp(30px, 5vw, 48px);
+      text-align: center;
+    }
+
+    .policy-support h2 {
+      margin: 0 0 13px;
+      font-family: Georgia, serif;
+      font-size: clamp(26px, 4vw, 35px);
+    }
+
+    .policy-support p {
+      color: #e1cfc1;
+      line-height: 1.8;
+      margin: 0 auto 22px;
+      max-width: 610px;
+    }
+
+    .policy-button {
+      display: inline-block;
+      background: white;
+      color: #69462f;
+      padding: 13px 22px;
+      border-radius: 11px;
+      font-size: 14px;
+      font-weight: 800;
+      margin: 5px;
+    }
+
+    .policy-footer {
+      background: #281e18;
+      color: #fff;
+      text-align: center;
+      padding: 30px 16px 95px;
+    }
+
+    .policy-footer strong {
+      display: block;
+      letter-spacing: .14em;
+      margin-bottom: 10px;
+    }
+
+    .policy-footer p {
+      margin: 0;
+      color: #cbbcb1;
+      line-height: 1.7;
+      font-size: 13px;
+    }
+
+    @media (max-width: 800px) {
+      .policy-page {
+        padding-top: 18px;
+      }
+
+      .policy-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .policy-sidebar {
+        position: static;
+      }
+
+      .policy-highlights {
+        grid-template-columns: 1fr;
+      }
+
+      .policy-hero {
+        border-radius: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header id="nav" class="topbar"></header>
+
+  <main class="container policy-page">
+
+    <section class="policy-hero">
+
+      <span class="policy-eyebrow">
+        MEMORA CREATIONS
+      </span>
+
+      <h1>
+        Shipping & Delivery Policy
+      </h1>
+
+      <p>
+        Learn about delivery availability,
+        order processing, shipping charges,
+        order tracking and the support
+        available for your Memora Creations
+        purchases.
+      </p>
+
+    </section>
+
+    <div class="policy-highlights">
+
+      <div class="policy-highlight">
+        <span class="symbol">📦</span>
+        <strong>Order Processing</strong>
+        <p>
+          Orders are processed after
+          the applicable order and
+          payment checks.
+        </p>
+      </div>
+
+      <div class="policy-highlight">
+        <span class="symbol">🚚</span>
+        <strong>Delivery Coverage</strong>
+        <p>
+          Shipping depends on courier
+          availability for your location.
+        </p>
+      </div>
+
+      <div class="policy-highlight">
+        <span class="symbol">📍</span>
+        <strong>Order Updates</strong>
+        <p>
+          Check order status using
+          the My Orders section.
+        </p>
+      </div>
+
+    </div>
+
+    <div class="policy-layout">
+
+      <aside class="policy-sidebar">
+
+        <h2>On This Page</h2>
+
+        <a href="#coverage">
+          1. Shipping Coverage
+        </a>
+
+        <a href="#processing">
+          2. Order Processing
+        </a>
+
+        <a href="#charges">
+          3. Shipping Charges
+        </a>
+
+        <a href="#time">
+          4. Delivery Time
+        </a>
+
+        <a href="#tracking">
+          5. Tracking Orders
+        </a>
+
+        <a href="#address">
+          6. Delivery Address
+        </a>
+
+        <a href="#attempts">
+          7. Delivery Attempts
+        </a>
+
+        <a href="#problems">
+          8. Delivery Problems
+        </a>
+
+        <a href="#support">
+          9. Customer Support
+        </a>
+
+      </aside>
+
+      <div class="policy-content">
+
+        <section
+          class="policy-section"
+          id="coverage"
+        >
+
+          <h2>1. Shipping Coverage</h2>
+
+          <p>
+            Memora Creations aims to
+            serve customers across India,
+            subject to courier service
+            availability and order
+            fulfilment requirements.
+          </p>
+
+          <p>
+            Delivery availability may
+            vary depending on the
+            destination PIN code,
+            selected payment method,
+            parcel dimensions and
+            courier partner.
+          </p>
+
+          <p>
+            Certain locations may
+            support prepaid delivery
+            but not Cash on Delivery
+            (COD).
+          </p>
+
+          <div class="policy-note">
+            Delivery to every Indian PIN
+            code is not guaranteed.
+            Our support team can help
+            with enquiries about
+            specific locations.
+          </div>
+
+        </section>
+
+        <section
+          class="policy-section"
+          id="processing"
+        >
+
+          <h2>2. Order Processing</h2>
+
+          <p>
+            When you place an order,
+            Memora Creations records
+            the order details in your
+            customer account.
+          </p>
+
+          <p>
+            Prepaid orders require
+            successful payment
+            confirmation before
+            fulfilment can proceed.
+            COD orders are handled
+            according to the applicable
+            order confirmation process.
+          </p>
+
+          <p>
+            Processing may be affected
+            by stock availability,
+            address verification,
+            courier pickup schedules
+            and public holidays.
+          </p>
+
+        </section>
+
+        <section
+          class="policy-section"
+          id="charges"
+        >
+
+          <h2>3. Shipping Charges</h2>
+
+          <p>
+            The applicable delivery
+            charge is calculated
+            during checkout and shown
+            in your Order Summary
+            before placing the order.
+          </p>
+
+          <p>
+            Any eligible free-delivery
+            benefit is reflected
+            in the checkout total.
+          </p>
+
+          <p>
+            The order confirmation
+            records the delivery charge
+            included in the
+            final order amount.
+          </p>
+
+          <div class="policy-note">
+            Always review the complete
+            checkout total before
+            confirming your purchase.
+          </div>
+
+        </section>
+
+        <section
+          class="policy-section"
+          id="time"
+        >
+
+          <h2>4. Delivery Time</h2>
+
+          <p>
+            Delivery times depend
+            on the destination,
+            product availability,
+            courier operations,
+            pickup scheduling and
+            other logistical factors.
+          </p>
+
+          <p>
+            Where an estimated
+            delivery date is supplied,
+            it is an estimate rather
+            than a guaranteed
+            delivery deadline,
+            unless we expressly
+            confirm otherwise.
+          </p>
+
+          <p>
+            Weather, transport
+            disruptions, holidays
+            or courier delays
+            can affect delivery.
+          </p>
+
+        </section>
+
+        <section
+          class="policy-section"
+          id="tracking"
+        >
+
+          <h2>5. Tracking Your Order</h2>
+
+          <p>
+            Registered customers can
+            check their order status
+            through the
+            My Orders section.
+          </p>
+
+          <p>
+            The displayed order
+            status may include
+            Order Placed, Confirmed,
+            Packed, Shipped,
+            Out for Delivery
+            and Delivered,
+            as applicable.
+          </p>
+
+          <p>
+            Courier tracking details,
+            where available,
+            may be shared through
+            order information or
+            customer support.
+          </p>
+
+          <p>
+            <a
+              href="/memora-creations/frontend/orders.html"
+            >
+              View My Orders
+            </a>
+          </p>
+
+        </section>
+
+        <section
+          class="policy-section"
+          id="address"
+        >
+
+          <h2>6. Delivery Address</h2>
+
+          <p>
+            Customers should provide
+            a complete and accurate
+            delivery address,
+            reachable mobile number
+            and correct six-digit
+            Indian PIN code.
+          </p>
+
+          <p>
+            An incomplete or incorrect
+            address may result in
+            a delivery delay,
+            failed delivery attempt
+            or courier return.
+          </p>
+
+          <p>
+            If you notice an address
+            mistake after ordering,
+            contact customer support
+            as soon as possible.
+            Address changes may not
+            be possible once an order
+            has been dispatched.
+          </p>
+
+        </section>
+
+        <section
+          class="policy-section"
+          id="attempts"
+        >
+
+          <h2>7. Delivery Attempts</h2>
+
+          <p>
+            Delivery attempts are
+            managed by the assigned
+            courier partner.
+            The number of attempts
+            and any rescheduling
+            depend on courier
+            procedures and
+            operational availability.
+          </p>
+
+          <p>
+            Please keep your mobile
+            number reachable and
+            provide accurate
+            delivery information.
+          </p>
+
+        </section>
+
+        <section
+          class="policy-section"
+          id="problems"
+        >
+
+          <h2>8. Damaged, Missing or
+          Delayed Deliveries</h2>
+
+          <p>
+            If your parcel arrives
+            damaged, contains
+            incorrect items or
+            appears to be missing
+            products, contact
+            customer support
+            promptly with your
+            Order ID and relevant
+            photos or details.
+          </p>
+
+          <p>
+            If delivery is delayed,
+            you can check My Orders
+            and contact our
+            support team for help.
+          </p>
+
+          <p>
+            Return, replacement,
+            cancellation and refund
+            requests are subject
+            to the applicable
+            Return & Refund Policy
+            and consumer rights
+            under applicable law.
+          </p>
+
+        </section>
+
+        <section
+          class="policy-section"
+          id="support"
+        >
+
+          <h2>9. Customer Support</h2>
+
+          <p>
+            For delivery-related
+            questions, contact
+            Memora Creations
+            Customer Support
+            and provide your Order ID.
+          </p>
+
+          <p>
+            Email:
+            <a
+              href="mailto:memoracreations.care@gmail.com"
+            >
+              memoracreations.care@gmail.com
+            </a>
+          </p>
+
+          <p>
+            WhatsApp:
+            <a
+              href="https://wa.me/918874050204"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              +91 88740 50204
+            </a>
+          </p>
+
+          <p>
+            We may update this
+            Shipping Policy as
+            our operations and
+            delivery arrangements
+            evolve. Material changes
+            will apply in accordance
+            with applicable law.
+          </p>
+
+        </section>
+
+      </div>
+
+    </div>
+
+    <section class="policy-support">
+
+      <h2>
+        Need Help With Delivery?
+      </h2>
+
+      <p>
+        Contact our customer support
+        team for enquiries about
+        shipping availability,
+        order status or delivery issues.
+      </p>
+
+      <a
+        class="policy-button"
+        href="/memora-creations/frontend/contact.html"
+      >
+        Contact Support
+      </a>
+
+      <a
+        class="policy-button"
+        href="/memora-creations/frontend/orders.html"
+      >
+        My Orders
+      </a>
+
+    </section>
+
+  </main>
+
+  <footer class="policy-footer">
+
+    <strong>MEMORA CREATIONS</strong>
+
+    <p>
+      Beautiful Decor • Thoughtful Gifts
+      • Memorable Spaces
+    </p>
+
+  </footer>
+
+  <nav
+    id="bottomNav"
+    class="bottomnav"
+  ></nav>
+
+  <script
+    src="/memora-creations/frontend/js/app.js?v=11"
+  ></script>
+
+</body>
+</html>
