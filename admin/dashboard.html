@@ -1,17 +1,20 @@
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport"
+content="width=device-width,initial-scale=1">
 
-<title>Admin Dashboard | Memora Creations</title>
+<title>
+Professional Sales Dashboard | Memora Creations
+</title>
 
 <link rel="stylesheet"
 href="/memora-creations/admin/css/style.css?v=4">
 
 <style>
-:root {
+:root{
   --dark:#241b16;
   --brown:#946343;
   --bg:#f7f5f2;
@@ -19,30 +22,30 @@ href="/memora-creations/admin/css/style.css?v=4">
   --muted:#817970;
 }
 
-* {box-sizing:border-box}
+*{box-sizing:border-box}
 
-body {
+body{
   margin:0;
   background:var(--bg);
   color:#231b17;
   font-family:Inter,Arial,sans-serif;
 }
 
-.adminnav {display:none!important}
+.adminnav{display:none!important}
 
-.mc-layout {
+.mc-layout{
   display:flex;
   min-height:100vh;
 }
 
-.mc-sidebar {
+.mc-sidebar{
   width:260px;
   min-width:260px;
   height:100vh;
   position:sticky;
   top:0;
   background:var(--dark);
-  color:white;
+  color:#fff;
   display:flex;
   flex-direction:column;
   padding:26px 16px;
@@ -50,21 +53,20 @@ body {
   overflow:hidden;
 }
 
-.mc-brand {
-  flex-shrink:0;
+.mc-brand{
   padding:10px 12px 25px;
   border-bottom:1px solid #493b32;
   margin-bottom:18px;
 }
 
-.mc-brand h2 {
+.mc-brand h2{
   margin:0;
-  color:white;
+  color:#fff;
   font-size:20px;
   letter-spacing:1px;
 }
 
-.mc-brand span {
+.mc-brand span{
   display:block;
   color:#d0a782;
   font-size:11px;
@@ -72,49 +74,27 @@ body {
   margin-top:7px;
 }
 
-.mc-nav-title {
-  flex-shrink:0;
+.mc-nav-title{
   color:#9b8e83;
   font-size:11px;
   letter-spacing:2px;
   margin:10px 12px 14px;
 }
 
-/* INDEPENDENT SIDEBAR SCROLL */
-
-.mc-menu {
+.mc-menu{
   display:flex;
   flex-direction:column;
   gap:7px;
-  flex:1 1 auto;
+  flex:1;
   min-height:0;
   overflow-y:auto;
-  overflow-x:hidden;
-  overscroll-behavior:contain;
   scrollbar-width:thin;
   scrollbar-color:#9b613c #241b16;
   padding-right:6px;
   padding-bottom:12px;
 }
 
-.mc-menu::-webkit-scrollbar {
-  width:7px;
-}
-
-.mc-menu::-webkit-scrollbar-track {
-  background:#241b16;
-}
-
-.mc-menu::-webkit-scrollbar-thumb {
-  background:#9b613c;
-  border-radius:12px;
-}
-
-.mc-menu::-webkit-scrollbar-thumb:hover {
-  background:#c28c67;
-}
-
-.mc-menu a {
+.mc-menu a{
   color:#d5ccc5;
   display:flex;
   align-items:center;
@@ -125,16 +105,15 @@ body {
   font-size:14px;
   font-weight:600;
   flex-shrink:0;
-  transition:.2s;
 }
 
 .mc-menu a:hover,
-.mc-menu a.active {
+.mc-menu a.active{
   background:#9b613c;
   color:white;
 }
 
-.mc-menu svg {
+.mc-menu svg{
   width:19px;
   height:19px;
   fill:none;
@@ -145,19 +124,12 @@ body {
   flex-shrink:0;
 }
 
-.mc-menu a:focus-visible {
-  outline:2px solid #d0a782;
-  outline-offset:-2px;
-}
-
-.mc-sidebar-bottom {
-  flex-shrink:0;
+.mc-sidebar-bottom{
   margin-top:auto;
   padding-top:15px;
-  background:var(--dark);
 }
 
-.mc-logout {
+.mc-logout{
   width:100%;
   border:1px solid #665347;
   background:transparent;
@@ -168,45 +140,45 @@ body {
   font-weight:700;
 }
 
-.mc-logout:hover {background:#50392e}
-
-.mc-content {
+.mc-content{
   flex:1;
   min-width:0;
 }
 
-.mc-topbar {
-  height:82px;
+.mc-topbar{
+  min-height:82px;
   background:white;
   border-bottom:1px solid var(--border);
-  padding:0 32px;
+  padding:16px 32px;
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:15px;
 }
 
-.mc-topbar-left strong {
+.mc-topbar-left strong{
   display:block;
   font-size:17px;
 }
 
 .mc-topbar-left small,
-.mc-admin-avatar small {
+.mc-admin-avatar small{
   display:block;
   color:var(--muted);
   font-size:12px;
 }
 
-.mc-admin-avatar {
+.mc-admin-avatar{
   display:flex;
   align-items:center;
   gap:10px;
 }
 
-.mc-admin-avatar strong {font-size:13px}
+.mc-admin-avatar strong{
+  font-size:13px;
+}
 
-.mc-avatar {
+.mc-avatar{
   height:42px;
   width:42px;
   background:#efe0d2;
@@ -218,13 +190,13 @@ body {
   font-weight:900;
 }
 
-.mc-page {
+.mc-page{
   max-width:1500px;
   padding:34px 32px 70px;
   margin:auto;
 }
 
-.mc-heading {
+.mc-heading{
   display:flex;
   justify-content:space-between;
   align-items:center;
@@ -232,19 +204,19 @@ body {
   margin-bottom:28px;
 }
 
-.mc-heading h1 {
+.mc-heading h1{
   font-size:clamp(26px,3vw,36px);
   margin:0 0 8px;
   font-weight:900;
 }
 
-.mc-heading p {
+.mc-heading p{
   margin:0;
   color:var(--muted);
   font-size:14px;
 }
 
-.mc-visit {
+.mc-visit{
   padding:12px 20px;
   background:#291e17;
   border-radius:12px;
@@ -255,20 +227,20 @@ body {
   white-space:nowrap;
 }
 
-.mc-section-title {
+.mc-section-title{
   font-size:20px;
-  font-weight:850;
   margin:0 0 20px;
+  font-weight:850;
 }
 
-#stats.stats {
+#stats.stats{
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
   gap:17px;
   margin-bottom:32px;
 }
 
-#stats .stat {
+#stats .stat{
   min-width:0;
   border:1px solid var(--border);
   background:white;
@@ -276,35 +248,40 @@ body {
   padding:24px 20px;
 }
 
-#stats .stat h3 {
+#stats .stat h3{
   margin:0 0 16px;
   color:var(--muted);
   font-size:13px;
 }
 
-#stats .stat strong {
+#stats .stat strong{
   display:block;
   font-size:clamp(24px,2.4vw,32px);
   font-weight:900;
   overflow-wrap:anywhere;
 }
 
-#stats .stat:nth-child(4) {
+#stats .stat:nth-child(4){
   background:#302117;
   border-color:#302117;
 }
 
-#stats .stat:nth-child(4) h3 {color:#dcc4b0}
-#stats .stat:nth-child(4) strong {color:white}
+#stats .stat:nth-child(4) h3{
+  color:#dcc4b0;
+}
 
-.mc-actions {
+#stats .stat:nth-child(4) strong{
+  color:white;
+}
+
+.mc-actions{
   display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-template-columns:repeat(4,minmax(0,1fr));
   gap:16px;
   margin-bottom:34px;
 }
 
-.mc-action {
+.mc-action{
   display:flex;
   flex-direction:column;
   gap:12px;
@@ -316,19 +293,19 @@ body {
   transition:.2s;
 }
 
-.mc-action:hover {
+.mc-action:hover{
   transform:translateY(-3px);
   border-color:#b68c6c;
 }
 
-.mc-action-icon {font-size:28px}
+.mc-action-icon{font-size:28px}
 
-.mc-action strong {
+.mc-action strong{
   color:#302219;
   font-size:16px;
 }
 
-.mc-action p {
+.mc-action p{
   color:var(--muted);
   font-size:12px;
   line-height:1.6;
@@ -336,7 +313,7 @@ body {
 }
 
 .mc-cashfree-panel,
-.mc-integrations {
+.mc-integrations{
   background:white;
   border:1px solid var(--border);
   padding:26px;
@@ -345,19 +322,19 @@ body {
 }
 
 .mc-cashfree-panel h2,
-.mc-integrations h2 {
+.mc-integrations h2{
   margin:0 0 8px;
   font-size:20px;
 }
 
 .mc-cashfree-panel p,
-.mc-integrations p {
+.mc-integrations p{
   color:var(--muted);
   line-height:1.6;
   font-size:13px;
 }
 
-.mc-cashfree-controls {
+.mc-cashfree-controls{
   display:flex;
   align-items:end;
   gap:15px;
@@ -365,18 +342,18 @@ body {
   margin-top:20px;
 }
 
-.mc-field {
+.mc-field{
   display:flex;
   flex-direction:column;
   gap:8px;
 }
 
-.mc-field label {
+.mc-field label{
   font-size:12px;
   font-weight:750;
 }
 
-.mc-field select {
+.mc-field select{
   min-width:160px;
   padding:12px;
   border:1px solid #d9cfc6;
@@ -385,7 +362,7 @@ body {
 }
 
 #checkCashfree,
-#testShiprocket {
+#testShiprocket{
   background:#946343;
   border:0;
   color:white;
@@ -395,37 +372,37 @@ body {
   cursor:pointer;
 }
 
-#checkCashfree:disabled {
+#checkCashfree:disabled{
   opacity:.6;
   cursor:wait;
 }
 
-.mc-report-stats {
+.mc-report-stats{
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
   gap:12px;
   margin:18px 0;
 }
 
-.mc-report-stat {
+.mc-report-stat{
   border:1px solid #e7ddd4;
   border-radius:13px;
   padding:17px;
   background:#faf8f6;
 }
 
-.mc-report-stat span {
+.mc-report-stat span{
   display:block;
   font-size:12px;
   color:#7f736b;
   margin-bottom:8px;
 }
 
-.mc-report-stat strong {
+.mc-report-stat strong{
   font-size:25px;
 }
 
-.mc-report-item {
+.mc-report-item{
   border:1px solid #e8e0d8;
   padding:17px;
   border-radius:13px;
@@ -433,7 +410,7 @@ body {
   overflow-wrap:anywhere;
 }
 
-.mc-readonly {
+.mc-readonly{
   margin-top:15px;
   font-size:12px;
   background:#f6f0ea;
@@ -444,59 +421,60 @@ body {
   line-height:1.6;
 }
 
-.mc-footer {
+.mc-footer{
   text-align:center;
   color:#9a9188;
   margin-top:36px;
   font-size:12px;
 }
 
-#mcAdminNotifications {
+#mcAdminNotifications{
   max-width:none!important;
   margin:0 0 26px!important;
 }
 
-@media(max-width:1100px) {
+@media(max-width:1100px){
   #stats.stats,
-  .mc-report-stats {
+  .mc-report-stats{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+  .mc-actions{
     grid-template-columns:repeat(2,minmax(0,1fr));
   }
 }
 
-@media(max-width:800px) {
-  .mc-layout {display:block}
+@media(max-width:800px){
+  .mc-layout{display:block}
 
-  .mc-sidebar {
+  .mc-sidebar{
     position:relative;
     width:100%;
     min-width:0;
     height:auto;
-    min-height:0;
     padding:13px;
     overflow:visible;
   }
 
-  .mc-brand {
+  .mc-brand{
     padding:5px 8px 14px;
     margin-bottom:13px;
   }
 
-  .mc-brand h2 {font-size:17px}
-
   .mc-nav-title,
-  .mc-sidebar-bottom {display:none}
+  .mc-sidebar-bottom{
+    display:none;
+  }
 
-  .mc-menu {
+  .mc-menu{
     display:grid;
     grid-template-columns:repeat(4,minmax(0,1fr));
     gap:5px;
     flex:none;
-    min-height:auto;
     overflow:visible;
-    padding-right:0;
   }
 
-  .mc-menu a {
+  .mc-menu a{
     padding:12px 4px;
     font-size:11px;
     text-align:center;
@@ -504,52 +482,71 @@ body {
     gap:6px;
   }
 
-  .mc-topbar {
-    height:70px;
-    padding:0 18px;
+  .mc-topbar{
+    min-height:70px;
+    padding:12px 18px;
   }
 
-  .mc-page {padding:24px 16px 50px}
+  .mc-page{
+    padding:24px 16px 50px;
+  }
 
-  .mc-actions {grid-template-columns:1fr}
-
-  .mc-heading {
+  .mc-heading{
     align-items:flex-start;
     flex-direction:column;
   }
 }
 
-@media(max-width:480px) {
-  #stats.stats {
+@media(max-width:480px){
+  #stats.stats{
     grid-template-columns:repeat(2,minmax(0,1fr));
     gap:10px;
   }
 
-  #stats .stat {padding:17px 13px}
-  #stats .stat strong {font-size:22px}
+  #stats .stat{
+    padding:17px 13px;
+  }
+
+  #stats .stat strong{
+    font-size:22px;
+  }
 
   .mc-admin-avatar strong,
-  .mc-admin-avatar small {display:none}
+  .mc-admin-avatar small{
+    display:none;
+  }
 
   .mc-cashfree-panel,
-  .mc-integrations {padding:18px}
+  .mc-integrations{
+    padding:18px;
+  }
 
-  .mc-report-stats {gap:8px}
-  .mc-report-stat {padding:12px}
+  .mc-report-stats{
+    gap:8px;
+  }
 
-  .mc-cashfree-controls {
+  .mc-report-stat{
+    padding:12px;
+  }
+
+  .mc-cashfree-controls{
     align-items:stretch;
     flex-direction:column;
   }
 
   .mc-field select,
-  #checkCashfree {width:100%}
+  #checkCashfree{
+    width:100%;
+  }
 }
 </style>
 </head>
 
 <body>
+
 <div class="mc-layout">
+
+<!-- SIDEBAR -->
 
 <aside class="mc-sidebar">
 
@@ -558,9 +555,12 @@ body {
     <span>CREATIONS ADMIN</span>
   </div>
 
-  <div class="mc-nav-title">MAIN MENU</div>
+  <div class="mc-nav-title">
+    MAIN MENU
+  </div>
 
-  <nav class="mc-menu" aria-label="Admin main menu">
+  <nav class="mc-menu"
+  aria-label="Admin main menu">
 
     <a class="active"
     href="/memora-creations/admin/dashboard.html">
@@ -590,8 +590,6 @@ body {
       </svg>
       Orders
     </a>
-
-    <!-- CUSTOMER REVIEWS: CACHE-FIXED LINK -->
 
     <a href="/memora-creations/admin/reviews.html?v=20261102-4">
       <svg viewBox="0 0 24 24">
@@ -661,213 +659,267 @@ body {
 
   <div class="mc-sidebar-bottom">
     <button type="button"
-    id="logout" class="mc-logout">
+    id="logout"
+    class="mc-logout">
       Logout
     </button>
   </div>
 
 </aside>
 
+<!-- MAIN DASHBOARD -->
+
 <div class="mc-content">
 
-  <header class="mc-topbar">
-    <div class="mc-topbar-left">
-      <strong>Admin Control Center</strong>
-      <small>Memora Creations</small>
+<header class="mc-topbar">
+
+  <div class="mc-topbar-left">
+    <strong>Sales Dashboard</strong>
+    <small>Memora Creations</small>
+  </div>
+
+  <div class="mc-admin-avatar">
+
+    <div>
+      <strong>Administrator</strong>
+      <small>Store Management</small>
     </div>
 
-    <div class="mc-admin-avatar">
-      <div>
-        <strong>Administrator</strong>
-        <small>Store Management</small>
-      </div>
-      <div class="mc-avatar">MC</div>
-    </div>
+    <div class="mc-avatar">MC</div>
 
-    <button id="mobileLogout"
-    type="button"
-    class="btn secondary"
-    style="display:none">
-      Logout
-    </button>
-  </header>
+  </div>
 
-  <main class="mc-page">
+  <button id="mobileLogout"
+  type="button"
+  class="btn secondary"
+  style="display:none">
+    Logout
+  </button>
 
-    <div id="mcDashboardNotifications"></div>
+</header>
 
-    <div class="mc-heading">
-      <div>
-        <h1>Dashboard Overview</h1>
-        <p>
-          Monitor your store performance
-          and manage your business.
-        </p>
-      </div>
+<main class="mc-page">
 
-      <a class="mc-visit"
-      href="/memora-creations/frontend/index.html"
-      target="_blank"
-      rel="noopener noreferrer">
-        Visit Store ↗
-      </a>
-    </div>
+  <div id="mcDashboardNotifications"></div>
 
-    <h2 class="mc-section-title">
-      Business Overview
-    </h2>
+  <div class="mc-heading">
 
-    <div id="stats" class="stats">
-      <p>Loading dashboard statistics...</p>
-    </div>
-
-    <h2 class="mc-section-title">
-      Quick Actions
-    </h2>
-
-    <div class="mc-actions">
-
-      <a class="mc-action"
-      href="/memora-creations/admin/products.html">
-        <span class="mc-action-icon">📦</span>
-        <strong>Manage Products →</strong>
-        <p>Add products, update prices, images and stock.</p>
-      </a>
-
-      <a class="mc-action"
-      href="/memora-creations/admin/orders.html">
-        <span class="mc-action-icon">🛒</span>
-        <strong>Manage Orders →</strong>
-        <p>View orders, payments and delivery status.</p>
-      </a>
-
-      <a class="mc-action"
-      href="/memora-creations/admin/users.html">
-        <span class="mc-action-icon">👥</span>
-        <strong>Manage Customers →</strong>
-        <p>View customers and manage account status.</p>
-      </a>
-
-      <!-- CUSTOMER REVIEWS QUICK ACTION -->
-
-      <a class="mc-action"
-      href="/memora-creations/admin/reviews.html?v=20261102-4">
-        <span class="mc-action-icon">⭐</span>
-        <strong>Customer Reviews →</strong>
-        <p>View review history, ratings, photos and approve or reject pending customer reviews.</p>
-      </a>
-
-    </div>
-
-    <h2 class="mc-section-title">
-      Payment Monitoring
-    </h2>
-
-    <section class="mc-cashfree-panel">
-
-      <h2>💳 Cashfree Pending Payments</h2>
-
+    <div>
+      <h1>Professional Sales Dashboard</h1>
       <p>
-        Inspect old Cashfree Pending and Failed Orders
-        directly from the Admin Dashboard.
+        Track your sales, orders,
+        customers and business performance.
       </p>
+    </div>
 
+    <a class="mc-visit"
+    href="/memora-creations/frontend/index.html"
+    target="_blank"
+    rel="noopener noreferrer">
+      Visit Store ↗
+    </a>
+
+  </div>
+
+  <!-- EXISTING BACKEND STATISTICS -->
+
+  <h2 class="mc-section-title">
+    Business Overview
+  </h2>
+
+  <div id="stats" class="stats">
+    <p>Loading dashboard statistics...</p>
+  </div>
+
+  <!--
+    PROFESSIONAL SALES ANALYTICS
+    INSERTED AUTOMATICALLY BY
+    sales-analytics.js AFTER #stats
+  -->
+
+  <h2 class="mc-section-title">
+    Quick Actions
+  </h2>
+
+  <div class="mc-actions">
+
+    <a class="mc-action"
+    href="/memora-creations/admin/products.html">
+      <span class="mc-action-icon">📦</span>
+      <strong>Manage Products →</strong>
       <p>
-        The report checks Cashfree gateway status and
-        payment attempts. No order or stock is changed.
+        Add products, update prices,
+        images and stock.
       </p>
+    </a>
 
-      <div class="mc-cashfree-controls">
-
-        <div class="mc-field">
-          <label for="cashfreeMinutes">
-            Orders older than
-          </label>
-          <select id="cashfreeMinutes">
-            <option value="15">15 Minutes</option>
-            <option value="30">30 Minutes</option>
-            <option value="60" selected>1 Hour</option>
-            <option value="180">3 Hours</option>
-            <option value="1440">24 Hours</option>
-            <option value="10080">7 Days</option>
-          </select>
-        </div>
-
-        <div class="mc-field">
-          <label for="cashfreeLimit">
-            Maximum Orders
-          </label>
-          <select id="cashfreeLimit">
-            <option value="10">10 Orders</option>
-            <option value="20" selected>20 Orders</option>
-            <option value="50">50 Orders</option>
-            <option value="100">100 Orders</option>
-          </select>
-        </div>
-
-        <button id="checkCashfree" type="button">
-          Check Pending Payments
-        </button>
-
-      </div>
-
-      <div id="cashfreeResult"
-      aria-live="polite">
-        <p>Click the button to inspect pending payments.</p>
-      </div>
-
-      <div class="mc-readonly">
-        🔒 Read-only Inspection Mode.
-        This tool does not cancel orders,
-        change payment status or release stock.
-        REVIEW_FOR_RELEASE is not authorization
-        to release stock.
-      </div>
-
-    </section>
-
-    <h2 class="mc-section-title">
-      Integrations
-    </h2>
-
-    <section class="mc-integrations">
-      <h2>🚚 Shiprocket Integration</h2>
-
+    <a class="mc-action"
+    href="/memora-creations/admin/orders.html">
+      <span class="mc-action-icon">🛒</span>
+      <strong>Manage Orders →</strong>
       <p>
-        Check the connection between
-        Memora Creations and Shiprocket.
+        View orders, payments
+        and delivery status.
       </p>
+    </a>
 
-      <button id="testShiprocket" type="button">
-        Test Shiprocket Connection
+    <a class="mc-action"
+    href="/memora-creations/admin/users.html">
+      <span class="mc-action-icon">👥</span>
+      <strong>Manage Customers →</strong>
+      <p>
+        View customer accounts.
+      </p>
+    </a>
+
+    <a class="mc-action"
+    href="/memora-creations/admin/reviews.html?v=20261102-4">
+      <span class="mc-action-icon">⭐</span>
+      <strong>Customer Reviews →</strong>
+      <p>
+        View, approve and manage
+        customer reviews.
+      </p>
+    </a>
+
+  </div>
+
+  <!-- CASHFREE INSPECTION -->
+
+  <h2 class="mc-section-title">
+    Payment Monitoring
+  </h2>
+
+  <section class="mc-cashfree-panel">
+
+    <h2>💳 Cashfree Pending Payments</h2>
+
+    <p>
+      Inspect old Cashfree Pending and Failed
+      Orders directly from the Admin Dashboard.
+    </p>
+
+    <p>
+      The report checks Cashfree gateway status
+      and payment attempts.
+      No order or stock is changed.
+    </p>
+
+    <div class="mc-cashfree-controls">
+
+      <div class="mc-field">
+        <label for="cashfreeMinutes">
+          Orders older than
+        </label>
+
+        <select id="cashfreeMinutes">
+          <option value="15">15 Minutes</option>
+          <option value="30">30 Minutes</option>
+          <option value="60" selected>1 Hour</option>
+          <option value="180">3 Hours</option>
+          <option value="1440">24 Hours</option>
+          <option value="10080">7 Days</option>
+        </select>
+      </div>
+
+      <div class="mc-field">
+        <label for="cashfreeLimit">
+          Maximum Orders
+        </label>
+
+        <select id="cashfreeLimit">
+          <option value="10">10 Orders</option>
+          <option value="20" selected>20 Orders</option>
+          <option value="50">50 Orders</option>
+          <option value="100">100 Orders</option>
+        </select>
+      </div>
+
+      <button id="checkCashfree"
+      type="button">
+        Check Pending Payments
       </button>
 
-      <p id="shiprocketResult"
-      style="font-weight:700;margin-top:15px">
-      </p>
-    </section>
-
-    <div class="mc-footer">
-      © MEMORA CREATIONS — Admin Management System
     </div>
 
-  </main>
+    <div id="cashfreeResult"
+    aria-live="polite">
+      <p>
+        Click the button to inspect
+        pending payments.
+      </p>
+    </div>
+
+    <div class="mc-readonly">
+      🔒 Read-only Inspection Mode.
+      This tool does not cancel orders,
+      change payment status or release stock.
+      REVIEW_FOR_RELEASE is not authorization
+      to release stock.
+    </div>
+
+  </section>
+
+  <!-- SHIPROCKET -->
+
+  <h2 class="mc-section-title">
+    Integrations
+  </h2>
+
+  <section class="mc-integrations">
+
+    <h2>🚚 Shiprocket Integration</h2>
+
+    <p>
+      Check the connection between
+      Memora Creations and Shiprocket.
+    </p>
+
+    <button id="testShiprocket"
+    type="button">
+      Test Shiprocket Connection
+    </button>
+
+    <p id="shiprocketResult"
+    style="font-weight:700;margin-top:15px">
+    </p>
+
+  </section>
+
+  <div class="mc-footer">
+    © MEMORA CREATIONS —
+    Professional Admin Management
+  </div>
+
+</main>
 </div>
 </div>
 
-<!-- EXISTING WEBSITE SCRIPTS -->
+<!-- WEBSITE API -->
 
 <script
 src="/memora-creations/frontend/js/app.js?v=4">
 </script>
 
+<!-- AUTHENTICATION -->
+
 <script
 src="/memora-creations/admin/js/auth.js?v=4">
 </script>
 
+<!-- EXISTING DASHBOARD -->
+
 <script
 src="/memora-creations/admin/js/dashboard.js?v=5">
 </script>
+
+<!-- NEW SALES ANALYTICS -->
+
+<script
+src="/memora-creations/admin/js/sales-analytics.js?v=1">
+</script>
+
+<!-- ORDER NOTIFICATIONS -->
 
 <script
 src="/memora-creations/admin/js/order-notifications.js?v=3">
@@ -878,13 +930,17 @@ src="/memora-creations/admin/js/order-notifications.js?v=3">
 <script>
 (function () {
   const target =
-    document.getElementById('mcDashboardNotifications');
+    document.getElementById(
+      'mcDashboardNotifications'
+    );
 
   if (!target) return;
 
   const move = () => {
     const bar =
-      document.getElementById('mcAdminNotifications');
+      document.getElementById(
+        'mcAdminNotifications'
+      );
 
     if (bar && !target.contains(bar)) {
       target.appendChild(bar);
@@ -894,7 +950,11 @@ src="/memora-creations/admin/js/order-notifications.js?v=3">
   const observer = new MutationObserver(() => {
     move();
 
-    if (target.querySelector('#mcAdminNotifications')) {
+    if (
+      target.querySelector(
+        '#mcAdminNotifications'
+      )
+    ) {
       observer.disconnect();
     }
   });
@@ -914,40 +974,76 @@ src="/memora-creations/admin/js/order-notifications.js?v=3">
 (function () {
   'use strict';
 
-  const button = document.getElementById('checkCashfree');
-  const resultBox = document.getElementById('cashfreeResult');
-  const minutesSelect = document.getElementById('cashfreeMinutes');
-  const limitSelect = document.getElementById('cashfreeLimit');
+  const button =
+    document.getElementById(
+      'checkCashfree'
+    );
 
-  if (!button || !resultBox || !minutesSelect || !limitSelect) {
+  const resultBox =
+    document.getElementById(
+      'cashfreeResult'
+    );
+
+  const minutesSelect =
+    document.getElementById(
+      'cashfreeMinutes'
+    );
+
+  const limitSelect =
+    document.getElementById(
+      'cashfreeLimit'
+    );
+
+  if (
+    !button ||
+    !resultBox ||
+    !minutesSelect ||
+    !limitSelect
+  ) {
     return;
   }
 
-  function make(tag, value, className) {
+  function make(tag,value,className) {
     const node = document.createElement(tag);
-    if (className) node.className = className;
+
+    if (className) {
+      node.className = className;
+    }
+
     if (value !== undefined) {
       node.textContent = String(value);
     }
+
     return node;
   }
 
   function showMessage(message) {
-    resultBox.replaceChildren(make('p', message));
+    resultBox.replaceChildren(
+      make('p',message)
+    );
   }
 
-  function addStat(container, label, value) {
-    const card = make('div', undefined, 'mc-report-stat');
-    card.append(
-      make('span', label),
-      make('strong', value)
+  function addStat(container,label,value) {
+    const card = make(
+      'div',
+      undefined,
+      'mc-report-stat'
     );
+
+    card.append(
+      make('span',label),
+      make('strong',value)
+    );
+
     container.appendChild(card);
   }
 
-  function addDetail(container, label, value) {
+  function addDetail(container,label,value) {
     container.appendChild(
-      make('p', label + ': ' + String(value))
+      make(
+        'p',
+        label + ': ' + String(value)
+      )
     );
   }
 
@@ -955,12 +1051,15 @@ src="/memora-creations/admin/js/order-notifications.js?v=3">
     resultBox.replaceChildren();
 
     if (data.mode !== 'INSPECTION_ONLY') {
-      showMessage('Unexpected inspection mode.');
+      showMessage(
+        'Unexpected inspection mode.'
+      );
       return;
     }
 
-    const results = Array.isArray(data.results)
-      ? data.results : [];
+    const results = Array.isArray(
+      data.results
+    ) ? data.results : [];
 
     const counts = {
       WAIT:0,
@@ -973,8 +1072,16 @@ src="/memora-creations/admin/js/order-notifications.js?v=3">
     };
 
     results.forEach(item => {
-      const action = String(item.action || 'ERROR');
-      if (Object.prototype.hasOwnProperty.call(counts, action)) {
+      const action = String(
+        item.action || 'ERROR'
+      );
+
+      if (
+        Object.prototype.hasOwnProperty.call(
+          counts,
+          action
+        )
+      ) {
         counts[action]++;
       }
     });
@@ -983,29 +1090,54 @@ src="/memora-creations/admin/js/order-notifications.js?v=3">
       make('p','Inspection completed.')
     );
 
-    const stats = make('div', undefined, 'mc-report-stats');
+    const stats = make(
+      'div',
+      undefined,
+      'mc-report-stats'
+    );
 
-    addStat(stats, 'Orders Inspected',
-      data.inspected ?? results.length);
+    addStat(
+      stats,
+      'Orders Inspected',
+      data.inspected ?? results.length
+    );
 
-    addStat(stats, 'Waiting', counts.WAIT);
+    addStat(
+      stats,
+      'Waiting',
+      counts.WAIT
+    );
 
-    addStat(stats, 'Need Review',
+    addStat(
+      stats,
+      'Need Review',
       counts.REVIEW +
       counts.REVIEW_FOR_RELEASE +
       counts.VERIFY_PAYMENT +
-      counts.ERROR);
+      counts.ERROR
+    );
 
-    addStat(stats, 'Stock Released',
-      data.stockReleased ?? 0);
+    addStat(
+      stats,
+      'Stock Released',
+      data.stockReleased ?? 0
+    );
 
     resultBox.appendChild(stats);
 
-    addDetail(resultBox, 'Mode', data.mode);
+    addDetail(
+      resultBox,
+      'Mode',
+      data.mode
+    );
 
     if (!results.length) {
       resultBox.appendChild(
-        make('p', 'No matching old pending or failed Cashfree orders were found.')
+        make(
+          'p',
+          'No matching old pending or failed ' +
+          'Cashfree orders were found.'
+        )
       );
       return;
     }
@@ -1014,21 +1146,38 @@ src="/memora-creations/admin/js/order-notifications.js?v=3">
 
     results.forEach(item => {
       const card = make(
-        'div', undefined, 'mc-report-item'
+        'div',
+        undefined,
+        'mc-report-item'
       );
 
       card.appendChild(
-        make('strong',
-          'Order: ' + String(item.orderId || 'Unknown'))
+        make(
+          'strong',
+          'Order: ' +
+          String(item.orderId || 'Unknown')
+        )
       );
 
-      addDetail(card, 'Action', item.action || 'UNKNOWN');
-      addDetail(card, 'Reason',
-        item.reason || 'No reason provided.');
+      addDetail(
+        card,
+        'Action',
+        item.action || 'UNKNOWN'
+      );
+
+      addDetail(
+        card,
+        'Reason',
+        item.reason ||
+        'No reason provided.'
+      );
 
       if (item.cashfreeOrderId) {
-        addDetail(card, 'Cashfree Reference',
-          item.cashfreeOrderId);
+        addDetail(
+          card,
+          'Cashfree Reference',
+          item.cashfreeOrderId
+        );
       }
 
       list.appendChild(card);
@@ -1037,50 +1186,89 @@ src="/memora-creations/admin/js/order-notifications.js?v=3">
     resultBox.appendChild(list);
   }
 
-  button.addEventListener('click', async () => {
-    if (!window.MC || typeof window.MC.api !== 'function') {
-      showMessage('Admin API unavailable.');
-      return;
-    }
+  button.addEventListener(
+    'click',
+    async () => {
 
-    const minutes = Number(minutesSelect.value);
-    const limit = Number(limitSelect.value);
-
-    if (!Number.isInteger(minutes) ||
-        minutes < 1 || minutes > 10080 ||
-        !Number.isInteger(limit) ||
-        limit < 1 || limit > 100) {
-      showMessage('Invalid inspection settings.');
-      return;
-    }
-
-    button.disabled = true;
-    button.textContent = 'Checking Payments...';
-    showMessage('Contacting Cashfree...');
-
-    try {
-      const path =
-        '/admin/cashfree/inspect?minutes=' +
-        minutes + '&limit=' + limit;
-
-      const data = await window.MC.api(path);
-
-      if (!data || data.success === false) {
-        throw new Error(data?.message || 'Inspection failed.');
+      if (
+        !window.MC ||
+        typeof window.MC.api !== 'function'
+      ) {
+        showMessage(
+          'Admin API unavailable.'
+        );
+        return;
       }
 
-      renderReport(data);
-    } catch (error) {
-      console.error('Cashfree inspection error:', error);
-      showMessage(
-        'Cashfree inspection failed: ' +
-        (error.message || 'Unknown error.')
+      const minutes = Number(
+        minutesSelect.value
       );
-    } finally {
-      button.disabled = false;
-      button.textContent = 'Check Pending Payments';
+
+      const limit = Number(
+        limitSelect.value
+      );
+
+      if (
+        !Number.isInteger(minutes) ||
+        minutes < 1 ||
+        minutes > 10080 ||
+        !Number.isInteger(limit) ||
+        limit < 1 ||
+        limit > 100
+      ) {
+        showMessage(
+          'Invalid inspection settings.'
+        );
+        return;
+      }
+
+      button.disabled = true;
+
+      button.textContent =
+        'Checking Payments...';
+
+      showMessage(
+        'Contacting Cashfree...'
+      );
+
+      try {
+        const path =
+          '/admin/cashfree/inspect?minutes=' +
+          minutes + '&limit=' + limit;
+
+        const data = await window.MC.api(path);
+
+        if (
+          !data ||
+          data.success === false
+        ) {
+          throw new Error(
+            data?.message ||
+            'Inspection failed.'
+          );
+        }
+
+        renderReport(data);
+
+      } catch (error) {
+        console.error(
+          'Cashfree inspection error:',
+          error
+        );
+
+        showMessage(
+          'Cashfree inspection failed: ' +
+          (error.message || 'Unknown error')
+        );
+
+      } finally {
+        button.disabled = false;
+
+        button.textContent =
+          'Check Pending Payments';
+      }
     }
-  });
+  );
 })();
 </script>
 
@@ -1088,21 +1276,37 @@ src="/memora-creations/admin/js/order-notifications.js?v=3">
 
 <script>
 (function () {
-  const mobile = document.getElementById('mobileLogout');
-  const desktop = document.getElementById('logout');
+  const mobile =
+    document.getElementById(
+      'mobileLogout'
+    );
+
+  const desktop =
+    document.getElementById(
+      'logout'
+    );
 
   function sync() {
     if (mobile) {
       mobile.style.display =
-        window.innerWidth <= 800 ? 'inline-block' : 'none';
+        window.innerWidth <= 800
+          ? 'inline-block'
+          : 'none';
     }
   }
 
   if (mobile && desktop) {
-    mobile.addEventListener('click', () => desktop.click());
+    mobile.addEventListener(
+      'click',
+      () => desktop.click()
+    );
   }
 
-  window.addEventListener('resize', sync);
+  window.addEventListener(
+    'resize',
+    sync
+  );
+
   sync();
 })();
 </script>
