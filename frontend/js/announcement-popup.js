@@ -1,67 +1,97 @@
 
 /*
-=========================================
- MEMORA CREATIONS
- CUSTOMER ANNOUNCEMENT POPUP
+  MEMORA CREATIONS
+  HOMEPAGE WELCOME / ANNOUNCEMENT POPUP
 
- FEATURES:
- - Loads announcement from backend
- - Shows popup on homepage visit
- - Admin-controlled ON/OFF
- - Admin-controlled title and message
- - Close button
- - Mobile responsive
- - Safe text rendering
- - No payment/order modifications
-=========================================
+  - Only on homepage
+  - Once per announcement per browser
+  - Refresh will not repeat it
+  - New admin announcement can appear once
+  - Safe if API or storage is unavailable
 */
 
-(function () {
+(() => {
   'use strict';
 
   const API_URL =
     'https://memora-creations.onrender.com/api/announcement';
 
-  let overlay = null;
+  const STORAGE_KEY = 'memora_seen_announcement_v2';
 
-  function removePopup() {
+  let overlay = null;
+  let started = false;
+  let currentKey = '';
+
+  function isHomePage() {
+    const path = window.location.pathname
+      .replace(/\/+$/, '/')
+      .toLowerCase();
+
+    return (
+      path === '/' ||
+      path === '/frontend/index.html' ||
+      path === '/memora-creations/' ||
+      path === '/memora-creations/frontend/index.html'
+    );
+  }
+
+  function getSeenKey() {
+    try {
+      return localStorage.getItem(STORAGE_KEY);
+    } catch (_) {
+      return window.__memoraSeenAnnouncement || '';
+    }
+  }
+
+  function markSeen(key) {
+    window.__memoraSeenAnnouncement = key;
+
+    try {
+      localStorage.setItem(STORAGE_KEY, key);
+    } catch (_) {
+      // Storage blocked: fall back to current page.
+    }
+  }
+
+  function closePopup() {
     if (overlay) {
       overlay.remove();
       overlay = null;
     }
 
-    document.body.classList.remove(
-      'mc-announcement-open'
-    );
+    document.body.classList.remove('mc-announcement-open');
 
-    document.removeEventListener(
-      'keydown',
-      handleEscape
-    );
+    document.removeEventListener('keydown', onKeyDown);
   }
 
-  function handleEscape(event) {
+  function onKeyDown(event) {
     if (event.key === 'Escape') {
-      removePopup();
+      closePopup();
     }
   }
 
-  function addStyles() {
-    if (
-      document.getElementById(
-        'mcAnnouncementStyles'
-      )
-    ) {
+  function createElement(tag, className, text) {
+    const element = document.createElement(tag);
+
+    if (className) element.className = className;
+
+    if (text !== undefined) {
+      element.textContent = String(text);
+    }
+
+    return element;
+  }
+
+  function installStyles() {
+    if (document.getElementById('mcAnnouncementStyles')) {
       return;
     }
 
-    const style =
-      document.createElement('style');
-
+    const style = document.createElement('style');
     style.id = 'mcAnnouncementStyles';
 
     style.textContent = `
-      .mc-announcement-open {
+      body.mc-announcement-open {
         overflow: hidden !important;
       }
 
@@ -72,7 +102,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 18px;
+        padding: 16px;
         background: rgba(24, 16, 12, .68);
         backdrop-filter: blur(5px);
       }
@@ -80,27 +110,25 @@
       .mc-announcement-popup {
         position: relative;
         width: min(100%, 460px);
-        max-height: calc(100dvh - 36px);
+        max-height: calc(100dvh - 32px);
         overflow-y: auto;
         background: #fffaf6;
         color: #302117;
         border-radius: 22px;
-        box-shadow:
-          0 24px 75px rgba(0, 0, 0, .27);
-        padding: 34px 25px 26px;
+        padding: 30px 24px 24px;
         text-align: center;
-        animation:
-          mcAnnouncementEnter .3s ease-out;
+        box-shadow: 0 24px 75px rgba(0,0,0,.27);
+        animation: mcWelcomeEnter .25s ease-out;
       }
 
       .mc-announcement-icon {
-        width: 67px;
-        height: 67px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 20px;
-        border-radius: 20px;
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 18px;
+        border-radius: 18px;
         background: #f1e1d2;
         font-size: 32px;
       }
@@ -115,26 +143,24 @@
 
       .mc-announcement-title {
         margin: 0 0 16px;
-        color: #302117;
-        font-size: clamp(22px, 5vw, 29px);
+        font-size: clamp(22px,5vw,29px);
         line-height: 1.3;
-        font-weight: 900;
         overflow-wrap: anywhere;
       }
 
       .mc-announcement-message {
-        margin: 0 0 25px;
+        margin: 0 0 24px;
         color: #68574a;
         font-size: 15px;
-        line-height: 1.8;
+        line-height: 1.7;
         white-space: pre-wrap;
         overflow-wrap: anywhere;
       }
 
       .mc-announcement-close {
-        display: block;
         width: 100%;
-        padding: 15px 18px;
+        min-height: 46px;
+        padding: 13px 18px;
         border: 0;
         border-radius: 12px;
         background: #302117;
@@ -142,37 +168,26 @@
         font-size: 15px;
         font-weight: 800;
         cursor: pointer;
-        transition: background .2s;
       }
 
       .mc-announcement-close:hover {
         background: #946343;
       }
 
-      .mc-announcement-close:focus-visible {
-        outline: 3px solid #b98b68;
-        outline-offset: 3px;
-      }
-
-      @keyframes mcAnnouncementEnter {
+      @keyframes mcWelcomeEnter {
         from {
           opacity: 0;
-          transform: translateY(18px) scale(.97);
+          transform: translateY(15px) scale(.97);
         }
-
         to {
           opacity: 1;
           transform: translateY(0) scale(1);
         }
       }
 
-      @media (max-width: 480px) {
-        .mc-announcement-overlay {
-          padding: 14px;
-        }
-
+      @media (max-width:480px) {
         .mc-announcement-popup {
-          padding: 28px 19px 21px;
+          padding: 25px 18px 20px;
           border-radius: 18px;
         }
 
@@ -181,7 +196,7 @@
         }
       }
 
-      @media (prefers-reduced-motion: reduce) {
+      @media (prefers-reduced-motion:reduce) {
         .mc-announcement-popup {
           animation: none;
         }
@@ -191,161 +206,111 @@
     document.head.appendChild(style);
   }
 
-  function makeElement(
-    tag,
-    className,
-    text
-  ) {
-    const element =
-      document.createElement(tag);
+  function showPopup(title, message, key) {
+    if (overlay || getSeenKey() === key) return;
 
-    if (className) {
-      element.className = className;
-    }
+    // Record it before opening so refresh does not repeat.
+    markSeen(key);
+    installStyles();
 
-    if (text !== undefined) {
-      element.textContent = String(text);
-    }
-
-    return element;
-  }
-
-  function showPopup(announcement) {
-    if (overlay) return;
-
-    addStyles();
-
-    overlay = makeElement(
+    overlay = createElement(
       'div',
       'mc-announcement-overlay'
     );
 
-    const popup = makeElement(
+    const popup = createElement(
       'section',
       'mc-announcement-popup'
     );
 
-    popup.setAttribute(
-      'role',
-      'dialog'
-    );
-
-    popup.setAttribute(
-      'aria-modal',
-      'true'
-    );
-
+    popup.setAttribute('role', 'dialog');
+    popup.setAttribute('aria-modal', 'true');
     popup.setAttribute(
       'aria-labelledby',
       'mcAnnouncementHeading'
     );
 
-    popup.setAttribute(
-      'aria-describedby',
-      'mcAnnouncementDescription'
-    );
-
-    const icon = makeElement(
+    const icon = createElement(
       'div',
       'mc-announcement-icon',
       '📢'
     );
 
-    icon.setAttribute(
-      'aria-hidden',
-      'true'
-    );
+    icon.setAttribute('aria-hidden', 'true');
 
-    const brand = makeElement(
+    const brand = createElement(
       'div',
       'mc-announcement-brand',
       'MEMORA CREATIONS'
     );
 
-    const title = makeElement(
+    const heading = createElement(
       'h2',
       'mc-announcement-title',
-      announcement.title
+      title
     );
 
-    title.id = 'mcAnnouncementHeading';
+    heading.id = 'mcAnnouncementHeading';
 
-    const message = makeElement(
+    const description = createElement(
       'p',
       'mc-announcement-message',
-      announcement.message
+      message
     );
 
-    message.id =
-      'mcAnnouncementDescription';
-
-    const closeButton = makeElement(
+    const close = createElement(
       'button',
       'mc-announcement-close',
-      'Close'
+      'Continue Shopping'
     );
 
-    closeButton.type = 'button';
-
-    closeButton.addEventListener(
-      'click',
-      removePopup
-    );
+    close.type = 'button';
+    close.addEventListener('click', closePopup);
 
     popup.append(
       icon,
       brand,
-      title,
-      message,
-      closeButton
+      heading,
+      description,
+      close
     );
 
     overlay.appendChild(popup);
 
+    overlay.addEventListener('click', event => {
+      if (event.target === overlay) {
+        closePopup();
+      }
+    });
+
     document.body.appendChild(overlay);
+    document.body.classList.add('mc-announcement-open');
+    document.addEventListener('keydown', onKeyDown);
 
-    document.body.classList.add(
-      'mc-announcement-open'
-    );
-
-    document.addEventListener(
-      'keydown',
-      handleEscape
-    );
-
-    closeButton.focus();
+    close.focus();
   }
 
   async function loadAnnouncement() {
-    try {
-      const response = await fetch(
-        API_URL,
-        {
-          method: 'GET',
-          credentials: 'omit',
-          cache: 'no-store',
-          headers: {
-            Accept: 'application/json'
-          }
-        }
-      );
+    if (!isHomePage()) return;
 
-      if (!response.ok) {
-        throw new Error(
-          'Announcement API: ' +
-          response.status
-        );
-      }
+    try {
+      const response = await fetch(API_URL, {
+        method: 'GET',
+        credentials: 'omit',
+        cache: 'no-store',
+        headers: {
+          Accept: 'application/json'
+        }
+      });
+
+      if (!response.ok) return;
 
       const data = await response.json();
-
-      const announcement =
-        data && data.announcement;
+      const announcement = data?.announcement;
 
       if (
-        !data.success ||
-        !announcement ||
-        announcement.enabled !== true
+        data?.success !== true ||
+        announcement?.enabled !== true
       ) {
         return;
       }
@@ -358,30 +323,29 @@
         announcement.message || ''
       ).trim();
 
-      if (!title || !message) {
-        return;
-      }
+      if (!title || !message) return;
 
-      showPopup({
-        title,
-        message
-      });
+      const version = String(
+        announcement.updatedAt || `${title}:${message}`
+      );
+
+      const key = `${version}:${title}:${message}`;
+
+      if (getSeenKey() === key) return;
+
+      showPopup(title, message, key);
 
     } catch (error) {
-      /*
-        Announcement errors must never
-        prevent customers from using
-        the website.
-      */
-
       console.warn(
-        'Announcement unavailable:',
+        'Welcome announcement unavailable:',
         error
       );
     }
   }
 
   function start() {
+    if (started) return;
+    started = true;
     loadAnnouncement();
   }
 
@@ -394,5 +358,4 @@
   } else {
     start();
   }
-
 })();
