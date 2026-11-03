@@ -4,6 +4,7 @@
  Cashfree + COD Checkout
  Coupon Support
  WhatsApp Customer Consent
+ Gift Wrapping Integration
 */
 
 (() => {
@@ -22,7 +23,6 @@
   let fromCart = false;
   let submitting = false;
 
-  // Existing coupon functionality
   let appliedCouponCode = null;
   let previewSequence = 0;
 
@@ -150,6 +150,90 @@
     }
   }
 
+  /*
+  ========================================
+   GIFT WRAPPING
+
+   Currently disabled on the checkout UI.
+
+   No wrapping fee is accepted from
+   the browser. Backend pricing remains
+   authoritative.
+
+   Later, when the feature is enabled,
+   these controls can send the selected
+   wrapping option and personal message.
+  ========================================
+  */
+
+  function giftWrappingData() {
+    const selectedOption = $(
+      'input[name="mcGiftWrappingPreview"]:checked'
+    );
+
+    const messageInput = $('#mcGiftMessagePreview');
+
+    const giftSection = $('#mcGiftWrap');
+
+    /*
+      If the section is absent or its
+      controls are disabled, use the
+      safe standard packaging default.
+    */
+
+    if (
+      !giftSection ||
+      !selectedOption ||
+      selectedOption.disabled
+    ) {
+      return {
+        selected: false,
+        type: 'NONE',
+        message: ''
+      };
+    }
+
+    /*
+      Future enabled gift options should
+      specify STANDARD or PREMIUM as
+      their radio input values.
+
+      Never accept a price here.
+    */
+
+    const type = String(
+      selectedOption.value || 'NONE'
+    ).trim().toUpperCase();
+
+    if (
+      !['STANDARD', 'PREMIUM'].includes(type)
+    ) {
+      return {
+        selected: false,
+        type: 'NONE',
+        message: ''
+      };
+    }
+
+    const message = (
+      messageInput?.disabled === false
+        ? messageInput.value
+        : ''
+    ).trim();
+
+    return {
+      selected: true,
+      type,
+      message: message.slice(0, 180)
+    };
+  }
+
+  /*
+  ========================================
+   ORDER SUMMARY
+  ========================================
+  */
+
   function drawSummary(preview) {
     const summary = $('#summary');
 
@@ -180,6 +264,7 @@
     }
 
     line('Delivery', preview.deliveryCharge);
+
     line(
       'You Save',
       preview.productSavings ?? preview.discount ?? 0
@@ -189,6 +274,18 @@
       line(
         'Coupon Discount',
         -Number(preview.couponDiscount)
+      );
+    }
+
+    /*
+      Display only the fee provided by
+      the backend's trusted preview.
+    */
+
+    if (Number(preview.giftWrappingFee || 0) > 0) {
+      line(
+        'Gift Wrapping',
+        Number(preview.giftWrappingFee)
       );
     }
 
@@ -231,6 +328,15 @@
     }
   }
 
+  /*
+  ========================================
+   ORDER PREVIEW
+
+   Product prices, coupons and wrapping
+   are checked by the server.
+  ========================================
+  */
+
   async function refreshCouponPreview(code = null) {
     const seq = ++previewSequence;
 
@@ -238,6 +344,9 @@
       method: 'POST',
       body: JSON.stringify({
         items,
+
+        giftWrapping: giftWrappingData(),
+
         ...(code ? { couponCode: code } : {})
       })
     });
@@ -375,6 +484,59 @@
     });
   });
 
+  /*
+    Refresh the server preview when a
+    future enabled wrapping option changes.
+  */
+
+  document.querySelectorAll(
+    'input[name="mcGiftWrappingPreview"]'
+  ).forEach(input => {
+    input.addEventListener('change', async () => {
+      if (submitting || input.disabled) return;
+
+      try {
+        await refreshCouponPreview(
+          appliedCouponCode
+        );
+      } catch (err) {
+        message(
+          err.message ||
+          'Gift wrapping summary update nahi hua.'
+        );
+      }
+    });
+  });
+
+  $('#mcGiftMessagePreview')?.addEventListener(
+    'change',
+    async event => {
+      if (
+        submitting ||
+        event.currentTarget.disabled
+      ) {
+        return;
+      }
+
+      try {
+        await refreshCouponPreview(
+          appliedCouponCode
+        );
+      } catch (err) {
+        message(
+          err.message ||
+          'Gift message update nahi hua.'
+        );
+      }
+    }
+  );
+
+  /*
+  ========================================
+   INITIALIZE
+  ========================================
+  */
+
   async function initialize() {
     user = await MC.requireLogin();
 
@@ -431,14 +593,9 @@
   ========================================
    WHATSAPP CUSTOMER OPT-IN
 
-   This reads only the customer's
-   actual checkbox selection.
-
    Disabled checkbox = false.
    Unchecked checkbox = false.
    Checked and enabled = true.
-
-   Consent never defaults to true.
   ========================================
   */
 
@@ -463,10 +620,14 @@
   function payload() {
     return {
       items,
+
       address: addressData(),
+
       clearCart: fromCart,
 
       whatsappOptIn: whatsappConsentValue(),
+
+      giftWrapping: giftWrappingData(),
 
       ...(appliedCouponCode &&
         ['COD', 'CASHFREE'].includes(chosenMethod())
@@ -570,8 +731,10 @@
             : 'sandbox'
       });
 
-      // SDK completion alone is not proof
-      // that the payment was successful.
+      /*
+        SDK completion alone is not proof
+        that the payment succeeded.
+      */
 
       const result = await cashfree.checkout({
         paymentSessionId:
@@ -588,7 +751,7 @@
       }
 
       /*
-        Verify payment with the server.
+        Verify payment on the server.
         Never trust the browser alone.
       */
 
@@ -623,9 +786,10 @@
       );
 
     } catch (err) {
-
-      // Verification errors do not prove
-      // that payment has failed.
+      /*
+        Verification errors do not prove
+        that payment failed.
+      */
 
       message(
         orderId
@@ -694,7 +858,7 @@
 
   /*
   ========================================
-   INITIALIZE
+   INITIALIZE CHECKOUT
   ========================================
   */
 
