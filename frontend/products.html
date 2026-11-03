@@ -29,6 +29,274 @@
     href="/memora-creations/frontend/css/products.css?v=1"
   >
 
+  <!-- =====================================
+       MOBILE PRODUCT POPUP FIX V1
+
+       Small product image
+       Compact product information
+       Scrollable long description
+       Visible close button
+       Accessible Add to Cart / Order Now
+       No changes to payments or orders
+  ====================================== -->
+
+  <style>
+
+    @media (max-width: 700px) {
+
+      .product-popup-overlay {
+        position: fixed !important;
+        inset: 0 !important;
+        z-index: 99999 !important;
+
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+
+        padding: 10px !important;
+
+        box-sizing: border-box;
+        overflow: hidden;
+      }
+
+      .product-popup {
+        position: relative !important;
+
+        display: flex !important;
+        flex-direction: column !important;
+
+        width: 100% !important;
+        max-width: 480px !important;
+
+        max-height: calc(100vh - 20px) !important;
+        max-height: calc(100dvh - 20px) !important;
+
+        margin: 0 auto !important;
+        padding: 12px !important;
+        gap: 10px !important;
+
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+
+        box-sizing: border-box !important;
+        overscroll-behavior: contain;
+
+        background: #fff !important;
+        border-radius: 18px !important;
+
+        box-shadow:
+          0 15px 45px rgba(0,0,0,.25) !important;
+      }
+
+      /* COMPACT IMAGE */
+
+      .product-popup-imagebox {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+
+        width: 100% !important;
+        height: 170px !important;
+        min-height: 170px !important;
+        max-height: 170px !important;
+
+        padding: 5px !important;
+        margin: 0 !important;
+
+        flex-shrink: 0 !important;
+
+        box-sizing: border-box !important;
+        border-radius: 13px !important;
+        background: #f7f3ef !important;
+      }
+
+      .product-popup-imagebox img {
+        width: 100% !important;
+        height: 100% !important;
+        max-height: 160px !important;
+
+        object-fit: contain !important;
+      }
+
+      /* PRODUCT INFORMATION */
+
+      .product-popup-info {
+        padding: 2px 3px 8px !important;
+        min-width: 0 !important;
+      }
+
+      .product-popup-info .pill {
+        display: inline-flex !important;
+        padding: 5px 10px !important;
+        font-size: 10px !important;
+        line-height: 1.4 !important;
+      }
+
+      .product-popup-info h2 {
+        margin: 9px 0 !important;
+
+        font-size: 19px !important;
+        line-height: 1.3 !important;
+        letter-spacing: -.02em;
+
+        overflow-wrap: anywhere;
+      }
+
+      .product-popup-price {
+        margin: 8px 0 10px !important;
+        font-size: 23px !important;
+        line-height: 1.3 !important;
+      }
+
+      .product-popup-price .old {
+        font-size: 13px !important;
+      }
+
+      /* LONG DESCRIPTION
+         Scroll inside without making
+         the whole popup excessively tall */
+
+      .product-popup-info > p.muted {
+        max-height: 78px !important;
+
+        margin: 8px 0 12px !important;
+        padding-right: 5px !important;
+
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+
+        color: #73675f !important;
+        font-size: 12px !important;
+        line-height: 1.6 !important;
+
+        overflow-wrap: anywhere;
+        scrollbar-width: thin;
+      }
+
+      /* STOCK */
+
+      .product-popup-info > p:not(.muted) {
+        margin: 9px 0 !important;
+
+        font-size: 12px !important;
+        line-height: 1.5 !important;
+      }
+
+      /* QUANTITY */
+
+      .product-popup-info .field {
+        margin: 10px 0 !important;
+      }
+
+      .product-popup-info .field label {
+        display: block !important;
+        margin-bottom: 5px !important;
+        font-size: 12px !important;
+      }
+
+      .product-popup-info .popup-qty {
+        width: 100% !important;
+        height: 42px !important;
+        min-height: 42px !important;
+
+        padding: 8px 12px !important;
+        border-radius: 10px !important;
+
+        box-sizing: border-box !important;
+        font-size: 14px !important;
+      }
+
+      /* SHOPPING BUTTONS */
+
+      .product-popup-actions {
+        display: grid !important;
+        grid-template-columns:
+          repeat(2, minmax(0, 1fr)) !important;
+
+        gap: 9px !important;
+        margin-top: 13px !important;
+      }
+
+      .product-popup-actions .btn {
+        width: 100% !important;
+        min-height: 45px !important;
+
+        padding: 10px 6px !important;
+
+        font-size: 12px !important;
+        font-weight: 800 !important;
+
+        line-height: 1.3 !important;
+        border-radius: 11px !important;
+
+        white-space: normal !important;
+      }
+
+      /* CLOSE BUTTON */
+
+      .product-popup-close {
+        position: sticky !important;
+        top: 0 !important;
+
+        align-self: flex-end !important;
+
+        width: 36px !important;
+        height: 36px !important;
+
+        margin-bottom: -36px !important;
+
+        flex-shrink: 0 !important;
+
+        background: #fff !important;
+        color: #302117 !important;
+
+        border: 1px solid #e7d9cc !important;
+        border-radius: 50% !important;
+
+        font-size: 24px !important;
+        line-height: 1 !important;
+
+        z-index: 20 !important;
+
+        box-shadow: 0 3px 12px rgba(0,0,0,.12);
+      }
+
+    }
+
+    /* SMALL MOBILE */
+
+    @media (max-width: 380px) {
+
+      .product-popup {
+        padding: 9px !important;
+      }
+
+      .product-popup-imagebox {
+        height: 145px !important;
+        min-height: 145px !important;
+        max-height: 145px !important;
+      }
+
+      .product-popup-imagebox img {
+        max-height: 135px !important;
+      }
+
+      .product-popup-info h2 {
+        font-size: 17px !important;
+      }
+
+      .product-popup-info > p.muted {
+        max-height: 65px !important;
+      }
+
+      .product-popup-actions .btn {
+        font-size: 11px !important;
+      }
+
+    }
+
+  </style>
+
 </head>
 
 <body class="products-body">
@@ -410,20 +678,8 @@
     src="/memora-creations/frontend/js/products.js?v=11"
   ></script>
 
-  <!-- =====================================
-       DELIVERY CHECKER TEMPORARILY DISABLED
-
-       Reason:
-       Parcel weight not configured yet.
-
-       Original Delivery Checker Code
-       remains saved in:
-
-       frontend/js/delivery-checker.js
-
-       It can be enabled again after
-       Shiprocket configuration is ready.
-  ====================================== -->
+  <!-- DELIVERY CHECKER TEMPORARILY DISABLED -->
+  <!-- Saved in frontend/js/delivery-checker.js -->
 
 </body>
 
