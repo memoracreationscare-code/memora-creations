@@ -1,0 +1,956 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <meta
+    name="description"
+    content="Read the terms and conditions for shopping, payments, orders and customer support at Memora Creations."
+  >
+
+  <title>Terms & Conditions | Memora Creations</title>
+
+  <link
+    rel="stylesheet"
+    href="/memora-creations/frontend/css/style.css?v=13"
+  >
+
+  <style>
+    :root {
+      --tc-ink: #302219;
+      --tc-brown: #8a5a3b;
+      --tc-muted: #74695f;
+      --tc-border: #e8ddd3;
+    }
+
+    .tc-page {
+      padding: 30px 0 75px;
+    }
+
+    .tc-hero {
+      background: linear-gradient(
+        135deg, #fffaf5, #f0dfd0
+      );
+      border: 1px solid #e6d5c5;
+      border-radius: 27px;
+      padding: clamp(32px, 6vw, 70px);
+      margin-bottom: 24px;
+    }
+
+    .tc-eyebrow {
+      display: block;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--tc-brown);
+      margin-bottom: 17px;
+    }
+
+    .tc-hero h1 {
+      color: var(--tc-ink);
+      font-family: Georgia, serif;
+      font-size: clamp(38px, 5.5vw, 64px);
+      letter-spacing: -.03em;
+      line-height: 1.12;
+      margin: 0 0 20px;
+    }
+
+    .tc-hero h1 span {
+      color: var(--tc-brown);
+    }
+
+    .tc-hero p {
+      color: #67594e;
+      font-size: 16px;
+      line-height: 1.85;
+      max-width: 760px;
+      margin: 0;
+    }
+
+    .tc-date {
+      display: inline-block;
+      margin-top: 22px;
+      padding: 10px 15px;
+      border: 1px solid #e1cfbf;
+      background: white;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 750;
+      color: #704c35;
+    }
+
+    .tc-highlights {
+      display: grid;
+      grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 25px;
+    }
+
+    .tc-highlight {
+      background: white;
+      border: 1px solid var(--tc-border);
+      border-radius: 18px;
+      padding: 24px;
+    }
+
+    .tc-highlight-icon {
+      font-size: 27px;
+      display: block;
+      margin-bottom: 14px;
+    }
+
+    .tc-highlight strong {
+      display: block;
+      color: var(--tc-ink);
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    .tc-highlight p {
+      color: var(--tc-muted);
+      line-height: 1.75;
+      font-size: 13px;
+      margin: 0;
+    }
+
+    .tc-layout {
+      display: grid;
+      grid-template-columns:
+        245px minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .tc-sidebar {
+      position: sticky;
+      top: 95px;
+      background: white;
+      border: 1px solid var(--tc-border);
+      border-radius: 18px;
+      padding: 23px;
+    }
+
+    .tc-sidebar h2 {
+      font-size: 15px;
+      color: var(--tc-ink);
+      margin: 0 0 14px;
+    }
+
+    .tc-sidebar a {
+      display: block;
+      padding: 10px 0;
+      color: var(--tc-muted);
+      font-size: 13px;
+      line-height: 1.5;
+      border-bottom: 1px solid #f1e9e2;
+    }
+
+    .tc-sidebar a:hover {
+      color: var(--tc-brown);
+    }
+
+    .tc-section {
+      background: white;
+      border: 1px solid var(--tc-border);
+      border-radius: 19px;
+      padding: clamp(23px, 4vw, 36px);
+      margin-bottom: 18px;
+      scroll-margin-top: 95px;
+    }
+
+    .tc-section h2 {
+      font-family: Georgia, serif;
+      color: var(--tc-ink);
+      font-size: clamp(23px, 3vw, 29px);
+      margin: 0 0 16px;
+    }
+
+    .tc-section p,
+    .tc-section li {
+      color: var(--tc-muted);
+      font-size: 14px;
+      line-height: 1.9;
+    }
+
+    .tc-section p {
+      margin: 0 0 14px;
+    }
+
+    .tc-section p:last-child {
+      margin-bottom: 0;
+    }
+
+    .tc-section ul {
+      padding-left: 22px;
+      margin: 10px 0;
+    }
+
+    .tc-section li {
+      margin-bottom: 8px;
+    }
+
+    .tc-section a {
+      color: var(--tc-brown);
+      font-weight: 750;
+      text-decoration: underline;
+      overflow-wrap: anywhere;
+    }
+
+    .tc-note {
+      padding: 17px;
+      margin-top: 18px;
+      border-radius: 13px;
+      background: #fff8ee;
+      border: 1px solid #ead6be;
+      color: #725139;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .tc-support {
+      background: #2e2119;
+      border-radius: 24px;
+      padding: clamp(32px, 5vw, 52px);
+      text-align: center;
+      margin-top: 25px;
+      color: white;
+    }
+
+    .tc-support h2 {
+      font-family: Georgia, serif;
+      font-size: clamp(27px, 4vw, 38px);
+      margin: 0 0 15px;
+    }
+
+    .tc-support p {
+      max-width: 620px;
+      margin: 0 auto 22px;
+      color: #e1cdbf;
+      line-height: 1.85;
+    }
+
+    .tc-button {
+      display: inline-block;
+      background: white;
+      color: #68452f;
+      border-radius: 12px;
+      padding: 13px 22px;
+      font-size: 14px;
+      font-weight: 800;
+      margin: 5px;
+    }
+
+    .tc-footer {
+      background: #281e18;
+      color: white;
+      text-align: center;
+      padding: 30px 16px 95px;
+    }
+
+    .tc-footer strong {
+      display: block;
+      letter-spacing: .14em;
+      margin-bottom: 10px;
+    }
+
+    .tc-footer p {
+      color: #cbbcb1;
+      font-size: 13px;
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    @media (max-width: 800px) {
+      .tc-layout,
+      .tc-highlights {
+        grid-template-columns: 1fr;
+      }
+
+      .tc-sidebar {
+        position: static;
+      }
+
+      .tc-page {
+        padding-top: 18px;
+      }
+
+      .tc-hero {
+        border-radius: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header id="nav" class="topbar"></header>
+
+  <main class="container tc-page">
+
+    <section class="tc-hero">
+      <span class="tc-eyebrow">
+        MEMORA CREATIONS
+      </span>
+
+      <h1>
+        Terms <span>& Conditions</span>
+      </h1>
+
+      <p>
+        Please read these terms before
+        using our online store or
+        placing an order.
+
+        They explain how shopping,
+        payments, delivery, account
+        use and customer support
+        are handled at Memora Creations.
+      </p>
+
+      <div class="tc-date">
+        Last Updated: 3 November 2026
+      </div>
+    </section>
+
+    <div class="tc-highlights">
+
+      <div class="tc-highlight">
+        <span class="tc-highlight-icon">🛒</span>
+        <strong>Shopping</strong>
+        <p>
+          Product availability, prices
+          and order details should be
+          reviewed before checkout.
+        </p>
+      </div>
+
+      <div class="tc-highlight">
+        <span class="tc-highlight-icon">💳</span>
+        <strong>Payments</strong>
+        <p>
+          Supported payment methods
+          and final charges are
+          displayed at checkout.
+        </p>
+      </div>
+
+      <div class="tc-highlight">
+        <span class="tc-highlight-icon">📦</span>
+        <strong>Delivery</strong>
+        <p>
+          Shipping depends on
+          product availability
+          and courier serviceability.
+        </p>
+      </div>
+
+    </div>
+
+    <div class="tc-layout">
+
+      <aside class="tc-sidebar">
+        <h2>On This Page</h2>
+
+        <a href="#introduction">1. Introduction</a>
+        <a href="#eligibility">2. Customer Eligibility</a>
+        <a href="#account">3. Customer Accounts</a>
+        <a href="#products">4. Product Information</a>
+        <a href="#pricing">5. Pricing & Charges</a>
+        <a href="#orders">6. Orders</a>
+        <a href="#payments">7. Payment Methods</a>
+        <a href="#shipping">8. Shipping & Delivery</a>
+        <a href="#returns">9. Cancellation & Refunds</a>
+        <a href="#reviews">10. Customer Reviews</a>
+        <a href="#acceptable-use">11. Acceptable Use</a>
+        <a href="#intellectual-property">12. Website Content</a>
+        <a href="#liability">13. Responsibilities</a>
+        <a href="#privacy">14. Privacy</a>
+        <a href="#changes">15. Changes to Terms</a>
+        <a href="#contact">16. Contact Us</a>
+      </aside>
+
+      <div class="tc-content">
+
+        <section class="tc-section" id="introduction">
+          <h2>1. Introduction</h2>
+
+          <p>
+            Welcome to Memora Creations,
+            an online store offering
+            home decoration and
+            gifting products.
+          </p>
+
+          <p>
+            These Terms & Conditions
+            describe the general
+            conditions for browsing,
+            creating an account and
+            purchasing from our website.
+          </p>
+
+          <p>
+            Any mandatory rights
+            available under applicable
+            Indian consumer laws
+            remain unaffected.
+          </p>
+        </section>
+
+        <section class="tc-section" id="eligibility">
+          <h2>2. Customer Eligibility</h2>
+
+          <p>
+            Customers must be legally
+            capable of making purchases
+            or have appropriate parent
+            or guardian involvement.
+          </p>
+
+          <p>
+            Information provided while
+            registering or ordering
+            should be accurate,
+            complete and current.
+          </p>
+        </section>
+
+        <section class="tc-section" id="account">
+          <h2>3. Customer Accounts</h2>
+
+          <p>
+            Some shopping features
+            require a registered
+            customer account.
+          </p>
+
+          <p>
+            You are responsible for
+            keeping your password
+            and login credentials
+            confidential.
+          </p>
+
+          <p>
+            Contact us if you
+            suspect unauthorised
+            access to your account.
+          </p>
+
+          <p>
+            Never share passwords,
+            verification codes
+            or OTPs with anyone.
+          </p>
+        </section>
+
+        <section class="tc-section" id="products">
+          <h2>4. Products & Descriptions</h2>
+
+          <p>
+            We aim to display
+            clear information about
+            our home decor and
+            gifting products.
+          </p>
+
+          <p>
+            Product colour,
+            appearance and visual
+            details may vary slightly
+            depending on screen
+            settings and lighting.
+          </p>
+
+          <p>
+            Product specifications,
+            included accessories,
+            dimensions and materials
+            should be checked on
+            the relevant product page.
+          </p>
+
+          <p>
+            If you need clarification
+            before purchasing,
+            please contact us.
+          </p>
+        </section>
+
+        <section class="tc-section" id="pricing">
+          <h2>5. Pricing & Charges</h2>
+
+          <p>
+            Product prices are shown
+            on the website and the
+            applicable order amount
+            is calculated at checkout.
+          </p>
+
+          <p>
+            The checkout summary
+            may include product
+            discounts, eligible
+            coupon discounts and
+            delivery charges.
+          </p>
+
+          <p>
+            Please review the
+            complete payable amount
+            before confirming
+            an order.
+          </p>
+
+          <p>
+            Any applicable tax
+            treatment should be
+            reflected in the
+            relevant transaction
+            documents as required
+            by law.
+          </p>
+        </section>
+
+        <section class="tc-section" id="orders">
+          <h2>6. Placing an Order</h2>
+
+          <p>
+            Customers can select
+            available products,
+            provide a delivery
+            address and choose a
+            supported payment method.
+          </p>
+
+          <p>
+            An order may require
+            additional payment,
+            inventory or
+            fulfilment checks.
+          </p>
+
+          <p>
+            After placing an
+            order, customers
+            can view its status
+            through My Orders.
+          </p>
+
+          <p>
+            If an order cannot
+            be fulfilled, we will
+            review the available
+            resolution in accordance
+            with applicable law.
+          </p>
+        </section>
+
+        <section class="tc-section" id="payments">
+          <h2>7. Payment Methods</h2>
+
+          <p>
+            The website currently
+            supports Cash on Delivery
+            (COD) and online payments
+            through Cashfree,
+            where available.
+          </p>
+
+          <p>
+            Online payments are
+            subject to confirmation
+            from the payment gateway.
+          </p>
+
+          <p>
+            A pending payment
+            status does not
+            establish that a
+            payment succeeded
+            or failed.
+          </p>
+
+          <p>
+            If your payment
+            result is unclear,
+            check My Orders
+            and contact support
+            before attempting
+            another payment.
+          </p>
+
+          <div class="tc-note">
+            Never send money
+            to an unverified
+            personal account
+            claiming to represent
+            Memora Creations.
+          </div>
+        </section>
+
+        <section class="tc-section" id="shipping">
+          <h2>8. Shipping & Delivery</h2>
+
+          <p>
+            Delivery availability
+            depends on destination
+            PIN code, courier
+            coverage and
+            fulfilment conditions.
+          </p>
+
+          <p>
+            COD availability may
+            differ from prepaid
+            delivery availability.
+          </p>
+
+          <p>
+            Shipping charges
+            are displayed in
+            the checkout summary.
+          </p>
+
+          <p>
+            Delivery estimates,
+            when provided,
+            are subject to
+            logistical conditions.
+          </p>
+
+          <p>
+            Read our
+            <a
+              href="/memora-creations/frontend/shipping-policy.html"
+            >
+              Shipping & Delivery Policy
+            </a>
+            for more information.
+          </p>
+        </section>
+
+        <section class="tc-section" id="returns">
+          <h2>
+            9. Cancellation, Returns & Refunds
+          </h2>
+
+          <p>
+            Available cancellation
+            options depend on
+            the payment method
+            and order status.
+          </p>
+
+          <p>
+            Eligible COD orders
+            may be cancelled
+            through the website
+            before the applicable
+            cancellation cut-off.
+          </p>
+
+          <p>
+            Cashfree cancellation
+            requests may require
+            payment verification
+            and support review.
+          </p>
+
+          <p>
+            Return or refund
+            requests may be
+            reviewed according
+            to the nature of
+            the product issue
+            and applicable law.
+          </p>
+
+          <p>
+            Please read our
+            <a
+              href="/memora-creations/frontend/return-refund-policy.html"
+            >
+              Return & Refund Policy
+            </a>.
+          </p>
+        </section>
+
+        <section class="tc-section" id="reviews">
+          <h2>10. Customer Reviews</h2>
+
+          <p>
+            Eligible customers
+            may submit product
+            ratings, comments
+            and photographs
+            through supported
+            review features.
+          </p>
+
+          <p>
+            Reviews may be
+            moderated before
+            appearing publicly.
+          </p>
+
+          <p>
+            Do not submit
+            misleading content,
+            someone else's
+            personal information,
+            unlawful material
+            or photographs
+            you are not
+            authorised to share.
+          </p>
+        </section>
+
+        <section
+          class="tc-section"
+          id="acceptable-use"
+        >
+          <h2>11. Acceptable Website Use</h2>
+
+          <p>
+            Customers should use
+            the website lawfully
+            and avoid activities
+            that interfere with
+            its normal functioning.
+          </p>
+
+          <ul>
+            <li>
+              Do not attempt to
+              access another
+              customer's account.
+            </li>
+
+            <li>
+              Do not submit
+              intentionally false
+              transaction details.
+            </li>
+
+            <li>
+              Do not attempt
+              to manipulate
+              prices or payments.
+            </li>
+
+            <li>
+              Do not upload
+              harmful or
+              unlawful content.
+            </li>
+          </ul>
+        </section>
+
+        <section
+          class="tc-section"
+          id="intellectual-property"
+        >
+          <h2>12. Website Content</h2>
+
+          <p>
+            Website branding,
+            descriptions, visual
+            materials and other
+            content may be
+            protected by
+            intellectual property
+            rights belonging
+            to their respective
+            owners.
+          </p>
+
+          <p>
+            Using this website
+            does not automatically
+            grant permission
+            to commercially
+            reproduce protected
+            materials.
+          </p>
+        </section>
+
+        <section class="tc-section" id="liability">
+          <h2>13. Responsibilities</h2>
+
+          <p>
+            Customers should
+            provide a valid
+            address and
+            reachable contact
+            number for
+            order fulfilment.
+          </p>
+
+          <p>
+            We aim to address
+            genuine complaints
+            about product quality,
+            delivery, payment
+            and other shopping
+            issues through
+            customer support.
+          </p>
+
+          <p>
+            Nothing in these
+            terms excludes or
+            limits liability
+            where doing so
+            would be prohibited
+            by applicable law.
+          </p>
+        </section>
+
+        <section class="tc-section" id="privacy">
+          <h2>14. Privacy & Personal Data</h2>
+
+          <p>
+            Customer information
+            is used for services
+            such as account
+            management, order
+            processing, delivery
+            and support.
+          </p>
+
+          <p>
+            Please review our
+            <a
+              href="/memora-creations/frontend/privacy-policy.html"
+            >
+              Privacy Policy
+            </a>
+            to learn more
+            about data handling.
+          </p>
+        </section>
+
+        <section class="tc-section" id="changes">
+          <h2>15. Changes to These Terms</h2>
+
+          <p>
+            These Terms & Conditions
+            may be updated to
+            reflect changes to
+            our services,
+            operations and
+            applicable law.
+          </p>
+
+          <p>
+            Updated terms may
+            be published here
+            with a revised date.
+          </p>
+
+          <p>
+            Changes will apply
+            in accordance with
+            applicable law and
+            will not remove
+            mandatory rights
+            relating to
+            earlier purchases.
+          </p>
+        </section>
+
+        <section class="tc-section" id="contact">
+          <h2>16. Contact Us</h2>
+
+          <p>
+            For questions about
+            these Terms & Conditions
+            or your order,
+            contact Memora Creations.
+          </p>
+
+          <p>
+            <strong>Email:</strong>
+            <a
+              href="mailto:memoracreations.care@gmail.com"
+            >
+              memoracreations.care@gmail.com
+            </a>
+          </p>
+
+          <p>
+            <strong>WhatsApp:</strong>
+            <a
+              href="https://wa.me/918874050204"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              +91 88740 50204
+            </a>
+          </p>
+
+          <p>
+            For order enquiries,
+            please include your
+            Order ID. Never send
+            your password or OTP.
+          </p>
+        </section>
+
+      </div>
+
+    </div>
+
+    <section class="tc-support">
+      <h2>Need Assistance?</h2>
+
+      <p>
+        Contact our customer support
+        team for questions about
+        orders, payments, products
+        or these terms.
+      </p>
+
+      <a
+        class="tc-button"
+        href="/memora-creations/frontend/contact.html"
+      >
+        Contact Support
+      </a>
+
+      <a
+        class="tc-button"
+        href="/memora-creations/frontend/products.html"
+      >
+        Explore Products
+      </a>
+    </section>
+
+  </main>
+
+  <footer class="tc-footer">
+    <strong>MEMORA CREATIONS</strong>
+
+    <p>
+      Beautiful Decor • Thoughtful Gifts
+      • Memorable Spaces
+    </p>
+  </footer>
+
+  <nav id="bottomNav" class="bottomnav"></nav>
+
+  <script
+    src="/memora-creations/frontend/js/app.js?v=11"
+  ></script>
+
+</body>
+</html>
