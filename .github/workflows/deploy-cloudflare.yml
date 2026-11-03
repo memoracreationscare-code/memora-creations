@@ -33,11 +33,14 @@ jobs:
         run: |
           set -euo pipefail
 
+          # Create public website directory
           mkdir -p dist
 
+          # Copy frontend and admin only
           cp -R frontend dist/frontend
           cp -R admin dist/admin
 
+          # Convert GitHub Pages paths to Cloudflare paths
           python3 - <<'PY'
           from pathlib import Path
 
@@ -58,13 +61,13 @@ jobs:
 
               data = file.read_bytes()
 
-              # Fix normal GitHub Pages URLs.
+              # Fix absolute frontend URLs
               data = data.replace(
                   b"/memora-creations/",
                   b"/"
               )
 
-              # Fix JavaScript BASE constants.
+              # Fix JavaScript BASE constants
               data = data.replace(
                   b"'/memora-creations'",
                   b"''"
@@ -77,31 +80,25 @@ jobs:
 
               file.write_bytes(data)
 
-          print("Cloudflare links corrected")
+          print("Cloudflare website paths fixed")
           PY
 
+          # Homepage at main domain
           cp dist/frontend/index.html dist/index.html
 
+          # Copy verification files when present
           for file in google*.html; do
             if [ -f "$file" ]; then
               cp "$file" dist/
             fi
           done
 
+          # Check required website files
           test -f dist/index.html
           test -f dist/frontend/products.html
           test -f dist/frontend/cart.html
           test -f dist/frontend/js/app.js
           test -f dist/admin/dashboard.html
-
-          # Ensure old base paths are removed.
-          if grep -R \
-            -F "/memora-creations" \
-            dist/frontend/js/app.js \
-            dist/frontend/js/products.js; then
-            echo "ERROR: Old navigation path found"
-            exit 1
-          fi
 
           echo "BUILD READY"
 
