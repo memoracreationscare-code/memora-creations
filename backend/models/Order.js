@@ -1,12 +1,17 @@
 
 const mongoose = require('mongoose');
 
-/* =========================================
-   MEMORA CREATIONS
-   ORDER MODEL
-   RAZORPAY + CASHFREE + COD
-   WHATSAPP ORDER UPDATE CONSENT
-========================================= */
+/*
+=========================================
+ MEMORA CREATIONS
+ ORDER MODEL
+
+ COD + CASHFREE + LEGACY RAZORPAY
+ COUPON SUPPORT
+ WHATSAPP CONSENT
+ GIFT WRAPPING SUPPORT
+=========================================
+*/
 
 const orderItemSchema = new mongoose.Schema({
   product: {
@@ -53,9 +58,7 @@ const orderItemSchema = new mongoose.Schema({
 });
 
 
-/* =========================================
-   SHIPPING ADDRESS
-========================================= */
+/* SHIPPING ADDRESS */
 
 const shippingAddressSchema = new mongoose.Schema({
   fullName: {
@@ -96,9 +99,38 @@ const shippingAddressSchema = new mongoose.Schema({
 });
 
 
-/* =========================================
-   MAIN ORDER SCHEMA
-========================================= */
+/* GIFT WRAPPING OPTIONS */
+
+const giftWrappingSchema = new mongoose.Schema({
+  selected: {
+    type: Boolean,
+    default: false
+  },
+
+  type: {
+    type: String,
+    enum: ['NONE', 'STANDARD', 'PREMIUM'],
+    default: 'NONE'
+  },
+
+  fee: {
+    type: Number,
+    min: 0,
+    default: 0
+  },
+
+  message: {
+    type: String,
+    trim: true,
+    maxlength: 180,
+    default: ''
+  }
+}, {
+  _id: false
+});
+
+
+/* MAIN ORDER SCHEMA */
 
 const orderSchema = new mongoose.Schema({
 
@@ -166,9 +198,7 @@ const orderSchema = new mongoose.Schema({
     default: 0
   },
 
-  /* =====================================
-     COUPON FIELDS
-  ===================================== */
+  /* COUPON FIELDS */
 
   coupon: {
     type: mongoose.Schema.Types.ObjectId,
@@ -197,15 +227,25 @@ const orderSchema = new mongoose.Schema({
     default: 0
   },
 
+  /* GIFT WRAPPING */
+
+  giftWrapping: {
+    type: giftWrappingSchema,
+    default: () => ({
+      selected: false,
+      type: 'NONE',
+      fee: 0,
+      message: ''
+    })
+  },
+
   grandTotal: {
     type: Number,
     required: true,
     min: 0
   },
 
-  /* =====================================
-     PAYMENT METHOD
-  ===================================== */
+  /* PAYMENT METHOD */
 
   paymentMethod: {
     type: String,
@@ -242,9 +282,7 @@ const orderSchema = new mongoose.Schema({
     index: true
   },
 
-  /* =====================================
-     RAZORPAY FIELDS
-  ===================================== */
+  /* LEGACY RAZORPAY FIELDS */
 
   razorpayOrderId: {
     type: String,
@@ -263,9 +301,7 @@ const orderSchema = new mongoose.Schema({
     unique: true
   },
 
-  /* =====================================
-     CASHFREE FIELDS
-  ===================================== */
+  /* CASHFREE FIELDS */
 
   cashfreeOrderId: {
     type: String,
@@ -286,17 +322,7 @@ const orderSchema = new mongoose.Schema({
     sparse: true
   },
 
-  /* =====================================
-     WHATSAPP CUSTOMER CONSENT
-
-     Default is FALSE.
-
-     A customer must explicitly opt in
-     before notifications can be sent.
-
-     Never automatically infer consent
-     from having a mobile number.
-  ===================================== */
+  /* WHATSAPP CONSENT */
 
   whatsappConsent: {
 
@@ -320,12 +346,6 @@ const orderSchema = new mongoose.Schema({
       default: 'NONE'
     },
 
-    /*
-      Consent disclosure version.
-      Useful for proving what the
-      customer agreed to.
-    */
-
     disclosureVersion: {
       type: String,
       trim: true,
@@ -335,9 +355,7 @@ const orderSchema = new mongoose.Schema({
 
   },
 
-  /* =====================================
-     ORDER STATUS
-  ===================================== */
+  /* ORDER STATUS */
 
   orderStatus: {
     type: String,
@@ -385,9 +403,7 @@ const orderSchema = new mongoose.Schema({
 });
 
 
-/* =========================================
-   DATABASE INDEXES
-========================================= */
+/* DATABASE INDEXES */
 
 orderSchema.index({
   user: 1,
@@ -404,9 +420,7 @@ orderSchema.index({
 });
 
 
-/* =========================================
-   EXPORT
-========================================= */
+/* EXPORT */
 
 module.exports = mongoose.model(
   'Order',
