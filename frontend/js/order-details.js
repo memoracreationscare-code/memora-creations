@@ -1,225 +1,139 @@
-const ORDER_BASE =
-  '/memora-creations';
+
+/*
+=========================================
+ MEMORA CREATIONS
+ ORDER DETAILS
+
+ Order Tracking
+ COD / Online Payment
+ Legacy Razorpay Retry
+ Gift Wrapping Details
+ Personal Gift Message
+=========================================
+*/
+
+'use strict';
+
+const ORDER_BASE = '/memora-creations';
+
+let currentOrderDetails = null;
+let retryPaymentRunning = false;
 
 
-let currentOrderDetails =
-  null;
+/* =====================================
+   HELPERS
+===================================== */
 
+function orderEsc(value) {
+  return window.MC.esc(
+    String(value ?? '')
+  );
+}
 
-let retryPaymentRunning =
-  false;
+function orderMoney(value) {
+  return window.MC.money(
+    Number(value) || 0
+  );
+}
 
-
-/* =========================
-   DATE
-========================= */
-
-function formatOrderDetailsDate(
-  value
-) {
-
-  if (!value) {
-    return '';
-  }
-
+function formatOrderDetailsDate(value) {
+  if (!value) return '';
 
   try {
+    const date = new Date(value);
 
-    return new Date(
-      value
-    )
-      .toLocaleString(
-        'en-IN',
-        {
-          day:
-            '2-digit',
+    if (Number.isNaN(date.getTime())) {
+      return '';
+    }
 
-          month:
-            'short',
-
-          year:
-            'numeric',
-
-          hour:
-            '2-digit',
-
-          minute:
-            '2-digit'
-        }
-      );
-
-  } catch {
-
+    return date.toLocaleString(
+      'en-IN',
+      {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }
+    );
+  } catch (_) {
     return '';
-
   }
-
 }
 
+function detailsStatusClass(status) {
+  const value = String(
+    status || ''
+  ).toLowerCase();
 
-/* =========================
-   STATUS CLASS
-========================= */
-
-function detailsStatusClass(
-  status
-) {
-
-  const value =
-    String(
-      status || ''
-    )
-      .toLowerCase();
-
-
-  if (
-    value ===
-    'cancelled'
-  ) {
-
+  if (value === 'cancelled') {
     return 'cancelled';
-
   }
 
-
-  if (
-    value ===
-    'delivered'
-  ) {
-
+  if (value === 'delivered') {
     return 'delivered';
-
   }
-
 
   if (
-    value ===
-    'shipped' ||
-    value ===
-    'out for delivery'
+    value === 'shipped' ||
+    value === 'out for delivery'
   ) {
-
     return 'shipping';
-
   }
-
 
   return 'processing';
+}
 
+function getOrderStatusTitle(order) {
+  switch (order.orderStatus) {
+    case 'Cancelled':
+      return 'Order Cancelled';
+
+    case 'Delivered':
+      return 'Order Delivered';
+
+    case 'Out for Delivery':
+      return 'Out for Delivery';
+
+    case 'Shipped':
+      return 'Order Shipped';
+
+    case 'Packed':
+      return 'Order Packed';
+
+    default:
+      return 'Order Confirmed';
+  }
 }
 
 
-/* =========================
-   STATUS TITLE
-========================= */
+/* =====================================
+   PAYMENT SUCCESS POPUP
+===================================== */
 
-function getOrderStatusTitle(
-  order
-) {
-
-  if (
-    order.orderStatus ===
-    'Cancelled'
-  ) {
-
-    return 'Order Cancelled';
-
-  }
-
-
-  if (
-    order.orderStatus ===
-    'Delivered'
-  ) {
-
-    return 'Order Delivered';
-
-  }
-
-
-  if (
-    order.orderStatus ===
-    'Out for Delivery'
-  ) {
-
-    return 'Out for Delivery';
-
-  }
-
-
-  if (
-    order.orderStatus ===
-    'Shipped'
-  ) {
-
-    return 'Order Shipped';
-
-  }
-
-
-  if (
-    order.orderStatus ===
-    'Packed'
-  ) {
-
-    return 'Order Packed';
-
-  }
-
-
-  return 'Order Confirmed';
-
-}
-
-
-/* =========================
-   SUCCESS POPUP
-========================= */
-
-function showOrderPaymentSuccess(
-  orderId
-) {
-
-  document
-    .querySelector(
-      '#orderPaymentSuccess'
-    )
-    ?.remove();
-
+function showOrderPaymentSuccess(orderId) {
+  document.querySelector(
+    '#orderPaymentSuccess'
+  )?.remove();
 
   const overlay =
-    document.createElement(
-      'div'
-    );
+    document.createElement('div');
 
-
-  overlay.id =
-    'orderPaymentSuccess';
-
-
-  overlay.className =
-    'order-success-popup';
-
+  overlay.id = 'orderPaymentSuccess';
+  overlay.className = 'order-success-popup';
 
   overlay.innerHTML = `
-
     <div class="order-success-popup-box">
-
       <div class="order-success-popup-icon">
         ✓
       </div>
 
-
-      <h2>
-        Payment Successful
-      </h2>
-
+      <h2>Payment Successful</h2>
 
       <p>
         Your payment has been completed
         and the order is confirmed.
       </p>
-
 
       <button
         type="button"
@@ -227,348 +141,415 @@ function showOrderPaymentSuccess(
       >
         Continue
       </button>
-
     </div>
-
   `;
 
+  document.body.appendChild(overlay);
 
-  document.body.appendChild(
-    overlay
-  );
-
-
-  overlay
-    .querySelector(
-      '#paymentSuccessContinue'
-    )
-    ?.addEventListener(
-      'click',
-      () => {
-
-        location.href =
-          ORDER_BASE +
-          '/frontend/order-details.html?id=' +
-          encodeURIComponent(
-            orderId
-          );
-
-      }
-    );
-
-}
-
-
-/* =========================
-   RAZORPAY
-========================= */
-
-function loadOrderRazorpayScript() {
-
-  return new Promise(
-    (
-      resolve,
-      reject
-    ) => {
-
-      if (window.Razorpay) {
-
-        resolve();
-
-        return;
-
-      }
-
-
-      const existingScript =
-        document.querySelector(
-          'script[data-order-razorpay="true"]'
-        );
-
-
-      if (existingScript) {
-
-        existingScript.addEventListener(
-          'load',
-          resolve,
-          { once:true }
-        );
-
-
-        existingScript.addEventListener(
-          'error',
-          () =>
-            reject(
-              new Error(
-                'Razorpay Checkout load nahi hua.'
-              )
-            ),
-          { once:true }
-        );
-
-
-        return;
-
-      }
-
-
-      const script =
-        document.createElement(
-          'script'
-        );
-
-
-      script.src =
-        'https://checkout.razorpay.com/v1/checkout.js';
-
-
-      script.dataset.orderRazorpay =
-        'true';
-
-
-      script.onload =
-        resolve;
-
-
-      script.onerror =
-        () =>
-          reject(
-            new Error(
-              'Razorpay Checkout load nahi hua.'
-            )
-          );
-
-
-      document.head.appendChild(
-        script
-      );
-
+  overlay.querySelector(
+    '#paymentSuccessContinue'
+  )?.addEventListener(
+    'click',
+    () => {
+      location.href =
+        ORDER_BASE +
+        '/frontend/order-details.html?id=' +
+        encodeURIComponent(orderId);
     }
   );
-
 }
 
 
-/* =========================
-   PRODUCT HTML
-========================= */
+/* =====================================
+   RAZORPAY SDK
+   LEGACY SUPPORT PRESERVED
+===================================== */
 
-function orderDetailProducts(
-  items
-) {
+function loadOrderRazorpayScript() {
+  return new Promise((resolve, reject) => {
+    if (window.Razorpay) {
+      resolve();
+      return;
+    }
 
+    const existingScript =
+      document.querySelector(
+        'script[data-order-razorpay="true"]'
+      );
+
+    if (existingScript) {
+      existingScript.addEventListener(
+        'load',
+        resolve,
+        { once: true }
+      );
+
+      existingScript.addEventListener(
+        'error',
+        () => reject(
+          new Error(
+            'Razorpay Checkout load nahi hua.'
+          )
+        ),
+        { once: true }
+      );
+
+      return;
+    }
+
+    const script =
+      document.createElement('script');
+
+    script.src =
+      'https://checkout.razorpay.com/v1/checkout.js';
+
+    script.dataset.orderRazorpay = 'true';
+
+    script.onload = resolve;
+
+    script.onerror = () => reject(
+      new Error(
+        'Razorpay Checkout load nahi hua.'
+      )
+    );
+
+    document.head.appendChild(script);
+  });
+}
+
+
+/* =====================================
+   ORDER PRODUCTS
+===================================== */
+
+function orderDetailProducts(items) {
   if (!items.length) {
-
     return `
-
       <div class="empty">
         No order items found.
       </div>
-
     `;
-
   }
 
+  return items.map(item => `
+    <div class="order-detail-product">
 
-  return items
-    .map(
-      item => `
+      <div class="order-detail-product-image">
+        <img
+          src="${orderEsc(
+            item.imageUrl ||
+            'https://placehold.co/180x180?text=Memora'
+          )}"
+          alt="${orderEsc(
+            item.name || 'Product'
+          )}"
+        >
+      </div>
 
-        <div class="order-detail-product">
+      <div class="order-detail-product-info">
+        <h3>
+          ${orderEsc(item.name || 'Product')}
+        </h3>
 
-          <div class="order-detail-product-image">
+        <span>
+          Quantity:
+          ${Number(item.quantity) || 1}
+        </span>
 
-            <img
-              src="${window.MC.esc(
-                item.imageUrl ||
-                'https://placehold.co/180x180?text=Memora'
-              )}"
-              alt="${window.MC.esc(
-                item.name ||
-                'Product'
-              )}"
-            >
+        <span>
+          Unit Price:
+          ${orderMoney(item.unitPrice)}
+        </span>
+      </div>
 
-          </div>
+      <div class="order-detail-product-total">
+        ${orderMoney(item.lineTotal)}
+      </div>
 
-
-          <div class="order-detail-product-info">
-
-            <h3>
-
-              ${window.MC.esc(
-                item.name ||
-                'Product'
-              )}
-
-            </h3>
-
-
-            <span>
-
-              Quantity:
-              ${Number(
-                item.quantity ||
-                1
-              )}
-
-            </span>
-
-
-            <span>
-
-              Unit Price:
-              ${window.MC.money(
-                item.unitPrice
-              )}
-
-            </span>
-
-          </div>
-
-
-          <div class="order-detail-product-total">
-
-            ${window.MC.money(
-              item.lineTotal
-            )}
-
-          </div>
-
-        </div>
-
-      `
-    )
-    .join('');
-
+    </div>
+  `).join('');
 }
 
 
-/* =========================
-   TRACKING
-========================= */
+/* =====================================
+   ORDER TRACKING
+===================================== */
 
-function orderTrackingHtml(
-  history
-) {
-
+function orderTrackingHtml(history) {
   if (!history.length) {
-
     return `
-
       <div class="empty">
         Tracking update not available yet.
       </div>
-
     `;
-
   }
 
-
   return `
-
     <div class="tracking-list">
+      ${history.map(status => `
+        <div class="tracking-item">
+          <span class="tracking-dot"></span>
 
-      ${
-        history
-          .map(
-            status => `
+          <strong>
+            ${orderEsc(status.status || '')}
+          </strong>
 
-              <div class="tracking-item">
+          <div class="tracking-date">
+            ${orderEsc(
+              formatOrderDetailsDate(
+                status.changedAt
+              )
+            )}
+          </div>
 
-                <span class="tracking-dot"></span>
-
-
-                <strong>
-
-                  ${window.MC.esc(
-                    status.status ||
-                    ''
-                  )}
-
-                </strong>
-
-
-                <div class="tracking-date">
-
-                  ${window.MC.esc(
-                    formatOrderDetailsDate(
-                      status.changedAt
-                    )
-                  )}
-
+          ${
+            status.note
+              ? `
+                <div class="tracking-note">
+                  ${orderEsc(status.note)}
                 </div>
-
-
-                ${
-                  status.note
-
-                    ? `
-                      <div class="tracking-note">
-
-                        ${window.MC.esc(
-                          status.note
-                        )}
-
-                      </div>
-                    `
-
-                    : ''
-                }
-
-              </div>
-
-            `
-          )
-          .join('')
-      }
-
+              `
+              : ''
+          }
+        </div>
+      `).join('')}
     </div>
-
   `;
-
 }
 
 
-/* =========================
-   LOAD ORDER
-========================= */
+/* =====================================
+   GIFT WRAPPING DISPLAY
+
+   Uses data saved on the order.
+   Never calculates or adds a fee
+   on the frontend.
+===================================== */
+
+function giftWrappingDisplay(order) {
+  const gift = order.giftWrapping;
+
+  if (
+    !gift ||
+    gift.selected !== true
+  ) {
+    return {
+      selected: false,
+      type: 'NONE',
+      label: '',
+      fee: 0,
+      message: ''
+    };
+  }
+
+  const type = String(
+    gift.type || ''
+  ).toUpperCase();
+
+  const label =
+    type === 'PREMIUM'
+      ? 'Premium Gift Wrapping'
+      : type === 'STANDARD'
+        ? 'Standard Gift Wrapping'
+        : 'Gift Wrapping';
+
+  const fee = Number(gift.fee);
+
+  return {
+    selected: true,
+    type,
+    label,
+    fee:
+      Number.isFinite(fee) && fee >= 0
+        ? fee
+        : 0,
+    message:
+      typeof gift.message === 'string'
+        ? gift.message
+        : ''
+  };
+}
+
+function giftSummaryHtml(order) {
+  const gift =
+    giftWrappingDisplay(order);
+
+  if (!gift.selected) {
+    return '';
+  }
+
+  return `
+    <div class="order-summary-line">
+      <span>
+        🎁 ${orderEsc(gift.label)}
+      </span>
+
+      <strong>
+        ${orderMoney(gift.fee)}
+      </strong>
+    </div>
+  `;
+}
+
+function giftMessageHtml(order) {
+  const gift =
+    giftWrappingDisplay(order);
+
+  if (!gift.selected) {
+    return '';
+  }
+
+  return `
+    <section
+      class="order-details-card"
+      style="margin-top:20px"
+    >
+
+      <div class="order-section-title">
+        <span>YOUR GIFT</span>
+        <h2>Gift Wrapping</h2>
+      </div>
+
+      <div
+        style="
+          padding:17px;
+          background:#fff8f0;
+          border:1px solid #ecd8c5;
+          border-radius:14px;
+        "
+      >
+        <strong
+          style="
+            display:block;
+            color:#663f28;
+            margin-bottom:8px;
+          "
+        >
+          🎁 ${orderEsc(gift.label)}
+        </strong>
+
+        <p
+          style="
+            margin:0;
+            color:#765943;
+            line-height:1.6;
+          "
+        >
+          Wrapping Charge:
+          <strong>
+            ${orderMoney(gift.fee)}
+          </strong>
+        </p>
+
+        ${
+          gift.message.trim()
+            ? `
+              <div
+                style="
+                  margin-top:15px;
+                  padding:14px;
+                  background:white;
+                  border-radius:10px;
+                  border:1px solid #ebd9c8;
+                "
+              >
+                <strong
+                  style="
+                    color:#663f28;
+                    display:block;
+                    margin-bottom:8px;
+                  "
+                >
+                  Personal Gift Message
+                </strong>
+
+                <p
+                  style="
+                    margin:0;
+                    white-space:pre-wrap;
+                    overflow-wrap:anywhere;
+                    line-height:1.7;
+                    color:#564034;
+                  "
+                >${orderEsc(gift.message)}</p>
+              </div>
+            `
+            : `
+              <p
+                style="
+                  font-size:12px;
+                  color:#866b55;
+                  margin:12px 0 0;
+                "
+              >
+                No personal message added.
+              </p>
+            `
+        }
+      </div>
+
+    </section>
+  `;
+}
+
+
+/* =====================================
+   COUPON SUMMARY
+===================================== */
+
+function couponSummaryHtml(order) {
+  const discount =
+    Number(order.couponDiscount || 0);
+
+  if (!Number.isFinite(discount) ||
+      discount <= 0) {
+    return '';
+  }
+
+  return `
+    <div class="order-summary-line">
+      <span>
+        Coupon Discount
+        ${
+          order.couponCode
+            ? `(${orderEsc(order.couponCode)})`
+            : ''
+        }
+      </span>
+
+      <strong>
+        -${orderMoney(discount)}
+      </strong>
+    </div>
+  `;
+}
+
+
+/* =====================================
+   LOAD ORDER DETAILS
+===================================== */
 
 async function loadOrderDetails() {
-
   const orderBox =
-    window.MC.$(
-      '#order'
-    );
-
+    window.MC.$('#order');
 
   if (!orderBox) {
     return;
   }
 
-
   const id =
     new URLSearchParams(
       location.search
-    )
-      .get('id');
-
+    ).get('id');
 
   if (!id) {
-
     orderBox.innerHTML = `
-
       <div class="empty">
         Order ID is missing.
       </div>
-
     `;
-
-
     return;
-
   }
-
 
   const data =
     await window.MC.api(
@@ -576,309 +557,208 @@ async function loadOrderDetails() {
       encodeURIComponent(id)
     );
 
-
   currentOrderDetails =
-    data.order ||
-    null;
+    data.order || null;
 
-
-  if (
-    !currentOrderDetails
-  ) {
-
+  if (!currentOrderDetails) {
     orderBox.innerHTML = `
-
       <div class="empty">
         Order not found.
       </div>
-
     `;
-
-
     return;
-
   }
-
 
   const order =
     currentOrderDetails;
 
-
   const items =
-    Array.isArray(
-      order.items
-    )
+    Array.isArray(order.items)
       ? order.items
       : [];
 
-
   const history =
-    Array.isArray(
-      order.statusHistory
-    )
+    Array.isArray(order.statusHistory)
       ? order.statusHistory
       : [];
 
-
   const statusTitle =
-    getOrderStatusTitle(
-      order
-    );
-
+    getOrderStatusTitle(order);
 
   orderBox.innerHTML = `
 
     <section class="order-status-hero">
-
       <div>
-
         <div class="order-status-eyebrow">
           ORDER STATUS
         </div>
 
-
         <h1>
-          ${window.MC.esc(
-            statusTitle
-          )}
+          ${orderEsc(statusTitle)}
         </h1>
 
-
         <p>
-
           Order ID:
 
           <strong>
-            ${window.MC.esc(
-              order.orderId ||
-              ''
-            )}
+            ${orderEsc(order.orderId || '')}
           </strong>
 
           •
-          ${window.MC.esc(
+
+          ${orderEsc(
             formatOrderDetailsDate(
               order.createdAt
             )
           )}
-
         </p>
-
       </div>
 
-
-      <div
-        class="order-status-badge ${detailsStatusClass(
-          order.orderStatus
-        )}"
-      >
-
-        ${window.MC.esc(
-          order.orderStatus ||
-          ''
-        )}
-
+      <div class="order-status-badge ${detailsStatusClass(
+        order.orderStatus
+      )}">
+        ${orderEsc(order.orderStatus || '')}
       </div>
-
     </section>
 
 
     <div class="order-details-grid">
 
-
-      <!-- LEFT -->
+      <!-- LEFT COLUMN -->
 
       <div>
-
 
         <section class="order-details-card">
 
           <div class="order-section-title">
-
-            <span>
-              YOUR ITEMS
-            </span>
-
-            <h2>
-              Products
-            </h2>
-
+            <span>YOUR ITEMS</span>
+            <h2>Products</h2>
           </div>
 
-
-          ${orderDetailProducts(
-            items
-          )}
+          ${orderDetailProducts(items)}
 
         </section>
 
 
-        <section class="order-details-card tracking-section">
+        <!-- GIFT WRAPPING DETAILS -->
+
+        ${giftMessageHtml(order)}
+
+
+        <section
+          class="order-details-card tracking-section"
+        >
 
           <div class="order-section-title">
-
-            <span>
-              TRACK YOUR ORDER
-            </span>
-
-            <h2>
-              Order Tracking
-            </h2>
-
+            <span>TRACK YOUR ORDER</span>
+            <h2>Order Tracking</h2>
           </div>
 
-
-          ${orderTrackingHtml(
-            history
-          )}
+          ${orderTrackingHtml(history)}
 
         </section>
 
       </div>
 
 
-      <!-- RIGHT -->
+      <!-- RIGHT COLUMN -->
 
       <aside class="order-summary-card">
 
         <div class="order-section-title">
-
-          <span>
-            ORDER
-          </span>
-
-          <h2>
-            Summary
-          </h2>
-
+          <span>ORDER</span>
+          <h2>Summary</h2>
         </div>
 
 
         <div class="order-summary-line">
-
-          <span>
-            Payment
-          </span>
+          <span>Payment</span>
 
           <strong>
-
             ${
-              order.paymentMethod ===
-              'COD'
-
+              order.paymentMethod === 'COD'
                 ? 'Cash on Delivery'
-
                 : 'Online Payment'
             }
-
           </strong>
-
         </div>
 
 
         <div class="order-summary-line">
-
-          <span>
-            Payment Status
-          </span>
+          <span>Payment Status</span>
 
           <strong>
-
-            ${window.MC.esc(
-              order.paymentStatus ||
-              ''
+            ${orderEsc(
+              order.paymentStatus || ''
             )}
-
           </strong>
-
         </div>
 
 
         <div class="order-summary-line">
-
-          <span>
-            Order Status
-          </span>
+          <span>Order Status</span>
 
           <strong>
-
-            ${window.MC.esc(
-              order.orderStatus ||
-              ''
+            ${orderEsc(
+              order.orderStatus || ''
             )}
-
           </strong>
-
         </div>
 
 
         <div class="order-summary-line">
-
-          <span>
-            Subtotal
-          </span>
+          <span>Subtotal</span>
 
           <strong>
-
-            ${window.MC.money(
+            ${orderMoney(
               order.subtotal
             )}
-
           </strong>
-
         </div>
 
 
         <div class="order-summary-line">
-
-          <span>
-            Delivery
-          </span>
+          <span>Delivery</span>
 
           <strong>
-
-            ${window.MC.money(
+            ${orderMoney(
               order.deliveryCharge
             )}
-
           </strong>
-
         </div>
 
 
         <div class="order-summary-line">
-
-          <span>
-            You Save
-          </span>
+          <span>You Save</span>
 
           <strong>
-
-            ${window.MC.money(
+            ${orderMoney(
               order.discount
             )}
-
           </strong>
-
         </div>
+
+
+        <!-- SAVED COUPON DISCOUNT -->
+
+        ${couponSummaryHtml(order)}
+
+
+        <!-- SAVED GIFT WRAPPING FEE -->
+
+        ${giftSummaryHtml(order)}
 
 
         <div
           class="order-summary-line order-summary-total"
         >
-
-          <span>
-            Total
-          </span>
+          <span>Total</span>
 
           <strong>
-
-            ${window.MC.money(
+            ${orderMoney(
               order.grandTotal
             )}
-
           </strong>
-
         </div>
 
 
@@ -888,69 +768,49 @@ async function loadOrderDetails() {
             Delivery Address
           </h3>
 
-
           <p>
-
             <strong>
-
-              ${window.MC.esc(
-                order.shippingAddress
-                  ?.fullName ||
-                ''
+              ${orderEsc(
+                order.shippingAddress?.fullName || ''
               )}
-
             </strong>
 
             <br>
 
-            ${window.MC.esc(
-              order.shippingAddress
-                ?.addressLine ||
-              ''
+            ${orderEsc(
+              order.shippingAddress?.addressLine || ''
             )}
 
             <br>
 
-            ${window.MC.esc(
-              order.shippingAddress
-                ?.city ||
-              ''
+            ${orderEsc(
+              order.shippingAddress?.city || ''
             )}
 
             ${
-              order.shippingAddress
-                ?.city &&
-              order.shippingAddress
-                ?.state
-
+              order.shippingAddress?.city &&
+              order.shippingAddress?.state
                 ? ', '
                 : ''
             }
 
-            ${window.MC.esc(
-              order.shippingAddress
-                ?.state ||
-              ''
+            ${orderEsc(
+              order.shippingAddress?.state || ''
             )}
 
             <br>
 
             PIN:
-            ${window.MC.esc(
-              order.shippingAddress
-                ?.pinCode ||
-              ''
+            ${orderEsc(
+              order.shippingAddress?.pinCode || ''
             )}
 
             <br>
 
             Mobile:
-            ${window.MC.esc(
-              order.shippingAddress
-                ?.mobile ||
-              ''
+            ${orderEsc(
+              order.shippingAddress?.mobile || ''
             )}
-
           </p>
 
         </div>
@@ -965,7 +825,6 @@ async function loadOrderDetails() {
             View My Orders
           </a>
 
-
           <a
             class="order-detail-secondary"
             href="${ORDER_BASE}/frontend/products.html"
@@ -978,387 +837,239 @@ async function loadOrderDetails() {
       </aside>
 
     </div>
-
   `;
 
 
-  /* RETRY PAYMENT */
+  /*
+  ========================================
+   LEGACY RAZORPAY RETRY
+
+   Never offer this retry flow
+   to COD or Cashfree orders.
+  ========================================
+  */
 
   if (
-    order.paymentMethod ===
-      'RAZORPAY' &&
-    order.paymentStatus !==
-      'SUCCESS' &&
-    order.orderStatus !==
-      'Cancelled'
+    order.paymentMethod === 'RAZORPAY' &&
+    order.paymentStatus !== 'SUCCESS' &&
+    order.orderStatus !== 'Cancelled'
   ) {
-
     const retryButton =
-      document.createElement(
-        'button'
-      );
-
+      document.createElement('button');
 
     retryButton.className =
       'retry-payment-btn';
 
-
     retryButton.id =
       'retryPaymentBtn';
 
-
-    retryButton.type =
-      'button';
-
+    retryButton.type = 'button';
 
     retryButton.textContent =
       'Retry Online Payment';
 
-
-    retryButton.onclick =
-      async () => {
-
-        await retryOnlinePayment(
-          retryButton
-        );
-
-      };
-
-
-    window.MC
-      .$('.order-detail-buttons')
-      ?.appendChild(
+    retryButton.onclick = async () => {
+      await retryOnlinePayment(
         retryButton
       );
+    };
 
+    window.MC.$(
+      '.order-detail-buttons'
+    )?.appendChild(retryButton);
   }
-
 }
 
 
-/* =========================
-   RETRY PAYMENT
-========================= */
+/* =====================================
+   LEGACY PAYMENT RETRY
+===================================== */
 
 async function retryOnlinePayment(
   button = null
 ) {
-
   if (
     retryPaymentRunning ||
     !currentOrderDetails?._id
   ) {
-
     return;
-
   }
 
-
-  retryPaymentRunning =
-    true;
-
+  retryPaymentRunning = true;
 
   const oldText =
     button?.textContent ||
     'Retry Online Payment';
 
-
   if (button) {
-
-    button.disabled =
-      true;
-
-
-    button.textContent =
-      'Please wait...';
-
+    button.disabled = true;
+    button.textContent = 'Please wait...';
   }
 
-
   try {
-
-    const data =
-      await window.MC.api(
-        '/payment/retry/' +
-        encodeURIComponent(
-          currentOrderDetails._id
-        ),
-        {
-          method:'POST'
-        }
-      );
-
+    const data = await window.MC.api(
+      '/payment/retry/' +
+      encodeURIComponent(
+        currentOrderDetails._id
+      ),
+      {
+        method: 'POST'
+      }
+    );
 
     if (
       !data.keyId ||
       !data.razorpayOrderId
     ) {
-
       throw new Error(
         'Payment retry order create nahi hua.'
       );
-
     }
-
 
     await loadOrderRazorpayScript();
 
+    const razorpay = new window.Razorpay({
+      key: data.keyId,
+      amount: data.amount,
+      currency: data.currency || 'INR',
+      name: 'MEMORA CREATIONS',
+      description: 'Retry Online Payment',
+      order_id: data.razorpayOrderId,
 
-    const razorpay =
-      new window.Razorpay({
-
-        key:
-          data.keyId,
-
-        amount:
-          data.amount,
-
-        currency:
-          data.currency ||
-          'INR',
-
+      prefill: {
         name:
-          'MEMORA CREATIONS',
+          currentOrderDetails.customer?.fullName ||
+          currentOrderDetails.shippingAddress?.fullName ||
+          '',
 
-        description:
-          'Retry Online Payment',
+        email:
+          currentOrderDetails.customer?.email ||
+          '',
 
-        order_id:
-          data.razorpayOrderId,
+        contact:
+          currentOrderDetails.customer?.mobile ||
+          currentOrderDetails.shippingAddress?.mobile ||
+          ''
+      },
 
-        prefill: {
+      theme: {
+        color: '#8a5a3b'
+      },
 
-          name:
-            currentOrderDetails
-              .customer
-              ?.fullName ||
-            currentOrderDetails
-              .shippingAddress
-              ?.fullName ||
-            '',
+      modal: {
+        ondismiss: () => {
+          retryPaymentRunning = false;
 
-          email:
-            currentOrderDetails
-              .customer
-              ?.email ||
-            '',
+          if (button) {
+            button.disabled = false;
+            button.textContent = oldText;
+          }
+        }
+      },
 
-          contact:
-            currentOrderDetails
-              .customer
-              ?.mobile ||
-            currentOrderDetails
-              .shippingAddress
-              ?.mobile ||
-            ''
-
-        },
-
-        theme: {
-          color:'#8a5a3b'
-        },
-
-        modal: {
-
-          ondismiss:
-            () => {
-
-              retryPaymentRunning =
-                false;
-
-
-              if (button) {
-
-                button.disabled =
-                  false;
-
-
-                button.textContent =
-                  oldText;
-
+      handler: async response => {
+        try {
+          const verified =
+            await window.MC.api(
+              '/payment/verify',
+              {
+                method: 'POST',
+                body: JSON.stringify({
+                  ...response,
+                  orderId: data.orderId,
+                  clearCart: false
+                })
               }
+            );
 
-            }
-
-        },
-
-        handler:
-          async response => {
-
-            try {
-
-              const verified =
-                await window.MC.api(
-                  '/payment/verify',
-                  {
-
-                    method:'POST',
-
-                    body:
-                      JSON.stringify({
-
-                        ...response,
-
-                        orderId:
-                          data.orderId,
-
-                        clearCart:
-                          false
-
-                      })
-
-                  }
-                );
-
-
-              if (
-                !verified.order?._id
-              ) {
-
-                throw new Error(
-                  'Payment verify hua lekin order ID nahi mila.'
-                );
-
-              }
-
-
-              showOrderPaymentSuccess(
-                verified.order._id
-              );
-
-
-            } catch (error) {
-
-              retryPaymentRunning =
-                false;
-
-
-              if (button) {
-
-                button.disabled =
-                  false;
-
-
-                button.textContent =
-                  oldText;
-
-              }
-
-
-              window.MC.toast(
-                error.message ||
-                'Payment verification failed.',
-                'error'
-              );
-
-            }
-
+          if (!verified.order?._id) {
+            throw new Error(
+              'Payment verify hua lekin order ID nahi mila.'
+            );
           }
 
-      });
+          showOrderPaymentSuccess(
+            verified.order._id
+          );
 
+        } catch (err) {
+          retryPaymentRunning = false;
+
+          if (button) {
+            button.disabled = false;
+            button.textContent = oldText;
+          }
+
+          window.MC.toast(
+            err.message ||
+            'Payment verification failed.',
+            'error'
+          );
+        }
+      }
+    });
 
     razorpay.on(
       'payment.failed',
       response => {
-
-        retryPaymentRunning =
-          false;
-
+        retryPaymentRunning = false;
 
         if (button) {
-
-          button.disabled =
-            false;
-
-
-          button.textContent =
-            oldText;
-
+          button.disabled = false;
+          button.textContent = oldText;
         }
 
-
         window.MC.toast(
-          response?.error
-            ?.description ||
+          response?.error?.description ||
           'Payment failed. Please try again.',
           'error'
         );
-
       }
     );
-
 
     razorpay.open();
 
-
-  } catch (error) {
-
-    retryPaymentRunning =
-      false;
-
+  } catch (err) {
+    retryPaymentRunning = false;
 
     if (button) {
-
-      button.disabled =
-        false;
-
-
-      button.textContent =
-        oldText;
-
+      button.disabled = false;
+      button.textContent = oldText;
     }
 
-
     window.MC.toast(
-      error.message ||
+      err.message ||
       'Payment retry failed.',
       'error'
     );
-
   }
-
 }
 
 
-/* =========================
+/* =====================================
    START
-========================= */
+===================================== */
 
-loadOrderDetails()
-  .catch(
-    error => {
-
-      console.error(
-        'Order details error:',
-        error
-      );
-
-
-      const orderBox =
-        window.MC.$(
-          '#order'
-        );
-
-
-      if (orderBox) {
-
-        orderBox.innerHTML = `
-
-          <div class="empty">
-            Order details load nahi ho pa rahe hain.
-          </div>
-
-        `;
-
-      }
-
-
-      window.MC.toast(
-        error.message ||
-        'Order details load failed.',
-        'error'
-      );
-
-    }
+loadOrderDetails().catch(err => {
+  console.error(
+    'Order details error:',
+    err
   );
+
+  const orderBox =
+    window.MC.$('#order');
+
+  if (orderBox) {
+    orderBox.innerHTML = `
+      <div class="empty">
+        Order details load nahi ho pa rahe hain.
+      </div>
+    `;
+  }
+
+  window.MC.toast(
+    err.message ||
+    'Order details load failed.',
+    'error'
+  );
+});
