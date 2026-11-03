@@ -6,48 +6,46 @@
  MEMORA CREATIONS
  GIFT WRAPPING SERVICE
 
- STANDARD = INR 29
- PREMIUM  = INR 59
+ LIVE WEBSITE INTEGRATION
 
- SANDBOX TESTING ONLY
+ Normal Packaging  = INR 0
+ Standard Wrapping = INR 29
+ Premium Wrapping  = INR 59
 
- Features:
- - Server-controlled prices
+ FEATURES:
+ - Production feature switch
+ - Server-controlled pricing
  - Gift message validation
- - Production protection
- - Backwards-compatible defaults
- - No client-supplied fees accepted
+ - Safe default for existing orders
+ - COD and Cashfree support
+ - Client fee manipulation protection
+
+ IMPORTANT:
+ Disabled by default.
 =========================================
 */
 
 
 /* =====================================
-   SANDBOX-ONLY FEATURE SWITCH
+   LIVE FEATURE CONFIGURATION
 
-   Both conditions must be true:
+   Render Environment Variable:
 
-   CASHFREE_ENV=sandbox
-   GIFT_WRAPPING_TEST_ENABLED=true
+   GIFT_WRAPPING_LIVE_ENABLED=true
 
-   Production payment environment
-   always disables this feature.
+   If missing or false,
+   Gift Wrapping remains disabled.
 ===================================== */
 
-const cashfreeEnvironment = String(
-  process.env.CASHFREE_ENV || ''
-).trim().toLowerCase();
-
-const testFlag = String(
-  process.env.GIFT_WRAPPING_TEST_ENABLED || ''
-).trim().toLowerCase();
-
 const GIFT_WRAPPING_ENABLED =
-  cashfreeEnvironment === 'sandbox' &&
-  testFlag === 'true';
+  String(
+    process.env.GIFT_WRAPPING_LIVE_ENABLED ||
+    'false'
+  ).trim().toLowerCase() === 'true';
 
 
 /* =====================================
-   CONFIGURATION
+   PRICES AND MESSAGE LIMIT
 ===================================== */
 
 const MAX_GIFT_MESSAGE_LENGTH = 180;
@@ -61,7 +59,7 @@ const GIFT_WRAPPING_PRICES =
 
 
 /* =====================================
-   DEFAULT PACKAGING
+   DEFAULT GIFT WRAPPING
 ===================================== */
 
 function defaultGiftWrapping() {
@@ -75,7 +73,7 @@ function defaultGiftWrapping() {
 
 
 /* =====================================
-   NORMALIZE MESSAGE
+   NORMALIZE GIFT MESSAGE
 ===================================== */
 
 function normalizeGiftMessage(value) {
@@ -110,7 +108,7 @@ function normalizeGiftMessage(value) {
 
 
 /* =====================================
-   NORMALIZE TYPE
+   VALIDATE GIFT TYPE
 ===================================== */
 
 function normalizeGiftType(value) {
@@ -134,14 +132,19 @@ function normalizeGiftType(value) {
 
 
 /* =====================================
-   SERVER-SIDE FEE
+   CALCULATE TRUSTED GIFT FEE
 
-   Never trust fees from the browser.
+   Never accept price from frontend.
 ===================================== */
 
 function calculateGiftWrappingFee(type) {
   const normalizedType =
     normalizeGiftType(type);
+
+  /*
+    When feature is disabled,
+    only normal packaging is allowed.
+  */
 
   if (!GIFT_WRAPPING_ENABLED) {
     if (normalizedType !== 'NONE') {
@@ -172,13 +175,12 @@ function calculateGiftWrappingFee(type) {
 
 
 /* =====================================
-   VALIDATE CUSTOMER SELECTION
+   PREPARE GIFT WRAPPING
 
-   Existing customers:
-   Missing input => normal packaging.
+   Validates customer selection.
 
-   Invalid or unavailable wrapping:
-   Reject instead of silently charging.
+   Missing input means normal
+   packaging at no extra charge.
 ===================================== */
 
 function prepareGiftWrapping(input = null) {
@@ -221,7 +223,9 @@ function prepareGiftWrapping(input = null) {
     );
 
 
-  /* FEATURE DISABLED */
+  /* =================================
+     FEATURE DISABLED
+  ================================= */
 
   if (!GIFT_WRAPPING_ENABLED) {
     if (
@@ -238,7 +242,9 @@ function prepareGiftWrapping(input = null) {
   }
 
 
-  /* NORMAL PACKAGING */
+  /* =================================
+     NORMAL PACKAGING
+  ================================= */
 
   if (!selected) {
     if (
@@ -254,7 +260,9 @@ function prepareGiftWrapping(input = null) {
   }
 
 
-  /* REQUIRE VALID PAID OPTION */
+  /* =================================
+     REQUIRE PAID WRAPPING
+  ================================= */
 
   if (type === 'NONE') {
     throw new Error(
@@ -263,7 +271,9 @@ function prepareGiftWrapping(input = null) {
   }
 
 
-  /* TRUSTED FEE */
+  /* =================================
+     SERVER CALCULATES FEE
+  ================================= */
 
   const fee =
     calculateGiftWrappingFee(type);
@@ -278,7 +288,9 @@ function prepareGiftWrapping(input = null) {
 
 
 /* =====================================
-   TRUSTED TOTAL CALCULATION
+   ADD GIFT WRAPPING TO ORDER TOTAL
+
+   Used for trusted server pricing.
 ===================================== */
 
 function addGiftWrappingToTotal(
@@ -323,9 +335,11 @@ module.exports = {
   GIFT_WRAPPING_ENABLED,
   GIFT_WRAPPING_PRICES,
   MAX_GIFT_MESSAGE_LENGTH,
+
   defaultGiftWrapping,
   normalizeGiftMessage,
   normalizeGiftType,
+
   calculateGiftWrappingFee,
   prepareGiftWrapping,
   addGiftWrappingToTotal
