@@ -10,7 +10,9 @@
  PAYMENT VERIFICATION
  DUPLICATE PAYMENT PROTECTION
  ORDER SECURITY
- WHATSAPP CONSENT SUPPORT
+ COUPON SUPPORT
+ WHATSAPP CONSENT
+ GIFT WRAPPING PREPARATION
 =========================================
 */
 
@@ -33,14 +35,16 @@ const {
 } = require('../utils/validation');
 
 const {
-  getTrustedItems,
-  totals,
   createCashfreePendingOrder
 } = require('../services/orderService');
 
 const {
   calculateCouponPricing
 } = require('../services/couponPricingService');
+
+const {
+  prepareGiftWrapping
+} = require('../services/giftWrappingService');
 
 const {
   getCashfreeConfig,
@@ -51,13 +55,34 @@ const {
 
 
 /* =====================================
+   VALIDATE GIFT WRAPPING
+
+   Always use the server service.
+   Never accept browser-calculated fees.
+===================================== */
+
+function getGiftWrapping(value) {
+  try {
+    return prepareGiftWrapping(value);
+  } catch (err) {
+    throw error(
+      400,
+      err.message ||
+        'Invalid gift wrapping selection.'
+    );
+  }
+}
+
+
+/* =====================================
    CREATE CASHFREE ORDER
 ===================================== */
 
 const createOrder = asyncHandler(
   async (req, res) => {
 
-    const address = req.body?.address;
+    const address =
+      req.body?.address;
 
     const validationMessage =
       validateAddress(address);
@@ -69,23 +94,41 @@ const createOrder = asyncHandler(
       );
     }
 
-    const items = req.body?.items;
+    const items =
+      req.body?.items;
 
-    /*
-      Prices must always be calculated
-      from the database.
-    */
+
+    /* TRUSTED GIFT WRAPPING */
+
+    const giftWrapping =
+      getGiftWrapping(
+        req.body?.giftWrapping
+      );
+
+
+    /* COUPON */
 
     const couponCode =
       typeof req.body?.couponCode === 'string'
-        ? req.body.couponCode.trim().toUpperCase()
+        ? req.body.couponCode
+            .trim()
+            .toUpperCase()
         : null;
+
+
+    /*
+      Server calculates the price
+      using database product prices,
+      delivery charge, coupon and
+      gift wrapping configuration.
+    */
 
     const amountDetails =
       await calculateCouponPricing({
         items,
         couponCode,
-        userId: req.user._id
+        userId: req.user._id,
+        giftWrapping
       });
 
     const amount =
@@ -101,21 +144,20 @@ const createOrder = asyncHandler(
       );
     }
 
+
     /*
-      WHATSAPP CUSTOMER CONSENT
+      WHATSAPP CONSENT
 
-      Only explicit boolean true
-      means that the customer
-      granted permission.
-
-      Missing or false stays false.
+      Only explicit true counts.
+      No messages are sent here.
     */
 
     const whatsappOptIn =
       req.body?.whatsappOptIn === true;
 
+
     /*
-      Unique Cashfree order reference.
+      UNIQUE CASHFREE REFERENCE
     */
 
     const cashfreeOrderId =
@@ -125,17 +167,18 @@ const createOrder = asyncHandler(
       crypto.randomBytes(8)
         .toString('hex');
 
-    /*
-      Check gateway configuration before
-      creating a payment session.
-    */
+
+    /* CASHFREE CONFIG */
 
     const config =
       getCashfreeConfig();
 
+
     /*
-      Create payment session through
-      Cashfree server API.
+      CREATE PAYMENT SESSION
+
+      Amount includes the trusted
+      gift wrapping fee, if enabled.
     */
 
     const cashfreeOrder =
@@ -163,14 +206,14 @@ const createOrder = asyncHandler(
 
       });
 
-    /*
-      Validate gateway response.
-    */
+
+    /* VALIDATE GATEWAY RESPONSE */
 
     if (
       !cashfreeOrder ||
       !cashfreeOrder.payment_session_id ||
-      cashfreeOrder.order_id !== cashfreeOrderId
+      cashfreeOrder.order_id !==
+        cashfreeOrderId
     ) {
       throw error(
         502,
@@ -178,15 +221,19 @@ const createOrder = asyncHandler(
       );
     }
 
+
     /*
-      Refuse a gateway amount different
-      from the requested amount.
+      Verify gateway amount
+      and currency.
     */
 
     if (
       Math.round(
-        Number(cashfreeOrder.order_amount) * 100
-      ) !== Math.round(amount * 100) ||
+        Number(
+          cashfreeOrder.order_amount
+        ) * 100
+      ) !==
+        Math.round(amount * 100) ||
       cashfreeOrder.order_currency !== 'INR'
     ) {
       throw error(
@@ -195,15 +242,15 @@ const createOrder = asyncHandler(
       );
     }
 
+
     /*
-      Create local pending order and
-      reserve stock inside transaction.
+      CREATE PENDING LOCAL ORDER
 
-      If the local transaction fails,
-      the gateway session may remain.
+      The order service independently
+      recalculates the final amount.
 
-      A separate reconciliation workflow
-      must handle such sessions.
+      If the amount differs,
+      the transaction is rejected.
     */
 
     const order =
@@ -224,44 +271,43 @@ const createOrder = asyncHandler(
           amount,
 
         clearCart:
-          req.body.clearCart === true,
+          req.body?.clearCart === true,
 
-        /*
-          NEW:
-          Save customer consent with
-          this Cashfree order.
+        whatsappOptIn,
 
-          This does NOT send WhatsApp.
-        */
-
-        whatsappOptIn
+        giftWrapping
 
       });
 
+
     /*
-      Cashfree reference for reporting.
-      The main order is already saved.
+      STORE CASHFREE CF ORDER ID
     */
 
     if (cashfreeOrder.cf_order_id) {
 
       await Order.updateOne(
         {
-          _id: order._id
+          _id:
+            order._id
         },
         {
           $set: {
             cashfreeCfOrderId:
-              String(cashfreeOrder.cf_order_id)
+              String(
+                cashfreeOrder.cf_order_id
+              )
           }
         }
       );
 
     }
 
+
     /*
-      Return the SDK payment session.
-      Never expose Cashfree credentials.
+      RETURN PAYMENT SESSION
+
+      Never expose Cashfree secrets.
     */
 
     return ok(res, {
@@ -295,8 +341,8 @@ const createOrder = asyncHandler(
 /* =====================================
    VERIFY CASHFREE PAYMENT
 
-   Verify only with Cashfree API.
-   Never trust browser payment status.
+   Only gateway API can confirm
+   payment success.
 ===================================== */
 
 const verifyPayment = asyncHandler(
@@ -307,7 +353,9 @@ const verifyPayment = asyncHandler(
 
     if (
       !orderId ||
-      !mongoose.isValidObjectId(orderId)
+      !mongoose.isValidObjectId(
+        orderId
+      )
     ) {
       throw error(
         400,
@@ -315,9 +363,10 @@ const verifyPayment = asyncHandler(
       );
     }
 
+
     /*
-      Customer may verify only
-      their own Cashfree orders.
+      Customer can verify only
+      their own Cashfree order.
     */
 
     const order =
@@ -348,8 +397,9 @@ const verifyPayment = asyncHandler(
       );
     }
 
+
     /*
-      Fetch authoritative status.
+      FETCH AUTHORITATIVE STATUS
     */
 
     const gatewayOrder =
@@ -367,9 +417,13 @@ const verifyPayment = asyncHandler(
       );
     }
 
+
     /*
-      Validate payment amount,
-      currency and PAID status.
+      VALIDATE PAYMENT AMOUNT,
+      CURRENCY AND PAID STATUS
+
+      order.grandTotal includes any
+      server-approved gift wrapping fee.
     */
 
     const paid =
@@ -378,9 +432,10 @@ const verifyPayment = asyncHandler(
         order.grandTotal
       );
 
+
     /*
-      A PAID gateway status with invalid
-      amount/currency needs manual review.
+      Paid with an invalid amount
+      requires manual review.
     */
 
     if (
@@ -393,8 +448,9 @@ const verifyPayment = asyncHandler(
       );
     }
 
+
     /*
-      Payment not confirmed.
+      PAYMENT NOT CONFIRMED
 
       Do not release stock here.
       Do not mark SUCCESS.
@@ -431,14 +487,15 @@ const verifyPayment = asyncHandler(
 
     }
 
+
     /*
-      Confirm payment atomically.
+      ATOMIC PAYMENT CONFIRMATION
 
       Webhook and browser verification
       may run simultaneously.
 
       Only a reserved, non-cancelled
-      order can transition to SUCCESS.
+      order can become SUCCESS.
     */
 
     const updatedOrder =
@@ -499,11 +556,12 @@ const verifyPayment = asyncHandler(
 
       );
 
-    /*
-      Reload latest database state.
 
-      Webhook may already have completed
-      the transition.
+    /*
+      RELOAD DATABASE STATE
+
+      Webhook may have already
+      completed the transition.
     */
 
     const confirmedOrder =
@@ -521,16 +579,20 @@ const verifyPayment = asyncHandler(
 
       });
 
+
     /*
-      Do not report success for a
-      cancelled/unreserved order.
+      Do not report success
+      for an invalid order.
     */
 
     if (
       !confirmedOrder ||
-      confirmedOrder.paymentStatus !== 'SUCCESS' ||
-      confirmedOrder.orderStatus === 'Cancelled' ||
-      confirmedOrder.stockReserved !== true
+      confirmedOrder.paymentStatus !==
+        'SUCCESS' ||
+      confirmedOrder.orderStatus ===
+        'Cancelled' ||
+      confirmedOrder.stockReserved !==
+        true
     ) {
       throw error(
         409,
@@ -538,15 +600,15 @@ const verifyPayment = asyncHandler(
       );
     }
 
-    /*
-      Clear cart only after verified
-      successful payment.
 
-      This preserves current behavior.
+    /*
+      CLEAR CART ONLY AFTER
+      VERIFIED PAYMENT SUCCESS
     */
 
     if (
-      confirmedOrder.clearCartOnPayment === true
+      confirmedOrder.clearCartOnPayment ===
+      true
     ) {
 
       await Cart.updateOne(
@@ -563,11 +625,12 @@ const verifyPayment = asyncHandler(
 
     }
 
-    /*
-      Payment confirmed.
 
-      WhatsApp dispatch is intentionally
-      not called here yet.
+    /*
+      PAYMENT CONFIRMED
+
+      WhatsApp dispatch is not
+      enabled here.
     */
 
     return ok(res, {
