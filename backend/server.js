@@ -39,6 +39,13 @@ const announcementRoutes =
   require('./routes/announcementRoutes');
 
 /* =========================================
+   DELIVERY PIN CODE CHECKER API
+========================================= */
+
+const deliveryRoutes =
+  require('./routes/deliveryRoutes');
+
+/* =========================================
    PAYMENT WEBHOOK CONTROLLERS
 ========================================= */
 
@@ -393,11 +400,30 @@ app.use(
   wishlistRoutes
 );
 
-// Customer Coupon Validation API
+/* =========================================
+   CUSTOMER COUPON API
+========================================= */
 
 app.use(
   '/api/coupons',
   couponRoutes
+);
+
+/* =========================================
+   DELIVERY PIN CODE CHECKER
+
+   GET /api/delivery/check
+
+   Example:
+   /api/delivery/check?pincode=274304&paymentMethod=COD
+
+   Read-only, no order mutations.
+   Rate limiting is inside deliveryRoutes.
+========================================= */
+
+app.use(
+  '/api/delivery',
+  deliveryRoutes
 );
 
 /* =========================================
