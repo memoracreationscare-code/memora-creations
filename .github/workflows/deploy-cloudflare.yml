@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - main
-
   workflow_dispatch:
 
 permissions:
@@ -34,16 +33,10 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Only public static website files.
-          # Never include backend or .env.
-
           mkdir -p dist
 
           cp -R frontend dist/frontend
           cp -R admin dist/admin
-
-          # Convert GitHub Pages paths to
-          # Cloudflare Pages root paths.
 
           python3 - <<'PY'
           from pathlib import Path
@@ -65,22 +58,29 @@ jobs:
 
               data = file.read_bytes()
 
-              updated = data.replace(
+              # Fix normal GitHub Pages URLs.
+              data = data.replace(
                   b"/memora-creations/",
                   b"/"
               )
 
-              if updated != data:
-                  file.write_bytes(updated)
+              # Fix JavaScript BASE constants.
+              data = data.replace(
+                  b"'/memora-creations'",
+                  b"''"
+              )
 
-          print("Cloudflare paths updated")
+              data = data.replace(
+                  b'"/memora-creations"',
+                  b'""'
+              )
+
+              file.write_bytes(data)
+
+          print("Cloudflare links corrected")
           PY
 
-          # Main homepage at root URL.
-
           cp dist/frontend/index.html dist/index.html
-
-          # Google site verification, when present.
 
           for file in google*.html; do
             if [ -f "$file" ]; then
@@ -88,12 +88,20 @@ jobs:
             fi
           done
 
-          # Confirm required files exist.
-
           test -f dist/index.html
           test -f dist/frontend/products.html
+          test -f dist/frontend/cart.html
           test -f dist/frontend/js/app.js
           test -f dist/admin/dashboard.html
+
+          # Ensure old base paths are removed.
+          if grep -R \
+            -F "/memora-creations" \
+            dist/frontend/js/app.js \
+            dist/frontend/js/products.js; then
+            echo "ERROR: Old navigation path found"
+            exit 1
+          fi
 
           echo "BUILD READY"
 
