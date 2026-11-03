@@ -10,9 +10,9 @@ const rateLimit = require('express-rate-limit');
 
 const connectDatabase = require('./config/db');
 
-/* =========================================
+/* ========================================
    API ROUTES
-========================================= */
+======================================== */
 
 const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
@@ -24,30 +24,15 @@ const cashfreeRoutes = require('./routes/cashfreeRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const wishlistRoutes = require('./routes/wishlistRoutes');
 const couponRoutes = require('./routes/couponRoutes');
-
-/* =========================================
-   PRODUCT REVIEWS & RATINGS API
-========================================= */
-
 const reviewRoutes = require('./routes/reviewRoutes');
-
-/* =========================================
-   WEBSITE ANNOUNCEMENT API
-========================================= */
-
 const announcementRoutes =
   require('./routes/announcementRoutes');
-
-/* =========================================
-   DELIVERY PIN CODE CHECKER API
-========================================= */
-
 const deliveryRoutes =
   require('./routes/deliveryRoutes');
 
-/* =========================================
-   PAYMENT WEBHOOK CONTROLLERS
-========================================= */
+/* ========================================
+   WEBHOOK CONTROLLERS
+======================================== */
 
 const {
   webhook
@@ -57,18 +42,18 @@ const {
   cashfreeWebhook
 } = require('./controllers/cashfreeWebhookController');
 
-/* =========================================
+/* ========================================
    EXPRESS APPLICATION
-========================================= */
+======================================== */
 
 const app = express();
 
 app.disable('x-powered-by');
 app.set('trust proxy', 1);
 
-/* =========================================
+/* ========================================
    SECURITY HEADERS
-========================================= */
+======================================== */
 
 app.use(
   helmet({
@@ -76,16 +61,18 @@ app.use(
   })
 );
 
-/* =========================================
-   ALLOWED CORS ORIGINS
-========================================= */
+/* ========================================
+   CORS
+======================================== */
 
 const configuredOrigins = (
   process.env.CORS_ORIGIN ||
   'http://localhost:5000'
 )
   .split(',')
-  .map(origin => origin.trim().replace(/\/+$/, ''))
+  .map(origin =>
+    origin.trim().replace(/\/+$/, '')
+  )
   .filter(Boolean);
 
 const allowedOrigins = new Set([
@@ -96,8 +83,7 @@ const allowedOrigins = new Set([
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-
+    origin(origin, callback) {
       if (!origin) {
         return callback(null, true);
       }
@@ -113,10 +99,10 @@ app.use(
   })
 );
 
-/* =========================================
-   RAZORPAY WEBHOOK
-   PRESERVED FOR EXISTING ORDERS
-========================================= */
+/* ========================================
+   PAYMENT WEBHOOKS
+   Keep raw body before express.json()
+======================================== */
 
 app.post(
   '/api/payment/webhook',
@@ -127,16 +113,6 @@ app.post(
   webhook
 );
 
-/* =========================================
-   CASHFREE WEBHOOK
-
-   IMPORTANT:
-   Register before express.json().
-
-   Cashfree signature validation
-   requires the original raw body.
-========================================= */
-
 app.post(
   '/api/cashfree/webhook',
   express.raw({
@@ -146,22 +122,11 @@ app.post(
   cashfreeWebhook
 );
 
-/* =========================================
-   MEMORA ORIGIN-BASED CSRF PROTECTION
-
-   Reject state-changing requests originating
-   from unapproved browser origins.
-
-   Webhooks are mounted above this middleware:
-   their signature verification remains intact.
-
-   This is a browser CSRF mitigation, not a
-   substitute for authentication or webhook
-   signature verification.
-========================================= */
+/* ========================================
+   ORIGIN BASED CSRF PROTECTION
+======================================== */
 
 app.use('/api', (req, res, next) => {
-
   const safeMethods = new Set([
     'GET',
     'HEAD',
@@ -171,10 +136,6 @@ app.use('/api', (req, res, next) => {
   if (safeMethods.has(req.method)) {
     return next();
   }
-
-  // Health endpoints and webhook routes are not
-  // browser-authenticated mutation endpoints.
-  // Webhooks are already mounted before this middleware.
 
   const browserOrigin = req.get('origin');
   const fetchSite = req.get('sec-fetch-site');
@@ -196,16 +157,11 @@ app.use('/api', (req, res, next) => {
     });
   }
 
-  // Browsers normally provide Origin on cross-origin POSTs.
-  // When absent, additionally reject an untrusted Referer.
-
   if (!browserOrigin) {
-
     const referer = req.get('referer');
 
     if (referer) {
       try {
-
         const refererOrigin =
           new URL(referer).origin;
 
@@ -221,14 +177,11 @@ app.use('/api', (req, res, next) => {
             message: 'Untrusted request referer.'
           });
         }
-
       } catch (_) {
-
         return res.status(403).json({
           success: false,
           message: 'Invalid request referer.'
         });
-
       }
     }
   }
@@ -236,9 +189,9 @@ app.use('/api', (req, res, next) => {
   next();
 });
 
-/* =========================================
+/* ========================================
    BODY PARSERS
-========================================= */
+======================================== */
 
 app.use(
   express.json({
@@ -255,19 +208,15 @@ app.use(
 
 app.use(cookieParser());
 
-/* =========================================
+/* ========================================
    RATE LIMITING
-========================================= */
+======================================== */
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-
   limit: 30,
-
   standardHeaders: 'draft-7',
-
   legacyHeaders: false,
-
   message: {
     success: false,
     message:
@@ -275,37 +224,15 @@ const authLimiter = rateLimit({
   }
 });
 
-app.use(
-  '/api/auth/login',
-  authLimiter
-);
+app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/register', authLimiter);
+app.use('/api/admin/login', authLimiter);
+app.use('/api/payment', authLimiter);
+app.use('/api/cashfree', authLimiter);
 
-app.use(
-  '/api/auth/register',
-  authLimiter
-);
-
-app.use(
-  '/api/admin/login',
-  authLimiter
-);
-
-app.use(
-  '/api/payment',
-  authLimiter
-);
-
-app.use(
-  '/api/cashfree',
-  authLimiter
-);
-
-/* =========================================
-   PRODUCT REVIEW RATE LIMITING
-
-   Limits customer review submission.
-   Public GET endpoints are unaffected.
-========================================= */
+/* ========================================
+   REVIEW RATE LIMITING
+======================================== */
 
 const reviewLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -334,220 +261,130 @@ app.use(
   }
 );
 
-/* =========================================
-   HEALTH CHECK
-========================================= */
+/* ========================================
+   API HEALTH CHECK
+======================================== */
 
-app.get(
-  '/api/health',
-  (_req, res) => {
-    res.json({
-      success: true,
+app.get('/api/health', (_req, res) => {
+  res.json({
+    success: true,
+    service: 'memora-creations-api',
+    whatsappOrder: false
+  });
+});
 
-      service: 'memora-creations-api',
+/* ========================================
+   CUSTOMER API ROUTES
+======================================== */
 
-      whatsappOrder: false
-    });
-  }
-);
+app.use('/api/auth', authRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/cart', cartRoutes);
+app.use('/api/profile', profileRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/payment', paymentRoutes);
+app.use('/api/cashfree', cashfreeRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/wishlist', wishlistRoutes);
+app.use('/api/coupons', couponRoutes);
+app.use('/api/delivery', deliveryRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/announcement', announcementRoutes);
 
-/* =========================================
-   API ROUTES
-========================================= */
+/* ========================================
+   SAFE STATIC FILE SERVING
 
-app.use(
-  '/api/auth',
-  authRoutes
-);
+   Only frontend and admin directories
+   are served as static files.
 
-app.use(
-  '/api/products',
-  productRoutes
-);
+   Never expose backend source, .env,
+   scripts or project configuration.
+======================================== */
 
-app.use(
-  '/api/cart',
-  cartRoutes
-);
+const projectRoot = path.join(__dirname, '..');
 
-app.use(
-  '/api/profile',
-  profileRoutes
-);
-
-app.use(
-  '/api/orders',
-  orderRoutes
-);
-
-app.use(
-  '/api/payment',
-  paymentRoutes
-);
+const staticOptions = {
+  dotfiles: 'deny',
+  index: false,
+  fallthrough: true
+};
 
 app.use(
-  '/api/cashfree',
-  cashfreeRoutes
-);
-
-app.use(
-  '/api/admin',
-  adminRoutes
-);
-
-app.use(
-  '/api/wishlist',
-  wishlistRoutes
-);
-
-/* =========================================
-   CUSTOMER COUPON API
-========================================= */
-
-app.use(
-  '/api/coupons',
-  couponRoutes
-);
-
-/* =========================================
-   DELIVERY PIN CODE CHECKER
-
-   GET /api/delivery/check
-
-   Example:
-   /api/delivery/check?pincode=274304&paymentMethod=COD
-
-   Read-only, no order mutations.
-   Rate limiting is inside deliveryRoutes.
-========================================= */
-
-app.use(
-  '/api/delivery',
-  deliveryRoutes
-);
-
-/* =========================================
-   PRODUCT REVIEWS & RATINGS ROUTES
-
-   GET:
-   /api/reviews/product/:productId
-
-   GET:
-   /api/reviews/product/:productId/eligibility
-
-   POST:
-   /api/reviews/product/:productId
-
-   GET:
-   /api/reviews/admin/pending
-
-   PATCH:
-   /api/reviews/admin/:id/status
-========================================= */
-
-app.use(
-  '/api/reviews',
-  reviewRoutes
-);
-
-/* =========================================
-   WEBSITE ANNOUNCEMENT ROUTES
-
-   GET /api/announcement
-   GET /api/announcement/manage
-   PUT /api/announcement/manage
-========================================= */
-
-app.use(
-  '/api/announcement',
-  announcementRoutes
-);
-
-/* =========================================
-   STATIC FILES
-========================================= */
-
-app.use(
+  '/frontend',
   express.static(
-    path.join(__dirname, '..')
+    path.join(projectRoot, 'frontend'),
+    staticOptions
   )
 );
 
-/* =========================================
-   API 404 HANDLER
-========================================= */
-
 app.use(
-  '/api',
-  (_req, res) => {
-    res.status(404).json({
-      success: false,
-      message: 'API route not found.'
-    });
-  }
+  '/admin',
+  express.static(
+    path.join(projectRoot, 'admin'),
+    staticOptions
+  )
 );
 
-/* =========================================
+/* ========================================
+   API NOT FOUND
+======================================== */
+
+app.use('/api', (_req, res) => {
+  res.status(404).json({
+    success: false,
+    message: 'API route not found.'
+  });
+});
+
+/* ========================================
    GLOBAL ERROR HANDLER
-========================================= */
+======================================== */
 
-app.use(
-  (err, _req, res, _next) => {
+app.use((err, _req, res, _next) => {
+  console.error(err);
 
-    console.error(err);
+  const status =
+    Number(err.statusCode || err.status) || 500;
 
-    const status =
-      err.statusCode || 500;
+  res.status(
+    status >= 400 && status < 600
+      ? status
+      : 500
+  ).json({
+    success: false,
+    message:
+      status >= 400 && status < 500
+        ? err.message
+        : 'Internal server error.'
+  });
+});
 
-    res.status(status).json({
-      success: false,
-
-      message:
-        status < 500
-          ? err.message
-          : 'Internal server error.'
-    });
-
-  }
-);
-
-/* =========================================
+/* ========================================
    SERVER START
-========================================= */
+======================================== */
 
-const port =
-  Number(process.env.PORT || 5000);
+const port = Number(process.env.PORT || 5000);
 
 if (require.main === module) {
-
   connectDatabase()
-
     .then(() => {
-
       app.listen(port, () => {
-
         console.log(
           `Memora Creations running on port ${port}`
         );
-
       });
-
     })
-
     .catch(error => {
-
       console.error(
         `Startup failed: ${error.message}`
       );
 
       process.exit(1);
-
     });
-
 }
 
-/* =========================================
+/* ========================================
    EXPORT APP
-========================================= */
+======================================== */
 
 module.exports = app;
