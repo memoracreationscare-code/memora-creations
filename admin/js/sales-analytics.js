@@ -2,289 +2,468 @@
 'use strict';
 
 /*
-==========================================
+========================================
  MEMORA CREATIONS
- PROFESSIONAL SALES ANALYTICS — V1
+ PROFESSIONAL SALES DASHBOARD V2
 
- READ-ONLY DASHBOARD
- - Actual orders (latest 200 maximum)
- - Payment-confirmed sales
- - Sales chart
- - Order status chart
- - Top products
- - Recent orders
- - Date range selection
+ - Daily / Weekly / Monthly chart
+ - Payment-confirmed revenue
+ - Order status donut chart
+ - Modern KPI cards
+ - Top selling products
+ - Recent orders with badges
+ - Date filters
+ - Mobile responsive
+ - Read-only operations
 
- Does not modify:
- - Orders
- - Stock
- - Payments
- - Shiprocket
-==========================================
+ Existing Cashfree / COD / Shiprocket
+ functionality remains untouched.
+========================================
 */
 
 (() => {
-
   const API = '/admin/orders';
 
-  const rupees = value =>
+  const STATUS = [
+    ['Delivered', '#22a559'],
+    ['Shipped', '#2878df'],
+    ['Packed', '#f28c38'],
+    ['Confirmed', '#e8b126'],
+    ['Order Placed', '#946343'],
+    ['Out for Delivery', '#8b5cf6'],
+    ['Cancelled', '#a3a3a3']
+  ];
+
+  const currency = value =>
     '₹' + Number(value || 0)
       .toLocaleString('en-IN', {
         maximumFractionDigits: 2
       });
 
-  const safeNumber = value => {
+  const num = value => {
     const n = Number(value);
     return Number.isFinite(n) ? n : 0;
   };
 
-  const dateOf = value => {
-    const date = new Date(value);
-    return Number.isNaN(date.getTime())
-      ? null
-      : date;
+  const el = (tag, cls, content) => {
+    const node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (content !== undefined) {
+      node.textContent = String(content);
+    }
+    return node;
   };
 
-  const isSale = order =>
+  const svgNS = 'http://www.w3.org/2000/svg';
+
+  let allOrders = [];
+  let period = '30';
+  let grouping = 'daily';
+
+  const paid = order =>
     order.paymentStatus === 'SUCCESS' &&
     order.orderStatus !== 'Cancelled';
 
-  let orders = [];
-  let period = '30';
+  function orderDate(order) {
+    const d = new Date(order.createdAt);
+    return Number.isNaN(d.getTime()) ? null : d;
+  }
 
-  const make = (tag, className, value) => {
-    const el = document.createElement(tag);
+  function inRange() {
+    if (period === 'all') return allOrders;
 
-    if (className) {
-      el.className = className;
-    }
+    const days = Number(period);
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - days);
 
-    if (value !== undefined) {
-      el.textContent = String(value);
-    }
-
-    return el;
-  };
-
+    return allOrders.filter(order => {
+      const date = orderDate(order);
+      return date && date >= cutoff;
+    });
+  }
 
   /* =====================================
-     CUSTOM STYLES
+     PROFESSIONAL STYLES
   ===================================== */
 
-  function styles() {
+  function installStyles() {
+    if (document.getElementById('mcSalesV2CSS')) {
+      return;
+    }
 
-    if (document.getElementById(
-      'mcSalesAnalyticsStyles'
-    )) return;
-
-    const style = make('style');
-
-    style.id = 'mcSalesAnalyticsStyles';
+    const style = el('style');
+    style.id = 'mcSalesV2CSS';
 
     style.textContent = `
-      .mc-sales-area {
-        margin: 12px 0 34px;
+      #mcSalesAnalytics {
+        margin: 10px 0 34px;
+        font-family: inherit;
       }
 
-      .mc-sales-head {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 12px;
-        flex-wrap: wrap;
-        margin-bottom: 19px;
+      .mc-v2-heading {
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:14px;
+        flex-wrap:wrap;
+        margin-bottom:20px;
       }
 
-      .mc-sales-head h2 {
-        margin: 0;
-        font-size: 23px;
+      .mc-v2-heading h2 {
+        font-size:25px;
+        margin:0 0 6px;
+        color:#302117;
       }
 
-      .mc-sales-head p {
-        margin: 5px 0 0;
-        font-size: 12px;
-        color: #817970;
+      .mc-v2-heading p {
+        margin:0;
+        font-size:13px;
+        color:#83786e;
       }
 
-      .mc-sales-select {
-        padding: 11px 15px;
-        border-radius: 11px;
-        border: 1px solid #dfd2c6;
-        background: white;
-        color: #39261d;
-        font-weight: 700;
+      .mc-v2-select {
+        background:white;
+        border:1px solid #e1d5ca;
+        border-radius:12px;
+        padding:12px 15px;
+        color:#39291e;
+        font-weight:750;
+        cursor:pointer;
       }
 
-      .mc-sales-kpis {
-        display: grid;
-        grid-template-columns: repeat(
-          4,minmax(0,1fr)
-        );
-        gap: 16px;
-        margin-bottom: 22px;
+      .mc-v2-kpis {
+        display:grid;
+        grid-template-columns:repeat(4,minmax(0,1fr));
+        gap:16px;
+        margin-bottom:20px;
       }
 
-      .mc-sales-kpi {
-        background: white;
-        padding: 22px;
-        border-radius: 17px;
-        border: 1px solid #eae4dc;
-        min-width: 0;
+      .mc-v2-kpi {
+        background:#fff;
+        border:1px solid #eae0d6;
+        border-radius:17px;
+        padding:22px;
+        min-width:0;
+        box-shadow:0 6px 24px rgba(49,30,16,.035);
       }
 
-      .mc-sales-kpi small {
-        display: block;
-        color: #807267;
-        margin-bottom: 12px;
+      .mc-v2-kpi-top {
+        display:flex;
+        align-items:center;
+        gap:12px;
+        margin-bottom:14px;
       }
 
-      .mc-sales-kpi strong {
-        font-size: clamp(22px,2.2vw,31px);
-        font-weight: 900;
-        color: #302117;
-        overflow-wrap: anywhere;
+      .mc-v2-kpi-icon {
+        display:flex;
+        width:45px;
+        height:45px;
+        align-items:center;
+        justify-content:center;
+        border-radius:13px;
+        background:#f8eadb;
+        font-size:23px;
+        flex-shrink:0;
       }
 
-      .mc-sales-kpi:nth-child(2) {
-        background: #302117;
+      .mc-v2-kpi small {
+        color:#85786d;
+        font-size:12px;
+        font-weight:700;
       }
 
-      .mc-sales-kpi:nth-child(2) small {
-        color: #dbc4b4;
+      .mc-v2-kpi strong {
+        display:block;
+        font-size:clamp(22px,2.4vw,31px);
+        line-height:1.3;
+        color:#2d1d15;
+        font-weight:900;
+        overflow-wrap:anywhere;
       }
 
-      .mc-sales-kpi:nth-child(2) strong {
-        color: white;
+      .mc-v2-kpi-note {
+        display:block;
+        font-size:11px;
+        color:#938477;
+        margin-top:8px;
       }
 
-      .mc-sales-grid {
-        display: grid;
-        grid-template-columns: 1.35fr 1fr;
-        gap: 18px;
-        margin-bottom: 18px;
+      .mc-v2-kpis .mc-v2-kpi:nth-child(2) {
+        background:#302117;
+        border-color:#302117;
       }
 
-      .mc-sales-panel {
-        min-width: 0;
-        background: white;
-        padding: 23px;
-        border: 1px solid #eae4dc;
-        border-radius: 18px;
+      .mc-v2-kpis .mc-v2-kpi:nth-child(2) small,
+      .mc-v2-kpis .mc-v2-kpi:nth-child(2)
+      .mc-v2-kpi-note {
+        color:#d8c1af;
       }
 
-      .mc-sales-panel h3 {
-        margin: 0 0 20px;
-        font-size: 19px;
+      .mc-v2-kpis .mc-v2-kpi:nth-child(2) strong {
+        color:#fff;
       }
 
-      .mc-sales-chart {
-        width: 100%;
-        min-height: 230px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+      .mc-v2-grid {
+        display:grid;
+        grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);
+        gap:18px;
+        margin-bottom:18px;
       }
 
-      .mc-sales-chart svg {
-        display: block;
-        width: 100%;
-        height: auto;
+      .mc-v2-panel {
+        background:white;
+        border:1px solid #eae0d6;
+        border-radius:19px;
+        padding:23px;
+        min-width:0;
+        box-shadow:0 6px 24px rgba(49,30,16,.035);
       }
 
-      .mc-sales-status-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 12px;
-        padding: 11px 0;
-        border-bottom: 1px solid #f0eae4;
-        font-size: 13px;
+      .mc-v2-panel-header {
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:12px;
+        flex-wrap:wrap;
+        margin-bottom:20px;
       }
 
-      .mc-sales-status-row:last-child {
-        border-bottom: 0;
+      .mc-v2-panel h3 {
+        font-size:19px;
+        font-weight:850;
+        margin:0;
+        color:#302117;
       }
 
-      .mc-sales-status-row strong {
-        white-space: nowrap;
+      .mc-v2-tabs {
+        display:flex;
+        gap:4px;
+        padding:4px;
+        background:#f6f0e9;
+        border-radius:11px;
       }
 
-      .mc-sales-dot {
-        width: 10px;
-        height: 10px;
-        display: inline-block;
-        border-radius: 50%;
-        margin-right: 8px;
+      .mc-v2-tab {
+        border:0;
+        padding:9px 12px;
+        font-size:12px;
+        background:transparent;
+        color:#795f4f;
+        border-radius:8px;
+        cursor:pointer;
+        font-weight:750;
       }
 
-      .mc-sales-table-wrap {
-        overflow-x: auto;
+      .mc-v2-tab.active {
+        color:#fff;
+        background:#946343;
       }
 
-      .mc-sales-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 12px;
+      .mc-v2-chart {
+        width:100%;
+        min-height:245px;
       }
 
-      .mc-sales-table th {
-        background: #f5eee7;
-        text-align: left;
-        color: #6d4932;
-        padding: 12px;
+      .mc-v2-chart svg {
+        display:block;
+        width:100%;
+        height:auto;
       }
 
-      .mc-sales-table td {
-        padding: 12px;
-        border-bottom: 1px solid #eee8e1;
+      .mc-v2-note {
+        color:#938579;
+        font-size:11px;
+        line-height:1.6;
+        margin:13px 0 0;
       }
 
-      .mc-sales-table a {
-        color: #784b2e;
-        text-decoration: none;
-        font-weight: 700;
+      .mc-v2-donut-wrap {
+        display:flex;
+        align-items:center;
+        gap:23px;
       }
 
-      .mc-sales-empty {
-        padding: 30px;
-        text-align: center;
-        color: #817970;
-        font-size: 13px;
+      .mc-v2-donut {
+        width:185px;
+        height:185px;
+        border-radius:50%;
+        position:relative;
+        flex-shrink:0;
+        display:flex;
+        align-items:center;
+        justify-content:center;
       }
 
-      .mc-sales-note {
-        margin: 10px 0 0;
-        color: #89786c;
-        font-size: 11px;
-        line-height: 1.6;
+      .mc-v2-donut-inner {
+        width:115px;
+        height:115px;
+        background:white;
+        border-radius:50%;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        position:relative;
+        z-index:1;
       }
 
-      .mc-sales-error {
-        border: 1px solid #efb4b4;
-        border-radius: 12px;
-        padding: 17px;
-        background: #fff2f2;
-        color: #a12020;
+      .mc-v2-donut-inner strong {
+        font-size:29px;
+        color:#302117;
       }
 
-      @media(max-width:1100px) {
-        .mc-sales-kpis {
-          grid-template-columns: repeat(2,1fr);
+      .mc-v2-donut-inner span {
+        color:#8d7c6b;
+        font-size:12px;
+      }
+
+      .mc-v2-legend {
+        flex:1;
+        min-width:0;
+      }
+
+      .mc-v2-legend-row {
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:9px;
+        padding:8px 0;
+        border-bottom:1px solid #f2ede8;
+        font-size:12px;
+      }
+
+      .mc-v2-legend-name {
+        display:flex;
+        align-items:center;
+        gap:8px;
+        min-width:0;
+      }
+
+      .mc-v2-dot {
+        width:10px;
+        height:10px;
+        border-radius:50%;
+        flex-shrink:0;
+      }
+
+      .mc-v2-table-scroll {
+        overflow-x:auto;
+      }
+
+      .mc-v2-table {
+        width:100%;
+        border-collapse:collapse;
+        font-size:12px;
+      }
+
+      .mc-v2-table th {
+        background:#f6f0e9;
+        color:#674833;
+        padding:13px 10px;
+        text-align:left;
+        white-space:nowrap;
+      }
+
+      .mc-v2-table td {
+        padding:13px 10px;
+        border-bottom:1px solid #eee7e0;
+        vertical-align:middle;
+      }
+
+      .mc-v2-table a {
+        color:#815239;
+        font-weight:800;
+        text-decoration:none;
+      }
+
+      .mc-v2-badge {
+        display:inline-flex;
+        align-items:center;
+        padding:6px 9px;
+        border-radius:999px;
+        font-size:10px;
+        font-weight:800;
+        white-space:nowrap;
+      }
+
+      .mc-v2-delivered {
+        background:#e4f7eb;
+        color:#13723a;
+      }
+
+      .mc-v2-cancelled {
+        background:#fce8e8;
+        color:#a52323;
+      }
+
+      .mc-v2-pending {
+        background:#fff1dc;
+        color:#975718;
+      }
+
+      .mc-v2-shipped {
+        background:#e5f0ff;
+        color:#245fbc;
+      }
+
+      .mc-v2-pay {
+        background:#eee9fa;
+        color:#6541a0;
+      }
+
+      .mc-v2-empty {
+        text-align:center;
+        padding:38px 15px;
+        color:#918174;
+        font-size:13px;
+      }
+
+      .mc-v2-error {
+        background:#fff0f0;
+        color:#a52b2b;
+        border:1px solid #efbcbc;
+        border-radius:13px;
+        padding:17px;
+      }
+
+      @media(max-width:1200px) {
+        .mc-v2-kpis {
+          grid-template-columns:repeat(2,minmax(0,1fr));
         }
-        .mc-sales-grid {
-          grid-template-columns: 1fr;
+
+        .mc-v2-grid {
+          grid-template-columns:1fr;
         }
       }
 
-      @media(max-width:500px) {
-        .mc-sales-kpis {
-          gap: 9px;
+      @media(max-width:650px) {
+        .mc-v2-panel {
+          padding:16px;
         }
-        .mc-sales-kpi {
-          padding: 14px;
+
+        .mc-v2-kpis {
+          gap:10px;
         }
-        .mc-sales-panel {
-          padding: 15px;
+
+        .mc-v2-kpi {
+          padding:15px;
+        }
+
+        .mc-v2-kpi strong {
+          font-size:22px;
+        }
+
+        .mc-v2-donut-wrap {
+          flex-direction:column;
+        }
+
+        .mc-v2-legend {
+          width:100%;
+        }
+
+        .mc-v2-tab {
+          padding:8px;
+          font-size:11px;
         }
       }
     `;
@@ -294,84 +473,51 @@
 
 
   /* =====================================
-     DATE FILTER
+     DASHBOARD LOCATION
   ===================================== */
 
-  function filteredOrders() {
-
-    const days = Number(period);
-
-    if (!days) {
-      return orders;
-    }
-
-    const cutoff = new Date();
-
-    cutoff.setDate(
-      cutoff.getDate() - days
-    );
-
-    return orders.filter(order => {
-      const d = dateOf(order.createdAt);
-      return d && d >= cutoff;
-    });
-  }
-
-
-  /* =====================================
-     BUILD DASHBOARD
-  ===================================== */
-
-  function createLayout() {
-
-    const existing = document.getElementById(
+  function createShell() {
+    let section = document.getElementById(
       'mcSalesAnalytics'
     );
 
-    if (existing) return existing;
+    if (section) return section;
 
-    const root = make(
-      'section','mc-sales-area'
-    );
+    section = el('section');
+    section.id = 'mcSalesAnalytics';
 
-    root.id = 'mcSalesAnalytics';
+    const heading = el('div','mc-v2-heading');
 
-    const heading = make(
-      'div','mc-sales-head'
-    );
+    const headingText = el('div');
 
-    const left = make('div');
-
-    left.append(
-      make('h2',null,'Sales Analytics'),
-      make(
+    headingText.append(
+      el('h2',null,'Sales Analytics'),
+      el(
         'p',
         null,
-        'Live order insights and business performance'
+        'Professional business insights'
       )
     );
 
-    const select = make(
-      'select','mc-sales-select'
+    const select = el(
+      'select',
+      'mc-v2-select'
     );
 
-    select.id = 'mcSalesPeriod';
+    select.id = 'mcV2Period';
 
     [
       ['7','Last 7 Days'],
       ['30','Last 30 Days'],
       ['90','Last 90 Days'],
-      ['0','All Available Orders']
+      ['all','All Available Orders']
     ].forEach(([value,label]) => {
-      const option = make(
+      const option = el(
         'option',null,label
       );
 
       option.value = value;
-
-      if (value === period) {
-        option.selected = true;
-      }
+      option.selected = value === period;
 
       select.appendChild(option);
     });
@@ -384,31 +530,29 @@
       }
     );
 
-    heading.append(left,select);
+    heading.append(headingText,select);
 
-    root.appendChild(heading);
-
-    const content = make('div');
-
-    content.id = 'mcSalesContent';
+    const content = el('div');
+    content.id = 'mcV2Content';
 
     content.textContent =
       'Loading sales analytics...';
 
-    root.appendChild(content);
+    section.append(heading,content);
 
-    const stats =
-      document.getElementById('stats');
+    const stats = document.getElementById(
+      'stats'
+    );
 
     if (stats) {
-      stats.after(root);
+      stats.after(section);
     } else {
       document.querySelector(
         '.mc-page'
-      )?.prepend(root);
+      )?.prepend(section);
     }
 
-    return root;
+    return section;
   }
 
 
@@ -417,16 +561,13 @@
   ===================================== */
 
   function createKpis(data) {
+    const grid = el('div','mc-v2-kpis');
 
-    const grid = make(
-      'div','mc-sales-kpis'
-    );
+    const successful = data.filter(paid);
 
-    const sales = data.filter(isSale);
-
-    const revenue = sales.reduce(
+    const revenue = successful.reduce(
       (sum,order) =>
-        sum + safeNumber(order.grandTotal),
+        sum + num(order.grandTotal),
       0
     );
 
@@ -440,22 +581,63 @@
         order.orderStatus === 'Cancelled'
     ).length;
 
-    const metrics = [
-      ['Total Orders',data.length],
-      ['Confirmed Revenue',rupees(revenue)],
-      ['Delivered Orders',delivered],
-      ['Cancelled Orders',cancelled]
+    const cards = [
+      {
+        icon:'🛒',
+        name:'Total Orders',
+        value:data.length,
+        note:'Orders in selected period'
+      },
+      {
+        icon:'💰',
+        name:'Confirmed Revenue',
+        value:currency(revenue),
+        note:'Successful payments only'
+      },
+      {
+        icon:'📦',
+        name:'Delivered Orders',
+        value:delivered,
+        note:'Delivered order count'
+      },
+      {
+        icon:'↩️',
+        name:'Cancelled Orders',
+        value:cancelled,
+        note:'Cancelled order count'
+      }
     ];
 
-    metrics.forEach(([label,value]) => {
+    cards.forEach(item => {
+      const card = el(
+        'article',
+        'mc-v2-kpi'
+      );
 
-      const card = make(
-        'div','mc-sales-kpi'
+      const top = el(
+        'div',
+        'mc-v2-kpi-top'
+      );
+
+      const icon = el(
+        'span',
+        'mc-v2-kpi-icon',
+        item.icon
+      );
+
+      top.append(
+        icon,
+        el('small',null,item.name)
       );
 
       card.append(
-        make('small',null,label),
-        make('strong',null,value)
+        top,
+        el('strong',null,item.value),
+        el(
+          'span',
+          'mc-v2-kpi-note',
+          item.note
+        )
       );
 
       grid.appendChild(card);
@@ -466,58 +648,130 @@
 
 
   /* =====================================
-     SALES CHART (SVG)
+     DATE BUCKET HELPERS
+  ===================================== */
+
+  function dateKey(date) {
+    return [
+      date.getFullYear(),
+      String(
+        date.getMonth() + 1
+      ).padStart(2,'0'),
+      String(
+        date.getDate()
+      ).padStart(2,'0')
+    ].join('-');
+  }
+
+  function bucketKey(date) {
+    if (grouping === 'monthly') {
+      return dateKey(date).slice(0,7);
+    }
+
+    if (grouping === 'weekly') {
+      const d = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate()
+      );
+
+      const day = (d.getDay() + 6) % 7;
+
+      d.setDate(d.getDate() - day);
+
+      return dateKey(d);
+    }
+
+    return dateKey(date);
+  }
+
+
+  /* =====================================
+     SVG SALES CHART
   ===================================== */
 
   function createSalesChart(data) {
-
-    const panel = make(
-      'section','mc-sales-panel'
+    const panel = el(
+      'section',
+      'mc-v2-panel'
     );
 
-    panel.appendChild(
-      make('h3',null,'Sales Overview')
+    const header = el(
+      'div',
+      'mc-v2-panel-header'
     );
 
-    const chart = make(
-      'div','mc-sales-chart'
+    header.appendChild(
+      el('h3',null,'📈 Sales Overview')
     );
 
-    const buckets = new Map();
+    const tabs = el(
+      'div',
+      'mc-v2-tabs'
+    );
 
-    for (const order of data) {
-
-      if (!isSale(order)) continue;
-
-      const date = dateOf(order.createdAt);
-
-      if (!date) continue;
-
-      const key = [
-        date.getFullYear(),
-        String(
-          date.getMonth() + 1
-        ).padStart(2,'0')
-      ].join('-');
-
-      buckets.set(
-        key,
-        (buckets.get(key) || 0) +
-        safeNumber(order.grandTotal)
+    [
+      ['daily','Daily'],
+      ['weekly','Weekly'],
+      ['monthly','Monthly']
+    ].forEach(([value,label]) => {
+      const button = el(
+        'button',
+        'mc-v2-tab',
+        label
       );
-    }
+
+      button.type = 'button';
+
+      if (grouping === value) {
+        button.classList.add('active');
+      }
+
+      button.addEventListener(
+        'click',
+        () => {
+          grouping = value;
+          render();
+        }
+      );
+
+      tabs.appendChild(button);
+    });
+
+    header.appendChild(tabs);
+    panel.appendChild(header);
+
+    const chart = el(
+      'div',
+      'mc-v2-chart'
+    );
+
+    const map = new Map();
+
+    data.filter(paid).forEach(order => {
+      const d = orderDate(order);
+      if (!d) return;
+
+      const key = bucketKey(d);
+
+      map.set(
+        key,
+        (map.get(key) || 0) +
+        num(order.grandTotal)
+      );
+    });
 
     const entries = Array.from(
-      buckets.entries()
+      map.entries()
     ).sort(
       (a,b) => a[0].localeCompare(b[0])
     );
 
     if (!entries.length) {
       chart.appendChild(
-        make(
+        el(
           'p',
-          'mc-sales-empty',
+          'mc-v2-empty',
           'No confirmed sales in this period.'
         )
       );
@@ -526,77 +780,71 @@
       return panel;
     }
 
-    const width = 680;
-    const height = 260;
+    const width = 700;
+    const height = 290;
+    const left = 70;
+    const right = 22;
+    const top = 20;
+    const bottom = 52;
 
-    const paddingLeft = 60;
-    const paddingRight = 20;
-    const paddingTop = 20;
-    const paddingBottom = 45;
+    const plotW = width - left - right;
+    const plotH = height - top - bottom;
 
-    const plotWidth =
-      width - paddingLeft - paddingRight;
-
-    const plotHeight =
-      height - paddingTop - paddingBottom;
-
-    const maxValue = Math.max(
+    const maximum = Math.max(
       1,
       ...entries.map(item => item[1])
     );
 
-    const xFor = index =>
-      paddingLeft +
-      (
+    const x = index =>
+      left + (
         entries.length === 1
-          ? plotWidth / 2
-          : index * plotWidth /
+          ? plotW / 2
+          : index * plotW /
             (entries.length - 1)
       );
 
-    const yFor = value =>
-      paddingTop +
-      plotHeight -
-      (value / maxValue) * plotHeight;
+    const y = value =>
+      top + plotH -
+      value / maximum * plotH;
 
     const points = entries.map(
       ([key,value],index) => ({
-        x:xFor(index),
-        y:yFor(value),
         key,
-        value
+        value,
+        x:x(index),
+        y:y(value)
       })
     );
 
-    const ns =
-      'http://www.w3.org/2000/svg';
-
     const svg = document.createElementNS(
-      ns,'svg'
+      svgNS,'svg'
     );
 
     svg.setAttribute(
-      'viewBox','0 0 680 260'
+      'viewBox',
+      `0 0 ${width} ${height}`
     );
 
     svg.setAttribute(
-      'role','img'
+      'role',
+      'img'
     );
 
     svg.setAttribute(
       'aria-label',
-      'Monthly confirmed sales chart'
+      `${grouping} confirmed sales graph`
     );
 
-    const addSvg = (
-      tag,attributes,text
-    ) => {
-      const node =
-        document.createElementNS(ns,tag);
+    const addSvg = (tag,attrs,text) => {
+      const node = document.createElementNS(
+        svgNS,tag
+      );
 
-      Object.entries(attributes).forEach(
+      Object.entries(attrs).forEach(
         ([key,value]) =>
-          node.setAttribute(key,String(value))
+          node.setAttribute(
+            key,String(value)
+          )
       );
 
       if (text !== undefined) {
@@ -604,36 +852,35 @@
       }
 
       svg.appendChild(node);
-
       return node;
     };
 
     for (let i = 0;i <= 4;i++) {
-
-      const value = maxValue * i / 4;
-      const y = yFor(value);
+      const amount = maximum * i / 4;
+      const yy = y(amount);
 
       addSvg('line',{
-        x1:paddingLeft,
-        y1:y,
-        x2:width-paddingRight,
-        y2:y,
-        stroke:'#eadfd4'
+        x1:left,
+        y1:yy,
+        x2:width-right,
+        y2:yy,
+        stroke:'#ece5de',
+        'stroke-width':1
       });
 
       addSvg('text',{
-        x:paddingLeft-9,
-        y:y+4,
+        x:left-9,
+        y:yy+4,
+        fill:'#918074',
         'text-anchor':'end',
-        fill:'#8a7769',
         'font-size':11
-      },rupees(value));
+      },currency(amount));
     }
 
     const path = points.map(
-      (p,index) =>
+      (point,index) =>
         (index ? 'L' : 'M') +
-        p.x + ' ' + p.y
+        point.x + ' ' + point.y
     ).join(' ');
 
     addSvg('path',{
@@ -641,38 +888,48 @@
       fill:'none',
       stroke:'#946343',
       'stroke-width':3,
-      'stroke-linecap':'round',
-      'stroke-linejoin':'round'
+      'stroke-linejoin':'round',
+      'stroke-linecap':'round'
     });
 
-    points.forEach(point => {
+    points.forEach((point,index) => {
 
       addSvg('circle',{
         cx:point.x,
         cy:point.y,
-        r:4,
-        fill:'#946343'
+        r:4.5,
+        fill:'#946343',
+        stroke:'#fff',
+        'stroke-width':1.5
       });
 
-      addSvg('text',{
-        x:point.x,
-        y:height-17,
-        'text-anchor':'middle',
-        fill:'#77675a',
-        'font-size':11
-      },point.key.slice(2));
+      const showLabel =
+        entries.length <= 8 ||
+        index % Math.ceil(
+          entries.length / 7
+        ) === 0 ||
+        index === entries.length - 1;
+
+      if (showLabel) {
+        addSvg('text',{
+          x:point.x,
+          y:height-19,
+          'text-anchor':'middle',
+          fill:'#857468',
+          'font-size':10
+        },point.key.slice(5));
+      }
     });
 
     chart.appendChild(svg);
-
     panel.appendChild(chart);
 
     panel.appendChild(
-      make(
+      el(
         'p',
-        'mc-sales-note',
-        'Monthly totals use successful, ' +
-        'non-cancelled orders only.'
+        'mc-v2-note',
+        'Only SUCCESS payments from ' +
+        'non-cancelled orders count as sales.'
       )
     );
 
@@ -681,60 +938,136 @@
 
 
   /* =====================================
-     ORDER STATUS BREAKDOWN
+     ORDER STATUS DONUT
   ===================================== */
 
-  function createStatusPanel(data) {
-
-    const panel = make(
-      'section','mc-sales-panel'
+  function createDonut(data) {
+    const panel = el(
+      'section',
+      'mc-v2-panel'
     );
 
-    panel.appendChild(
-      make('h3',null,'Order Status')
+    const header = el(
+      'div',
+      'mc-v2-panel-header'
     );
 
-    const statuses = [
-      ['Delivered','#22a559'],
-      ['Shipped','#2776df'],
-      ['Packed','#ed8b35'],
-      ['Confirmed','#e0ae21'],
-      ['Order Placed','#966344'],
-      ['Out for Delivery','#8b5cf6'],
-      ['Cancelled','#a6a6a6']
-    ];
+    header.appendChild(
+      el('h3',null,'🎯 Order Status')
+    );
 
-    statuses.forEach(([status,color]) => {
+    panel.appendChild(header);
 
-      const count = data.filter(
-        order =>
-          order.orderStatus === status
-      ).length;
+    const wrap = el(
+      'div',
+      'mc-v2-donut-wrap'
+    );
 
-      const row = make(
-        'div','mc-sales-status-row'
+    const donut = el(
+      'div',
+      'mc-v2-donut'
+    );
+
+    const total = data.length;
+
+    let start = 0;
+
+    const segments = STATUS.map(
+      ([status,color]) => {
+        const count = data.filter(
+          order =>
+            order.orderStatus === status
+        ).length;
+
+        const portion = total
+          ? count / total * 100
+          : 0;
+
+        const end = start + portion;
+
+        const segment =
+          `${color} ${start}% ${end}%`;
+
+        start = end;
+
+        return {
+          status,
+          color,
+          count,
+          segment
+        };
+      }
+    );
+
+    donut.style.background = total
+      ? `conic-gradient(${
+          segments.map(
+            item => item.segment
+          ).join(',')
+        })`
+      : '#e8e2dc';
+
+    const inner = el(
+      'div',
+      'mc-v2-donut-inner'
+    );
+
+    inner.append(
+      el('strong',null,total),
+      el('span',null,'Orders')
+    );
+
+    donut.appendChild(inner);
+
+    const legend = el(
+      'div',
+      'mc-v2-legend'
+    );
+
+    segments.forEach(item => {
+      const row = el(
+        'div',
+        'mc-v2-legend-row'
       );
 
-      const label = make('span');
-
-      const dot = make(
-        'span','mc-sales-dot'
+      const label = el(
+        'span',
+        'mc-v2-legend-name'
       );
 
-      dot.style.background = color;
+      const dot = el(
+        'span',
+        'mc-v2-dot'
+      );
+
+      dot.style.background = item.color;
 
       label.append(
         dot,
-        document.createTextNode(status)
+        document.createTextNode(
+          item.status
+        )
       );
+
+      const percentage = total
+        ? (item.count / total * 100)
+          .toFixed(1)
+        : '0.0';
 
       row.append(
         label,
-        make('strong',null,count)
+        el(
+          'strong',
+          null,
+          `${item.count} (${percentage}%)`
+        )
       );
 
-      panel.appendChild(row);
+      legend.appendChild(row);
     });
+
+    wrap.append(donut,legend);
+    panel.appendChild(wrap);
 
     return panel;
   }
@@ -744,60 +1077,64 @@
      TOP SELLING PRODUCTS
   ===================================== */
 
-  function createProductsPanel(data) {
-
-    const panel = make(
-      'section','mc-sales-panel'
+  function createProducts(data) {
+    const panel = el(
+      'section',
+      'mc-v2-panel'
     );
 
-    panel.appendChild(
-      make('h3',null,'Top Selling Products')
+    const heading = el(
+      'div',
+      'mc-v2-panel-header'
     );
+
+    heading.appendChild(
+      el('h3',null,'🏆 Top Selling Products')
+    );
+
+    panel.appendChild(heading);
 
     const products = new Map();
 
-    data.filter(isSale).forEach(
-      order => {
+    data.filter(paid).forEach(order => {
 
-        (order.items || []).forEach(
-          item => {
-
-            const key = String(
-              item.productId ||
-              item.name ||
-              'Unknown'
-            );
-
-            const existing =
-              products.get(key) || {
-                name:item.name || 'Product',
-                quantity:0,
-                revenue:0
-              };
-
-            existing.quantity +=
-              safeNumber(item.quantity);
-
-            existing.revenue +=
-              safeNumber(item.lineTotal);
-
-            products.set(key,existing);
-          }
+      (order.items || []).forEach(item => {
+        const key = String(
+          item.productId ||
+          item.name ||
+          'Unknown'
         );
-      }
-    );
+
+        const current =
+          products.get(key) || {
+            name:item.name || 'Product',
+            units:0,
+            revenue:0
+          };
+
+        current.units += num(
+          item.quantity
+        );
+
+        current.revenue += num(
+          item.lineTotal
+        );
+
+        products.set(key,current);
+      });
+    });
 
     const top = Array.from(
       products.values()
     ).sort(
-      (a,b) => b.quantity - a.quantity
+      (a,b) => b.units - a.units
     ).slice(0,5);
 
     if (!top.length) {
       panel.appendChild(
-        make(
+        el(
           'p',
-          'mc-sales-empty',
+          'mc-v2-empty',
           'No confirmed product sales yet.'
         )
       );
@@ -805,49 +1142,52 @@
       return panel;
     }
 
-    const wrap = make(
-      'div','mc-sales-table-wrap'
+    const scroll = el(
+      'div',
+      'mc-v2-table-scroll'
     );
 
-    const table = make(
-      'table','mc-sales-table'
+    const table = el(
+      'table',
+      'mc-v2-table'
     );
 
-    const thead = make('thead');
-    const header = make('tr');
+    const head = el('thead');
+    const tr = el('tr');
 
     [
-      'Product','Units Sold','Item Revenue'
-    ].forEach(label => {
-      header.append(
-        make('th',null,label)
-      );
-    });
+      'Product',
+      'Units Sold',
+      'Item Revenue'
+    ].forEach(value =>
+      tr.appendChild(
+        el('th',null,value)
+      )
+    );
 
-    thead.appendChild(header);
+    head.appendChild(tr);
 
-    const tbody = make('tbody');
+    const body = el('tbody');
 
     top.forEach(item => {
-
-      const row = make('tr');
+      const row = el('tr');
 
       [
         item.name,
-        item.quantity,
-        rupees(item.revenue)
-      ].forEach(value => {
-        row.append(
-          make('td',null,value)
-        );
-      });
+        item.units,
+        currency(item.revenue)
+      ].forEach(value =>
+        row.appendChild(
+          el('td',null,value)
+        )
+      );
 
-      tbody.appendChild(row);
+      body.appendChild(row);
     });
 
-    table.append(thead,tbody);
-    wrap.appendChild(table);
-    panel.appendChild(wrap);
+    table.append(head,body);
+    scroll.appendChild(table);
+    panel.appendChild(scroll);
 
     return panel;
   }
@@ -857,25 +1197,35 @@
      RECENT ORDERS
   ===================================== */
 
-  function createRecentOrders(data) {
-
-    const panel = make(
-      'section','mc-sales-panel'
+  function createRecent(data) {
+    const panel = el(
+      'section',
+      'mc-v2-panel'
     );
 
-    panel.appendChild(
-      make('h3',null,'Recent Orders')
+    const heading = el(
+      'div',
+      'mc-v2-panel-header'
     );
 
-    const wrap = make(
-      'div','mc-sales-table-wrap'
+    heading.appendChild(
+      el('h3',null,'🕒 Recent Orders')
     );
 
-    const table = make(
-      'table','mc-sales-table'
+    panel.appendChild(heading);
+
+    const scroll = el(
+      'div',
+      'mc-v2-table-scroll'
     );
 
-    const header = make('tr');
+    const table = el(
+      'table',
+      'mc-v2-table'
+    );
+
+    const head = el('thead');
+    const headRow = el('tr');
 
     [
       'Order ID',
@@ -883,135 +1233,186 @@
       'Amount',
       'Payment',
       'Status'
-    ].forEach(label => {
-      header.append(
-        make('th',null,label)
-      );
-    });
+    ].forEach(value =>
+      headRow.appendChild(
+        el('th',null,value)
+      )
+    );
 
-    const thead = make('thead');
-    thead.appendChild(header);
+    head.appendChild(headRow);
 
-    const tbody = make('tbody');
+    const body = el('tbody');
 
     data.slice(0,5).forEach(order => {
 
-      const row = make('tr');
+      const row = el('tr');
 
-      const idCell = make('td');
-      const link = make(
+      const idCell = el('td');
+
+      const link = el(
         'a',
         null,
-        order.orderId || 'View Order'
+        order.orderId || 'View'
       );
 
       link.href =
         '/memora-creations/admin/orders.html';
 
       idCell.appendChild(link);
-
       row.appendChild(idCell);
 
-      const values = [
-        order.customer?.fullName ||
+      row.appendChild(
+        el(
+          'td',
+          null,
+          order.customer?.fullName ||
           order.user?.fullName ||
-          'Customer',
-        rupees(order.grandTotal),
-        order.paymentMethod || '-',
-        order.orderStatus || '-'
-      ];
+          'Customer'
+        )
+      );
 
-      values.forEach(value => {
-        row.append(
-          make('td',null,value)
-        );
-      });
+      row.appendChild(
+        el(
+          'td',
+          null,
+          currency(order.grandTotal)
+        )
+      );
 
-      tbody.appendChild(row);
+      const payment = el('td');
+
+      const paymentBadge = el(
+        'span',
+        'mc-v2-badge mc-v2-pay',
+        order.paymentMethod || '-'
+      );
+
+      payment.appendChild(paymentBadge);
+      row.appendChild(payment);
+
+      const statusCell = el('td');
+
+      const status =
+        order.orderStatus || '-';
+
+      let statusClass = 'mc-v2-pending';
+
+      if (status === 'Delivered') {
+        statusClass = 'mc-v2-delivered';
+      } else if (status === 'Cancelled') {
+        statusClass = 'mc-v2-cancelled';
+      } else if (
+        status === 'Shipped' ||
+        status === 'Out for Delivery'
+      ) {
+        statusClass = 'mc-v2-shipped';
+      }
+
+      statusCell.appendChild(
+        el(
+          'span',
+          'mc-v2-badge ' + statusClass,
+          status
+        )
+      );
+
+      row.appendChild(statusCell);
+      body.appendChild(row);
     });
 
-    table.append(thead,tbody);
-    wrap.appendChild(table);
-    panel.appendChild(wrap);
+    if (!data.length) {
+      const row = el('tr');
+      const cell = el(
+        'td',
+        'mc-v2-empty',
+        'No orders in this period.'
+      );
+
+      cell.colSpan = 5;
+      row.appendChild(cell);
+      body.appendChild(row);
+    }
+
+    table.append(head,body);
+    scroll.appendChild(table);
+    panel.appendChild(scroll);
 
     return panel;
   }
 
 
   /* =====================================
-     RENDER
+     RENDER DASHBOARD
   ===================================== */
 
   function render() {
-
-    const root = document.getElementById(
-      'mcSalesContent'
+    const content = document.getElementById(
+      'mcV2Content'
     );
 
-    if (!root) return;
+    if (!content) return;
 
-    const data = filteredOrders();
+    const data = inRange();
 
-    root.replaceChildren();
+    content.replaceChildren();
 
-    root.appendChild(
+    content.appendChild(
       createKpis(data)
     );
 
-    const topGrid = make(
-      'div','mc-sales-grid'
+    const first = el(
+      'div',
+      'mc-v2-grid'
     );
 
-    topGrid.append(
+    first.append(
       createSalesChart(data),
-      createStatusPanel(data)
+      createDonut(data)
     );
 
-    root.appendChild(topGrid);
-
-    const bottomGrid = make(
-      'div','mc-sales-grid'
+    const second = el(
+      'div',
+      'mc-v2-grid'
     );
 
-    bottomGrid.append(
-      createProductsPanel(data),
-      createRecentOrders(data)
+    second.append(
+      createProducts(data),
+      createRecent(data)
     );
 
-    root.appendChild(bottomGrid);
+    content.append(first,second);
 
-    root.appendChild(
-      make(
+    content.appendChild(
+      el(
         'p',
-        'mc-sales-note',
-        'Analytics are calculated from the ' +
-        'latest 200 orders returned by the ' +
-        'Admin API. Historical totals may be ' +
-        'incomplete if more than 200 orders exist. ' +
-        'Revenue excludes unpaid and cancelled orders.'
+        'mc-v2-note',
+        'Analytics use up to the latest ' +
+        '200 orders from the Admin API. ' +
+        'For more than 200 orders, this ' +
+        'report is not a complete historical ' +
+        'sales report. Confirmed revenue ' +
+        'excludes cancelled orders and ' +
+        'payments not marked SUCCESS.'
       )
     );
   }
 
 
   /* =====================================
-     LOAD FROM PROTECTED ADMIN API
+     LOAD VERIFIED ADMIN DATA
   ===================================== */
 
   async function initialize() {
-
-    styles();
-    createLayout();
-
-    const root = document.getElementById(
-      'mcSalesContent'
-    );
+    installStyles();
+    createShell();
 
     try {
-
-      if (!window.MC?.api) {
+      if (
+        !window.MC ||
+        typeof window.MC.api !== 'function'
+      ) {
         throw new Error(
-          'Admin API is not available.'
+          'Admin API unavailable.'
         );
       }
 
@@ -1025,7 +1426,7 @@
         );
       }
 
-      orders = response.orders.sort(
+      allOrders = response.orders.sort(
         (a,b) =>
           new Date(b.createdAt) -
           new Date(a.createdAt)
@@ -1034,12 +1435,15 @@
       render();
 
     } catch (error) {
+      const content = document.getElementById(
+        'mcV2Content'
+      );
 
-      if (root) {
-        root.replaceChildren(
-          make(
+      if (content) {
+        content.replaceChildren(
+          el(
             'div',
-            'mc-sales-error',
+            'mc-v2-error',
             'Could not load Sales Analytics: ' +
             (error.message || 'Unknown error')
           )
@@ -1047,7 +1451,7 @@
       }
 
       console.error(
-        'Sales Analytics Error:',
+        'Sales Dashboard V2:',
         error
       );
     }
