@@ -12,8 +12,8 @@
  Payment Protection
  Stock Protection
  Coupon Protection
- WhatsApp Consent Support
- Gift Wrapping Preparation
+ WhatsApp Consent
+ Gift Wrapping Live Status
 =========================================
 */
 
@@ -42,7 +42,10 @@ const {
 } = require('../services/couponPricingService');
 
 const {
-  prepareGiftWrapping
+  prepareGiftWrapping,
+  GIFT_WRAPPING_ENABLED,
+  GIFT_WRAPPING_PRICES,
+  MAX_GIFT_MESSAGE_LENGTH
 } = require('../services/giftWrappingService');
 
 const {
@@ -54,9 +57,6 @@ const {
 
 /* =====================================
    VALIDATE GIFT WRAPPING
-
-   Server controls availability
-   and price, not browser input.
 ===================================== */
 
 function getGiftWrapping(value) {
@@ -75,10 +75,12 @@ function getGiftWrapping(value) {
 /* =====================================
    ORDER PREVIEW
 
-   Product + Delivery + Coupon
-   + Gift Wrapping
+   Returns current gift wrapping
+   availability to checkout.
 
-   Nothing is charged here.
+   The prices are public, but the
+   backend always calculates the
+   actual fee.
 ===================================== */
 
 const preview = asyncHandler(
@@ -94,28 +96,27 @@ const preview = asyncHandler(
         req.body.giftWrapping
       );
 
-    /*
-      Unified pricing keeps
-      preview consistent for
-      coupon and non-coupon orders.
-    */
-
     const amountDetails =
       await calculateCouponPricing({
-        items: req.body.items,
+
+        items:
+          req.body.items,
 
         couponCode:
           typeof req.body.couponCode === 'string'
             ? req.body.couponCode
             : null,
 
-        userId: req.user._id,
+        userId:
+          req.user._id,
 
         giftWrapping
+
       });
 
     const items = trustedItems.map(
       item => ({
+
         productId:
           item.product.productId,
 
@@ -137,12 +138,37 @@ const preview = asyncHandler(
         lineTotal:
           item.product.sellingPrice *
           item.quantity
+
       })
     );
 
     return ok(res, {
+
       ...amountDetails,
-      items
+
+      items,
+
+      giftWrappingConfig: {
+
+        enabled:
+          GIFT_WRAPPING_ENABLED,
+
+        prices: {
+          NONE:
+            GIFT_WRAPPING_PRICES.NONE,
+
+          STANDARD:
+            GIFT_WRAPPING_PRICES.STANDARD,
+
+          PREMIUM:
+            GIFT_WRAPPING_PRICES.PREMIUM
+        },
+
+        maxMessageLength:
+          MAX_GIFT_MESSAGE_LENGTH
+
+      }
+
     });
 
   }
@@ -151,10 +177,6 @@ const preview = asyncHandler(
 
 /* =====================================
    CREATE COD ORDER
-
-   WhatsApp Consent
-   Coupon Support
-   Gift Wrapping Support
 ===================================== */
 
 const createCod = asyncHandler(
@@ -173,20 +195,8 @@ const createCod = asyncHandler(
       );
     }
 
-    /*
-      Explicit consent only.
-      Missing / disabled checkbox
-      means false.
-    */
-
     const whatsappOptIn =
       req.body.whatsappOptIn === true;
-
-    /*
-      Validate gift wrapping
-      before starting the
-      order transaction.
-    */
 
     const giftWrapping =
       getGiftWrapping(
@@ -220,18 +230,15 @@ const createCod = asyncHandler(
 
       });
 
-    /*
-      WhatsApp notification sending
-      is not active yet.
-    */
-
     return ok(
       res,
       {
+
         message:
           'COD order placed successfully.',
 
         order
+
       },
       201
     );
@@ -247,13 +254,17 @@ const createCod = asyncHandler(
 const listOrders = asyncHandler(
   async (req, res) => {
 
-    const orders = await Order.find({
-      user: req.user._id
-    })
-      .sort({
-        createdAt: -1
+    const orders =
+      await Order.find({
+
+        user:
+          req.user._id
+
       })
-      .lean();
+        .sort({
+          createdAt: -1
+        })
+        .lean();
 
     return ok(res, {
       orders
@@ -270,10 +281,16 @@ const listOrders = asyncHandler(
 const getOrder = asyncHandler(
   async (req, res) => {
 
-    const order = await Order.findOne({
-      _id: req.params.id,
-      user: req.user._id
-    }).lean();
+    const order =
+      await Order.findOne({
+
+        _id:
+          req.params.id,
+
+        user:
+          req.user._id
+
+      }).lean();
 
     if (!order) {
       throw error(
@@ -293,32 +310,29 @@ const getOrder = asyncHandler(
 /* =====================================
    CANCEL ORDER
 
-   SECURITY RULES
+   Only eligible COD orders
+   can be cancelled automatically.
 
-   1. Only order owner can cancel.
-   2. Only eligible COD orders
-      are cancelled automatically.
-   3. Cashfree cancellation needs
-      separate review.
-   4. Legacy Razorpay cancellation
-      needs support.
-   5. Stock + coupon are released
-      inside one DB transaction.
-   6. Duplicate cancellation blocked.
+   Cashfree and legacy Razorpay
+   require support-assisted handling.
+
+   Stock release and coupon release
+   run in one MongoDB transaction.
 ===================================== */
 
 const cancelOrder = asyncHandler(
   async (req, res) => {
 
-    const order = await Order.findOne({
+    const order =
+      await Order.findOne({
 
-      _id:
-        req.params.id,
+        _id:
+          req.params.id,
 
-      user:
-        req.user._id
+        user:
+          req.user._id
 
-    });
+      });
 
     if (!order) {
       throw error(
@@ -343,7 +357,9 @@ const cancelOrder = asyncHandler(
       ![
         'Order Placed',
         'Confirmed'
-      ].includes(order.orderStatus)
+      ].includes(
+        order.orderStatus
+      )
     ) {
       throw error(
         400,
@@ -376,7 +392,7 @@ const cancelOrder = asyncHandler(
     }
 
 
-    /* ALLOW COD ONLY */
+    /* COD ONLY */
 
     if (
       order.paymentMethod !== 'COD'
@@ -386,9 +402,6 @@ const cancelOrder = asyncHandler(
         'Unsupported payment method.'
       );
     }
-
-
-    /* CHECK COD PAYMENT STATUS */
 
     if (
       order.paymentStatus !== 'COD_PENDING'
@@ -412,12 +425,6 @@ const cancelOrder = asyncHandler(
       await session.withTransaction(
         async () => {
 
-          /*
-            Re-read order inside
-            transaction to avoid
-            stale order status.
-          */
-
           const freshOrder =
             await Order.findOne({
 
@@ -437,7 +444,7 @@ const cancelOrder = asyncHandler(
           }
 
 
-          /* RECHECK ORDER STATUS */
+          /* RECHECK STATUS */
 
           if (
             ![
@@ -475,12 +482,7 @@ const cancelOrder = asyncHandler(
           );
 
 
-          /*
-            RELEASE RESERVED COUPON
-
-            Only once, inside
-            the same transaction.
-          */
+          /* RELEASE RESERVED COUPON */
 
           if (
             freshOrder.couponUsageReserved === true
@@ -510,7 +512,7 @@ const cancelOrder = asyncHandler(
           }
 
 
-          /* UPDATE ORDER STATUS */
+          /* UPDATE ORDER */
 
           freshOrder.orderStatus =
             'Cancelled';
@@ -519,7 +521,7 @@ const cancelOrder = asyncHandler(
             'CANCELLED';
 
 
-          /* SAVE STATUS HISTORY */
+          /* STATUS HISTORY */
 
           freshOrder.statusHistory.push({
 
@@ -535,7 +537,7 @@ const cancelOrder = asyncHandler(
           });
 
 
-          /* SAVE ORDER */
+          /* SAVE */
 
           await freshOrder.save({
             session
@@ -552,9 +554,6 @@ const cancelOrder = asyncHandler(
       await session.endSession();
 
     }
-
-
-    /* FINAL RESPONSE */
 
     return ok(res, {
 
