@@ -23,63 +23,177 @@
 
   <style>
     .mc-whatsapp-consent {
-      display:flex;
-      align-items:flex-start;
-      gap:13px;
-      padding:17px;
-      margin:20px 0;
-      border:1px solid #d9e8dd;
-      border-radius:14px;
-      background:#f4faf5;
+      display: flex;
+      align-items: flex-start;
+      gap: 13px;
+      padding: 17px;
+      margin: 20px 0;
+      border: 1px solid #d9e8dd;
+      border-radius: 14px;
+      background: #f4faf5;
     }
 
     .mc-whatsapp-consent input {
-      width:19px;
-      height:19px;
-      margin:3px 0 0;
-      accent-color:#178b4b;
-      flex-shrink:0;
+      width: 19px;
+      height: 19px;
+      margin: 3px 0 0;
+      accent-color: #178b4b;
+      flex-shrink: 0;
     }
 
     .mc-whatsapp-consent strong {
-      display:block;
-      color:#215b39;
-      font-size:14px;
-      margin-bottom:6px;
+      display: block;
+      color: #215b39;
+      font-size: 14px;
+      margin-bottom: 6px;
     }
 
     .mc-whatsapp-consent p {
-      color:#536b5b;
-      font-size:12px;
-      line-height:1.6;
-      margin:0;
+      color: #536b5b;
+      font-size: 12px;
+      line-height: 1.6;
+      margin: 0;
     }
 
     .mc-whatsapp-consent small {
-      display:block;
-      color:#786853;
-      font-size:11px;
-      margin-top:8px;
+      display: block;
+      color: #786853;
+      font-size: 11px;
+      margin-top: 8px;
     }
 
-    /* MC_GIFT_WRAP_PREVIEW_STYLES_V1 */
-    .mc-gift-wrap{margin:25px 0;padding:22px;border-radius:18px;border:1px solid #ebd6c5;background:linear-gradient(135deg,#fff9f3,#f8ebdf)}
-    .mc-gift-wrap-head{display:flex;align-items:flex-start;gap:13px;margin-bottom:19px}
-    .mc-gift-wrap-emoji{font-size:34px;line-height:1}
-    .mc-gift-wrap-kicker{font-size:11px;font-weight:800;letter-spacing:.13em;color:#936548}
-    .mc-gift-wrap h2{margin:5px 0 6px;color:#39261b;font-size:23px;font-family:Georgia,serif}
-    .mc-gift-wrap-head p{font-size:13px;color:#7d6654;margin:0;line-height:1.7}
-    .mc-gift-wrap-choice{display:grid;gap:10px;margin-bottom:17px}
-    .mc-gift-wrap-option{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid #e4cdb9;border-radius:12px;padding:15px}
-    .mc-gift-wrap-option input{accent-color:#855338}
-    .mc-gift-wrap-option strong,.mc-gift-wrap-option small{display:block;line-height:1.5}
-    .mc-gift-wrap-option strong{color:#4c3324;font-size:14px}
-    .mc-gift-wrap-option small{color:#796453;font-size:12px}
-    .mc-gift-wrap-muted{opacity:.67}
-    .mc-gift-wrap-message-label{display:block;font-size:13px;font-weight:800;margin-bottom:7px;color:#4c3324}
-    .mc-gift-wrap textarea{box-sizing:border-box;width:100%;border:1px solid #e2cdb9;border-radius:10px;min-height:80px;padding:12px;background:#faf5f0;color:#846e5f;font:inherit}
-    .mc-gift-wrap-note{font-size:12px;line-height:1.7;color:#866346;margin:13px 0 0}
+    /* GIFT WRAPPING */
 
+    .mc-gift-wrap {
+      margin: 25px 0;
+      padding: 22px;
+      border-radius: 18px;
+      border: 1px solid #ebd6c5;
+      background: linear-gradient(
+        135deg, #fff9f3, #f8ebdf
+      );
+    }
+
+    .mc-gift-wrap-head {
+      display: flex;
+      align-items: flex-start;
+      gap: 13px;
+      margin-bottom: 19px;
+    }
+
+    .mc-gift-wrap-emoji {
+      font-size: 34px;
+      line-height: 1;
+    }
+
+    .mc-gift-wrap-kicker {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .13em;
+      color: #936548;
+    }
+
+    .mc-gift-wrap h2 {
+      margin: 5px 0 6px;
+      color: #39261b;
+      font-size: 23px;
+      font-family: Georgia, serif;
+    }
+
+    .mc-gift-wrap-head p {
+      font-size: 13px;
+      color: #7d6654;
+      margin: 0;
+      line-height: 1.7;
+    }
+
+    .mc-gift-wrap-choice {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 17px;
+    }
+
+    .mc-gift-wrap-option {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      background: #fff;
+      border: 1px solid #e4cdb9;
+      border-radius: 12px;
+      padding: 15px;
+    }
+
+    .mc-gift-wrap-option input {
+      accent-color: #855338;
+    }
+
+    .mc-gift-wrap-option strong,
+    .mc-gift-wrap-option small {
+      display: block;
+      line-height: 1.5;
+    }
+
+    .mc-gift-wrap-option strong {
+      color: #4c3324;
+      font-size: 14px;
+    }
+
+    .mc-gift-wrap-option small {
+      color: #796453;
+      font-size: 12px;
+    }
+
+    .mc-gift-wrap-muted {
+      opacity: .67;
+      cursor: not-allowed;
+    }
+
+    .mc-gift-wrap-price {
+      margin-left: auto;
+      font-size: 18px;
+      font-weight: 900;
+      color: #805338;
+      white-space: nowrap;
+    }
+
+    .mc-gift-wrap-message-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 7px;
+      color: #4c3324;
+    }
+
+    .mc-gift-wrap textarea {
+      box-sizing: border-box;
+      width: 100%;
+      border: 1px solid #e2cdb9;
+      border-radius: 10px;
+      min-height: 80px;
+      padding: 12px;
+      background: #faf5f0;
+      color: #846e5f;
+      font: inherit;
+    }
+
+    .mc-gift-wrap-note {
+      font-size: 12px;
+      line-height: 1.7;
+      color: #866346;
+      margin: 13px 0 0;
+    }
+
+    .mc-gift-wrap-test {
+      display: inline-block;
+      padding: 6px 10px;
+      margin-top: 10px;
+      border-radius: 8px;
+      background: #fff;
+      border: 1px solid #e6d0b7;
+      font-size: 11px;
+      font-weight: 800;
+      color: #84583a;
+    }
   </style>
 </head>
 
@@ -87,11 +201,17 @@
 
   <header id="nav" class="topbar"></header>
 
-  <div class="checkout-watermark" aria-hidden="true">
+  <div
+    class="checkout-watermark"
+    aria-hidden="true"
+  >
     MEMORA CREATIONS
   </div>
 
-  <main id="checkout" class="container checkout-page">
+  <main
+    id="checkout"
+    class="container checkout-page"
+  >
 
     <section class="checkout-hero">
       <div class="checkout-eyebrow">
@@ -109,7 +229,10 @@
 
     <section class="checkout-layout">
 
-      <form id="checkoutForm" class="checkout-card">
+      <form
+        id="checkoutForm"
+        class="checkout-card"
+      >
 
         <div class="checkout-card-heading">
           <span>STEP 1</span>
@@ -119,7 +242,9 @@
         <div class="checkout-form-grid">
 
           <div class="checkout-field">
-            <label for="fullName">Full Name *</label>
+            <label for="fullName">
+              Full Name *
+            </label>
 
             <input
               id="fullName"
@@ -131,7 +256,9 @@
           </div>
 
           <div class="checkout-field">
-            <label for="mobile">Mobile Number *</label>
+            <label for="mobile">
+              Mobile Number *
+            </label>
 
             <input
               id="mobile"
@@ -147,7 +274,9 @@
           </div>
 
           <div class="checkout-field full">
-            <label for="addressLine">Full Address *</label>
+            <label for="addressLine">
+              Full Address *
+            </label>
 
             <textarea
               id="addressLine"
@@ -159,7 +288,9 @@
           </div>
 
           <div class="checkout-field">
-            <label for="pinCode">PIN Code *</label>
+            <label for="pinCode">
+              PIN Code *
+            </label>
 
             <input
               id="pinCode"
@@ -174,7 +305,9 @@
           </div>
 
           <div class="checkout-field">
-            <label for="city">City</label>
+            <label for="city">
+              City
+            </label>
 
             <input
               id="city"
@@ -185,7 +318,9 @@
           </div>
 
           <div class="checkout-field full">
-            <label for="state">State</label>
+            <label for="state">
+              State
+            </label>
 
             <input
               id="state"
@@ -196,6 +331,9 @@
           </div>
 
         </div>
+
+
+        <!-- PAYMENT METHODS -->
 
         <div class="payment-section">
 
@@ -248,41 +386,183 @@
         </div>
 
 
-        <!-- MC_GIFT_WRAP_PREVIEW_V1: UI-only until backend & payment integration -->
-        <section class="mc-gift-wrap" id="mcGiftWrap" aria-labelledby="mcGiftWrapTitle">
+        <!--
+        =====================================
+        GIFT WRAPPING
+        PRICING DISPLAY PREPARATION
+
+        NORMAL  : INR 0
+        STANDARD: INR 29
+        PREMIUM : INR 59
+
+        IMPORTANT:
+        PAID OPTIONS ARE DISABLED.
+
+        Do not remove "disabled" until
+        separate sandbox environment and
+        complete testing are ready.
+        =====================================
+        -->
+
+        <section
+          class="mc-gift-wrap"
+          id="mcGiftWrap"
+          aria-labelledby="mcGiftWrapTitle"
+        >
+
           <div class="mc-gift-wrap-head">
-            <span class="mc-gift-wrap-emoji" aria-hidden="true">🎁</span>
+            <span
+              class="mc-gift-wrap-emoji"
+              aria-hidden="true"
+            >
+              🎁
+            </span>
+
             <div>
-              <span class="mc-gift-wrap-kicker">AN EXTRA SPECIAL TOUCH</span>
-              <h2 id="mcGiftWrapTitle">Make it a gift</h2>
-              <p>Beautiful wrapping and a personal message for someone special.</p>
+              <span class="mc-gift-wrap-kicker">
+                AN EXTRA SPECIAL TOUCH
+              </span>
+
+              <h2 id="mcGiftWrapTitle">
+                Make it a gift
+              </h2>
+
+              <p>
+                Beautiful gift wrapping
+                and a personal message
+                for someone special.
+              </p>
             </div>
           </div>
+
+
           <div class="mc-gift-wrap-choice">
+
+            <!-- NORMAL PACKAGING -->
+
             <label class="mc-gift-wrap-option">
-              <input type="radio" name="mcGiftWrappingPreview" checked disabled>
-              <span><strong>Standard packaging</strong><small>Included with your order</small></span>
+              <input
+                type="radio"
+                name="mcGiftWrappingPreview"
+                value="NONE"
+                checked
+                disabled
+              >
+
+              <span>
+                <strong>
+                  Normal Packaging
+                </strong>
+
+                <small>
+                  Included with your order
+                </small>
+              </span>
+
+              <span class="mc-gift-wrap-price">
+                FREE
+              </span>
             </label>
-            <label class="mc-gift-wrap-option mc-gift-wrap-muted">
-              <input type="radio" name="mcGiftWrappingPreview" disabled>
-              <span><strong>Gift wrapping — Coming Soon</strong><small>Gift wrapping price will be shown when the service launches</small></span>
+
+
+            <!-- STANDARD WRAPPING -->
+
+            <label
+              class="mc-gift-wrap-option mc-gift-wrap-muted"
+            >
+              <input
+                type="radio"
+                name="mcGiftWrappingPreview"
+                value="STANDARD"
+                disabled
+              >
+
+              <span>
+                <strong>
+                  Standard Gift Wrapping
+                </strong>
+
+                <small>
+                  Gift Paper + Ribbon +
+                  Personal Message
+                </small>
+              </span>
+
+              <span class="mc-gift-wrap-price">
+                ₹29
+              </span>
             </label>
+
+
+            <!-- PREMIUM WRAPPING -->
+
+            <label
+              class="mc-gift-wrap-option mc-gift-wrap-muted"
+            >
+              <input
+                type="radio"
+                name="mcGiftWrappingPreview"
+                value="PREMIUM"
+                disabled
+              >
+
+              <span>
+                <strong>
+                  Premium Gift Wrapping
+                </strong>
+
+                <small>
+                  Premium Packing + Ribbon +
+                  Message Card
+                </small>
+              </span>
+
+              <span class="mc-gift-wrap-price">
+                ₹59
+              </span>
+            </label>
+
           </div>
-          <label for="mcGiftMessagePreview" class="mc-gift-wrap-message-label">Personal gift message</label>
-          <textarea id="mcGiftMessagePreview" maxlength="180" rows="3" placeholder="Your special message..." disabled></textarea>
-          <p class="mc-gift-wrap-note">Gift wrapping is not available for purchase yet. No wrapping fee is being charged. Your order will proceed with standard packaging.</p>
+
+
+          <!-- PERSONAL MESSAGE -->
+
+          <label
+            for="mcGiftMessagePreview"
+            class="mc-gift-wrap-message-label"
+          >
+            Personal Gift Message
+          </label>
+
+          <textarea
+            id="mcGiftMessagePreview"
+            maxlength="180"
+            rows="3"
+            placeholder="Write your special message..."
+            disabled
+          ></textarea>
+
+
+          <div class="mc-gift-wrap-test">
+            Gift Wrapping — Testing Preparation
+          </div>
+
+          <p class="mc-gift-wrap-note">
+            Gift wrapping is not available
+            for purchase yet. The prices
+            above are for the upcoming
+            service. No gift wrapping
+            fee will be charged during
+            normal checkout.
+          </p>
+
         </section>
+
 
         <!--
         =====================================
         WHATSAPP ORDER UPDATES
-
         UI ONLY - NOT YET ACTIVE
-
-        Enable only after:
-        1. Backend consent persistence
-        2. Approved WhatsApp templates
-        3. Notification dispatch integration
         =====================================
         -->
 
@@ -304,19 +584,24 @@
             </label>
 
             <p>
-              Get order confirmation, shipping
-              and delivery updates on WhatsApp
-              from Memora Creations.
+              Get order confirmation,
+              shipping and delivery updates
+              on WhatsApp from
+              Memora Creations.
             </p>
 
             <small>
-              Coming soon. This option will
-              be enabled after notification
-              setup is completed.
+              Coming soon. This option
+              will be enabled after
+              notification setup
+              is completed.
             </small>
           </div>
 
         </div>
+
+
+        <!-- CONFIRMATION -->
 
         <label class="checkout-confirm">
           <input
@@ -326,21 +611,29 @@
           >
 
           <span>
-            I confirm that my delivery address
-            and order details are correct.
+            I confirm that my delivery
+            address and order details
+            are correct.
           </span>
         </label>
 
-        <button class="checkout-submit" type="submit">
+        <button
+          class="checkout-submit"
+          type="submit"
+        >
           Place Order / Pay
           <span>→</span>
         </button>
 
         <div class="checkout-safe-note">
-          🔒 Secure checkout • Your details are protected
+          🔒 Secure checkout • Your details
+          are protected
         </div>
 
       </form>
+
+
+      <!-- ORDER SUMMARY -->
 
       <aside class="checkout-summary-card">
 
@@ -349,7 +642,8 @@
           <h2>Order Summary</h2>
         </div>
 
-        <!-- MC_COUPON_CHECKOUT_UI_V1 -->
+
+        <!-- COUPON -->
 
         <section
           id="mcCouponArea"
@@ -365,7 +659,9 @@
             Have a coupon code?
           </label>
 
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <div
+            style="display:flex;gap:8px;flex-wrap:wrap"
+          >
 
             <input
               id="mcCouponInput"
@@ -403,11 +699,16 @@
 
         </section>
 
-        <div id="summary" class="checkout-summary">
+
+        <div
+          id="summary"
+          class="checkout-summary"
+        >
           <div class="checkout-loading">
             Loading order...
           </div>
         </div>
+
 
         <a
           class="checkout-back"
@@ -416,18 +717,24 @@
           ← Back to Cart
         </a>
 
+
         <div class="checkout-support-mini">
           <div>💬</div>
 
           <p>
             <strong>Need help?</strong>
-            <span>Contact Memora Customer Care</span>
+            <span>
+              Contact Memora Customer Care
+            </span>
           </p>
         </div>
 
       </aside>
 
     </section>
+
+
+    <!-- TRUST SECTION -->
 
     <section class="checkout-trust">
 
@@ -451,16 +758,22 @@
 
     </section>
 
+
+    <!-- CUSTOMER SUPPORT -->
+
     <section class="checkout-help">
 
       <div>
         <small>MEMORA CUSTOMER CARE</small>
 
-        <h2>Having trouble placing your order?</h2>
+        <h2>
+          Having trouble placing your order?
+        </h2>
 
         <p>
-          Checkout, payment ya delivery address
-          se related help ke liye humse contact karein.
+          Checkout, payment ya delivery
+          address se related help ke liye
+          humse contact karein.
         </p>
       </div>
 
@@ -486,39 +799,65 @@
 
   </main>
 
+
+  <!-- FOOTER -->
+
   <footer class="checkout-footer">
-    <strong>MEMORA CREATIONS</strong>
+
+    <strong>
+      MEMORA CREATIONS
+    </strong>
 
     <p>
-      Beautiful Decor • Thoughtful Gifts • Memorable Spaces
+      Beautiful Decor • Thoughtful Gifts
+      • Memorable Spaces
     </p>
+
   </footer>
 
-  <nav id="bottomNav" class="bottomnav"></nav>
 
-  <!-- Cashfree JavaScript SDK -->
-  <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+  <nav
+    id="bottomNav"
+    class="bottomnav"
+  ></nav>
+
+
+  <!-- CASHFREE SDK -->
+
+  <script
+    src="https://sdk.cashfree.com/js/v3/cashfree.js"
+  ></script>
+
+
+  <!-- COMMON APPLICATION -->
 
   <script
     src="/memora-creations/frontend/js/app.js?v=10"
   ></script>
 
+
+  <!-- SECURE CHECKOUT INITIALIZATION -->
+
   <script>
     (async function secureCheckoutPage() {
       try {
-        const user = await window.MC.requireLogin();
+        const user =
+          await window.MC.requireLogin();
 
         if (!user) {
           return;
         }
 
-        const script = document.createElement("script");
+        const script =
+          document.createElement("script");
 
         script.src =
           "/memora-creations/frontend/js/checkout.js?v=16";
 
         script.onerror = function () {
-          document.getElementById("summary").textContent =
+          document.getElementById(
+            "summary"
+          ).textContent =
             "Checkout load nahi hua. Page refresh karein.";
 
           document.querySelector(
@@ -526,14 +865,19 @@
           ).disabled = true;
         };
 
-        document.body.appendChild(script);
+        document.body.appendChild(
+          script
+        );
+
       } catch (error) {
         console.error(
           "Checkout initialization failed:",
           error
         );
 
-        document.getElementById("summary").textContent =
+        document.getElementById(
+          "summary"
+        ).textContent =
           "Checkout load nahi hua. Page refresh karein.";
 
         document.querySelector(
