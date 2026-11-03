@@ -61,6 +61,25 @@
       font-size:11px;
       margin-top:8px;
     }
+
+    /* MC_GIFT_WRAP_PREVIEW_STYLES_V1 */
+    .mc-gift-wrap{margin:25px 0;padding:22px;border-radius:18px;border:1px solid #ebd6c5;background:linear-gradient(135deg,#fff9f3,#f8ebdf)}
+    .mc-gift-wrap-head{display:flex;align-items:flex-start;gap:13px;margin-bottom:19px}
+    .mc-gift-wrap-emoji{font-size:34px;line-height:1}
+    .mc-gift-wrap-kicker{font-size:11px;font-weight:800;letter-spacing:.13em;color:#936548}
+    .mc-gift-wrap h2{margin:5px 0 6px;color:#39261b;font-size:23px;font-family:Georgia,serif}
+    .mc-gift-wrap-head p{font-size:13px;color:#7d6654;margin:0;line-height:1.7}
+    .mc-gift-wrap-choice{display:grid;gap:10px;margin-bottom:17px}
+    .mc-gift-wrap-option{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid #e4cdb9;border-radius:12px;padding:15px}
+    .mc-gift-wrap-option input{accent-color:#855338}
+    .mc-gift-wrap-option strong,.mc-gift-wrap-option small{display:block;line-height:1.5}
+    .mc-gift-wrap-option strong{color:#4c3324;font-size:14px}
+    .mc-gift-wrap-option small{color:#796453;font-size:12px}
+    .mc-gift-wrap-muted{opacity:.67}
+    .mc-gift-wrap-message-label{display:block;font-size:13px;font-weight:800;margin-bottom:7px;color:#4c3324}
+    .mc-gift-wrap textarea{box-sizing:border-box;width:100%;border:1px solid #e2cdb9;border-radius:10px;min-height:80px;padding:12px;background:#faf5f0;color:#846e5f;font:inherit}
+    .mc-gift-wrap-note{font-size:12px;line-height:1.7;color:#866346;margin:13px 0 0}
+
   </style>
 </head>
 
@@ -227,6 +246,32 @@
           </div>
 
         </div>
+
+
+        <!-- MC_GIFT_WRAP_PREVIEW_V1: UI-only until backend & payment integration -->
+        <section class="mc-gift-wrap" id="mcGiftWrap" aria-labelledby="mcGiftWrapTitle">
+          <div class="mc-gift-wrap-head">
+            <span class="mc-gift-wrap-emoji" aria-hidden="true">🎁</span>
+            <div>
+              <span class="mc-gift-wrap-kicker">AN EXTRA SPECIAL TOUCH</span>
+              <h2 id="mcGiftWrapTitle">Make it a gift</h2>
+              <p>Beautiful wrapping and a personal message for someone special.</p>
+            </div>
+          </div>
+          <div class="mc-gift-wrap-choice">
+            <label class="mc-gift-wrap-option">
+              <input type="radio" name="mcGiftWrappingPreview" checked disabled>
+              <span><strong>Standard packaging</strong><small>Included with your order</small></span>
+            </label>
+            <label class="mc-gift-wrap-option mc-gift-wrap-muted">
+              <input type="radio" name="mcGiftWrappingPreview" disabled>
+              <span><strong>Gift wrapping — Coming Soon</strong><small>Gift wrapping price will be shown when the service launches</small></span>
+            </label>
+          </div>
+          <label for="mcGiftMessagePreview" class="mc-gift-wrap-message-label">Personal gift message</label>
+          <textarea id="mcGiftMessagePreview" maxlength="180" rows="3" placeholder="Your special message..." disabled></textarea>
+          <p class="mc-gift-wrap-note">Gift wrapping is not available for purchase yet. No wrapping fee is being charged. Your order will proceed with standard packaging.</p>
+        </section>
 
         <!--
         =====================================
