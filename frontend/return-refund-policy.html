@@ -1,0 +1,957 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <meta
+    name="description"
+    content="Learn how to request order cancellation, report damaged or incorrect products, and contact Memora Creations about returns and refunds."
+  >
+
+  <title>
+    Return & Refund Policy | Memora Creations
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="/memora-creations/frontend/css/style.css?v=13"
+  >
+
+  <style>
+    :root {
+      --policy-ink: #302219;
+      --policy-brown: #8a5a3b;
+      --policy-muted: #766b62;
+      --policy-border: #e8ddd2;
+    }
+
+    .rr-page {
+      padding: 30px 0 75px;
+    }
+
+    .rr-hero {
+      border: 1px solid #e7d6c7;
+      border-radius: 28px;
+      background: linear-gradient(
+        135deg,
+        #fffaf5,
+        #f0dfd1
+      );
+      padding: clamp(35px, 6vw, 70px);
+      margin-bottom: 25px;
+    }
+
+    .rr-eyebrow {
+      display: block;
+      color: var(--policy-brown);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .18em;
+      margin-bottom: 17px;
+    }
+
+    .rr-hero h1 {
+      font-family: Georgia, serif;
+      font-size: clamp(36px, 5.3vw, 62px);
+      line-height: 1.12;
+      color: var(--policy-ink);
+      margin: 0 0 20px;
+      letter-spacing: -.03em;
+    }
+
+    .rr-hero h1 span {
+      color: var(--policy-brown);
+    }
+
+    .rr-hero p {
+      max-width: 760px;
+      color: #66574d;
+      font-size: 16px;
+      line-height: 1.85;
+      margin: 0;
+    }
+
+    .rr-highlights {
+      display: grid;
+      grid-template-columns: repeat(
+        3,
+        minmax(0, 1fr)
+      );
+      gap: 16px;
+      margin-bottom: 25px;
+    }
+
+    .rr-highlight {
+      background: #fff;
+      border: 1px solid var(--policy-border);
+      border-radius: 18px;
+      padding: 25px;
+    }
+
+    .rr-highlight-icon {
+      font-size: 28px;
+      display: block;
+      margin-bottom: 15px;
+    }
+
+    .rr-highlight h2 {
+      font-size: 17px;
+      margin: 0 0 10px;
+      color: var(--policy-ink);
+    }
+
+    .rr-highlight p {
+      margin: 0;
+      color: var(--policy-muted);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .rr-layout {
+      display: grid;
+      grid-template-columns:
+        245px minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .rr-sidebar {
+      position: sticky;
+      top: 95px;
+      padding: 23px;
+      border-radius: 19px;
+      background: #fff;
+      border: 1px solid var(--policy-border);
+    }
+
+    .rr-sidebar h2 {
+      margin: 0 0 14px;
+      font-size: 15px;
+      color: var(--policy-ink);
+    }
+
+    .rr-sidebar a {
+      display: block;
+      padding: 11px 0;
+      border-bottom: 1px solid #f0e8e1;
+      color: var(--policy-muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .rr-sidebar a:hover {
+      color: var(--policy-brown);
+    }
+
+    .rr-section {
+      padding: clamp(23px, 4vw, 37px);
+      background: #fff;
+      border: 1px solid var(--policy-border);
+      border-radius: 19px;
+      margin-bottom: 18px;
+      scroll-margin-top: 95px;
+    }
+
+    .rr-section h2 {
+      font-family: Georgia, serif;
+      font-size: clamp(24px, 3vw, 30px);
+      color: var(--policy-ink);
+      margin: 0 0 16px;
+    }
+
+    .rr-section p,
+    .rr-section li {
+      color: var(--policy-muted);
+      font-size: 14px;
+      line-height: 1.9;
+    }
+
+    .rr-section p {
+      margin: 0 0 15px;
+    }
+
+    .rr-section p:last-child {
+      margin-bottom: 0;
+    }
+
+    .rr-section ul,
+    .rr-section ol {
+      padding-left: 22px;
+      margin: 10px 0;
+    }
+
+    .rr-section li {
+      margin-bottom: 9px;
+    }
+
+    .rr-section a {
+      color: var(--policy-brown);
+      text-decoration: underline;
+      font-weight: 750;
+    }
+
+    .rr-note {
+      padding: 17px;
+      border-radius: 13px;
+      border: 1px solid #e8d4bc;
+      background: #fff8ed;
+      color: #715135;
+      font-size: 13px;
+      line-height: 1.8;
+      margin-top: 18px;
+    }
+
+    .rr-steps {
+      display: grid;
+      gap: 13px;
+      margin-top: 20px;
+    }
+
+    .rr-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 17px;
+      border: 1px solid #eee2d8;
+      background: #faf7f3;
+      border-radius: 13px;
+    }
+
+    .rr-step-number {
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #8a5a3b;
+      color: white;
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .rr-step strong {
+      color: var(--policy-ink);
+      font-size: 14px;
+    }
+
+    .rr-step p {
+      margin: 5px 0 0;
+      font-size: 13px;
+    }
+
+    .rr-support {
+      background: #2d2119;
+      color: white;
+      border-radius: 24px;
+      padding: clamp(32px, 5vw, 52px);
+      text-align: center;
+      margin-top: 25px;
+    }
+
+    .rr-support h2 {
+      font-family: Georgia, serif;
+      font-size: clamp(27px, 4vw, 38px);
+      margin: 0 0 15px;
+    }
+
+    .rr-support p {
+      max-width: 650px;
+      color: #decbbd;
+      line-height: 1.85;
+      margin: 0 auto 23px;
+    }
+
+    .rr-button {
+      display: inline-block;
+      padding: 13px 22px;
+      border-radius: 12px;
+      background: #fff;
+      color: #6f4a32;
+      font-size: 14px;
+      font-weight: 800;
+      margin: 5px;
+    }
+
+    .rr-footer {
+      background: #281e18;
+      color: #fff;
+      text-align: center;
+      padding: 30px 16px 95px;
+    }
+
+    .rr-footer strong {
+      display: block;
+      letter-spacing: .14em;
+      margin-bottom: 10px;
+    }
+
+    .rr-footer p {
+      font-size: 13px;
+      line-height: 1.7;
+      color: #cbbcb1;
+      margin: 0;
+    }
+
+    @media (max-width: 800px) {
+      .rr-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .rr-sidebar {
+        position: static;
+      }
+
+      .rr-highlights {
+        grid-template-columns: 1fr;
+      }
+
+      .rr-page {
+        padding-top: 18px;
+      }
+
+      .rr-hero {
+        border-radius: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header id="nav" class="topbar"></header>
+
+  <main class="container rr-page">
+
+    <!-- HERO -->
+
+    <section class="rr-hero">
+
+      <span class="rr-eyebrow">
+        MEMORA CREATIONS
+      </span>
+
+      <h1>
+        Return, Cancellation
+        <span>& Refund Policy</span>
+      </h1>
+
+      <p>
+        Your shopping experience matters
+        to us. This page explains how
+        to request order cancellation,
+        report delivery problems,
+        seek return assistance
+        and enquire about refunds.
+      </p>
+
+    </section>
+
+    <!-- HIGHLIGHTS -->
+
+    <div class="rr-highlights">
+
+      <div class="rr-highlight">
+        <span class="rr-highlight-icon">📦</span>
+        <h2>Order Cancellation</h2>
+        <p>
+          Cancellation options depend
+          on order status and payment method.
+        </p>
+      </div>
+
+      <div class="rr-highlight">
+        <span class="rr-highlight-icon">↩️</span>
+        <h2>Return Assistance</h2>
+        <p>
+          Contact support if your product
+          arrives damaged, defective
+          or different from your order.
+        </p>
+      </div>
+
+      <div class="rr-highlight">
+        <span class="rr-highlight-icon">💳</span>
+        <h2>Refund Review</h2>
+        <p>
+          Refund requests are reviewed
+          according to eligibility,
+          payment records and applicable law.
+        </p>
+      </div>
+
+    </div>
+
+    <div class="rr-layout">
+
+      <!-- TABLE OF CONTENTS -->
+
+      <aside class="rr-sidebar">
+
+        <h2>On This Page</h2>
+
+        <a href="#overview">
+          1. Policy Overview
+        </a>
+
+        <a href="#cancellation">
+          2. Order Cancellation
+        </a>
+
+        <a href="#returns">
+          3. Return Requests
+        </a>
+
+        <a href="#damaged">
+          4. Damaged or Wrong Items
+        </a>
+
+        <a href="#request-process">
+          5. Request Process
+        </a>
+
+        <a href="#refunds">
+          6. Refund Process
+        </a>
+
+        <a href="#limitations">
+          7. Important Conditions
+        </a>
+
+        <a href="#support">
+          8. Contact Support
+        </a>
+
+      </aside>
+
+      <div>
+
+        <!-- OVERVIEW -->
+
+        <section
+          class="rr-section"
+          id="overview"
+        >
+
+          <h2>1. Policy Overview</h2>
+
+          <p>
+            At Memora Creations, we aim
+            to provide clear product
+            information and helpful
+            customer support.
+          </p>
+
+          <p>
+            Cancellation, return and
+            refund handling may depend
+            on the order status,
+            payment method, product
+            condition, the nature
+            of the issue and applicable
+            consumer protection laws.
+          </p>
+
+          <p>
+            Customers can contact us
+            for assistance with an
+            incorrect product, damaged
+            item, delivery issue,
+            cancellation or refund enquiry.
+          </p>
+
+        </section>
+
+        <!-- CANCELLATION -->
+
+        <section
+          class="rr-section"
+          id="cancellation"
+        >
+
+          <h2>2. Order Cancellation</h2>
+
+          <p>
+            Cancellation options depend
+            on the payment method
+            and current order status.
+          </p>
+
+          <ul>
+            <li>
+              <strong>Cash on Delivery:</strong>
+              Eligible COD orders may
+              be cancelled through
+              My Orders before they
+              enter a status where
+              online cancellation
+              is no longer available.
+            </li>
+
+            <li>
+              <strong>Cashfree Online Payment:</strong>
+              Customers may submit a
+              cancellation request
+              for eligible orders.
+              Payment verification
+              and support review
+              may be required.
+            </li>
+
+            <li>
+              <strong>Dispatched Orders:</strong>
+              Cancellation may no
+              longer be available
+              through the website.
+              Contact customer support
+              for assistance.
+            </li>
+          </ul>
+
+          <div class="rr-note">
+            Submitting a cancellation
+            request does not mean the
+            order has already been
+            cancelled or that a refund
+            has been approved.
+          </div>
+
+          <p>
+            <a
+              href="/memora-creations/frontend/orders.html"
+            >
+              View My Orders
+            </a>
+          </p>
+
+        </section>
+
+        <!-- RETURNS -->
+
+        <section
+          class="rr-section"
+          id="returns"
+        >
+
+          <h2>3. Return Requests</h2>
+
+          <p>
+            If you have a problem
+            with a delivered product,
+            contact Memora Creations
+            Customer Support promptly
+            after receiving it.
+          </p>
+
+          <p>
+            Please explain the issue
+            and provide the Order ID,
+            product details and
+            supporting photographs
+            where relevant.
+          </p>
+
+          <p>
+            We will review the request
+            and advise you about the
+            available next steps.
+          </p>
+
+          <p>
+            A request is not
+            automatically approved
+            simply because it
+            has been submitted.
+            Any mandatory rights
+            under applicable law
+            remain unaffected.
+          </p>
+
+        </section>
+
+        <!-- DAMAGED PRODUCTS -->
+
+        <section
+          class="rr-section"
+          id="damaged"
+        >
+
+          <h2>
+            4. Damaged, Defective
+            or Incorrect Products
+          </h2>
+
+          <p>
+            If your order arrives
+            damaged, defective,
+            incomplete or different
+            from the ordered item,
+            please notify our support
+            team promptly.
+          </p>
+
+          <p>
+            To help us investigate,
+            please share:
+          </p>
+
+          <ul>
+            <li>Your Order ID.</li>
+            <li>The affected product name.</li>
+            <li>A description of the problem.</li>
+            <li>
+              Clear photos of the product
+              and packaging, if available.
+            </li>
+          </ul>
+
+          <p>
+            Keep the item and packaging
+            reasonably available while
+            the issue is being reviewed,
+            where practical.
+          </p>
+
+          <p>
+            Depending on the situation,
+            available remedies may
+            include replacement,
+            refund or another
+            appropriate resolution.
+          </p>
+
+        </section>
+
+        <!-- REQUEST PROCESS -->
+
+        <section
+          class="rr-section"
+          id="request-process"
+        >
+
+          <h2>
+            5. How to Request Assistance
+          </h2>
+
+          <p>
+            Follow these steps if
+            you need assistance with
+            a cancellation, return
+            or refund.
+          </p>
+
+          <div class="rr-steps">
+
+            <div class="rr-step">
+
+              <span class="rr-step-number">
+                1
+              </span>
+
+              <div>
+                <strong>
+                  Open My Orders
+                </strong>
+
+                <p>
+                  Find the order
+                  and check its
+                  latest status.
+                </p>
+              </div>
+
+            </div>
+
+            <div class="rr-step">
+
+              <span class="rr-step-number">
+                2
+              </span>
+
+              <div>
+                <strong>
+                  Check Available Actions
+                </strong>
+
+                <p>
+                  If an eligible cancellation
+                  option is displayed,
+                  you may use it.
+                  Otherwise, contact support.
+                </p>
+              </div>
+
+            </div>
+
+            <div class="rr-step">
+
+              <span class="rr-step-number">
+                3
+              </span>
+
+              <div>
+                <strong>
+                  Share Order Details
+                </strong>
+
+                <p>
+                  Provide your Order ID,
+                  issue description and
+                  relevant photographs.
+                </p>
+              </div>
+
+            </div>
+
+            <div class="rr-step">
+
+              <span class="rr-step-number">
+                4
+              </span>
+
+              <div>
+                <strong>
+                  Receive Further Guidance
+                </strong>
+
+                <p>
+                  Our support team
+                  will review the case
+                  and explain the
+                  available resolution.
+                </p>
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- REFUNDS -->
+
+        <section
+          class="rr-section"
+          id="refunds"
+        >
+
+          <h2>6. Refund Process</h2>
+
+          <p>
+            Refunds are handled
+            according to the
+            applicable order issue,
+            payment method,
+            verified transaction
+            information and
+            relevant consumer rights.
+          </p>
+
+          <p>
+            For an online payment,
+            a refund may require
+            payment gateway
+            verification and
+            administrative review
+            before processing.
+          </p>
+
+          <p>
+            If a refund is approved,
+            we will provide information
+            about the refund method
+            and any available
+            transaction reference.
+          </p>
+
+          <p>
+            The time for funds to
+            appear may depend on
+            the payment provider,
+            bank and applicable
+            processing requirements.
+          </p>
+
+          <div class="rr-note">
+            A pending refund request
+            is not confirmation that
+            a refund has been issued.
+            Do not place another
+            payment simply because
+            an earlier payment
+            appears pending.
+          </div>
+
+        </section>
+
+        <!-- IMPORTANT CONDITIONS -->
+
+        <section
+          class="rr-section"
+          id="limitations"
+        >
+
+          <h2>
+            7. Important Conditions
+          </h2>
+
+          <ul>
+            <li>
+              Return and cancellation
+              eligibility can depend
+              on the product,
+              transaction and
+              nature of the complaint.
+            </li>
+
+            <li>
+              Do not send a product
+              back without receiving
+              return instructions
+              from customer support.
+            </li>
+
+            <li>
+              If a return is authorised,
+              support will explain
+              the return method
+              and applicable
+              shipping arrangements.
+            </li>
+
+            <li>
+              Change-of-mind returns
+              are not automatically
+              available for every
+              product. Check the
+              applicable product
+              terms or contact support.
+            </li>
+
+            <li>
+              This policy does not
+              limit any non-excludable
+              rights available under
+              applicable consumer law.
+            </li>
+          </ul>
+
+        </section>
+
+        <!-- SUPPORT -->
+
+        <section
+          class="rr-section"
+          id="support"
+        >
+
+          <h2>
+            8. Customer Support
+          </h2>
+
+          <p>
+            If you need help with
+            cancellation, returns
+            or refunds, contact
+            Memora Creations.
+          </p>
+
+          <p>
+            <strong>Email:</strong>
+            <a
+              href="mailto:memoracreations.care@gmail.com"
+            >
+              memoracreations.care@gmail.com
+            </a>
+          </p>
+
+          <p>
+            <strong>WhatsApp:</strong>
+            <a
+              href="https://wa.me/918874050204"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              +91 88740 50204
+            </a>
+          </p>
+
+          <p>
+            Include your Order ID
+            and a short description
+            of your concern.
+            Never share your
+            password or OTP.
+          </p>
+
+        </section>
+
+      </div>
+
+    </div>
+
+    <!-- SUPPORT CTA -->
+
+    <section class="rr-support">
+
+      <h2>
+        Need Help With Your Order?
+      </h2>
+
+      <p>
+        Our support channels are
+        available for enquiries
+        about cancellations,
+        product problems
+        and refund requests.
+      </p>
+
+      <a
+        class="rr-button"
+        href="/memora-creations/frontend/contact.html"
+      >
+        Contact Support
+      </a>
+
+      <a
+        class="rr-button"
+        href="/memora-creations/frontend/orders.html"
+      >
+        My Orders
+      </a>
+
+    </section>
+
+  </main>
+
+  <footer class="rr-footer">
+
+    <strong>
+      MEMORA CREATIONS
+    </strong>
+
+    <p>
+      Beautiful Decor • Thoughtful Gifts
+      • Memorable Spaces
+    </p>
+
+  </footer>
+
+  <nav
+    id="bottomNav"
+    class="bottomnav"
+  ></nav>
+
+  <script
+    src="/memora-creations/frontend/js/app.js?v=11"
+  ></script>
+
+</body>
+</html>
