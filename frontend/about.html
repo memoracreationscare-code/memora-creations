@@ -1,0 +1,543 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <meta
+    name="description"
+    content="Learn about Memora Creations, an online store for home decoration, thoughtful gifts and beautiful living spaces."
+  >
+
+  <title>About Us | Memora Creations</title>
+
+  <link
+    rel="stylesheet"
+    href="/memora-creations/frontend/css/style.css?v=13"
+  >
+
+  <style>
+    :root {
+      --about-ink: #2d2119;
+      --about-brown: #8a5a3b;
+      --about-muted: #766c63;
+      --about-border: #e9dfd5;
+      --about-cream: #faf5ee;
+    }
+
+    .about-page {
+      padding-top: 34px;
+      padding-bottom: 75px;
+    }
+
+    .about-hero {
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(
+          circle at 90% 10%,
+          rgba(189, 143, 104, .23),
+          transparent 38%
+        ),
+        linear-gradient(
+          135deg,
+          #fffaf4,
+          #f3e5d7
+        );
+
+      border: 1px solid #e7d6c8;
+      border-radius: 28px;
+      padding: clamp(32px, 6vw, 75px);
+      margin-bottom: 30px;
+    }
+
+    .about-eyebrow {
+      display: inline-block;
+      color: var(--about-brown);
+      text-transform: uppercase;
+      letter-spacing: .19em;
+      font-size: 12px;
+      font-weight: 900;
+      margin-bottom: 18px;
+    }
+
+    .about-hero h1 {
+      margin: 0 0 20px;
+      max-width: 780px;
+      color: var(--about-ink);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(40px, 6vw, 68px);
+      line-height: 1.08;
+      letter-spacing: -.035em;
+    }
+
+    .about-hero h1 span {
+      color: var(--about-brown);
+    }
+
+    .about-hero p {
+      color: #65574d;
+      max-width: 660px;
+      font-size: 16px;
+      line-height: 1.85;
+      margin: 0 0 28px;
+    }
+
+    .about-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .about-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 47px;
+      padding: 12px 22px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 800;
+      transition: transform .2s;
+    }
+
+    .about-button:hover {
+      transform: translateY(-2px);
+    }
+
+    .about-button.primary {
+      background: #795036;
+      color: #fff;
+    }
+
+    .about-button.secondary {
+      background: #fff;
+      color: #795036;
+      border: 1px solid #d9c4b2;
+    }
+
+    .about-section {
+      background: #fff;
+      border: 1px solid var(--about-border);
+      border-radius: 22px;
+      padding: clamp(24px, 4vw, 42px);
+      margin-bottom: 22px;
+    }
+
+    .about-section h2 {
+      margin: 0 0 15px;
+      color: var(--about-ink);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(27px, 3.3vw, 35px);
+    }
+
+    .about-section p {
+      color: var(--about-muted);
+      line-height: 1.9;
+      font-size: 15px;
+      margin: 0 0 15px;
+    }
+
+    .about-section p:last-child {
+      margin-bottom: 0;
+    }
+
+    .about-values {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .about-value {
+      background: #fff;
+      border: 1px solid var(--about-border);
+      border-radius: 20px;
+      padding: 28px 23px;
+    }
+
+    .about-value-icon {
+      display: grid;
+      place-items: center;
+      width: 51px;
+      height: 51px;
+      border-radius: 15px;
+      background: #f6eee7;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    .about-value h3 {
+      margin: 0 0 10px;
+      color: var(--about-ink);
+      font-size: 18px;
+    }
+
+    .about-value p {
+      margin: 0;
+      color: var(--about-muted);
+      line-height: 1.8;
+      font-size: 14px;
+    }
+
+    .about-story {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .about-story-visual {
+      min-height: 300px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      text-align: center;
+      border-radius: 20px;
+      background:
+        linear-gradient(
+          135deg,
+          #ede0d3,
+          #f9f0e7
+        );
+    }
+
+    .about-story-visual .symbol {
+      font-size: 70px;
+      margin-bottom: 17px;
+    }
+
+    .about-story-visual strong {
+      font-family: Georgia, serif;
+      color: #69452e;
+      font-size: 29px;
+      letter-spacing: .08em;
+    }
+
+    .about-story-visual small {
+      margin-top: 10px;
+      color: #846a56;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      font-size: 11px;
+    }
+
+    .about-contact {
+      text-align: center;
+      padding: clamp(32px, 5vw, 55px);
+      border-radius: 24px;
+      background: #2e2119;
+      color: #fff;
+    }
+
+    .about-contact h2 {
+      margin: 0 0 15px;
+      font-size: clamp(27px, 4vw, 38px);
+      font-family: Georgia, serif;
+    }
+
+    .about-contact p {
+      max-width: 600px;
+      margin: 0 auto 25px;
+      color: #e2cdc0;
+      line-height: 1.8;
+    }
+
+    .about-contact .about-button {
+      background: #fff;
+      color: #67442f;
+    }
+
+    .about-footer {
+      padding: 30px 16px 95px;
+      background: #281e18;
+      color: #fff;
+      text-align: center;
+    }
+
+    .about-footer strong {
+      display: block;
+      letter-spacing: .14em;
+      margin-bottom: 10px;
+    }
+
+    .about-footer p {
+      color: #cbbcb1;
+      font-size: 13px;
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    @media (max-width: 760px) {
+      .about-page {
+        padding-top: 18px;
+      }
+
+      .about-values,
+      .about-story {
+        grid-template-columns: 1fr;
+      }
+
+      .about-hero {
+        border-radius: 20px;
+      }
+
+      .about-story-visual {
+        min-height: 230px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Existing Memora navigation -->
+  <header id="nav" class="topbar"></header>
+
+  <main class="container about-page">
+
+    <!-- HERO -->
+
+    <section class="about-hero">
+
+      <div class="about-eyebrow">
+        Welcome to Memora Creations
+      </div>
+
+      <h1>
+        Beautiful Spaces.
+        <span>Memorable Moments.</span>
+      </h1>
+
+      <p>
+        At Memora Creations, we believe that
+        little details can make a space feel
+        truly special.
+
+        Explore home decor and thoughtful
+        gifting ideas designed to bring
+        personality, warmth and charm
+        into everyday living.
+      </p>
+
+      <div class="about-actions">
+
+        <a
+          class="about-button primary"
+          href="/memora-creations/frontend/products.html"
+        >
+          Explore Products
+        </a>
+
+        <a
+          class="about-button secondary"
+          href="mailto:memoracreations.care@gmail.com?subject=Memora%20Creations%20Enquiry"
+        >
+          Contact Us
+        </a>
+
+      </div>
+
+    </section>
+
+    <!-- WHO WE ARE -->
+
+    <section class="about-section">
+
+      <span class="about-eyebrow">
+        Our Introduction
+      </span>
+
+      <h2>Who We Are</h2>
+
+      <p>
+        Memora Creations is an online
+        shopping brand focused on home
+        decoration and gifting products.
+
+        Our aim is to make it easier for
+        customers to explore decorative
+        pieces that reflect their
+        personal style.
+      </p>
+
+      <p>
+        Whether you are refreshing a room,
+        decorating a corner or looking
+        for a gift, our collection is
+        intended to help you find
+        something meaningful for the
+        occasion.
+      </p>
+
+    </section>
+
+    <!-- OUR VALUES -->
+
+    <div class="about-values">
+
+      <section class="about-value">
+
+        <div class="about-value-icon"
+        aria-hidden="true">🏡</div>
+
+        <h3>Home & Lifestyle</h3>
+
+        <p>
+          Explore decorative products
+          that add character and style
+          to your everyday spaces.
+        </p>
+
+      </section>
+
+      <section class="about-value">
+
+        <div class="about-value-icon"
+        aria-hidden="true">🎁</div>
+
+        <h3>Thoughtful Gifting</h3>
+
+        <p>
+          Discover gifting ideas for
+          special occasions, celebrations
+          and meaningful moments.
+        </p>
+
+      </section>
+
+      <section class="about-value">
+
+        <div class="about-value-icon"
+        aria-hidden="true">🤝</div>
+
+        <h3>Customer Experience</h3>
+
+        <p>
+          We aim to provide clear product
+          information, helpful support
+          and a convenient online
+          shopping experience.
+        </p>
+
+      </section>
+
+    </div>
+
+    <!-- BRAND STORY -->
+
+    <section class="about-section">
+
+      <div class="about-story">
+
+        <div>
+
+          <span class="about-eyebrow">
+            Our Vision
+          </span>
+
+          <h2>
+            Decor That Feels Personal
+          </h2>
+
+          <p>
+            A home is more than just a
+            place to live. It is where
+            everyday memories are made.
+          </p>
+
+          <p>
+            We want Memora Creations to
+            become a destination where
+            customers can discover
+            home decor and gift products
+            that match their taste,
+            needs and budget.
+          </p>
+
+          <p>
+            Our journey is centered on
+            growing our collection,
+            improving our shopping
+            experience and listening
+            to our customers.
+          </p>
+
+        </div>
+
+        <div class="about-story-visual">
+
+          <div class="symbol"
+          aria-hidden="true">✨</div>
+
+          <strong>
+            MEMORA CREATIONS
+          </strong>
+
+          <small>
+            Make Your Space Special
+          </small>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- CONTACT -->
+
+    <section class="about-contact">
+
+      <h2>
+        We Would Love to Hear From You
+      </h2>
+
+      <p>
+        Have a question about a product,
+        an order or your shopping
+        experience?
+
+        Reach out to Memora Creations
+        Customer Support.
+      </p>
+
+      <a
+        class="about-button"
+        href="mailto:memoracreations.care@gmail.com?subject=Customer%20Support%20-%20Memora%20Creations"
+      >
+        Email Customer Support
+      </a>
+
+    </section>
+
+  </main>
+
+  <footer class="about-footer">
+
+    <strong>MEMORA CREATIONS</strong>
+
+    <p>
+      Beautiful Decor • Thoughtful Gifts
+      • Memorable Spaces
+    </p>
+
+  </footer>
+
+  <!-- Existing Mobile Navigation -->
+  <nav id="bottomNav" class="bottomnav"></nav>
+
+  <!-- Existing Website Script -->
+  <script
+    src="/memora-creations/frontend/js/app.js?v=11"
+  ></script>
+
+</body>
+</html>
