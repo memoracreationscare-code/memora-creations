@@ -3,88 +3,59 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1"
-  >
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>MEMORA CREATIONS - Make Your Space Special</title>
+  <title>MEMORA CREATIONS | Make Your Space Special</title>
+  <meta name="description" content="Shop beautiful home decor, photo frames and thoughtful gifts at Memora Creations.">
 
-  <link
-    rel="stylesheet"
-    href="/memora-creations/frontend/css/style.css?v=13"
-  >
-
-  <link
-    rel="preconnect"
-    href="https://memora-creations.onrender.com"
-    crossorigin
-  >
+  <link rel="stylesheet" href="/memora-creations/frontend/css/style.css?v=13">
+  <link rel="preconnect" href="https://memora-creations.onrender.com" crossorigin>
 
   <style>
-    /* HOME PAGE */
     .home-announcement {
       background: #2d1d14;
       color: #fff7f1;
       text-align: center;
-      padding: 9px 15px;
+      padding: 10px 15px;
       font-size: 12px;
       font-weight: 700;
-      letter-spacing: .08em;
+      letter-spacing: .04em;
     }
 
-    /* HERO */
     .home-hero {
       margin: 24px 0 38px;
-      min-height: 520px;
-      border-radius: 30px;
-      overflow: hidden;
-      position: relative;
+      min-height: 500px;
       display: grid;
       grid-template-columns: 1.15fr .85fr;
-      background: linear-gradient(
-        135deg, #f5eadf, #fffaf5
-      );
+      background: linear-gradient(135deg,#f5eadf,#fffaf5);
       border: 1px solid #eadfd5;
+      border-radius: 30px;
+      overflow: hidden;
       box-shadow: 0 22px 55px rgba(61,39,23,.08);
     }
 
     .hero-copy {
-      padding: clamp(42px, 6vw, 78px);
+      padding: clamp(35px,6vw,78px);
       display: flex;
       flex-direction: column;
       justify-content: center;
-      position: relative;
-      z-index: 2;
     }
 
     .hero-kicker {
-      display: inline-flex;
-      align-items: center;
-      gap: 9px;
-      margin-bottom: 20px;
       color: #9b613c;
       font-size: 12px;
       font-weight: 900;
-      letter-spacing: .22em;
-      text-transform: uppercase;
-    }
-
-    .hero-kicker::before {
-      content: "";
-      width: 34px;
-      height: 2px;
-      background: #b7835d;
+      letter-spacing: .18em;
+      margin-bottom: 20px;
     }
 
     .home-hero h1 {
       margin: 0;
-      max-width: 650px;
       color: #281a12;
-      font-family: Georgia, "Times New Roman", serif;
-      font-size: clamp(54px, 7vw, 92px);
-      line-height: .92;
-      letter-spacing: -.045em;
+      font-family: Georgia,serif;
+      font-size: clamp(48px,7vw,88px);
+      line-height: .98;
+      letter-spacing: -.04em;
     }
 
     .home-hero h1 span {
@@ -92,121 +63,78 @@
     }
 
     .hero-description {
-      max-width: 560px;
-      margin: 25px 0 30px;
       color: #71675f;
-      font-size: 18px;
-      line-height: 1.65;
+      font-size: 17px;
+      line-height: 1.7;
+      margin: 25px 0 30px;
     }
 
     .hero-actions {
       display: flex;
-      gap: 12px;
       flex-wrap: wrap;
+      gap: 12px;
     }
 
     .hero-primary,
     .hero-secondary {
-      min-height: 56px;
-      padding: 0 26px;
-      border-radius: 999px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 9px;
+      min-height: 54px;
+      padding: 0 24px;
+      border-radius: 999px;
       font-weight: 800;
       text-decoration: none;
-      transition: transform .2s, box-shadow .2s;
     }
 
     .hero-primary {
-      background: linear-gradient(
-        180deg, #9b613c, #7e492a
-      );
-      color: #fff;
-      box-shadow: 0 13px 26px rgba(138,90,59,.24);
+      background: #8a5333;
+      color: white;
     }
 
     .hero-secondary {
-      background: #fff;
-      border: 1px solid #dfd0c3;
+      background: white;
       color: #37261c;
+      border: 1px solid #dfd0c3;
     }
 
-    .hero-primary:hover,
-    .hero-secondary:hover {
-      transform: translateY(-2px);
-    }
-
-    /* HERO VISUAL */
     .hero-visual {
-      position: relative;
-      min-height: 520px;
-      background: radial-gradient(
-        circle at center, #f3ddc8, #e7c7aa
-      );
-      overflow: hidden;
-    }
-
-    .hero-visual::before {
-      content: "";
-      position: absolute;
-      width: 350px;
-      height: 350px;
-      border-radius: 50%;
-      border: 1px solid rgba(102,62,34,.14);
-      right: -80px;
-      top: -70px;
-    }
-
-    .hero-visual::after {
-      content: "";
-      position: absolute;
-      width: 220px;
-      height: 220px;
-      border-radius: 50%;
-      background: rgba(255,255,255,.22);
-      left: -65px;
-      bottom: -50px;
-    }
-
-    .decor-scene {
-      position: absolute;
-      inset: 0;
+      min-height: 500px;
+      background: radial-gradient(circle,#f3ddc8,#e7c7aa);
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
+      overflow: hidden;
     }
 
-    .decor-frame-large {
-      width: 230px;
-      height: 285px;
-      background: linear-gradient(
-        145deg, #f3cfae, #9c6743
-      );
-      border: 18px solid #7b4c2c;
-      border-radius: 10px;
-      box-shadow: 0 28px 50px rgba(74,40,20,.24);
-      transform: rotate(-4deg);
+    .decor-scene {
+      width: 100%;
+      height: 100%;
+      min-height: 350px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       position: relative;
     }
 
-    .decor-frame-large::before {
-      content: "";
-      position: absolute;
-      inset: 16px;
-      background: linear-gradient(
-        160deg, #f9e6d5, #d6a67f
-      );
+    .decor-frame-large {
+      width: 200px;
+      height: 260px;
+      border: 17px solid #7b4c2c;
+      border-radius: 10px;
+      background: linear-gradient(145deg,#f9e6d5,#d6a67f);
+      transform: rotate(-5deg);
+      box-shadow: 0 25px 45px rgba(74,40,20,.2);
     }
 
     .decor-vase-home {
       position: absolute;
-      right: 56px;
-      bottom: 72px;
-      width: 105px;
-      height: 155px;
-      border-radius: 46px 46px 28px 28px;
+      right: 12%;
+      bottom: 15%;
+      width: 95px;
+      height: 145px;
+      border-radius: 45px 45px 25px 25px;
       background: #f6eee7;
       box-shadow: 0 20px 30px rgba(82,48,24,.15);
     }
@@ -214,34 +142,22 @@
     .decor-vase-home::before {
       content: "";
       position: absolute;
-      width: 28px;
-      height: 130px;
-      left: 38px;
-      top: -95px;
-      background: linear-gradient(#728f50,#3b5d2b);
+      width: 30px;
+      height: 120px;
+      left: 36px;
+      top: -90px;
+      background: #728f50;
       border-radius: 100% 0 100% 0;
       transform: rotate(-18deg);
     }
 
-    .decor-vase-home::after {
-      content: "";
-      position: absolute;
-      width: 25px;
-      height: 110px;
-      left: 52px;
-      top: -80px;
-      background: linear-gradient(#819d5d,#426331);
-      border-radius: 0 100% 0 100%;
-      transform: rotate(28deg);
-    }
-
     .decor-candle-home {
       position: absolute;
-      left: 55px;
-      bottom: 82px;
-      width: 68px;
-      height: 100px;
-      border-radius: 15px;
+      left: 12%;
+      bottom: 17%;
+      width: 65px;
+      height: 95px;
+      border-radius: 14px;
       background: #fff6ea;
       box-shadow: 0 18px 28px rgba(82,48,24,.13);
     }
@@ -250,172 +166,131 @@
       content: "";
       position: absolute;
       width: 14px;
-      height: 23px;
-      left: 27px;
-      top: -22px;
-      border-radius: 50% 50% 45% 45%;
+      height: 24px;
+      top: -23px;
+      left: 25px;
       background: linear-gradient(#ffd477,#eb7c2d);
+      border-radius: 50%;
     }
 
-    /* TRUST STRIP */
     .trust-strip {
       display: grid;
       grid-template-columns: repeat(4,1fr);
       gap: 12px;
-      margin-bottom: 50px;
+      margin-bottom: 45px;
     }
 
     .trust-item {
-      min-height: 104px;
-      padding: 17px;
+      background: white;
       border: 1px solid #e8ddd3;
-      border-radius: 19px;
-      background: #fff;
+      border-radius: 18px;
+      padding: 18px;
       display: flex;
       align-items: center;
-      gap: 13px;
-      box-shadow: 0 8px 24px rgba(61,39,23,.045);
+      gap: 12px;
     }
 
     .trust-icon {
-      width: 47px;
-      height: 47px;
-      border-radius: 14px;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       background: #f5e9dd;
-      color: #8a5a3b;
+      border-radius: 13px;
+      padding: 12px;
       font-size: 24px;
     }
 
-    .trust-text strong {
+    .trust-text strong,
+    .trust-text span {
       display: block;
-      margin-bottom: 4px;
+    }
+
+    .trust-text strong {
       color: #33241b;
       font-size: 14px;
     }
 
     .trust-text span {
-      display: block;
       color: #81776f;
       font-size: 12px;
-      line-height: 1.4;
+      margin-top: 4px;
     }
 
-    /* SECTIONS */
     .premium-section {
-      padding: 32px 0 54px;
-    }
-
-    .premium-heading {
-      margin-bottom: 24px;
+      padding: 30px 0 50px;
     }
 
     .premium-eyebrow {
-      margin-bottom: 8px;
       color: #9b613c;
       font-size: 11px;
       font-weight: 900;
-      letter-spacing: .22em;
-      text-transform: uppercase;
+      letter-spacing: .2em;
+      margin-bottom: 8px;
     }
 
     .premium-title-row {
       display: flex;
-      align-items: flex-end;
       justify-content: space-between;
-      gap: 20px;
+      align-items: end;
+      gap: 16px;
+      margin-bottom: 24px;
     }
 
     .premium-title-row h2 {
-      margin: 0;
-      font-family: Georgia, "Times New Roman", serif;
-      font-size: clamp(34px,4vw,50px);
-      line-height: 1;
+      font-family: Georgia,serif;
+      font-size: clamp(30px,4vw,48px);
       color: #2b1b12;
+      margin: 0;
     }
 
     .view-all-link {
       color: #8a5a3b;
       font-weight: 800;
-      font-size: 14px;
       white-space: nowrap;
     }
 
-    /* CATEGORIES */
     .home-category-grid {
       display: grid;
-      grid-template-columns: repeat(3,1fr);
+      grid-template-columns: repeat(3,minmax(0,1fr));
       gap: 16px;
     }
 
     .home-category-card {
-      min-height: 210px;
-      border-radius: 24px;
-      border: 1px solid #e7dbd0;
-      background: linear-gradient(145deg,#fff,#f8f0e8);
-      padding: 24px;
-      position: relative;
-      overflow: hidden;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      box-shadow: 0 12px 30px rgba(61,39,23,.055);
-      transition: transform .2s, box-shadow .2s;
+      min-height: 210px;
+      padding: 24px;
+      border: 1px solid #e7dbd0;
+      border-radius: 24px;
+      background: linear-gradient(145deg,#fff,#f8f0e8);
       text-decoration: none;
-    }
-
-    .home-category-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 18px 38px rgba(61,39,23,.10);
-    }
-
-    .home-category-card::after {
-      content: "";
-      position: absolute;
-      width: 150px;
-      height: 150px;
-      right: -35px;
-      bottom: -35px;
-      border-radius: 50%;
-      background: rgba(183,131,93,.12);
+      box-shadow: 0 12px 30px rgba(61,39,23,.05);
     }
 
     .home-category-icon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
       width: 72px;
       height: 72px;
-      border-radius: 21px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       background: #f4e5d7;
+      border-radius: 21px;
       font-size: 35px;
-      position: relative;
-      z-index: 1;
     }
 
     .home-category-name {
-      position: relative;
-      z-index: 1;
-      margin-top: 32px;
+      margin-top: 25px;
       color: #2f2118;
-      font-family: Georgia, "Times New Roman", serif;
+      font-family: Georgia,serif;
       font-size: 23px;
       font-weight: 700;
     }
 
     .category-arrow {
       margin-top: 8px;
-      position: relative;
-      z-index: 1;
       color: #8a5a3b;
       font-size: 13px;
       font-weight: 800;
     }
 
-    /* PRODUCTS */
     .home-products-grid {
       display: grid;
       grid-template-columns: repeat(4,minmax(0,1fr));
@@ -423,64 +298,51 @@
     }
 
     .home-product-card {
-      overflow: hidden;
-      background: #fff;
+      background: white;
       border: 1px solid #e8dfd8;
       border-radius: 22px;
+      overflow: hidden;
       box-shadow: 0 9px 25px rgba(46,31,20,.05);
-      transition: transform .2s, box-shadow .2s;
-    }
-
-    .home-product-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 18px 38px rgba(46,31,20,.11);
     }
 
     .home-product-image-wrap {
-      position: relative;
+      aspect-ratio: 1;
       background: #f6f3ef;
+      position: relative;
       overflow: hidden;
-      aspect-ratio: 1 / 1;
     }
 
     .home-product-image {
+      display: block;
       width: 100%;
       height: 100%;
       object-fit: cover;
-      display: block;
-      transition: transform .3s ease;
-    }
-
-    .home-product-card:hover .home-product-image {
-      transform: scale(1.035);
     }
 
     .discount-badge {
       position: absolute;
-      left: 11px;
-      top: 11px;
+      top: 10px;
+      left: 10px;
       padding: 6px 9px;
-      border-radius: 999px;
       background: #2f2118;
-      color: #fff;
+      color: white;
       font-size: 11px;
       font-weight: 800;
+      border-radius: 999px;
     }
 
     .stock-badge {
       position: absolute;
-      right: 11px;
-      top: 11px;
-      width: 10px;
-      height: 10px;
+      top: 12px;
+      right: 12px;
+      width: 11px;
+      height: 11px;
       border-radius: 50%;
       background: #2da560;
-      box-shadow: 0 0 0 4px rgba(45,165,96,.14);
     }
 
     .stock-badge.out {
       background: #c84d44;
-      box-shadow: 0 0 0 4px rgba(200,77,68,.14);
     }
 
     .home-product-content {
@@ -488,27 +350,25 @@
     }
 
     .product-category-label {
-      margin-bottom: 7px;
       color: #9b613c;
       font-size: 10px;
       font-weight: 900;
-      letter-spacing: .12em;
       text-transform: uppercase;
+      letter-spacing: .1em;
     }
 
     .home-product-title {
-      margin: 0 0 10px;
-      min-height: 42px;
+      margin: 8px 0 10px;
       color: #302219;
       font-size: 15px;
       line-height: 1.4;
-      font-weight: 800;
+      min-height: 42px;
     }
 
     .product-price-row {
       display: flex;
-      align-items: baseline;
       gap: 8px;
+      align-items: baseline;
       flex-wrap: wrap;
     }
 
@@ -520,34 +380,32 @@
 
     .old-price {
       color: #9d9690;
-      font-size: 13px;
       text-decoration: line-through;
+      font-size: 13px;
     }
 
     .home-product-actions {
-      padding: 0 15px 15px;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
+      padding: 0 15px 15px;
     }
 
     .home-product-actions .btn {
       padding: 11px 8px;
-      font-size: 12px;
       border-radius: 11px;
+      font-size: 12px;
+      cursor: pointer;
     }
 
-    /* CUSTOMER CARE */
     .home-care {
-      margin: 28px 0 60px;
-      border-radius: 28px;
-      overflow: hidden;
+      margin: 25px 0 60px;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      border: 1px solid #e3d5c8;
       background: linear-gradient(135deg,#302016,#74482d);
-      color: #fff;
-      box-shadow: 0 22px 50px rgba(54,31,16,.15);
+      color: white;
+      border-radius: 28px;
+      overflow: hidden;
     }
 
     .care-copy-home {
@@ -555,162 +413,137 @@
     }
 
     .care-copy-home small {
-      display: block;
-      margin-bottom: 10px;
       color: #e5c7ad;
       font-weight: 900;
-      letter-spacing: .20em;
+      letter-spacing: .15em;
     }
 
     .care-copy-home h2 {
-      margin: 0 0 13px;
-      font-family: Georgia, "Times New Roman", serif;
-      font-size: clamp(34px,4vw,52px);
-      line-height: 1;
+      font-family: Georgia,serif;
+      font-size: clamp(32px,4vw,50px);
+      margin: 12px 0;
     }
 
     .care-copy-home p {
-      margin: 0;
-      max-width: 500px;
       color: #eadfd7;
-      line-height: 1.65;
+      line-height: 1.7;
     }
 
     .care-actions-home {
-      padding: 30px;
       display: flex;
       flex-direction: column;
       justify-content: center;
       gap: 12px;
+      padding: 30px;
       background: rgba(255,255,255,.06);
     }
 
     .care-action {
+      display: flex;
+      gap: 13px;
+      align-items: center;
       padding: 16px;
       border: 1px solid rgba(255,255,255,.17);
       border-radius: 16px;
-      display: flex;
-      align-items: center;
-      gap: 13px;
       background: rgba(255,255,255,.08);
-      color: #fff;
+      color: white;
       text-decoration: none;
     }
 
     .care-action-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 13px;
-      background: rgba(255,255,255,.12);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 21px;
-      flex-shrink: 0;
+      font-size: 25px;
     }
 
-    .care-action strong {
+    .care-action strong,
+    .care-action span {
       display: block;
-      margin-bottom: 3px;
     }
 
     .care-action span {
-      display: block;
       color: #e4d7cf;
       font-size: 13px;
+      margin-top: 4px;
     }
 
-    /* FOOTER */
     .premium-footer {
       background: #21160f;
       color: #e9dfd8;
       padding: 48px 0 110px;
-      margin-top: 25px;
     }
 
     .footer-grid {
       display: grid;
-      grid-template-columns: repeat(
-        auto-fit,minmax(190px,1fr)
-      );
+      grid-template-columns: repeat(auto-fit,minmax(190px,1fr));
       gap: 32px;
     }
 
     .footer-brand {
-      color: #fff;
+      color: white;
       font-size: 20px;
       font-weight: 900;
-      letter-spacing: .08em;
     }
 
     .footer-text {
-      max-width: 400px;
-      margin-top: 12px;
       color: #bfb3aa;
-      font-size: 14px;
       line-height: 1.7;
     }
 
     .footer-title {
-      margin-bottom: 14px;
-      color: #fff;
-      font-size: 14px;
+      color: white;
       font-weight: 800;
+      margin-bottom: 14px;
     }
 
     .footer-links {
       display: flex;
       flex-direction: column;
       gap: 10px;
-      color: #cbbfb7;
-      font-size: 14px;
     }
 
     .footer-links a {
-      color: inherit;
+      color: #cbbfb7;
+      text-decoration: none;
     }
 
     .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,.1);
       margin-top: 35px;
       padding-top: 20px;
-      border-top: 1px solid rgba(255,255,255,.10);
-      color: #938980;
+      text-align: center;
       font-size: 12px;
-      text-align: center;
+      color: #938980;
     }
 
-    /* LOADING AND ERROR STATES */
-    .home-load-status {
+    .home-load-message {
       grid-column: 1 / -1;
-      padding: 30px 18px;
-      text-align: center;
-      background: #fffaf6;
+      padding: 25px;
       border: 1px solid #eadfd5;
-      border-radius: 15px;
-      color: #765c4b;
-      line-height: 1.6;
+      border-radius: 16px;
+      background: #fffaf5;
+      color: #71675f;
+      text-align: center;
     }
 
-    .home-retry {
+    .home-load-message button {
       display: inline-block;
       margin-top: 12px;
       padding: 10px 18px;
       border: 0;
       border-radius: 10px;
-      background: #8a5a3b;
+      background: #8a5333;
       color: white;
       font-weight: 700;
       cursor: pointer;
     }
 
-    /* RESPONSIVE */
-    @media (max-width: 900px) {
-      .home-hero {
+    @media(max-width:900px) {
+      .home-hero,
+      .home-care {
         grid-template-columns: 1fr;
       }
 
       .hero-visual {
-        min-height: 360px;
+        min-height: 340px;
       }
 
       .trust-strip {
@@ -718,24 +551,13 @@
       }
 
       .home-products-grid {
-        grid-template-columns: repeat(
-          2,minmax(0,1fr)
-        );
-      }
-
-      .home-care {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2,minmax(0,1fr));
       }
     }
 
-    @media (max-width: 640px) {
-      .home-announcement {
-        font-size: 10px;
-        padding: 8px 10px;
-      }
-
+    @media(max-width:640px) {
       .home-hero {
-        margin: 10px 0 24px;
+        margin-top: 10px;
         border-radius: 22px;
       }
 
@@ -744,12 +566,15 @@
       }
 
       .home-hero h1 {
-        font-size: clamp(47px,14vw,62px);
+        font-size: clamp(45px,13vw,62px);
       }
 
-      .hero-description {
-        margin: 21px 0 25px;
-        font-size: 16px;
+      .hero-visual {
+        min-height: 300px;
+      }
+
+      .decor-scene {
+        min-height: 300px;
       }
 
       .hero-actions {
@@ -759,50 +584,14 @@
 
       .hero-primary,
       .hero-secondary {
-        min-height: 52px;
-        padding: 0 13px;
-        font-size: 14px;
-      }
-
-      .hero-visual {
-        min-height: 305px;
-      }
-
-      .decor-frame-large {
-        width: 165px;
-        height: 205px;
-        border-width: 13px;
-      }
-
-      .decor-vase-home {
-        right: 28px;
-        width: 75px;
-        height: 110px;
-      }
-
-      .decor-candle-home {
-        left: 25px;
-        width: 50px;
-        height: 74px;
-      }
-
-      .trust-strip {
-        grid-template-columns:
-          repeat(2,minmax(0,1fr));
-        gap: 9px;
-        margin-bottom: 35px;
+        padding: 0 12px;
+        font-size: 13px;
       }
 
       .trust-item {
-        min-height: 100px;
-        padding: 11px;
-        align-items: flex-start;
         flex-direction: column;
-      }
-
-      .trust-icon {
-        width: 39px;
-        height: 39px;
+        align-items: flex-start;
+        padding: 12px;
       }
 
       .trust-text strong {
@@ -813,24 +602,14 @@
         font-size: 10px;
       }
 
-      .premium-section {
-        padding: 24px 0 38px;
-      }
-
-      .premium-title-row h2 {
-        font-size: 32px;
-      }
-
       .home-category-grid {
-        grid-template-columns:
-          repeat(2,minmax(0,1fr));
+        grid-template-columns: repeat(2,minmax(0,1fr));
         gap: 11px;
       }
 
       .home-category-card {
         min-height: 165px;
         padding: 17px;
-        border-radius: 19px;
       }
 
       .home-category-icon {
@@ -840,7 +619,6 @@
       }
 
       .home-category-name {
-        margin-top: 20px;
         font-size: 17px;
       }
 
@@ -857,7 +635,6 @@
       }
 
       .home-product-title {
-        min-height: 38px;
         font-size: 13px;
       }
 
@@ -865,40 +642,17 @@
         font-size: 16px;
       }
 
-      .old-price {
-        font-size: 11px;
-      }
-
       .home-product-actions {
-        padding: 0 10px 10px;
         grid-template-columns: 1fr;
-        gap: 6px;
-      }
-
-      .home-product-actions .btn {
-        font-size: 11px;
-      }
-
-      .home-care {
-        margin: 20px 0 40px;
-        border-radius: 22px;
+        padding: 0 10px 10px;
       }
 
       .care-actions-home {
         padding: 20px;
       }
-
-      .footer-grid {
-        grid-template-columns: 1fr;
-        gap: 28px;
-      }
-
-      .premium-footer {
-        padding-top: 38px;
-      }
     }
 
-    @media (max-width: 380px) {
+    @media(max-width:380px) {
       .home-products-grid {
         grid-template-columns: 1fr;
       }
@@ -909,43 +663,41 @@
 <body>
 
   <!-- ANNOUNCEMENT -->
+
   <div class="home-announcement">
     ✨ Welcome to MEMORA CREATIONS —
-    Beautiful Decor • Thoughtful Gifts •
-    Memorable Spaces
+    Beautiful Decor • Thoughtful Gifts • Memorable Spaces
   </div>
 
-  <!-- NAVIGATION -->
-  <header
-    id="nav"
-    class="topbar"
-  ></header>
+  <!-- NAVBAR -->
+
+  <header id="nav" class="topbar"></header>
 
   <main class="container">
 
     <!-- HERO -->
+
     <section class="home-hero">
 
       <div class="hero-copy">
+
         <div class="hero-kicker">
           MEMORA CREATIONS
         </div>
 
         <h1>
-          Make Your
-          <br>
-          Space
-          <span>Special.</span>
+          Make Your<br>
+          Space <span>Special.</span>
         </h1>
 
         <p class="hero-description">
           Beautiful home decor, photo frames
           and thoughtfully selected products
-          designed to make every corner feel
-          personal.
+          designed to make every corner feel personal.
         </p>
 
         <div class="hero-actions">
+
           <a
             class="hero-primary"
             href="/memora-creations/frontend/products.html"
@@ -959,10 +711,11 @@
           >
             Explore Categories
           </a>
+
         </div>
       </div>
 
-      <div class="hero-visual">
+      <div class="hero-visual" aria-hidden="true">
         <div class="decor-scene">
           <div class="decor-candle-home"></div>
           <div class="decor-frame-large"></div>
@@ -972,11 +725,12 @@
 
     </section>
 
-    <!-- TRUST SECTION -->
+    <!-- TRUST -->
+
     <section class="trust-strip">
 
       <div class="trust-item">
-        <div class="trust-icon">🛡️</div>
+        <div class="trust-icon">🔒</div>
         <div class="trust-text">
           <strong>Secure Shopping</strong>
           <span>Safe account & checkout</span>
@@ -1009,27 +763,20 @@
 
     </section>
 
-    <!-- CATEGORY SECTION -->
-    <section
-      id="homeCategories"
-      class="premium-section"
-    >
+    <!-- CATEGORIES -->
 
-      <div class="premium-heading">
-        <div class="premium-eyebrow">
-          EXPLORE
-        </div>
+    <section id="homeCategories" class="premium-section">
 
-        <div class="premium-title-row">
-          <h2>Shop by Category</h2>
+      <div class="premium-eyebrow">EXPLORE</div>
 
-          <a
-            class="view-all-link"
-            href="/memora-creations/frontend/products.html"
-          >
-            Shop all →
-          </a>
-        </div>
+      <div class="premium-title-row">
+        <h2>Shop by Category</h2>
+        <a
+          class="view-all-link"
+          href="/memora-creations/frontend/products.html"
+        >
+          Shop all →
+        </a>
       </div>
 
       <div
@@ -1037,31 +784,27 @@
         class="home-category-grid"
         aria-live="polite"
       >
-        <div class="home-load-status">
+        <div class="home-load-message">
           Loading categories...
         </div>
       </div>
 
     </section>
 
-    <!-- PRODUCTS SECTION -->
+    <!-- PRODUCTS -->
+
     <section class="premium-section">
 
-      <div class="premium-heading">
-        <div class="premium-eyebrow">
-          DISCOVER
-        </div>
+      <div class="premium-eyebrow">DISCOVER</div>
 
-        <div class="premium-title-row">
-          <h2>Our Collection</h2>
-
-          <a
-            class="view-all-link"
-            href="/memora-creations/frontend/products.html"
-          >
-            View all →
-          </a>
-        </div>
+      <div class="premium-title-row">
+        <h2>Our Collection</h2>
+        <a
+          class="view-all-link"
+          href="/memora-creations/frontend/products.html"
+        >
+          View all →
+        </a>
       </div>
 
       <div
@@ -1069,28 +812,24 @@
         class="home-products-grid"
         aria-live="polite"
       >
-        <div class="home-load-status">
+        <div class="home-load-message">
           Loading products...
         </div>
       </div>
 
     </section>
 
-    <!-- CUSTOMER SUPPORT -->
+    <!-- CUSTOMER CARE -->
+
     <section class="home-care">
 
       <div class="care-copy-home">
-        <small>
-          WE'RE HERE TO HELP
-        </small>
-
+        <small>WE'RE HERE TO HELP</small>
         <h2>Need Assistance?</h2>
-
         <p>
           Order, payment, delivery, login
-          ya password se related kisi bhi
-          help ke liye Memora Creations
-          Customer Care se contact karein.
+          ya password se related kisi bhi help ke liye
+          Memora Creations Customer Care se contact karein.
         </p>
       </div>
 
@@ -1102,10 +841,7 @@
           target="_blank"
           rel="noopener noreferrer"
         >
-          <div class="care-action-icon">
-            💬
-          </div>
-
+          <div class="care-action-icon">💬</div>
           <div>
             <strong>WhatsApp Support</strong>
             <span>+91 88740 50204</span>
@@ -1116,15 +852,10 @@
           class="care-action"
           href="mailto:memoracreations.care@gmail.com?subject=Memora%20Creations%20Customer%20Support"
         >
-          <div class="care-action-icon">
-            ✉️
-          </div>
-
+          <div class="care-action-icon">✉️</div>
           <div>
             <strong>Email Support</strong>
-            <span>
-              memoracreations.care@gmail.com
-            </span>
+            <span>memoracreations.care@gmail.com</span>
           </div>
         </a>
 
@@ -1134,6 +865,7 @@
   </main>
 
   <!-- FOOTER -->
+
   <footer class="premium-footer">
     <div class="container">
 
@@ -1143,80 +875,40 @@
           <div class="footer-brand">
             MEMORA CREATIONS
           </div>
-
           <p class="footer-text">
             Beautiful home decor and memorable
             creations selected to make your
-            everyday spaces feel more special.
+            everyday spaces feel special.
           </p>
-
           <p class="footer-text">
-            Beautiful Decor • Thoughtful Gifts
-            • Memorable Spaces
+            Beautiful Decor • Thoughtful Gifts • Memorable Spaces
           </p>
         </div>
 
         <div>
-          <div class="footer-title">
-            Quick Links
-          </div>
-
+          <div class="footer-title">Quick Links</div>
           <div class="footer-links">
-            <a href="/memora-creations/frontend/index.html">
-              Home
-            </a>
-
-            <a href="/memora-creations/frontend/products.html">
-              Shop Products
-            </a>
-
-            <a href="/memora-creations/frontend/about.html">
-              About Us
-            </a>
-
-            <a href="/memora-creations/frontend/contact.html">
-              Contact Us
-            </a>
-
-            <a href="/memora-creations/frontend/orders.html">
-              My Orders
-            </a>
-
-            <a href="/memora-creations/frontend/profile.html">
-              My Profile
-            </a>
+            <a href="/memora-creations/frontend/index.html">Home</a>
+            <a href="/memora-creations/frontend/products.html">Shop Products</a>
+            <a href="/memora-creations/frontend/about.html">About Us</a>
+            <a href="/memora-creations/frontend/contact.html">Contact Us</a>
+            <a href="/memora-creations/frontend/orders.html">My Orders</a>
+            <a href="/memora-creations/frontend/profile.html">My Profile</a>
           </div>
         </div>
 
         <div>
-          <div class="footer-title">
-            Customer Policies
-          </div>
-
+          <div class="footer-title">Customer Policies</div>
           <div class="footer-links">
-            <a href="/memora-creations/frontend/shipping-policy.html">
-              Shipping & Delivery
-            </a>
-
-            <a href="/memora-creations/frontend/return-refund-policy.html">
-              Return & Refund Policy
-            </a>
-
-            <a href="/memora-creations/frontend/privacy-policy.html">
-              Privacy Policy
-            </a>
-
-            <a href="/memora-creations/frontend/terms.html">
-              Terms & Conditions
-            </a>
+            <a href="/memora-creations/frontend/shipping-policy.html">Shipping & Delivery</a>
+            <a href="/memora-creations/frontend/return-refund-policy.html">Return & Refund Policy</a>
+            <a href="/memora-creations/frontend/privacy-policy.html">Privacy Policy</a>
+            <a href="/memora-creations/frontend/terms.html">Terms & Conditions</a>
           </div>
         </div>
 
         <div>
-          <div class="footer-title">
-            Customer Care
-          </div>
-
+          <div class="footer-title">Customer Care</div>
           <div class="footer-links">
             <a
               href="https://wa.me/918874050204"
@@ -1225,11 +917,9 @@
             >
               WhatsApp: +91 88740 50204
             </a>
-
             <a href="mailto:memoracreations.care@gmail.com">
               memoracreations.care@gmail.com
             </a>
-
             <a href="/memora-creations/frontend/contact.html">
               Help & Support
             </a>
@@ -1240,40 +930,483 @@
 
       <div class="footer-bottom">
         © MEMORA CREATIONS • All Rights Reserved
-
-        <p style="margin:9px 0 0;line-height:1.7">
-          Beautiful Spaces. Memorable Moments.
-        </p>
+        <p>Beautiful Spaces. Memorable Moments.</p>
       </div>
 
     </div>
   </footer>
 
-  <!-- MOBILE NAV -->
-  <nav
-    id="bottomNav"
-    class="bottomnav"
-  ></nav>
+  <!-- MOBILE NAVIGATION -->
+
+  <nav id="bottomNav" class="bottomnav"></nav>
 
   <!-- COMMON APP -->
-  <script
-    src="/memora-creations/frontend/js/app.js?v=13"
-  ></script>
 
-  <!-- HOME LOGIC -->
+  <script src="/memora-creations/frontend/js/app.js?v=13"></script>
+
+  <!-- HOME PAGE LOGIC -->
+
   <script>
-    const HOME_BASE = '/memora-creations';
+    (() => {
+      'use strict';
 
-    let homeProducts = [];
+      const HOME_BASE = '/memora-creations';
 
-    function getCategoryIcon(categoryName) {
-      const name = String(
-        categoryName || ''
-      ).toUpperCase();
+      let homeProducts = [];
 
-      if (name.includes('HOME')) return '🏠';
-      if (name.includes('PHOTO')) return '🖼️';
-      if (name.includes('WALL')) return '✨';
-      if (name.includes('GIFT')) return '🎁';
-      if (name.includes('CANDLE')) return '🕯️';
-      if (name.includes('
+      const $ = selector =>
+        document.querySelector(selector);
+
+      const esc = value =>
+        window.MC.esc(String(value ?? ''));
+
+      const money = value =>
+        window.MC.money(value);
+
+      const message = (text, retry) => `
+        <div class="home-load-message">
+          <p>${esc(text)}</p>
+          ${retry ? `
+            <button type="button" data-retry="${retry}">
+              Try Again
+            </button>
+          ` : ''}
+        </div>
+      `;
+
+      function getCategoryIcon(name) {
+        const value = String(name || '').toUpperCase();
+
+        if (value.includes('HOME')) return '🏠';
+        if (value.includes('PHOTO')) return '🖼️';
+        if (value.includes('WALL')) return '✨';
+        if (value.includes('GIFT')) return '🎁';
+        if (value.includes('CANDLE')) return '🕯️';
+        if (value.includes('VASE')) return '🏺';
+
+        return '✨';
+      }
+
+      function homeCategoryCard(category) {
+        return `
+          <a
+            class="home-category-card"
+            href="${HOME_BASE}/frontend/products.html?category=${encodeURIComponent(category._id)}"
+          >
+            <div class="home-category-icon">
+              ${getCategoryIcon(category.name)}
+            </div>
+
+            <div>
+              <div class="home-category-name">
+                ${esc(category.name)}
+              </div>
+              <div class="category-arrow">
+                Explore Collection →
+              </div>
+            </div>
+          </a>
+        `;
+      }
+
+      function getDiscount(product) {
+        const original = Number(product.originalPrice || 0);
+        const selling = Number(product.sellingPrice || 0);
+
+        if (
+          original <= 0 ||
+          selling >= original
+        ) return 0;
+
+        return Math.round(
+          ((original - selling) / original) * 100
+        );
+      }
+
+      function homeProductCard(product) {
+        const image =
+          product.images?.[0]?.url ||
+          'https://placehold.co/600x600?text=Memora';
+
+        const discount = getDiscount(product);
+        const inStock = Number(product.stock) > 0;
+        const id = esc(product._id);
+
+        return `
+          <article class="home-product-card">
+
+            <button
+              class="product-card-open home-product-open"
+              type="button"
+              data-id="${id}"
+              style="display:block;width:100%;border:0;padding:0;background:none;text-align:left;cursor:pointer"
+            >
+              <div class="home-product-image-wrap">
+
+                <img
+                  class="home-product-image"
+                  src="${esc(image)}"
+                  alt="${esc(product.name)}"
+                  loading="lazy"
+                  decoding="async"
+                >
+
+                ${discount > 0 ? `
+                  <span class="discount-badge">
+                    ${discount}% OFF
+                  </span>
+                ` : ''}
+
+                <span class="stock-badge ${inStock ? '' : 'out'}"></span>
+
+              </div>
+
+              <div class="home-product-content">
+
+                <div class="product-category-label">
+                  ${esc(product.category?.name || 'Collection')}
+                </div>
+
+                <h3 class="home-product-title">
+                  ${esc(product.name)}
+                </h3>
+
+                <div class="product-price-row">
+
+                  <span class="current-price">
+                    ${money(product.sellingPrice)}
+                  </span>
+
+                  ${Number(product.originalPrice) > Number(product.sellingPrice) ? `
+                    <span class="old-price">
+                      ${money(product.originalPrice)}
+                    </span>
+                  ` : ''}
+
+                </div>
+
+              </div>
+            </button>
+
+            <div class="home-product-actions">
+
+              <button
+                class="btn home-add-cart"
+                type="button"
+                data-id="${id}"
+                ${inStock ? '' : 'disabled'}
+              >
+                Add to Cart
+              </button>
+
+              <button
+                class="btn secondary home-buy-now"
+                type="button"
+                data-id="${id}"
+                ${inStock ? '' : 'disabled'}
+              >
+                Order Now
+              </button>
+
+            </div>
+
+          </article>
+        `;
+      }
+
+      function closeHomeProductPopup() {
+        $('#homeProductPopup')?.remove();
+        document.body.style.overflow = '';
+      }
+
+      function openHomeProductPopup(product) {
+        closeHomeProductPopup();
+
+        const overlay = document.createElement('div');
+        overlay.id = 'homeProductPopup';
+        overlay.className = 'product-popup-overlay';
+
+        const image =
+          product.images?.[0]?.url ||
+          'https://placehold.co/600x600?text=Memora';
+
+        const stock = Math.max(
+          0,
+          Number(product.stock) || 0
+        );
+
+        overlay.innerHTML = `
+          <div class="product-popup" role="dialog" aria-modal="true" aria-label="Product details">
+
+            <button
+              class="product-popup-close"
+              type="button"
+              aria-label="Close"
+            >×</button>
+
+            <div class="product-popup-imagebox">
+              <img
+                src="${esc(image)}"
+                alt="${esc(product.name)}"
+                decoding="async"
+              >
+            </div>
+
+            <div class="product-popup-info">
+
+              <span class="pill">
+                ${esc(product.category?.name || 'Collection')}
+              </span>
+
+              <h2>${esc(product.name)}</h2>
+
+              <div class="product-popup-price">
+                ${money(product.sellingPrice)}
+
+                ${Number(product.originalPrice) > Number(product.sellingPrice) ? `
+                  <span class="old">
+                    ${money(product.originalPrice)}
+                  </span>
+                ` : ''}
+              </div>
+
+              <p class="muted">
+                ${esc(product.description || '')}
+              </p>
+
+              <p>
+                ${stock > 0 ? `✅ In Stock (${stock})` : '❌ Out of Stock'}
+              </p>
+
+              <div class="field">
+                <label for="homePopupQty">Quantity</label>
+                <input
+                  id="homePopupQty"
+                  class="input home-popup-qty"
+                  type="number"
+                  min="1"
+                  max="${Math.max(1,stock)}"
+                  value="1"
+                  ${stock > 0 ? '' : 'disabled'}
+                >
+              </div>
+
+              <div class="product-popup-actions">
+
+                <button
+                  class="btn home-popup-add"
+                  type="button"
+                  ${stock > 0 ? '' : 'disabled'}
+                >
+                  Add to Cart
+                </button>
+
+                <button
+                  class="btn secondary home-popup-order"
+                  type="button"
+                  ${stock > 0 ? '' : 'disabled'}
+                >
+                  Order Now
+                </button>
+
+              </div>
+
+            </div>
+          </div>
+        `;
+
+        document.body.appendChild(overlay);
+        document.body.style.overflow = 'hidden';
+
+        const close = () => {
+          closeHomeProductPopup();
+          document.removeEventListener('keydown', onKey);
+        };
+
+        const onKey = event => {
+          if (event.key === 'Escape') close();
+        };
+
+        document.addEventListener('keydown', onKey);
+
+        overlay.querySelector('.product-popup-close')
+          ?.addEventListener('click', close);
+
+        overlay.addEventListener('click', event => {
+          if (event.target === overlay) close();
+        });
+
+        function quantity() {
+          const requested = Math.floor(
+            Number(overlay.querySelector('.home-popup-qty')?.value)
+          );
+
+          return Number.isFinite(requested)
+            ? Math.max(1,Math.min(stock,requested))
+            : 1;
+        }
+
+        overlay.querySelector('.home-popup-add')
+          ?.addEventListener('click', () => {
+            addHomeProductToCart(product._id,quantity());
+          });
+
+        overlay.querySelector('.home-popup-order')
+          ?.addEventListener('click', () => {
+            buyHomeProductNow(product._id,quantity());
+          });
+      }
+
+      async function addHomeProductToCart(id, quantity = 1) {
+        try {
+          await window.MC.api('/cart', {
+            method: 'POST',
+            body: JSON.stringify({
+              productId: id,
+              quantity
+            })
+          });
+
+          await window.MC.updateCartCount();
+          closeHomeProductPopup();
+          window.MC.showCartPopup();
+
+        } catch (error) {
+          const unauthorized =
+            error.status === 401 ||
+            error.code === 'UNAUTHORIZED';
+
+          if (unauthorized) {
+            location.href =
+              HOME_BASE +
+              '/frontend/login.html?next=' +
+              encodeURIComponent(
+                location.pathname + location.search
+              );
+            return;
+          }
+
+          window.MC.toast(
+            error.message || 'Product cart mein add nahi hua.',
+            'error'
+          );
+        }
+      }
+
+      function buyHomeProductNow(id, quantity = 1) {
+        location.href =
+          `${HOME_BASE}/frontend/checkout.html?buyNow=${encodeURIComponent(id)}&qty=${encodeURIComponent(quantity)}`;
+      }
+
+      function bindHomeButtons() {
+        document.querySelectorAll('.home-product-open')
+          .forEach(button => {
+            button.onclick = () => {
+              const product = homeProducts.find(
+                item => String(item._id) === String(button.dataset.id)
+              );
+
+              if (product) openHomeProductPopup(product);
+            };
+          });
+
+        document.querySelectorAll('.home-add-cart')
+          .forEach(button => {
+            button.onclick = () =>
+              addHomeProductToCart(button.dataset.id,1);
+          });
+
+        document.querySelectorAll('.home-buy-now')
+          .forEach(button => {
+            button.onclick = () =>
+              buyHomeProductNow(button.dataset.id,1);
+          });
+      }
+
+      // CATEGORY AND PRODUCT REQUESTS ARE INDEPENDENT
+
+      async function loadHomeCategories() {
+        const box = $('#categories');
+        if (!box) return;
+
+        box.innerHTML = message('Loading categories...');
+
+        try {
+          const data = await window.MC.api('/products/categories');
+
+          const categories = Array.isArray(data.categories)
+            ? data.categories
+            : [];
+
+          box.innerHTML = categories.length
+            ? categories.map(homeCategoryCard).join('')
+            : message('No categories available.');
+
+        } catch (error) {
+          console.error('Category loading error:',error);
+
+          box.innerHTML = message(
+            'Categories could not load. Please try again.',
+            'categories'
+          );
+        }
+      }
+
+      async function loadHomeProducts() {
+        const box = $('#allProducts');
+        if (!box) return;
+
+        box.innerHTML = message('Loading products...');
+
+        try {
+          const data = await window.MC.api('/products?limit=24');
+
+          homeProducts = Array.isArray(data.products)
+            ? data.products
+            : [];
+
+          box.innerHTML = homeProducts.length
+            ? homeProducts.map(homeProductCard).join('')
+            : message('Products coming soon.');
+
+          bindHomeButtons();
+
+        } catch (error) {
+          console.error('Product loading error:',error);
+
+          box.innerHTML = message(
+            'Products could not load. Please try again.',
+            'products'
+          );
+        }
+      }
+
+      function loadHomePage() {
+        loadHomeCategories();
+        loadHomeProducts();
+      }
+
+      document.addEventListener('click', event => {
+        const retry = event.target.closest('[data-retry]');
+        if (!retry) return;
+
+        if (retry.dataset.retry === 'categories') {
+          loadHomeCategories();
+        }
+
+        if (retry.dataset.retry === 'products') {
+          loadHomeProducts();
+        }
+      });
+
+      loadHomePage();
+
+    })();
+  </script>
+
+  <!-- ADMIN ANNOUNCEMENT POPUP -->
+
+  <script src="/memora-creations/frontend/js/announcement-popup.js?v=2"></script>
+
+</body>
+</html>
