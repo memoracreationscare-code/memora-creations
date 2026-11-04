@@ -1,1752 +1,388 @@
 
-/* =========================
-   MC_WISHLIST_V1
-   Account-synced wishlist buttons
-========================= */
-const mcWishlistIds = new Set();
-let mcWishlistLoaded = false;
-let mcWishlistLoading = null;
+/* Memora Creations — frontend/js/products.js — full replacement v12 */
+(() => {
+  'use strict';
+  const MC = window.MC;
+  if (!MC || typeof MC.api !== 'function') {
+    console.error('Memora common app.js must load before products.js');
+    return;
+  }
+  const BASE = '/memora-creations';
+  const $ = (selector, root = document) => root.querySelector(selector);
+  const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+  const esc = value => MC.esc(String(value ?? ''));
+  const money = value => MC.money(value);
+  const placeholder = 'https://placehold.co/600x600?text=Memora';
+  const savedIds = new Set();
+  let wishlistPromise = null;
+  let productsCache = [];
+  let popupKeyHandler = null;
 
-(function mcWishlistStyle() {
-  if (document.getElementById('mc-wishlist-style')) return;
-  const style = document.createElement('style');
-  style.id = 'mc-wishlist-style';
-  style.textContent = "\n    .premium-product-card { position: relative; }\n    .mc-wish-toggle {\n      cursor:pointer; border:1px solid #e7d6ce;\n      background:#fff; color:#71412c; border-radius:999px;\n      font-weight:700; box-shadow:0 3px 12px #0002;\n      min-height:42px; transition:transform .15s,background .15s;\n    }\n    .mc-wish-toggle:focus-visible { outline:3px solid #9b613c; outline-offset:3px; }\n    .mc-wish-toggle:hover { transform:scale(1.04); }\n    .mc-wish-toggle[aria-pressed=\"true\"] { color:#bd2649; border-color:#e5a4b1; background:#fff4f6; }\n    .mc-wish-toggle:disabled { opacity:.6; cursor:wait; }\n    .mc-wish-card { position:absolute; top:12px; right:12px; z-index:4;\n      width:44px; height:44px; font-size:29px; line-height:1; }\n    .mc-wish-single { padding:10px 18px; font-size:15px; }\n  ";
-  document.head.appendChild(style);
-})();
+  function css() {
+    if ($('#mc-wishlist-style')) return;
+    const style = document.createElement('style');
+    style.id = 'mc-wishlist-style';
+    style.textContent = `
+      .premium-product-card{position:relative}
+      .mc-wish-toggle{cursor:pointer;border:1px solid #e7d6ce;background:#fff;color:#71412c;border-radius:999px;font-weight:700;box-shadow:0 3px 12px #0002;min-height:42px}
+      .mc-wish-toggle:focus-visible{outline:3px solid #9b613c;outline-offset:3px}
+      .mc-wish-toggle[aria-pressed="true"]{color:#bd2649;border-color:#e5a4b1;background:#fff4f6}
+      .mc-wish-toggle:disabled{opacity:.6;cursor:wait}
+      .mc-wish-card{position:absolute;top:12px;right:12px;z-index:4;width:44px;height:44px;font-size:29px;line-height:1}
+      .mc-wish-single{padding:10px 18px;font-size:15px}
+      .mc-product-retry{margin-top:12px;padding:9px 16px;border:0;border-radius:9px;background:#885735;color:white;cursor:pointer;font-weight:700}
+    `;
+    document.head.appendChild(style);
+  }
+  css();
 
-function mcWishlistRefreshButtons() {
-  document.querySelectorAll('.mc-wish-toggle[data-wish-id]').forEach(button => {
-    const saved = mcWishlistIds.has(button.dataset.wishId);
-    button.setAttribute('aria-pressed', String(saved));
-    button.setAttribute('aria-label', saved ? 'Remove from wishlist' : 'Add to wishlist');
-    button.textContent = button.classList.contains('mc-wish-card')
-      ? (saved ? '♥' : '♡')
-      : (saved ? '♥ Saved to Wishlist' : '♡ Save to Wishlist');
-  });
-}
-
-async function mcWishlistLoad() {
-  if (mcWishlistLoading) return mcWishlistLoading;
-  mcWishlistLoading = (async () => {
-    try {
-      const result = await window.MC.api('/wishlist');
-      mcWishlistIds.clear();
-      for (const product of result.products || []) {
-        if (product && product._id) mcWishlistIds.add(String(product._id));
-      }
-      mcWishlistLoaded = true;
-      mcWishlistRefreshButtons();
-    } catch (error) {
-      if (error.status !== 401 && error.status !== 403) {
-        console.warn('Wishlist availability:', error.message);
-      }
-    }
-  })();
-  try { await mcWishlistLoading; } finally { mcWishlistLoading = null; }
-}
-
-document.addEventListener('click', async event => {
-  const button = event.target.closest('.mc-wish-toggle[data-wish-id]');
-  if (!button || button.disabled) return;
-  event.preventDefault();
-  event.stopPropagation();
-  const id = button.dataset.wishId;
-  if (!id) return;
-  button.disabled = true;
-  try {
-    const isSaved = mcWishlistIds.has(id);
-    await window.MC.api(isSaved ? '/wishlist/' + encodeURIComponent(id) : '/wishlist', {
-      method: isSaved ? 'DELETE' : 'POST',
-      ...(isSaved ? {} : {body: JSON.stringify({productId:id})})
+  function refreshWishlist() {
+    $$('.mc-wish-toggle[data-wish-id]').forEach(button => {
+      const saved = savedIds.has(button.dataset.wishId);
+      button.setAttribute('aria-pressed', String(saved));
+      button.setAttribute('aria-label', saved ? 'Remove from wishlist' : 'Add to wishlist');
+      button.textContent = button.classList.contains('mc-wish-card')
+        ? (saved ? '♥' : '♡')
+        : (saved ? '♥ Saved to Wishlist' : '♡ Save to Wishlist');
     });
-    if (isSaved) mcWishlistIds.delete(id); else mcWishlistIds.add(id);
-    mcWishlistLoaded = true;
-    mcWishlistRefreshButtons();
-    window.MC.toast(isSaved ? 'Wishlist se remove ho gaya' : 'Wishlist mein save ho gaya');
-  } catch (error) {
-    if (error.status === 401 || error.status === 403) {
-      const next = encodeURIComponent(location.pathname + location.search);
-      location.href = '/memora-creations/frontend/login.html?next=' + next;
-      return;
-    }
-    window.MC.toast(error.message || 'Wishlist update nahi ho payi', 'error');
-  } finally {
-    button.disabled = false;
-  }
-});
-mcWishlistLoad();
-
-
-const PRODUCTS_BASE =
-  '/memora-creations';
-
-
-let productListCache =
-  [];
-
-
-/* =========================
-   QUANTITY
-========================= */
-
-function safeQuantity(
-  value,
-  stock
-) {
-
-  const maxStock =
-    Math.max(
-      0,
-      Number(
-        stock || 0
-      )
-    );
-
-
-  if (
-    maxStock < 1
-  ) {
-
-    return 0;
-
   }
 
-
-  const quantity =
-    Math.max(
-      1,
-      Number(
-        value || 1
-      )
-    );
-
-
-  return Math.min(
-    quantity,
-    maxStock
-  );
-
-}
-
-
-/* =========================
-   DISCOUNT
-========================= */
-
-function productDiscount(
-  product
-) {
-
-  const original =
-    Number(
-      product.originalPrice ||
-      0
-    );
-
-
-  const selling =
-    Number(
-      product.sellingPrice ||
-      0
-    );
-
-
-  if (
-    original <= 0 ||
-    selling >= original
-  ) {
-
-    return 0;
-
-  }
-
-
-  return Math.round(
-    (
-      (
-        original -
-        selling
-      ) /
-      original
-    ) *
-    100
-  );
-
-}
-
-
-/* =========================
-   CLOSE POPUP
-========================= */
-
-function closeProductPopup() {
-
-  document
-    .querySelector(
-      '#productQuickView'
-    )
-    ?.remove();
-
-
-  document.body.style.overflow =
-    '';
-
-}
-
-
-/* =========================
-   QUICK VIEW
-========================= */
-
-function openProductPopup(
-  product
-) {
-
-  closeProductPopup();
-
-
-  const overlay =
-    document.createElement(
-      'div'
-    );
-
-
-  overlay.id =
-    'productQuickView';
-
-
-  overlay.className =
-    'product-popup-overlay';
-
-
-  const image =
-    product.images?.[0]?.url ||
-    'https://placehold.co/600x600?text=Memora';
-
-
-  const stock =
-    Math.max(
-      0,
-      Number(
-        product.stock || 0
-      )
-    );
-
-
-  overlay.innerHTML = `
-
-    <div class="product-popup">
-
-      <button
-        class="product-popup-close"
-        type="button"
-        aria-label="Close"
-      >
-        ×
-      </button>
-
-
-      <div class="product-popup-imagebox">
-
-        <img
-          src="${window.MC.esc(
-            image
-          )}"
-          alt="${window.MC.esc(
-            product.name || ''
-          )}"
-        >
-
-      </div>
-
-
-      <div class="product-popup-info">
-
-        <span class="pill">
-
-          ${window.MC.esc(
-            product.category?.name ||
-            'Collection'
-          )}
-
-        </span>
-
-
-        <h2>
-
-          ${window.MC.esc(
-            product.name || ''
-          )}
-
-        </h2>
-
-
-        <div class="product-popup-price">
-
-          ${window.MC.money(
-            product.sellingPrice
-          )}
-
-
-          ${
-            Number(
-              product.originalPrice
-            ) >
-            Number(
-              product.sellingPrice
-            )
-
-              ? `
-                <span class="old">
-
-                  ${window.MC.money(
-                    product.originalPrice
-                  )}
-
-                </span>
-              `
-
-              : ''
-          }
-
-        </div>
-
-
-        <p class="muted">
-
-          ${window.MC.esc(
-            product.description ||
-            ''
-          )}
-
-        </p>
-
-
-        <p>
-
-          ${
-            stock > 0
-
-              ? `✅ In Stock (${stock})`
-
-              : '❌ Out of Stock'
-          }
-
-        </p>
-
-
-        <div class="field">
-
-          <label>
-            Quantity
-          </label>
-
-
-          <input
-            class="input popup-qty"
-            type="number"
-            min="1"
-            max="${Math.max(
-              stock,
-              1
-            )}"
-            value="1"
-
-            ${
-              stock < 1
-                ? 'disabled'
-                : ''
-            }
-          >
-
-        </div>
-
-
-        <div class="product-popup-actions">
-
-          <button
-            class="btn popup-add-cart"
-            type="button"
-
-            ${
-              stock < 1
-                ? 'disabled'
-                : ''
-            }
-          >
-            Add to Cart
-          </button>
-
-
-          <button
-            class="btn secondary popup-order-now"
-            type="button"
-
-            ${
-              stock < 1
-                ? 'disabled'
-                : ''
-            }
-          >
-            Order Now
-          </button>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  `;
-
-
-  document.body.appendChild(
-    overlay
-  );
-
-
-  document.body.style.overflow =
-    'hidden';
-
-
-  overlay
-    .querySelector(
-      '.product-popup-close'
-    )
-    ?.addEventListener(
-      'click',
-      closeProductPopup
-    );
-
-
-  overlay.addEventListener(
-    'click',
-    event => {
-
-      if (
-        event.target ===
-        overlay
-      ) {
-
-        closeProductPopup();
-
-      }
-
-    }
-  );
-
-
-  const escapeHandler =
-    event => {
-
-      if (
-        event.key ===
-        'Escape'
-      ) {
-
-        closeProductPopup();
-
-
-        document
-          .removeEventListener(
-            'keydown',
-            escapeHandler
-          );
-
-      }
-
-    };
-
-
-  document.addEventListener(
-    'keydown',
-    escapeHandler
-  );
-
-
-  overlay
-    .querySelector(
-      '.popup-add-cart'
-    )
-    ?.addEventListener(
-      'click',
-      async () => {
-
-        const qty =
-          safeQuantity(
-
-            overlay
-              .querySelector(
-                '.popup-qty'
-              )
-              ?.value,
-
-            stock
-
-          );
-
-
-        if (
-          qty < 1
-        ) {
-
-          return;
-
+  function loadWishlist() {
+    if (wishlistPromise) return wishlistPromise;
+    wishlistPromise = (async () => {
+      try {
+        const result = await MC.api('/wishlist');
+        savedIds.clear();
+        for (const item of (result.products || [])) {
+          if (item?._id) savedIds.add(String(item._id));
         }
-
-
-        await addProductToCart(
-          product._id,
-          qty
-        );
-
-      }
-    );
-
-
-  overlay
-    .querySelector(
-      '.popup-order-now'
-    )
-    ?.addEventListener(
-      'click',
-      () => {
-
-        const qty =
-          safeQuantity(
-
-            overlay
-              .querySelector(
-                '.popup-qty'
-              )
-              ?.value,
-
-            stock
-
-          );
-
-
-        if (
-          qty < 1
-        ) {
-
-          return;
-
+        refreshWishlist();
+      } catch (error) {
+        if (![401, 403].includes(error?.status)) {
+          console.warn('Wishlist loading:', error?.message);
         }
-
-
-        location.href =
-          `${PRODUCTS_BASE}/frontend/checkout.html?buyNow=${encodeURIComponent(
-            product._id
-          )}&qty=${encodeURIComponent(
-            qty
-          )}`;
-
       }
-    );
-
-}
-
-
-/* =========================
-   PRODUCT CARD
-========================= */
-
-function productCard(
-  product
-) {
-
-  const stock =
-    Math.max(
-      0,
-      Number(
-        product.stock || 0
-      )
-    );
-
-
-  const discount =
-    productDiscount(
-      product
-    );
-
-
-  const image =
-    product.images?.[0]?.url ||
-    'https://placehold.co/600x600?text=Memora';
-
-
-  return `
-
-    <article class="premium-product-card">
-
-      <button
-        class="premium-product-open product-card-open"
-        type="button"
-        data-id="${window.MC.esc(
-          product._id
-        )}"
-      >
-
-        <div class="premium-image-wrap">
-
-          <img
-            class="premium-product-img"
-            src="${window.MC.esc(
-              image
-            )}"
-            alt="${window.MC.esc(
-              product.name || ''
-            )}"
-          >
-
-
-          ${
-            discount > 0
-
-              ? `
-                <span class="discount-badge">
-                  ${discount}% OFF
-                </span>
-              `
-
-              : ''
-          }
-
-
-          <span
-            class="stock-dot ${
-              stock > 0
-                ? ''
-                : 'out'
-            }"
-          ></span>
-
-        </div>
-
-
-        <div class="premium-card-content">
-
-          <div class="premium-category">
-
-            ${window.MC.esc(
-              product.category?.name ||
-              'Collection'
-            )}
-
-          </div>
-
-
-          <h3 class="premium-product-title">
-
-            ${window.MC.esc(
-              product.name || ''
-            )}
-
-          </h3>
-
-
-          <div class="premium-price-row">
-
-            <span class="premium-price">
-
-              ${window.MC.money(
-                product.sellingPrice
-              )}
-
-            </span>
-
-
-            ${
-              Number(
-                product.originalPrice
-              ) >
-              Number(
-                product.sellingPrice
-              )
-
-                ? `
-                  <span class="premium-old-price">
-
-                    ${window.MC.money(
-                      product.originalPrice
-                    )}
-
-                  </span>
-                `
-
-                : ''
-            }
-
-          </div>
-
-
-          <div
-            class="stock-text ${
-              stock > 0
-                ? ''
-                : 'out'
-            }"
-          >
-
-            ${
-              stock > 0
-                ? `In stock (${stock})`
-                : 'Out of stock'
-            }
-
-          </div>
-
-        </div>
-
-      </button>
-
-
-
-      <button type="button" class="mc-wish-toggle mc-wish-card"
-        data-wish-id="${window.MC.esc(product._id)}"
-        aria-label="Add to wishlist" aria-pressed="false" title="Save to wishlist">♡</button>
-
-      <div class="premium-card-actions">
-
-        <button
-          class="btn add"
-          type="button"
-          data-id="${window.MC.esc(
-            product._id
-          )}"
-
-          ${
-            stock < 1
-              ? 'disabled'
-              : ''
-          }
-        >
-          Add to Cart
-        </button>
-
-
-        <button
-          class="btn secondary buy"
-          type="button"
-          data-id="${window.MC.esc(
-            product._id
-          )}"
-
-          ${
-            stock < 1
-              ? 'disabled'
-              : ''
-          }
-        >
-          Order Now
-        </button>
-
-      </div>
-
-    </article>
-
-  `;
-
-}
-
-
-/* =========================
-   LOAD PRODUCTS
-========================= */
-
-async function loadProducts() {
-
-  const grid =
-    window.MC.$(
-      '#productGrid'
-    );
-
-
-  if (!grid) {
-    return;
+    })().finally(() => { wishlistPromise = null; });
+    return wishlistPromise;
   }
 
+  function goLogin() {
+    location.href = BASE + '/frontend/login.html?next=' +
+      encodeURIComponent(location.pathname + location.search);
+  }
 
-  const params =
-    new URLSearchParams(
-      location.search
-    );
-
-
-  try {
-
-    const [
-      data,
-      categoryData
-    ] =
-      await Promise.all([
-
-        window.MC.api(
-          '/products?' +
-          params.toString()
-        ),
-
-        window.MC.api(
-          '/products/categories'
-        )
-
-      ]);
-
-
-    productListCache =
-      data.products ||
-      [];
-
-
-    /* CATEGORY */
-
-    const categorySelect =
-      window.MC.$(
-        '#categorySelect'
-      );
-
-
-    if (
-      categorySelect
-    ) {
-
-      categorySelect.innerHTML =
-        '<option value="">All Categories</option>' +
-
-        (
-          categoryData.categories ||
-          []
-        )
-          .map(
-            category => `
-
-              <option
-                value="${window.MC.esc(
-                  category._id
-                )}"
-
-                ${
-                  params.get(
-                    'category'
-                  ) ===
-                  String(
-                    category._id
-                  )
-
-                    ? 'selected'
-                    : ''
-                }
-              >
-
-                ${window.MC.esc(
-                  category.name
-                )}
-
-              </option>
-
-            `
-          )
-          .join('');
-
+  document.addEventListener('click', async event => {
+    const button = event.target.closest('.mc-wish-toggle[data-wish-id]');
+    if (!button || button.disabled) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const id = button.dataset.wishId;
+    if (!id) return;
+    button.disabled = true;
+    try {
+      const wasSaved = savedIds.has(id);
+      await MC.api(wasSaved ? '/wishlist/' + encodeURIComponent(id) : '/wishlist', {
+        method: wasSaved ? 'DELETE' : 'POST',
+        ...(wasSaved ? {} : { body: JSON.stringify({ productId: id }) })
+      });
+      if (wasSaved) savedIds.delete(id);
+      else savedIds.add(id);
+      refreshWishlist();
+      MC.toast(wasSaved ? 'Wishlist se remove ho gaya' : 'Wishlist mein save ho gaya');
+    } catch (error) {
+      if ([401, 403].includes(error?.status)) return goLogin();
+      MC.toast(error?.message || 'Wishlist update nahi ho payi', 'error');
+    } finally {
+      button.disabled = false;
     }
+  });
 
+  function stockOf(product) {
+    const value = Number(product?.stock);
+    return Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
+  }
 
-    /* SEARCH */
+  function safeQuantity(value, stock) {
+    const available = Math.max(0, Math.floor(Number(stock) || 0));
+    if (available < 1) return 0;
+    const requested = Math.floor(Number(value));
+    return Math.min(available, Math.max(1, Number.isFinite(requested) ? requested : 1));
+  }
 
-    const searchInput =
-      window.MC.$(
-        '#filterForm [name="q"]'
-      );
+  function discountOf(product) {
+    const original = Number(product.originalPrice) || 0;
+    const selling = Number(product.sellingPrice) || 0;
+    if (original <= 0 || selling >= original) return 0;
+    return Math.max(0, Math.min(100, Math.round((original - selling) * 100 / original)));
+  }
 
+  function pictureOf(product) {
+    return product.images?.[0]?.url || placeholder;
+  }
 
-    if (
-      searchInput
-    ) {
+  function priceMarkup(product, prefix) {
+    return `<span class="${prefix === 'premium' ? 'premium-price' : ''}">${money(product.sellingPrice)}</span>` +
+      (Number(product.originalPrice) > Number(product.sellingPrice)
+        ? `<span class="${prefix === 'premium' ? 'premium-old-price' : 'old'}">${money(product.originalPrice)}</span>`
+        : '');
+  }
 
-      searchInput.value =
-        params.get(
-          'q'
-        ) ||
-        '';
-
+  function closePopup() {
+    $('#productQuickView')?.remove();
+    document.body.style.overflow = '';
+    if (popupKeyHandler) {
+      document.removeEventListener('keydown', popupKeyHandler);
+      popupKeyHandler = null;
     }
+  }
 
-
-    /* SORT */
-
-    const sortSelect =
-      window.MC.$(
-        '#filterForm [name="sort"]'
-      );
-
-
-    if (
-      sortSelect
-    ) {
-
-      sortSelect.value =
-        params.get(
-          'sort'
-        ) ||
-        'newest';
-
+  async function addToCart(id, quantity = 1) {
+    try {
+      await MC.api('/cart', {
+        method: 'POST',
+        body: JSON.stringify({ productId: id, quantity })
+      });
+      await MC.updateCartCount();
+      closePopup();
+      if (typeof MC.showCartPopup === 'function') MC.showCartPopup();
+      else MC.toast('Product cart mein add ho gaya', 'success');
+    } catch (error) {
+      if ([401, 403].includes(error?.status)) return goLogin();
+      MC.toast(error?.message || 'Cart update failed', 'error');
     }
+  }
 
+  function buyNow(id, quantity = 1) {
+    location.href = BASE + '/frontend/checkout.html?buyNow=' +
+      encodeURIComponent(id) + '&qty=' + encodeURIComponent(quantity);
+  }
 
-    /* COUNT */
-
-    const resultCount =
-      window.MC.$(
-        '#resultCount'
-      );
-
-
-    if (
-      resultCount
-    ) {
-
-      const total =
-        data.pagination?.total ??
-        productListCache.length;
-
-
-      resultCount.textContent =
-        `${total} ${
-          total === 1
-            ? 'product'
-            : 'products'
-        }`;
-
-    }
-
-
-    /* GRID */
-
-    grid.innerHTML =
-
-      productListCache.length
-
-        ? productListCache
-            .map(
-              productCard
-            )
-            .join('')
-
-        : `
-
-            <div class="products-empty">
-
-              <div class="products-empty-icon">
-                🛍️
-              </div>
-
-              <strong>
-                No products found
-              </strong>
-
-              <span>
-                Search ya filter change karke dobara try karein.
-              </span>
-
-            </div>
-
-          `;
-
-
-    bindProductButtons();
-    mcWishlistRefreshButtons();
-
-
-  } catch (error) {
-
-    console.error(
-      'Product loading error:',
-      error
-    );
-
-
-    grid.innerHTML = `
-
-      <div class="products-empty">
-
-        <div class="products-empty-icon">
-          ⚠️
+  function openPopup(product) {
+    closePopup();
+    const stock = stockOf(product);
+    const overlay = document.createElement('div');
+    overlay.id = 'productQuickView';
+    overlay.className = 'product-popup-overlay';
+    overlay.innerHTML = `
+      <div class="product-popup" role="dialog" aria-modal="true" aria-label="Product quick view">
+        <button class="product-popup-close" type="button" aria-label="Close">×</button>
+        <div class="product-popup-imagebox">
+          <img src="${esc(pictureOf(product))}" alt="${esc(product.name)}" decoding="async">
         </div>
-
-        <strong>
-          Products load nahi ho pa rahe hain
-        </strong>
-
-        <span>
-          Please thodi der baad dobara try karein.
-        </span>
-
-      </div>
-
-    `;
-
-
-    window.MC.toast(
-      error.message ||
-      'Products load failed.',
-      'error'
-    );
-
-  }
-
-}
-
-
-/* =========================
-   BIND PRODUCT BUTTONS
-========================= */
-
-function bindProductButtons() {
-
-
-  window.MC
-    .$$(
-      '.product-card-open'
-    )
-    .forEach(
-      button => {
-
-        button.onclick =
-          () => {
-
-            const product =
-              productListCache
-                .find(
-                  item =>
-                    String(
-                      item._id
-                    ) ===
-                    String(
-                      button.dataset.id
-                    )
-                );
-
-
-            if (
-              product
-            ) {
-
-              openProductPopup(
-                product
-              );
-
-            }
-
-          };
-
-      }
-    );
-
-
-  window.MC
-    .$$(
-      '.add'
-    )
-    .forEach(
-      button => {
-
-        button.onclick =
-          async () => {
-
-            await addProductToCart(
-              button.dataset.id,
-              1
-            );
-
-          };
-
-      }
-    );
-
-
-  window.MC
-    .$$(
-      '.buy'
-    )
-    .forEach(
-      button => {
-
-        button.onclick =
-          () => {
-
-            buyProductNow(
-              button.dataset.id
-            );
-
-          };
-
-      }
-    );
-
-}
-
-
-/* =========================
-   ADD TO CART
-========================= */
-
-async function addProductToCart(
-  id,
-  quantity = 1
-) {
-
-  try {
-
-    await window.MC.api(
-      '/cart',
-      {
-
-        method:
-          'POST',
-
-        body:
-          JSON.stringify({
-
-            productId:
-              id,
-
-            quantity:
-              Number(
-                quantity || 1
-              )
-
-          })
-
-      }
-    );
-
-
-    await window.MC
-      .updateCartCount();
-
-
-    if (
-      typeof
-        window.MC.showCartPopup ===
-      'function'
-    ) {
-
-      window.MC
-        .showCartPopup();
-
-    } else {
-
-      window.MC.toast(
-        'Product cart mein add ho gaya.',
-        'success'
-      );
-
-    }
-
-
-  } catch (error) {
-
-    const message =
-      String(
-        error.message || ''
-      )
-        .toLowerCase();
-
-
-    if (
-      message.includes(
-        'login'
-      ) ||
-      message.includes(
-        'unauthorized'
-      ) ||
-      message.includes(
-        'authentication'
-      )
-    ) {
-
-      location.href =
-        `${PRODUCTS_BASE}/frontend/login.html?next=` +
-        encodeURIComponent(
-          location.pathname +
-          location.search
-        );
-
-
-      return;
-
-    }
-
-
-    window.MC.toast(
-      error.message ||
-      'Cart update failed.',
-      'error'
-    );
-
-  }
-
-}
-
-
-/* =========================
-   BUY NOW
-========================= */
-
-function buyProductNow(
-  id
-) {
-
-  location.href =
-    `${PRODUCTS_BASE}/frontend/checkout.html?buyNow=` +
-    encodeURIComponent(
-      id
-    ) +
-    '&qty=1';
-
-}
-
-
-/* =========================
-   SINGLE PRODUCT PAGE
-========================= */
-
-async function loadSingleProduct() {
-
-  const productBox =
-    window.MC.$(
-      '#product'
-    );
-
-
-  if (!productBox) {
-    return;
-  }
-
-
-  const id =
-    new URLSearchParams(
-      location.search
-    )
-      .get('id');
-
-
-  if (!id) {
-
-    productBox.innerHTML = `
-
-      <div class="empty">
-        Product not found.
-      </div>
-
-    `;
-
-
-    return;
-
-  }
-
-
-  try {
-
-    const data =
-      await window.MC.api(
-        '/products/' +
-        encodeURIComponent(
-          id
-        )
-      );
-
-
-    const product =
-      data.product;
-
-
-    if (!product) {
-
-      productBox.innerHTML = `
-
-        <div class="empty">
-          Product not found.
-        </div>
-
-      `;
-
-
-      return;
-
-    }
-
-
-    const stock =
-      Math.max(
-        0,
-        Number(
-          product.stock || 0
-        )
-      );
-
-
-    const images =
-      product.images ||
-      [];
-
-
-    productBox.innerHTML = `
-
-      <div class="two">
-
-        <div class="gallery">
-
-          <div class="thumbs">
-
-            ${
-              images.length
-
-                ? images
-                    .map(
-                      image => `
-
-                        <img
-                          src="${window.MC.esc(
-                            image.url
-                          )}"
-                          data-url="${window.MC.esc(
-                            image.url
-                          )}"
-                          alt="${window.MC.esc(
-                            product.name || ''
-                          )}"
-                        >
-
-                      `
-                    )
-                    .join('')
-
-                : ''
-            }
-
-          </div>
-
-
-          <img
-            class="mainimage"
-            id="mainImage"
-            src="${window.MC.esc(
-              product.images?.[0]?.url ||
-              'https://placehold.co/800x800?text=Memora'
-            )}"
-            alt="${window.MC.esc(
-              product.name || ''
-            )}"
-          >
-
-        </div>
-
-
-        <div>
-
-          <span class="pill">
-
-            ${window.MC.esc(
-              product.category?.name ||
-              'Category'
-            )}
-
-          </span>
-
-
-          <h1>
-
-            ${window.MC.esc(
-              product.name || ''
-            )}
-
-          </h1>
-
-
-          <p>
-
-            ${window.MC.esc(
-              product.description ||
-              ''
-            )}
-
-          </p>
-
-
-          <div class="price">
-
-            ${window.MC.money(
-              product.sellingPrice
-            )}
-
-
-            ${
-              Number(
-                product.originalPrice
-              ) >
-              Number(
-                product.sellingPrice
-              )
-
-                ? `
-                  <span class="old">
-
-                    ${window.MC.money(
-                      product.originalPrice
-                    )}
-
-                  </span>
-                `
-
-                : ''
-            }
-
-          </div>
-
-
-          <p>
-
-            ${
-              stock > 0
-
-                ? `✅ In Stock (${stock})`
-
-                : '❌ OUT OF STOCK'
-            }
-
-          </p>
-
-
+        <div class="product-popup-info">
+          <span class="pill">${esc(product.category?.name || 'Collection')}</span>
+          <h2>${esc(product.name)}</h2>
+          <div class="product-popup-price">${priceMarkup(product)}</div>
+          <p class="muted">${esc(product.description || '')}</p>
+          <p>${stock ? `✅ In Stock (${stock})` : '❌ Out of Stock'}</p>
           <div class="field">
-
-            <label>
-              Quantity
-            </label>
-
-
-            <input
-              id="qty"
-              class="input"
-              type="number"
-              min="1"
-              max="${Math.max(
-                stock,
-                1
-              )}"
-              value="1"
-
-              ${
-                stock < 1
-                  ? 'disabled'
-                  : ''
-              }
-            >
-
+            <label for="mcPopupQty">Quantity</label>
+            <input id="mcPopupQty" class="input popup-qty" type="number" min="1" max="${Math.max(1, stock)}" value="1" ${stock ? '' : 'disabled'}>
           </div>
-
-
-          <div class="actions">
-
-            <button type="button" class="mc-wish-toggle mc-wish-single"
-              data-wish-id="${window.MC.esc(product._id)}"
-              aria-label="Add to wishlist" aria-pressed="false">♡ Save to Wishlist</button>
-
-
-            <button
-              class="btn"
-              id="addBtn"
-              type="button"
-
-              ${
-                stock < 1
-                  ? 'disabled'
-                  : ''
-              }
-            >
-              Add to Cart
-            </button>
-
-
-            <button
-              class="btn secondary"
-              id="buyBtn"
-              type="button"
-
-              ${
-                stock < 1
-                  ? 'disabled'
-                  : ''
-              }
-            >
-              Order Now
-            </button>
-
+          <div class="product-popup-actions">
+            <button class="btn popup-add-cart" type="button" ${stock ? '' : 'disabled'}>Add to Cart</button>
+            <button class="btn secondary popup-order-now" type="button" ${stock ? '' : 'disabled'}>Order Now</button>
           </div>
-
         </div>
-
-      </div>
-
-    `;
-
-
-    mcWishlistRefreshButtons();
-
-    window.MC
-      .$(
-        '.thumbs img'
-      )
-      .forEach(
-        image => {
-
-          image.onclick =
-            () => {
-
-              const mainImage =
-                window.MC.$(
-                  '#mainImage'
-                );
-
-
-              if (
-                mainImage
-              ) {
-
-                mainImage.src =
-                  image.dataset.url;
-
-              }
-
-            };
-
-        }
-      );
-
-
-    const addBtn =
-      window.MC.$(
-        '#addBtn'
-      );
-
-
-    if (
-      addBtn
-    ) {
-
-      addBtn.onclick =
-        async () => {
-
-          const qty =
-            safeQuantity(
-
-              window.MC.$(
-                '#qty'
-              )?.value,
-
-              stock
-
-            );
-
-
-          if (
-            qty < 1
-          ) {
-
-            return;
-
-          }
-
-
-          await addProductToCart(
-            product._id,
-            qty
-          );
-
-        };
-
-    }
-
-
-    const buyBtn =
-      window.MC.$(
-        '#buyBtn'
-      );
-
-
-    if (
-      buyBtn
-    ) {
-
-      buyBtn.onclick =
-        () => {
-
-          const qty =
-            safeQuantity(
-
-              window.MC.$(
-                '#qty'
-              )?.value,
-
-              stock
-
-            );
-
-
-          if (
-            qty < 1
-          ) {
-
-            return;
-
-          }
-
-
-          location.href =
-            `${PRODUCTS_BASE}/frontend/checkout.html?buyNow=${encodeURIComponent(
-              product._id
-            )}&qty=${encodeURIComponent(
-              qty
-            )}`;
-
-        };
-
-    }
-
-
-  } catch (error) {
-
-    console.error(
-      'Single product error:',
-      error
-    );
-
-
-    productBox.innerHTML = `
-
-      <div class="empty">
-        Product load nahi ho pa raha hai.
-      </div>
-
-    `;
-
-
-    window.MC.toast(
-      error.message ||
-      'Product load failed.',
-      'error'
-    );
-
+      </div>`;
+    document.body.appendChild(overlay);
+    document.body.style.overflow = 'hidden';
+    $('.product-popup-close', overlay)?.addEventListener('click', closePopup);
+    overlay.addEventListener('click', event => {
+      if (event.target === overlay) closePopup();
+    });
+    popupKeyHandler = event => {
+      if (event.key === 'Escape') closePopup();
+    };
+    document.addEventListener('keydown', popupKeyHandler);
+    const qty = () => safeQuantity($('.popup-qty', overlay)?.value, stock);
+    $('.popup-add-cart', overlay)?.addEventListener('click', () => {
+      if (qty()) addToCart(product._id, qty());
+    });
+    $('.popup-order-now', overlay)?.addEventListener('click', () => {
+      if (qty()) buyNow(product._id, qty());
+    });
   }
 
-}
+  function productCard(product) {
+    const stock = stockOf(product);
+    const discount = discountOf(product);
+    const id = esc(product._id);
+    return `
+      <article class="premium-product-card">
+        <button class="premium-product-open product-card-open" type="button" data-id="${id}">
+          <div class="premium-image-wrap">
+            <img class="premium-product-img" src="${esc(pictureOf(product))}" alt="${esc(product.name)}" loading="lazy" decoding="async">
+            ${discount > 0 ? `<span class="discount-badge">${discount}% OFF</span>` : ''}
+            <span class="stock-dot ${stock ? '' : 'out'}"></span>
+          </div>
+          <div class="premium-card-content">
+            <div class="premium-category">${esc(product.category?.name || 'Collection')}</div>
+            <h3 class="premium-product-title">${esc(product.name)}</h3>
+            <div class="premium-price-row">${priceMarkup(product, 'premium')}</div>
+            <div class="stock-text ${stock ? '' : 'out'}">${stock ? `In stock (${stock})` : 'Out of stock'}</div>
+          </div>
+        </button>
+        <button type="button" class="mc-wish-toggle mc-wish-card" data-wish-id="${id}" aria-label="Add to wishlist" aria-pressed="false" title="Save to wishlist">♡</button>
+        <div class="premium-card-actions">
+          <button class="btn add" type="button" data-id="${id}" ${stock ? '' : 'disabled'}>Add to Cart</button>
+          <button class="btn secondary buy" type="button" data-id="${id}" ${stock ? '' : 'disabled'}>Order Now</button>
+        </div>
+      </article>`;
+  }
 
+  function listError(title, retry) {
+    return `<div class="products-empty">
+      <div class="products-empty-icon">${retry ? '⚠️' : '🛍️'}</div>
+      <strong>${esc(title)}</strong>
+      <span>${retry ? 'Please check connection and try again.' : 'Search ya filter change karke dobara try karein.'}</span>
+      ${retry ? '<button class="mc-product-retry" type="button" id="mcReloadProducts">Try Again</button>' : ''}
+    </div>`;
+  }
 
-/* =========================
-   PRODUCT LIST START
-========================= */
+  function fillFilters(params) {
+    const search = $('#filterForm [name="q"]');
+    const sort = $('#filterForm [name="sort"]');
+    if (search) search.value = params.get('q') || '';
+    if (sort) sort.value = params.get('sort') || 'newest';
+  }
 
-if (
-  window.MC.$(
-    '#productGrid'
-  )
-) {
+  async function loadCategories(params) {
+    const select = $('#categorySelect');
+    if (!select) return;
+    try {
+      const result = await MC.api('/products/categories');
+      const categories = Array.isArray(result.categories) ? result.categories : [];
+      select.innerHTML = '<option value="">All Categories</option>' +
+        categories.map(category => `<option value="${esc(category._id)}">${esc(category.name)}</option>`).join('');
+      select.value = params.get('category') || '';
+    } catch (error) {
+      console.warn('Category loading:', error?.message);
+      // Keep existing options, allowing products to load even when categories fail.
+    }
+  }
 
-  const filterForm =
-    window.MC.$(
-      '#filterForm'
-    );
+  async function loadProducts() {
+    const grid = $('#productGrid');
+    if (!grid) return;
+    const params = new URLSearchParams(location.search);
+    fillFilters(params);
+    grid.innerHTML = '<div class="products-empty"><strong>Loading products...</strong></div>';
+    // Important: category and product requests are independent.
+    void loadCategories(params);
+    try {
+      const result = await MC.api('/products?' + params.toString());
+      productsCache = Array.isArray(result.products) ? result.products : [];
+      const count = $('#resultCount');
+      const total = Number(result.pagination?.total ?? productsCache.length);
+      if (count) count.textContent = `${total} ${total === 1 ? 'product' : 'products'}`;
+      grid.innerHTML = productsCache.length
+        ? productsCache.map(productCard).join('')
+        : listError('No products found', false);
+      refreshWishlist();
+    } catch (error) {
+      console.error('Product loading:', error);
+      grid.innerHTML = listError('Products load nahi ho pa rahe hain', true);
+      $('#mcReloadProducts')?.addEventListener('click', loadProducts);
+    }
+  }
 
-
-  if (
-    filterForm
-  ) {
-
-    filterForm.addEventListener(
-      'submit',
-      event => {
-
-        event.preventDefault();
-
-
-        const formData =
-          new FormData(
-            event.currentTarget
-          );
-
-
-        const params =
-          new URLSearchParams();
-
-
-        for (
-          const [
-            key,
-            value
-          ] of formData.entries()
-        ) {
-
-          const cleanValue =
-            String(
-              value || ''
-            )
-              .trim();
-
-
-          if (
-            cleanValue &&
-            !(
-              key === 'sort' &&
-              cleanValue ===
-              'newest'
-            )
-          ) {
-
-            params.set(
-              key,
-              cleanValue
-            );
-
-          }
-
-        }
-
-
-        const query =
-          params.toString();
-
-
-        location.href =
-          `${location.pathname}${
-            query
-              ? '?' + query
-              : ''
-          }`;
-
+  async function loadSingleProduct() {
+    const box = $('#product');
+    if (!box) return;
+    const id = new URLSearchParams(location.search).get('id');
+    if (!id) {
+      box.innerHTML = '<div class="empty">Product not found.</div>';
+      return;
+    }
+    box.innerHTML = '<div class="empty">Loading product...</div>';
+    try {
+      const data = await MC.api('/products/' + encodeURIComponent(id));
+      const product = data.product;
+      if (!product) {
+        box.innerHTML = '<div class="empty">Product not found.</div>';
+        return;
       }
-    );
-
+      const stock = stockOf(product);
+      const images = Array.isArray(product.images) ? product.images.filter(x => x?.url) : [];
+      box.innerHTML = `
+        <div class="two">
+          <div class="gallery">
+            <div class="thumbs">${images.map(image => `
+              <img src="${esc(image.url)}" data-url="${esc(image.url)}" alt="${esc(product.name)}" loading="lazy" decoding="async">
+            `).join('')}</div>
+            <img class="mainimage" id="mainImage" src="${esc(pictureOf(product))}" alt="${esc(product.name)}">
+          </div>
+          <div>
+            <span class="pill">${esc(product.category?.name || 'Category')}</span>
+            <h1>${esc(product.name)}</h1>
+            <p>${esc(product.description || '')}</p>
+            <div class="price">${priceMarkup(product)}</div>
+            <p>${stock ? `✅ In Stock (${stock})` : '❌ OUT OF STOCK'}</p>
+            <div class="field">
+              <label for="qty">Quantity</label>
+              <input id="qty" class="input" type="number" min="1" max="${Math.max(1, stock)}" value="1" ${stock ? '' : 'disabled'}>
+            </div>
+            <div class="actions">
+              <button type="button" class="mc-wish-toggle mc-wish-single" data-wish-id="${esc(product._id)}" aria-label="Add to wishlist" aria-pressed="false">♡ Save to Wishlist</button>
+              <button class="btn" id="addBtn" type="button" ${stock ? '' : 'disabled'}>Add to Cart</button>
+              <button class="btn secondary" id="buyBtn" type="button" ${stock ? '' : 'disabled'}>Order Now</button>
+            </div>
+          </div>
+        </div>`;
+      refreshWishlist();
+      // FIX: querySelectorAll returns a list; querySelector does not.
+      $$('.thumbs img', box).forEach(image => {
+        image.addEventListener('click', () => {
+          const mainImage = $('#mainImage', box);
+          if (mainImage) mainImage.src = image.dataset.url;
+        });
+      });
+      const quantity = () => safeQuantity($('#qty')?.value, stock);
+      $('#addBtn')?.addEventListener('click', () => {
+        if (quantity()) addToCart(product._id, quantity());
+      });
+      $('#buyBtn')?.addEventListener('click', () => {
+        if (quantity()) buyNow(product._id, quantity());
+      });
+    } catch (error) {
+      console.error('Single product loading:', error);
+      box.innerHTML = '<div class="empty">Product load nahi ho pa raha hai. <button type="button" id="mcRetrySingle">Try Again</button></div>';
+      $('#mcRetrySingle')?.addEventListener('click', loadSingleProduct);
+    }
   }
 
+  document.addEventListener('click', event => {
+    const open = event.target.closest('.product-card-open[data-id]');
+    if (open) {
+      const product = productsCache.find(item => String(item._id) === open.dataset.id);
+      if (product) openPopup(product);
+      return;
+    }
+    const add = event.target.closest('#productGrid .add[data-id]');
+    if (add && !add.disabled) {
+      addToCart(add.dataset.id, 1);
+      return;
+    }
+    const buy = event.target.closest('#productGrid .buy[data-id]');
+    if (buy && !buy.disabled) buyNow(buy.dataset.id);
+  });
 
-  loadProducts();
+  const filterForm = $('#filterForm');
+  if (filterForm && $('#productGrid')) {
+    filterForm.addEventListener('submit', event => {
+      event.preventDefault();
+      const params = new URLSearchParams();
+      for (const [key, value] of new FormData(filterForm).entries()) {
+        const clean = String(value || '').trim();
+        if (clean && !(key === 'sort' && clean === 'newest')) params.set(key, clean);
+      }
+      const query = params.toString();
+      location.href = location.pathname + (query ? '?' + query : '');
+    });
+  }
 
-}
-
-
-/* =========================
-   SINGLE PRODUCT START
-========================= */
-
-if (
-  window.MC.$(
-    '#product'
-  )
-) {
-
-  loadSingleProduct();
-
-}
+  if ($('#productGrid')) loadProducts();
+  if ($('#product')) loadSingleProduct();
+  if ($('#productGrid') || $('#product')) void loadWishlist();
+})();
