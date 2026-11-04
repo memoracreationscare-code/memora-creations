@@ -115,6 +115,53 @@ const productSchema = new mongoose.Schema({
     index: true
   },
 
+
+  /* =========================
+     SHIPROCKET PACKAGE DETAILS
+
+     Optional fields:
+     Existing products remain valid.
+
+     Weight is in kilograms.
+     Dimensions are in centimeters.
+
+     Values must represent the
+     product's packed parcel.
+  ========================= */
+
+  shippingWeightKg: {
+    type: Number,
+    min: 0.001,
+    max: 100,
+    default: undefined
+  },
+
+  packageLengthCm: {
+    type: Number,
+    min: 0.1,
+    max: 1000,
+    default: undefined
+  },
+
+  packageWidthCm: {
+    type: Number,
+    min: 0.1,
+    max: 1000,
+    default: undefined
+  },
+
+  packageHeightCm: {
+    type: Number,
+    min: 0.1,
+    max: 1000,
+    default: undefined
+  },
+
+
+  /* =========================
+     EXISTING PRODUCT FLAGS
+  ========================= */
+
   isFeatured: {
     type: Boolean,
     default: false,
@@ -159,10 +206,6 @@ productSchema.index({
   sellingPrice: 1
 });
 
-
-/* =========================
-   PERFORMANCE INDEXES
-========================= */
 
 /* Active products sorted by newest */
 
