@@ -1,56 +1,34 @@
 
 /*
- MEMORA CREATIONS
- ESTIMATED DELIVERY DATE
+  MEMORA CREATIONS
+  DELIVERY ESTIMATE - SAFE VERSION 2
 
- Safe for Checkout and Order Success
- No payment or stock changes
+  Features:
+  - Checkout PIN Code auto-fill detection
+  - Manual PIN Code updates
+  - Order Success delivery estimate
+  - No changes to orders, payments or stock
+  - No invented delivery promises
 */
 
 (() => {
   "use strict";
 
-  // Add only courier-verified PIN delivery windows.
-  // Days are calendar days after order placement.
   const VERIFIED_PIN_WINDOWS = {
-
-    // Example format only:
-    // "274304": { minDays: 4, maxDays: 7 },
-
+    // Add only verified delivery windows.
+    // Example:
+    // "274305": { minDays: 4, maxDays: 7 }
   };
 
-  const API =
-    "https://memora-creations.onrender.com/api";
+  const INDIA_TIMEZONE = "Asia/Kolkata";
 
   function validPin(pin) {
-    return /^\d{6}$/.test(String(pin || "").trim());
+    return /^\d{6}$/.test(
+      String(pin || "").trim()
+    );
   }
 
-  function addDays(date, days) {
-    const source = new Date(date);
-
-    if (!Number.isFinite(source.getTime())) {
-      return null;
-    }
-
-    const indiaDate = new Date(
-      source.getTime() + 330 * 60000
-    );
-
-    const result = new Date(Date.UTC(
-      indiaDate.getUTCFullYear(),
-      indiaDate.getUTCMonth(),
-      indiaDate.getUTCDate()
-    ));
-
-    result.setUTCDate(
-      result.getUTCDate() + days
-    );
-
-    return result;
-  }
-
-  function formatDate(date) {
+  function formatIndiaDate(date) {
     return new Intl.DateTimeFormat("en-IN", {
       day: "numeric",
       month: "short",
@@ -59,21 +37,72 @@
     }).format(date);
   }
 
-  function estimateDelivery(pin, orderDate) {
+  function indiaCalendarDate(value) {
+    const source = new Date(value);
+
+    if (!Number.isFinite(source.getTime())) {
+      return null;
+    }
+
+    const parts = new Intl.DateTimeFormat(
+      "en-CA",
+      {
+        timeZone: INDIA_TIMEZONE,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      }
+    ).formatToParts(source);
+
+    const get = type =>
+      Number(
+        parts.find(p => p.type === type)?.value
+      );
+
+    const year = get("year");
+    const month = get("month");
+    const day = get("day");
+
+    return new Date(
+      Date.UTC(year, month - 1, day)
+    );
+  }
+
+  function addDays(date, days) {
+    const result = indiaCalendarDate(date);
+
+    if (!result) return null;
+
+    result.setUTCDate(
+      result.getUTCDate() + days
+    );
+
+    return result;
+  }
+
+  function getEstimate(pin, orderDate) {
     const code = String(pin || "").trim();
 
     if (!validPin(code)) {
-      return null;
+      return {
+        message: "Enter a valid 6-digit PIN Code.",
+        available: false
+      };
     }
 
-    const range = VERIFIED_PIN_WINDOWS[code];
+    const window = VERIFIED_PIN_WINDOWS[code];
 
-    if (!range) {
-      return null;
+    if (!window) {
+      return {
+        message:
+          "Delivery date will be confirmed " +
+          "after courier serviceability check.",
+        available: false
+      };
     }
 
-    const min = Number(range.minDays);
-    const max = Number(range.maxDays);
+    const min = Number(window.minDays);
+    const max = Number(window.maxDays);
 
     if (
       !Number.isInteger(min) ||
@@ -82,25 +111,35 @@
       max < min ||
       max > 60
     ) {
-      return null;
+      return {
+        message:
+          "Delivery estimate is currently unavailable.",
+        available: false
+      };
     }
 
-    const first = addDays(orderDate, min);
-    const last = addDays(orderDate, max);
+    const start = addDays(orderDate, min);
+    const end = addDays(orderDate, max);
 
-    if (!first || !last) {
-      return null;
+    if (!start || !end) {
+      return {
+        message: "Delivery date unavailable.",
+        available: false
+      };
     }
 
-    return (
-      formatDate(first) +
-      " - " +
-      formatDate(last)
-    );
+    return {
+      available: true,
+      message:
+        "Expected Delivery: " +
+        formatIndiaDate(start) +
+        " - " +
+        formatIndiaDate(end)
+    };
   }
 
   function createPanel() {
-    const panel = document.createElement("div");
+    const panel = document.createElement("section");
 
     panel.id = "mcDeliveryEstimate";
 
@@ -113,8 +152,8 @@
       "color:#34251c"
     ].join(";");
 
-    const title = document.createElement("h3");
-    title.textContent = "Estimated Delivery";
+    const heading = document.createElement("h3");
+    heading.textContent = "Estimated Delivery";
 
     const result = document.createElement("p");
     result.className = "mc-estimate-result";
@@ -124,104 +163,130 @@
     note.textContent =
       "Delivery dates are estimates, not guarantees.";
 
-    panel.append(title, result, note);
+    panel.append(heading, result, note);
 
     return panel;
   }
 
-  function showEstimate(panel, pin, date) {
+  function updatePanel(panel, pin, date) {
     const result = panel.querySelector(
       ".mc-estimate-result"
     );
 
     if (!result) return;
 
-    const estimated = estimateDelivery(pin, date);
+    const estimate = getEstimate(pin, date);
 
-    if (estimated) {
-      result.textContent =
-        "Expected Delivery: " + estimated;
-    } else if (validPin(pin)) {
-      result.textContent =
-        "Delivery date will be confirmed " +
-        "after courier serviceability check.";
-    } else {
-      result.textContent =
-        "Enter a valid 6-digit PIN Code.";
-    }
+    result.textContent = estimate.message;
   }
 
-  function checkoutEstimate() {
+  function initializeCheckout() {
     const pinInput =
       document.getElementById("pinCode");
-
-    if (!pinInput) return;
 
     const form =
       document.getElementById("checkoutForm");
 
-    if (!form) return;
+    if (!pinInput || !form) return;
 
-    const panel = createPanel();
+    let panel =
+      document.getElementById("mcDeliveryEstimate");
 
-    const summary = form.querySelector("#summary");
+    if (!panel) {
+      panel = createPanel();
 
-    if (summary) {
-      summary.insertAdjacentElement(
-        "afterend",
-        panel
-      );
-    } else {
       pinInput.insertAdjacentElement(
         "afterend",
         panel
       );
     }
 
-    function update() {
-      showEstimate(
+    let lastPin = null;
+
+    function update(force = false) {
+      const currentPin = String(
+        pinInput.value || ""
+      ).trim();
+
+      if (!force && currentPin === lastPin) {
+        return;
+      }
+
+      lastPin = currentPin;
+
+      updatePanel(
         panel,
-        pinInput.value,
+        currentPin,
         new Date()
       );
     }
 
-    pinInput.addEventListener("input", update);
-    pinInput.addEventListener("change", update);
+    pinInput.addEventListener(
+      "input",
+      () => update(true)
+    );
 
-    update();
+    pinInput.addEventListener(
+      "change",
+      () => update(true)
+    );
+
+    window.addEventListener(
+      "pageshow",
+      () => update(true)
+    );
+
+    update(true);
+
+    // Detect asynchronous saved-address filling.
+    // This only reads the PIN and updates the UI.
+    const startedAt = Date.now();
+
+    const watcher = setInterval(() => {
+      update();
+
+      if (Date.now() - startedAt >= 20000) {
+        clearInterval(watcher);
+      }
+    }, 250);
+
+    window.addEventListener(
+      "pagehide",
+      () => clearInterval(watcher),
+      { once: true }
+    );
   }
 
-  async function successEstimate() {
+  async function initializeOrderSuccess() {
     const holder =
       document.getElementById("orderSuccess");
 
-    const id = new URLSearchParams(
+    const orderId = new URLSearchParams(
       location.search
     ).get("id");
 
-    if (!holder || !id) return;
+    if (!holder || !orderId || !window.MC?.api) {
+      return;
+    }
 
     try {
-      if (!window.MC?.api) return;
-
-      const response = await window.MC.api(
-        "/orders/" + encodeURIComponent(id)
+      const data = await window.MC.api(
+        "/orders/" + encodeURIComponent(orderId)
       );
 
-      const order = response.order;
+      const order = data.order;
 
       if (!order) return;
 
       const panel = createPanel();
 
-      showEstimate(
+      updatePanel(
         panel,
         order.shippingAddress?.pinCode,
         order.createdAt
       );
 
-      function insertPanel() {
+      function insert() {
         const card =
           holder.querySelector(".success-card");
 
@@ -238,10 +303,10 @@
         return true;
       }
 
-      if (insertPanel()) return;
+      if (insert()) return;
 
       const observer = new MutationObserver(() => {
-        if (insertPanel()) observer.disconnect();
+        if (insert()) observer.disconnect();
       });
 
       observer.observe(holder, {
@@ -249,9 +314,10 @@
         subtree: true
       });
 
-      setTimeout(() => {
-        observer.disconnect();
-      }, 15000);
+      setTimeout(
+        () => observer.disconnect(),
+        15000
+      );
 
     } catch (error) {
       console.warn(
@@ -265,11 +331,11 @@
     const path = location.pathname;
 
     if (path.endsWith("/checkout.html")) {
-      checkoutEstimate();
+      initializeCheckout();
     }
 
     if (path.endsWith("/order-success.html")) {
-      successEstimate();
+      initializeOrderSuccess();
     }
   }
 
