@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 
@@ -14,12 +15,10 @@
     Order Details | MEMORA CREATIONS
   </title>
 
-
   <link
     rel="stylesheet"
     href="/memora-creations/frontend/css/style.css?v=13"
   >
-
 
   <link
     rel="stylesheet"
@@ -32,11 +31,15 @@
 <body class="order-details-body">
 
 
+  <!-- HEADER -->
+
   <header
     id="nav"
     class="topbar"
   ></header>
 
+
+  <!-- BACKGROUND WATERMARK -->
 
   <div
     class="order-details-watermark"
@@ -46,8 +49,12 @@
   </div>
 
 
+  <!-- MAIN CONTENT -->
+
   <main class="container order-details-page">
 
+
+    <!-- BREADCRUMB -->
 
     <div class="order-details-breadcrumb">
 
@@ -64,6 +71,8 @@
     </div>
 
 
+    <!-- ORDER DETAILS -->
+
     <section
       id="order"
       class="order-details-container"
@@ -75,6 +84,13 @@
 
     </section>
 
+
+    <!-- SHIPMENT TRACKING IS ADDED
+         AUTOMATICALLY BY JAVASCRIPT
+         AFTER THE ORDER SECTION -->
+
+
+    <!-- CUSTOMER SUPPORT -->
 
     <section class="order-details-support">
 
@@ -120,6 +136,8 @@
   </main>
 
 
+  <!-- FOOTER -->
+
   <footer class="order-details-footer">
 
     <strong>
@@ -133,43 +151,103 @@
   </footer>
 
 
+  <!-- BOTTOM NAVIGATION -->
+
   <nav
     id="bottomNav"
     class="bottomnav"
   ></nav>
 
 
+  <!-- MAIN APPLICATION SCRIPT -->
+
   <script
     src="/memora-creations/frontend/js/app.js?v=10"
   ></script>
 
 
+  <!-- SECURE ORDER DETAILS AND TRACKING -->
+
   <script>
 
     (async function secureOrderDetailsPage() {
 
-      const user =
-        await window.MC.requireLogin();
+      try {
+
+        /*
+        =====================================
+          REQUIRE CUSTOMER LOGIN
+        =====================================
+        */
+
+        const user =
+          await window.MC.requireLogin();
+
+        if (!user) {
+          return;
+        }
 
 
-      if (!user) {
-        return;
-      }
+        /*
+        =====================================
+          LOAD EXISTING ORDER DETAILS
 
+          Retains:
+          - Order information
+          - Payment status
+          - Order timeline
+          - Existing actions
+          - Gift wrapping details
+        =====================================
+        */
 
-      const script =
-        document.createElement(
-          'script'
+        const orderScript =
+          document.createElement('script');
+
+        orderScript.src =
+          '/memora-creations/frontend/js/order-details.js?v=12';
+
+        document.body.appendChild(
+          orderScript
         );
 
 
-      script.src =
-        '/memora-creations/frontend/js/order-details.js?v=12';
+        /*
+        =====================================
+          LOAD NEW SHIPMENT TRACKING
+
+          Customer-specific tracking:
+          - Courier name
+          - AWB number
+          - Shipment created date
+          - Shipment status
+          - Estimated delivery date
+          - Verified tracking link
+
+          Read-only.
+          No changes to order or payment.
+        =====================================
+        */
+
+        const trackingScript =
+          document.createElement('script');
+
+        trackingScript.src =
+          '/memora-creations/frontend/js/shipment-tracking.js?v=1';
+
+        document.body.appendChild(
+          trackingScript
+        );
 
 
-      document.body.appendChild(
-        script
-      );
+      } catch (error) {
+
+        console.error(
+          'Order details initialization failed:',
+          error
+        );
+
+      }
 
     })();
 
