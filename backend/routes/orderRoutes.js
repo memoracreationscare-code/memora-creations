@@ -4,14 +4,15 @@
  MEMORA CREATIONS
  CUSTOMER ORDER ROUTES
 
- FULL REPLACEMENT CODE
-
  ORDER PREVIEW
  COD ORDER CREATION
  MY ORDERS
  ORDER DETAILS
+ SHIPMENT TRACKING
  COD ORDER CANCELLATION
  CASHFREE CANCELLATION REQUEST
+
+ Customer authentication required.
 =========================================
 */
 
@@ -22,6 +23,9 @@ const orderController =
 
 const cancellationRequestController =
   require('../controllers/cancellationRequestController');
+
+const shipmentTrackingController =
+  require('../controllers/shipmentTrackingController');
 
 const {
   requireUser
@@ -71,10 +75,8 @@ router.get(
    POST:
    /api/orders/:id/cancel-request
 
-   Only records customer's request.
-
-   Does not cancel order.
-   Does not initiate refund.
+   Does not cancel the order.
+   Does not initiate a refund.
    Does not release stock.
 ===================================== */
 
@@ -98,7 +100,28 @@ router.patch(
 
 
 /* =====================================
+   CUSTOMER SHIPMENT TRACKING
+
+   GET:
+   /api/orders/:id/shipment-tracking
+
+   Only the logged-in order owner
+   can view their shipment.
+
+   Read-only.
+   No order or payment changes.
+===================================== */
+
+router.get(
+  '/:id/shipment-tracking',
+  shipmentTrackingController.getShipmentTracking
+);
+
+
+/* =====================================
    GET SINGLE ORDER DETAILS
+
+   Keep after shipment-specific routes.
 ===================================== */
 
 router.get(
