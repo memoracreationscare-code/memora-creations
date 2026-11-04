@@ -4,17 +4,19 @@
 /*
 =========================================
  MEMORA CREATIONS
- DELIVERY PIN CODE CHECKER
+ SHIPROCKET DELIVERY PINCODE SERVICE
 
- Uses existing Shiprocket integration.
-
- - Validates Indian PIN codes
- - Checks actual courier availability
- - Supports prepaid and COD modes
- - Does not change payment or orders
- - Never invents delivery dates
+ Dynamic Product Weight
+ MongoDB Product Verification
+ COD / PREPAID Availability
+ No Payment or Order Modification
+ No Fake Delivery Dates
 =========================================
 */
+
+const mongoose = require('mongoose');
+
+const Product = require('../models/Product');
 
 const {
   configured,
@@ -22,94 +24,238 @@ const {
 } = require('./shiprocketService');
 
 
-/*
-=========================================
- VALIDATE PIN CODE
-=========================================
-*/
+/* =====================================
+   PINCODE VALIDATION
+===================================== */
 
 function normalizePincode(value) {
 
-  if (typeof value !== 'string' &&
-      typeof value !== 'number') {
+  if (
+    typeof value !== 'string' &&
+    typeof value !== 'number'
+  ) {
     return null;
   }
 
-  const pincode = String(value).trim();
+  const pin = String(value).trim();
 
-  if (!/^[1-9][0-9]{5}$/.test(pincode)) {
+  if (!/^[1-9][0-9]{5}$/.test(pin)) {
     return null;
   }
 
-  return pincode;
+  return pin;
 }
 
 
-/*
-=========================================
- SHIPPING CONFIGURATION
-
- The weight must be configured by the
- store owner based on a realistic
- packed parcel weight.
-
- No guessed parcel weight is used.
-=========================================
-*/
+/* =====================================
+   DELIVERY CONFIGURATION
+===================================== */
 
 function getDeliveryConfig() {
-
-  const weight = Number(
-    process.env.DELIVERY_CHECK_WEIGHT_KG
-  );
-
-  const pickupLocation = String(
-    process.env.SHIPROCKET_PICKUP_LOCATION ||
-    'Home'
-  ).trim();
 
   return {
 
     shiprocketConfigured: configured(),
 
-    pickupLocation,
-
-    weightKg:
-      Number.isFinite(weight) &&
-      weight > 0 &&
-      weight <= 100
-        ? weight
-        : null
+    pickupLocation: String(
+      process.env.SHIPROCKET_PICKUP_LOCATION ||
+      'Home'
+    ).trim()
 
   };
 
 }
 
 
-/*
-=========================================
- CHECK COURIER AVAILABILITY
+/* =====================================
+   READ TRUSTED PRODUCT WEIGHT
 
- available:
-   true  = Courier found
-   false = No matching courier found
-   null  = Could not verify
+   Product IDs and quantities can be
+   supplied by the customer.
 
- This is informational only.
- Final checkout and shipment require
- their own authoritative checks.
-=========================================
-*/
+   Shipping weight is ALWAYS read
+   from MongoDB, never from the client.
+===================================== */
+
+async function getTrustedPackage(items) {
+
+  if (
+    !Array.isArray(items) ||
+    items.length === 0 ||
+    items.length > 100
+  ) {
+    return {
+      success: false,
+      reason: 'INVALID_ITEMS',
+      message: 'Please select valid products.'
+    };
+  }
+
+  const merged = new Map();
+
+  for (const item of items) {
+
+    if (
+      !item ||
+      typeof item !== 'object' ||
+      Array.isArray(item)
+    ) {
+      return {
+        success: false,
+        reason: 'INVALID_ITEMS',
+        message: 'Invalid product details.'
+      };
+    }
+
+    const id = String(
+      item.productId || item.product || ''
+    );
+
+    const quantity = Number(item.quantity);
+
+    if (
+      !mongoose.isValidObjectId(id) ||
+      !Number.isInteger(quantity) ||
+      quantity < 1 ||
+      quantity > 99
+    ) {
+      return {
+        success: false,
+        reason: 'INVALID_ITEMS',
+        message: 'Invalid product or quantity.'
+      };
+    }
+
+    const previous = merged.get(id) || 0;
+
+    if (previous + quantity > 99) {
+      return {
+        success: false,
+        reason: 'INVALID_ITEMS',
+        message: 'Maximum quantity exceeded.'
+      };
+    }
+
+    merged.set(id, previous + quantity);
+  }
+
+  const ids = [...merged.keys()];
+
+  const products = await Product.find({
+    _id: {
+      $in: ids
+    },
+    isActive: true
+  })
+    .select(
+      '_id name shippingWeightKg ' +
+      'packageLengthCm packageWidthCm ' +
+      'packageHeightCm'
+    )
+    .lean();
+
+  if (products.length !== ids.length) {
+    return {
+      success: false,
+      reason: 'PRODUCT_UNAVAILABLE',
+      message:
+        'One or more products are unavailable.'
+    };
+  }
+
+  let totalWeight = 0;
+  let missingShippingDetails = false;
+
+  for (const product of products) {
+
+    const quantity = merged.get(
+      String(product._id)
+    );
+
+    const weight = Number(
+      product.shippingWeightKg
+    );
+
+    const length = Number(
+      product.packageLengthCm
+    );
+
+    const width = Number(
+      product.packageWidthCm
+    );
+
+    const height = Number(
+      product.packageHeightCm
+    );
+
+    if (
+      !Number.isFinite(weight) ||
+      weight < 0.001 ||
+      weight > 100 ||
+      !Number.isFinite(length) ||
+      length < 0.1 ||
+      !Number.isFinite(width) ||
+      width < 0.1 ||
+      !Number.isFinite(height) ||
+      height < 0.1
+    ) {
+      missingShippingDetails = true;
+      break;
+    }
+
+    totalWeight += weight * quantity;
+  }
+
+  if (missingShippingDetails) {
+    return {
+      success: false,
+      reason: 'SHIPPING_DETAILS_MISSING',
+      message:
+        'Package weight or dimensions ' +
+        'are missing for one or more products.'
+    };
+  }
+
+  totalWeight = Math.ceil(
+    totalWeight * 1000
+  ) / 1000;
+
+  if (
+    !Number.isFinite(totalWeight) ||
+    totalWeight <= 0 ||
+    totalWeight > 100
+  ) {
+    return {
+      success: false,
+      reason: 'INVALID_PACKAGE_WEIGHT',
+      message:
+        'Package weight is outside supported limits.'
+    };
+  }
+
+  return {
+    success: true,
+    weightKg: totalWeight,
+    productCount: ids.length,
+    totalQuantity: [...merged.values()]
+      .reduce((sum, quantity) => sum + quantity, 0)
+  };
+}
+
+
+/* =====================================
+   COURIER AVAILABILITY CHECK
+===================================== */
 
 async function checkDeliveryPincode({
   pincode,
-  paymentMethod = 'PREPAID'
+  paymentMethod = 'PREPAID',
+  items
 } = {}) {
 
-  const normalized =
-    normalizePincode(pincode);
+  const pin = normalizePincode(pincode);
 
-  if (!normalized) {
+  if (!pin) {
     return {
       success: false,
       available: null,
@@ -128,85 +274,78 @@ async function checkDeliveryPincode({
       success: false,
       available: null,
       reason: 'INVALID_PAYMENT_METHOD',
-      message:
-        'Invalid payment method.'
+      message: 'Invalid payment method.'
     };
   }
 
   const config = getDeliveryConfig();
 
-  if (
-    !config.shiprocketConfigured ||
-    !config.weightKg
-  ) {
+  if (!config.shiprocketConfigured) {
     return {
       success: false,
       available: null,
-      pincode: normalized,
       reason: 'DELIVERY_CHECK_NOT_CONFIGURED',
       message:
-        'Delivery availability checking is not configured yet.'
+        'Shiprocket delivery checking is not configured.'
     };
   }
 
   try {
 
-    const result =
-      await checkCourierServiceability({
+    const packageInfo = await getTrustedPackage(
+      items
+    );
 
-        pickupLocation:
-          config.pickupLocation,
+    if (!packageInfo.success) {
+      return {
+        success: false,
+        available: null,
+        pincode: pin,
+        reason: packageInfo.reason,
+        message: packageInfo.message
+      };
+    }
 
-        deliveryPincode:
-          normalized,
+    const result = await checkCourierServiceability({
 
-        weight:
-          config.weightKg,
+      pickupLocation:
+        config.pickupLocation,
 
-        cod:
-          method === 'COD'
+      deliveryPincode: pin,
 
-      });
+      weight: packageInfo.weightKg,
 
-    const couriers =
-      Array.isArray(result.couriers)
-        ? result.couriers
-        : [];
+      cod: method === 'COD'
 
-    /*
-      Courier API responses may contain
-      options that do not support COD.
+    });
 
-      Keep only matching courier modes.
-    */
+    const couriers = Array.isArray(
+      result.couriers
+    )
+      ? result.couriers
+      : [];
 
-    const matchingCouriers =
-      couriers.filter(courier => {
+    const matchingCouriers = couriers.filter(
+      courier => {
 
-        if (!courier ||
-            typeof courier !== 'object') {
+        if (
+          !courier ||
+          typeof courier !== 'object'
+        ) {
           return false;
         }
 
         if (method === 'COD') {
           return (
-            Number(courier.cod) === 1 ||
             courier.cod === true ||
-            courier.cod === 'Y'
+            courier.cod === 'Y' ||
+            Number(courier.cod) === 1
           );
         }
 
         return true;
-
-      });
-
-    /*
-      Shiprocket may return delivery
-      estimates in differing formats.
-
-      Do not turn an unverified
-      value into a promised date.
-    */
+      }
+    );
 
     const available =
       matchingCouriers.length > 0;
@@ -215,7 +354,7 @@ async function checkDeliveryPincode({
 
       success: true,
 
-      pincode: normalized,
+      pincode: pin,
 
       paymentMethod: method,
 
@@ -224,63 +363,62 @@ async function checkDeliveryPincode({
       courierCount:
         matchingCouriers.length,
 
+      packageWeightKg:
+        packageInfo.weightKg,
+
+      productCount:
+        packageInfo.productCount,
+
+      totalQuantity:
+        packageInfo.totalQuantity,
+
       estimatedDeliveryDate: null,
 
       message: available
         ? 'Delivery service is available for this PIN code.'
-        : 'No matching courier service is currently available for this PIN code.',
+        : 'No matching courier service is available for this PIN code.',
 
       note:
-        'Availability may change with parcel weight, dimensions, courier capacity and final shipment details.'
+        'This is an availability estimate, ' +
+        'not a delivery promise. Actual packed ' +
+        'parcel dimensions and final courier ' +
+        'serviceability must be verified.'
 
     };
 
   } catch (err) {
 
-    /*
-      Do not expose provider credentials
-      or internal error response bodies.
-    */
-
     console.error(
-      '[Delivery Checker] Shiprocket lookup failed:',
+      '[Delivery Checker] Lookup failed:',
       err.message
     );
 
     return {
-
       success: false,
-
       available: null,
-
-      pincode: normalized,
-
+      pincode: pin,
       paymentMethod: method,
-
       reason:
         'DELIVERY_CHECK_TEMPORARILY_UNAVAILABLE',
-
       message:
-        'Delivery availability could not be checked right now. Please try again.'
-
+        'Delivery availability could not be checked right now.'
     };
-
   }
 
 }
 
 
-/*
-=========================================
- EXPORTS
-=========================================
-*/
+/* =====================================
+   EXPORTS
+===================================== */
 
 module.exports = {
 
   normalizePincode,
 
   getDeliveryConfig,
+
+  getTrustedPackage,
 
   checkDeliveryPincode
 
