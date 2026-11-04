@@ -1,22 +1,26 @@
 
+'use strict';
+
 /*
 =========================================
  MEMORA CREATIONS
  ADMIN ROUTES
+ SHIPROCKET SAFE MODE V1
 
- DASHBOARD
- PRODUCTS
- CATEGORIES
- ORDERS
- COD PAYMENT
- CASHFREE VERIFICATION
- CASHFREE APPROVAL STATUS
- SANDBOX CANCELLATION APPROVAL
- CLOUDINARY
- SHIPROCKET
- SHIPMENT STATUS
- SHIPROCKET DRY RUN
- USERS
+ DEFAULT:
+ - Live shipment creation DISABLED
+ - Dry run ENABLED
+ - Courier rate checks ENABLED
+ - Existing shipment status ENABLED
+
+ To enable real shipments later, set
+ this Render environment variable:
+
+ SHIPROCKET_LIVE_SHIPMENTS_ENABLED=true
+
+ IMPORTANT:
+ No client-side request can override
+ this environment variable.
 =========================================
 */
 
@@ -73,9 +77,7 @@ router.post(
 
 
 /* =====================================
-   ADMIN SECURITY
-
-   ALL ROUTES BELOW REQUIRE ADMIN
+   REQUIRE ADMIN AUTHENTICATION
 ===================================== */
 
 router.use(requireAdmin);
@@ -93,9 +95,6 @@ router.use(
 
 /* =====================================
    CASHFREE SANDBOX REFUND STATUS
-
-   ADMIN AUTHENTICATED
-   READ ONLY
 ===================================== */
 
 router.get(
@@ -131,9 +130,6 @@ router.post(
 
 /* =====================================
    CASHFREE REFUND VERIFICATION
-
-   ADMIN AUTHENTICATED
-   READ ONLY
 ===================================== */
 
 router.get(
@@ -155,8 +151,6 @@ router.get(
 
 /* =====================================
    CASHFREE APPROVAL CONFIGURATION
-
-   Disabled by default.
 ===================================== */
 
 function isSandboxApprovalEnabled() {
@@ -179,16 +173,6 @@ function isSandboxApprovalEnabled() {
 
 /* =====================================
    CASHFREE APPROVAL STATUS
-
-   READ ONLY
-
-   GET:
-   /api/admin/cashfree/approval-status
-
-   Does not cancel orders,
-   modify payments,
-   release stock,
-   or initiate refunds.
 ===================================== */
 
 router.get(
@@ -199,13 +183,9 @@ router.get(
       isSandboxApprovalEnabled();
 
     return res.status(200).json({
-
       success: true,
-
       approvalEnabled: enabled,
-
       sandboxOnly: true,
-
       message: enabled
         ? 'Sandbox cancellation approval is enabled.'
         : 'Cashfree cancellation approval is disabled.'
@@ -216,8 +196,6 @@ router.get(
 
 /* =====================================
    CASHFREE PENDING INSPECTION
-
-   READ ONLY
 ===================================== */
 
 router.get(
@@ -239,7 +217,6 @@ router.get(
         minutes < 1 ||
         minutes > 10080
       ) {
-
         return res.status(400).json({
           success: false,
           message:
@@ -252,7 +229,6 @@ router.get(
         limit < 1 ||
         limit > 100
       ) {
-
         return res.status(400).json({
           success: false,
           message:
@@ -362,11 +338,6 @@ router.put(
 
 /* =====================================
    CASHFREE VERIFY PAYMENT
-
-   READ ONLY
-
-   GET:
-   /api/admin/orders/:id/cashfree/verify
 ===================================== */
 
 router.get(
@@ -378,10 +349,6 @@ router.get(
 
 /* =====================================
    SANDBOX APPROVAL SECURITY
-
-   1. Admin login required
-   2. Sandbox mode required
-   3. Explicit approval enabled
 ===================================== */
 
 function requireSandboxApproval(
@@ -393,9 +360,7 @@ function requireSandboxApproval(
   if (!isSandboxApprovalEnabled()) {
 
     return res.status(403).json({
-
       success: false,
-
       message:
         'Cashfree cancellation approval is disabled.'
     });
@@ -407,11 +372,6 @@ function requireSandboxApproval(
 
 /* =====================================
    CASHFREE CANCELLATION APPROVAL
-
-   SANDBOX ONLY
-
-   POST:
-   /api/admin/orders/:id/cashfree/approve
 ===================================== */
 
 router.post(
@@ -477,10 +437,93 @@ router.get(
 
 
 /* =====================================
+   SHIPROCKET SAFE MODE
+===================================== */
+
+function isLiveShipmentEnabled() {
+
+  return (
+    String(
+      process.env
+        .SHIPROCKET_LIVE_SHIPMENTS_ENABLED ||
+      ''
+    ).trim() === 'true'
+  );
+}
+
+
+/*
+  This middleware runs BEFORE the
+  real shipment creation controller.
+
+  When Safe Mode is ON, no call to
+  createShiprocketOrder or
+  assignCourierAwb can be made
+  through this route.
+*/
+
+function requireLiveShipmentEnabled(
+  req,
+  res,
+  next
+) {
+
+  res.set('Cache-Control', 'no-store');
+
+  if (!isLiveShipmentEnabled()) {
+
+    return res.status(403).json({
+      success: false,
+      safeMode: true,
+      liveShipmentEnabled: false,
+      shipmentCreated: false,
+      message:
+        'SHIPROCKET SAFE MODE IS ON. ' +
+        'Real shipment creation is disabled. ' +
+        'Use Test Shipment (Dry Run).'
+    });
+  }
+
+  return next();
+}
+
+
+/* =====================================
+   SHIPROCKET SAFE MODE STATUS
+
+   GET:
+   /api/admin/shiprocket/safe-mode
+
+   READ ONLY
+===================================== */
+
+router.get(
+  '/shiprocket/safe-mode',
+  (req, res) => {
+
+    res.set('Cache-Control', 'no-store');
+
+    const liveEnabled =
+      isLiveShipmentEnabled();
+
+    return res.status(200).json({
+      success: true,
+      safeMode: !liveEnabled,
+      liveShipmentEnabled: liveEnabled,
+      dryRunEnabled: true,
+      message: liveEnabled
+        ? 'Live shipment creation is enabled.'
+        : 'Safe Mode is ON. Real shipment creation is blocked.'
+    });
+  }
+);
+
+
+/* =====================================
    SHIPROCKET COURIER RATES
 
-   POST:
-   /api/admin/orders/:id/check-couriers
+   Safe Mode does not block
+   read-only courier checks.
 ===================================== */
 
 router.post(
@@ -490,27 +533,22 @@ router.post(
 
 
 /* =====================================
-   SHIPROCKET SHIPMENT CREATION
+   REAL SHIPMENT CREATION
 
-   POST:
-   /api/admin/orders/:id/create-shipment
-
-   REAL SHIPMENT OPERATION
+   Important:
+   The security middleware must
+   remain BEFORE createShipment.
 ===================================== */
 
 router.post(
   '/orders/:id/create-shipment',
+  requireLiveShipmentEnabled,
   shiprocketController.createShipment
 );
 
 
 /* =====================================
-   EXISTING SHIPROCKET SHIPMENT STATUS
-
-   GET:
-   /api/admin/orders/:id/shipment-status
-
-   ADMIN ONLY, READ ONLY
+   EXISTING SHIPMENT STATUS
 ===================================== */
 
 router.get(
@@ -522,25 +560,9 @@ router.get(
 /* =====================================
    SHIPROCKET DRY RUN
 
-   NEW SAFE TEST ENDPOINT
-
-   POST:
-   /api/admin/orders/:id/shipment-dry-run
-
-   ADMIN LOGIN REQUIRED
-
-   CHECKS:
-   - Order eligibility
-   - Package dimensions
-   - Courier availability
-   - Estimated shipping charges
-   - Estimated delivery date
-
-   DOES NOT:
-   - Create shipment
-   - Assign AWB
-   - Schedule pickup
-   - Change payment or stock
+   Safe Mode ON or OFF:
+   This endpoint never creates
+   a real shipment or AWB.
 ===================================== */
 
 router.post(
