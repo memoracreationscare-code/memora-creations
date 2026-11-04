@@ -3,6 +3,8 @@
 ====================================
  MEMORA CREATIONS
  DATABASE MODELS
+
+ SHIPROCKET TRACKING SUPPORT
 ====================================
 */
 
@@ -19,6 +21,9 @@ module.exports = {
   Cart: require('./Cart'),
 
   Order: require('./Order'),
+
+  // SHIPROCKET SHIPMENT TRACKING
+  ShipmentTracking: require('./ShipmentTracking'),
 
   // PRODUCT REVIEWS & RATINGS
   Review: require('./Review'),
