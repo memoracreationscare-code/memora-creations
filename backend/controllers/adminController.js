@@ -6,7 +6,7 @@
 
  ADMIN LOGIN / LOGOUT
  DASHBOARD
- PRODUCTS
+ PRODUCTS + SHIPPING DETAILS
  CATEGORIES
  ORDERS
  USERS
@@ -50,6 +50,97 @@ const {
 const {
   releaseStock
 } = require('../services/orderService');
+
+const {
+  releaseCoupon
+} = require('../services/couponUsageService');
+
+
+/* =====================================
+   OPTIONAL SHIPPING DETAILS
+===================================== */
+
+const SHIPPING_FIELDS = {
+  shippingWeightKg: {
+    min: 0.001,
+    max: 100
+  },
+  packageLengthCm: {
+    min: 0.1,
+    max: 1000
+  },
+  packageWidthCm: {
+    min: 0.1,
+    max: 1000
+  },
+  packageHeightCm: {
+    min: 0.1,
+    max: 1000
+  }
+};
+
+function readShippingDetails(body) {
+  const details = {};
+
+  for (const [key, range] of Object.entries(
+    SHIPPING_FIELDS
+  )) {
+    if (
+      !Object.prototype.hasOwnProperty.call(
+        body,
+        key
+      )
+    ) {
+      continue;
+    }
+
+    const raw = body[key];
+
+    if (
+      raw === null ||
+      raw === undefined ||
+      raw === ''
+    ) {
+      details[key] = undefined;
+      continue;
+    }
+
+    if (
+      typeof raw !== 'string' &&
+      typeof raw !== 'number'
+    ) {
+      throw error(
+        400,
+        `Invalid ${key}.`
+      );
+    }
+
+    if (
+      typeof raw === 'string' &&
+      raw.trim() === ''
+    ) {
+      details[key] = undefined;
+      continue;
+    }
+
+    const value = Number(raw);
+
+    if (
+      !Number.isFinite(value) ||
+      value < range.min ||
+      value > range.max
+    ) {
+      throw error(
+        400,
+        `Invalid ${key}.`
+      );
+    }
+
+    details[key] = value;
+  }
+
+  return details;
+}
 
 
 /* =====================================
@@ -135,13 +226,7 @@ const logout = asyncHandler(async (_req, res) => {
 /* =====================================
    ADMIN DASHBOARD
 
-   IMPORTANT:
    Only SUCCESS payments count as sales.
-
-   Delivered COD with COD_PENDING
-   does NOT count as received revenue.
-
-   Cashfree and Razorpay require SUCCESS.
 ===================================== */
 
 const dashboard = asyncHandler(async (_req, res) => {
@@ -172,18 +257,6 @@ const dashboard = asyncHandler(async (_req, res) => {
       }
     }),
 
-    /*
-      REVENUE FIX
-
-      Count only successfully
-      confirmed payments.
-
-      COD must be manually marked
-      SUCCESS after cash receipt.
-
-      Exclude cancelled orders.
-    */
-
     Order.aggregate([
       {
         $match: {
@@ -203,10 +276,6 @@ const dashboard = asyncHandler(async (_req, res) => {
       }
     ]),
 
-    /*
-      ONLINE SUCCESSFUL PAYMENTS
-    */
-
     Order.countDocuments({
       paymentMethod: {
         $in: [
@@ -220,17 +289,9 @@ const dashboard = asyncHandler(async (_req, res) => {
       }
     }),
 
-    /*
-      TOTAL COD ORDERS
-    */
-
     Order.countDocuments({
       paymentMethod: 'COD'
     }),
-
-    /*
-      PENDING ORDERS
-    */
 
     Order.countDocuments({
       orderStatus: {
@@ -241,33 +302,17 @@ const dashboard = asyncHandler(async (_req, res) => {
       }
     }),
 
-    /*
-      DELIVERED ORDERS
-    */
-
     Order.countDocuments({
       orderStatus: 'Delivered'
     }),
-
-    /*
-      CANCELLED ORDERS
-    */
 
     Order.countDocuments({
       orderStatus: 'Cancelled'
     }),
 
-    /*
-      ACTIVE PRODUCTS
-    */
-
     Product.countDocuments({
       isActive: true
     }),
-
-    /*
-      LOW STOCK
-    */
 
     Product.countDocuments({
       isActive: true,
@@ -275,10 +320,6 @@ const dashboard = asyncHandler(async (_req, res) => {
         $lte: 5
       }
     }),
-
-    /*
-      ACTIVE CUSTOMERS
-    */
 
     User.countDocuments({
       isActive: true
@@ -386,6 +427,9 @@ const createProduct = asyncHandler(async (req, res) => {
     );
   }
 
+  const shippingDetails =
+    readShippingDetails(b);
+
   const productId =
     `MC-P-${Date.now()
       .toString(36)
@@ -433,6 +477,8 @@ const createProduct = asyncHandler(async (req, res) => {
     ),
 
     stock: Number(b.stock),
+
+    ...shippingDetails,
 
     isFeatured: Boolean(
       b.isFeatured
@@ -496,6 +542,15 @@ const updateProduct = asyncHandler(async (req, res) => {
     }
 
   });
+
+  const shippingDetails =
+    readShippingDetails(body);
+
+  for (const [key, value] of Object.entries(
+    shippingDetails
+  )) {
+    product[key] = value;
+  }
 
   if (body.name !== undefined) {
 
@@ -787,9 +842,6 @@ const listOrders = asyncHandler(async (req, res) => {
    UPDATE ORDER
 ===================================== */
 
-// Admin COD Coupon Release service
-const { releaseCoupon } = require('../services/couponUsageService');
-
 const updateOrder = asyncHandler(async (req, res) => {
 
   const status = req.body.orderStatus;
@@ -896,13 +948,17 @@ const updateOrder = asyncHandler(async (req, res) => {
         );
 
         // MC_ADMIN_COD_COUPON_RELEASE_V1
-        // Release reserved coupon once, inside order transaction.
+        // Release reserved coupon once,
+        // inside the order transaction.
         if (
           order.paymentMethod === 'COD' &&
           order.couponUsageReserved === true
         ) {
           if (!order.coupon) {
-            throw error(409, 'Order coupon reservation is incomplete.');
+            throw error(
+              409,
+              'Order coupon reservation is incomplete.'
+            );
           }
 
           await releaseCoupon({
