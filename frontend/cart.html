@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 
@@ -14,12 +15,14 @@
     Your Cart | MEMORA CREATIONS
   </title>
 
+  <!-- COMMON CSS -->
 
   <link
     rel="stylesheet"
     href="/memora-creations/frontend/css/style.css?v=13"
   >
 
+  <!-- CART CSS -->
 
   <link
     rel="stylesheet"
@@ -31,6 +34,7 @@
 
 <body class="cart-page-body">
 
+  <!-- NAVBAR -->
 
   <header
     id="nav"
@@ -50,7 +54,6 @@
 
   <main class="container cart-page">
 
-
     <!-- HEADER -->
 
     <section class="cart-hero">
@@ -59,11 +62,9 @@
         YOUR SELECTION
       </div>
 
-
       <h1>
         Shopping Cart
       </h1>
-
 
       <p>
         Review your products before proceeding
@@ -77,8 +78,7 @@
 
     <section class="cart-layout">
 
-
-      <!-- LEFT -->
+      <!-- LEFT SIDE -->
 
       <div>
 
@@ -96,7 +96,6 @@
 
           </div>
 
-
           <a
             href="/memora-creations/frontend/products.html"
             class="continue-shopping"
@@ -106,6 +105,7 @@
 
         </div>
 
+        <!-- CART PRODUCTS -->
 
         <div id="cartItems">
 
@@ -118,7 +118,7 @@
       </div>
 
 
-      <!-- RIGHT -->
+      <!-- RIGHT SIDE -->
 
       <aside class="cart-summary-wrap">
 
@@ -134,12 +134,10 @@
 
         </div>
 
-
         <div
           id="summary"
           class="cart-summary"
         ></div>
-
 
         <div class="cart-secure-box">
 
@@ -166,7 +164,7 @@
     </section>
 
 
-    <!-- TRUST -->
+    <!-- TRUST SECTION -->
 
     <section class="cart-trust">
 
@@ -244,7 +242,6 @@
 
       </div>
 
-
       <div class="cart-help-actions">
 
         <a
@@ -254,7 +251,6 @@
         >
           💬 WhatsApp
         </a>
-
 
         <a
           href="mailto:memoracreations.care@gmail.com?subject=Cart%20Support%20-%20Memora%20Creations"
@@ -284,48 +280,31 @@
   </footer>
 
 
+  <!-- MOBILE NAVIGATION -->
+
   <nav
     id="bottomNav"
     class="bottomnav"
   ></nav>
 
 
+  <!-- COMMON JS -->
+
   <script
-    src="/memora-creations/frontend/js/app.js?v=10"
+    src="/memora-creations/frontend/js/app.js?v=13"
   ></script>
 
 
-  <script>
+  <!--
+    CART JS
 
-    (async function secureCartPage() {
+    cart.js already calls requireLogin().
+    Do not call requireLogin() again here.
+  -->
 
-      const user =
-        await window.MC.requireLogin();
-
-
-      if (!user) {
-        return;
-      }
-
-
-      const script =
-        document.createElement(
-          'script'
-        );
-
-
-      script.src =
-        '/memora-creations/frontend/js/cart.js?v=10';
-
-
-      document.body.appendChild(
-        script
-      );
-
-    })();
-
-  </script>
+  <script
+    src="/memora-creations/frontend/js/cart.js?v=10"
+  ></script>
 
 </body>
-
 </html>
