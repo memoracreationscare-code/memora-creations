@@ -14,7 +14,8 @@
  SANDBOX CANCELLATION APPROVAL
  CLOUDINARY
  SHIPROCKET
- SHIPROCKET SHIPMENT STATUS
+ SHIPMENT STATUS
+ SHIPROCKET DRY RUN
  USERS
 =========================================
 */
@@ -33,6 +34,9 @@ const cloudinaryController =
 
 const shiprocketController =
   require('../controllers/shiprocketController');
+
+const shiprocketDryRunController =
+  require('../controllers/shiprocketDryRunController');
 
 const codPaymentController =
   require('../controllers/codPaymentController');
@@ -77,14 +81,9 @@ router.post(
 router.use(requireAdmin);
 
 
-// ================================
-// ADMIN COUPON MANAGEMENT
-// GET /api/admin/coupons
-// GET /api/admin/coupons/report
-// POST /api/admin/coupons
-// PUT /api/admin/coupons/:id
-// PATCH /api/admin/coupons/:id/status
-// ================================
+/* =====================================
+   ADMIN COUPON MANAGEMENT
+===================================== */
 
 router.use(
   '/coupons',
@@ -92,12 +91,12 @@ router.use(
 );
 
 
-// =====================================
-// CASHFREE SANDBOX REFUND STATUS
-//
-// Protected by requireAdmin.
-// Read-only safety status.
-// =====================================
+/* =====================================
+   CASHFREE SANDBOX REFUND STATUS
+
+   ADMIN AUTHENTICATED
+   READ ONLY
+===================================== */
 
 router.get(
   '/cashfree/refunds/initiation-status',
@@ -110,19 +109,18 @@ router.get(
 
     res.set('Cache-Control', 'no-store');
 
-    res.json({
+    return res.json({
       success: true,
       enabled,
       sandboxOnly: true
     });
-
   }
 );
 
 
-// =====================================
-// CASHFREE SANDBOX REFUND INITIATION
-// =====================================
+/* =====================================
+   CASHFREE SANDBOX REFUND INITIATION
+===================================== */
 
 router.post(
   '/orders/:id/cashfree/refunds/initiate',
@@ -131,12 +129,12 @@ router.post(
 );
 
 
-// =====================================
-// CASHFREE REFUND VERIFICATION
-//
-// ADMIN AUTHENTICATED
-// READ ONLY
-// =====================================
+/* =====================================
+   CASHFREE REFUND VERIFICATION
+
+   ADMIN AUTHENTICATED
+   READ ONLY
+===================================== */
 
 router.get(
   '/orders/:id/cashfree/refunds',
@@ -176,7 +174,6 @@ function isSandboxApprovalEnabled() {
     environment === 'sandbox' &&
     enabled
   );
-
 }
 
 
@@ -212,9 +209,7 @@ router.get(
       message: enabled
         ? 'Sandbox cancellation approval is enabled.'
         : 'Cashfree cancellation approval is disabled.'
-
     });
-
   }
 );
 
@@ -250,7 +245,6 @@ router.get(
           message:
             'Minutes must be between 1 and 10080.'
         });
-
       }
 
       if (
@@ -264,7 +258,6 @@ router.get(
           message:
             'Limit must be between 1 and 100.'
         });
-
       }
 
       const report =
@@ -292,9 +285,7 @@ router.get(
         message:
           'Cashfree inspection failed.'
       });
-
     }
-
   }
 );
 
@@ -407,13 +398,10 @@ function requireSandboxApproval(
 
       message:
         'Cashfree cancellation approval is disabled.'
-
     });
-
   }
 
   return next();
-
 }
 
 
@@ -424,14 +412,6 @@ function requireSandboxApproval(
 
    POST:
    /api/admin/orders/:id/cashfree/approve
-
-   BODY:
-   {
-     "confirmed": true
-   }
-
-   Controller verifies Cashfree and
-   performs the database transaction.
 ===================================== */
 
 router.post(
@@ -468,7 +448,6 @@ router.get(
           message:
             'Shiprocket credentials are not configured.'
         });
-
       }
 
       await getShiprocketToken();
@@ -492,9 +471,7 @@ router.get(
           err.message ||
           'Shiprocket connection failed.'
       });
-
     }
-
   }
 );
 
@@ -518,7 +495,7 @@ router.post(
    POST:
    /api/admin/orders/:id/create-shipment
 
-   Real shipment operation.
+   REAL SHIPMENT OPERATION
 ===================================== */
 
 router.post(
@@ -528,30 +505,47 @@ router.post(
 
 
 /* =====================================
-   SHIPROCKET SHIPMENT STATUS
-
-   NEW ROUTE
+   EXISTING SHIPROCKET SHIPMENT STATUS
 
    GET:
    /api/admin/orders/:id/shipment-status
 
-   ADMIN LOGIN REQUIRED
-
-   READ ONLY:
-   - Existing shipment
-   - Courier name
-   - Shipment ID
-   - AWB number
-   - Estimated delivery date
-   - Shipment status
-
-   Does not create a shipment.
-   Does not change orders or payments.
+   ADMIN ONLY, READ ONLY
 ===================================== */
 
 router.get(
   '/orders/:id/shipment-status',
   shiprocketController.getShipmentStatus
+);
+
+
+/* =====================================
+   SHIPROCKET DRY RUN
+
+   NEW SAFE TEST ENDPOINT
+
+   POST:
+   /api/admin/orders/:id/shipment-dry-run
+
+   ADMIN LOGIN REQUIRED
+
+   CHECKS:
+   - Order eligibility
+   - Package dimensions
+   - Courier availability
+   - Estimated shipping charges
+   - Estimated delivery date
+
+   DOES NOT:
+   - Create shipment
+   - Assign AWB
+   - Schedule pickup
+   - Change payment or stock
+===================================== */
+
+router.post(
+  '/orders/:id/shipment-dry-run',
+  shiprocketDryRunController.dryRunShipment
 );
 
 
