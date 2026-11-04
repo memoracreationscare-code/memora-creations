@@ -11,6 +11,8 @@
  SHIPROCKET COURIER RATES
  SHIPMENT CREATION + AWB
  PACKAGING LABEL
+
+ FIX: BREADTH -> WIDTH
 =========================================
 */
 
@@ -295,6 +297,7 @@ function confirmShiprocketShipment() {
         ) {
           event.preventDefault();
           confirmButton.focus();
+
         } else if (
           !event.shiftKey &&
           document.activeElement === confirmButton
@@ -605,6 +608,31 @@ function shipmentFormHtml(order) {
 
 
 /* =====================================
+   SHIPMENT PAYLOAD
+
+   FIX:
+   HTML form uses "breadth".
+   Backend expects "width".
+
+   Both courier check and shipment
+   creation use the same payload.
+===================================== */
+
+function getShipmentPayload(form) {
+
+  const body = Object.fromEntries(
+    new FormData(form)
+  );
+
+  body.width = body.breadth;
+
+  delete body.breadth;
+
+  return body;
+}
+
+
+/* =====================================
    CHECK COURIER RATES
 ===================================== */
 
@@ -629,9 +657,7 @@ async function checkCourierRates(form, order) {
   const createButton =
     form.querySelector('.create-shipment');
 
-  const body = Object.fromEntries(
-    new FormData(form)
-  );
+  const body = getShipmentPayload(form);
 
   checkButton.disabled = true;
   createButton.disabled = true;
@@ -800,9 +826,7 @@ async function submitShipmentForm(form, order) {
   const result =
     form.querySelector('.shipment-result');
 
-  const body = Object.fromEntries(
-    new FormData(form)
-  );
+  const body = getShipmentPayload(form);
 
   button.disabled = true;
   button.textContent = 'Creating Shipment...';
