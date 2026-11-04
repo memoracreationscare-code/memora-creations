@@ -4,34 +4,40 @@
 /*
 =========================================
  MEMORA CREATIONS
- SHIPROCKET SAFE MODE UI V1
+ SHIPROCKET SAFE MODE UI V2
 
- - Reads actual backend safe mode
- - Shows Safe Mode ON/OFF
- - Blocks live shipment UI when safe
- - Keeps Dry Run available
- - Keeps Courier Rates available
- - Fails closed if API cannot be read
+ - Reads real backend safe-mode status
+ - Shows Safe Mode ON / Live Mode ON
+ - Disables real shipment creation
+ - Allows Dry Run and courier checks
+ - Blocks forms while status is unknown
+ - Avoids MutationObserver update loops
 
- Backend is the final security layer.
+ SECURITY:
+ Backend authorization is authoritative.
 =========================================
 */
 
 (() => {
-
   const API_PATH = '/admin/shiprocket/safe-mode';
 
   let liveEnabled = false;
   let statusKnown = false;
 
-  function element(tag, text) {
-    const node = document.createElement(tag);
+  function makeElement(tag, text) {
+    const element = document.createElement(tag);
 
     if (text !== undefined) {
-      node.textContent = text;
+      element.textContent = String(text);
     }
 
-    return node;
+    return element;
+  }
+
+  function setTextIfChanged(node, value) {
+    if (node && node.textContent !== value) {
+      node.textContent = value;
+    }
   }
 
   function getShipmentForms() {
@@ -40,20 +46,26 @@
     );
   }
 
-  function makeStatusPanel(form) {
+  function ensureStatusPanel(form) {
     const parent = form.parentElement;
 
-    if (!parent) return null;
+    if (!parent) {
+      return null;
+    }
 
     let panel = parent.querySelector(
       '.mc-safe-mode-panel'
     );
 
-    if (panel) return panel;
+    if (panel) {
+      return panel;
+    }
 
-    panel = element('div');
+    panel = makeElement('div');
 
     panel.className = 'mc-safe-mode-panel';
+
+    panel.setAttribute('role', 'status');
 
     panel.style.cssText = [
       'padding:14px',
@@ -75,74 +87,128 @@
   }
 
   function updateForm(form) {
-    const button = form.querySelector(
+    const panel = ensureStatusPanel(form);
+
+    if (!panel) {
+      return;
+    }
+
+    const liveButton = form.querySelector(
       '.create-shipment'
     );
 
-    const panel = makeStatusPanel(form);
-
-    if (!panel) return;
+    let message;
 
     if (!statusKnown) {
-      panel.textContent =
-        'Checking Shiprocket Safe Mode...';
+      message =
+        'SHIPROCKET SAFE MODE — ' +
+        'Verifying backend status. ' +
+        'Real shipment creation is unavailable.';
     } else if (liveEnabled) {
-      panel.textContent =
-        'LIVE MODE ON — Real shipment creation ' +
-        'is enabled on the backend.';
+      message =
+        'LIVE MODE ON — Real Shiprocket ' +
+        'shipment creation is enabled. ' +
+        'Only use this when sending a parcel.';
     } else {
-      panel.textContent =
-        'SAFE MODE ON — Real shipment and AWB ' +
-        'creation are disabled. Use Test ' +
-        'Shipment (Dry Run).';
+      message =
+        'SAFE MODE ON — Real shipment ' +
+        'and AWB creation are disabled. ' +
+        'Use Test Shipment (Dry Run).';
     }
 
-    panel.style.background =
+    setTextIfChanged(panel, message);
+
+    const background =
       statusKnown && liveEnabled
         ? '#fff0ed'
         : '#fff8e8';
 
-    if (button && !liveEnabled) {
-      if (!button.disabled) {
-        button.disabled = true;
+    if (panel.style.background !== background) {
+      panel.style.background = background;
+    }
+
+    if (!liveButton) {
+      return;
+    }
+
+    if (!statusKnown || !liveEnabled) {
+      if (!liveButton.disabled) {
+        liveButton.disabled = true;
       }
 
-      if (
-        button.textContent !==
-        'Live Shipment Disabled (Safe Mode)'
-      ) {
-        button.textContent =
-          'Live Shipment Disabled (Safe Mode)';
-      }
+      const buttonLabel = statusKnown
+        ? 'Live Shipment Disabled (Safe Mode)'
+        : 'Checking Shipment Safe Mode...';
+
+      setTextIfChanged(
+        liveButton,
+        buttonLabel
+      );
+
+      liveButton.dataset.mcSafeModeLocked =
+        'true';
+
+      return;
+    }
+
+    /*
+      In Live Mode, the original
+      Orders script controls this
+      button. Courier selection and
+      order eligibility must still
+      be checked before enabling it.
+    */
+
+    if (
+      liveButton.dataset.mcSafeModeLocked ===
+      'true'
+    ) {
+      delete liveButton.dataset.mcSafeModeLocked;
+
+      setTextIfChanged(
+        liveButton,
+        'Create Shipment + AWB'
+      );
+
+      /*
+        Do not automatically enable:
+        the original Orders script
+        enables after courier checks.
+      */
     }
   }
 
   function updateAllForms() {
-    for (const form of getShipmentForms()) {
-      updateForm(form);
-    }
+    getShipmentForms().forEach(updateForm);
   }
 
   /*
-    Prevent clicks and form submission
-    while Live Mode is not confirmed.
-    Backend additionally blocks this.
+    Capture clicks and submissions
+    before the original Orders script
+    handles them.
   */
 
   document.addEventListener(
     'click',
     event => {
-      const button = event.target.closest(
+      const button = event.target.closest?.(
         '.create-shipment'
       );
 
-      if (!button || liveEnabled) return;
+      if (!button || (statusKnown && liveEnabled)) {
+        return;
+      }
 
       event.preventDefault();
       event.stopImmediatePropagation();
 
-      updateAllForms();
+      const form = button.closest(
+        'form.shipment-form'
+      );
 
+      if (form) {
+        updateForm(form);
+      }
     },
     true
   );
@@ -154,7 +220,7 @@
 
       if (
         !form.matches?.('form.shipment-form') ||
-        liveEnabled
+        (statusKnown && liveEnabled)
       ) {
         return;
       }
@@ -163,31 +229,32 @@
       event.stopImmediatePropagation();
 
       updateForm(form);
-
     },
     true
   );
 
   /*
-    The original Orders script may
-    enable the button after it loads
-    courier rates.
+    New order-detail forms are inserted
+    dynamically.
 
-    Watch for newly rendered forms and
-    button updates, then lock it again.
+    Only update text if it has changed.
+    This prevents repeated mutations
+    and observer feedback loops.
   */
 
-  let updating = false;
+  let isUpdating = false;
 
   const observer = new MutationObserver(() => {
-    if (updating) return;
+    if (isUpdating) {
+      return;
+    }
 
-    updating = true;
+    isUpdating = true;
 
     try {
       updateAllForms();
     } finally {
-      updating = false;
+      isUpdating = false;
     }
   });
 
@@ -199,22 +266,23 @@
   });
 
   /*
-    Only the authenticated admin
-    can read this backend status.
+    The backend is the source of truth.
 
-    An API error is treated as
-    Safe Mode ON in the UI.
+    A failed or invalid response does
+    not permit live shipment creation.
   */
 
   async function loadSafeMode() {
-    statusKnown = false;
     liveEnabled = false;
+    statusKnown = false;
 
     updateAllForms();
 
     try {
       if (!window.MC?.api) {
-        throw new Error('API unavailable.');
+        throw new Error(
+          'Admin API is unavailable.'
+        );
       }
 
       const data = await window.MC.api(
@@ -250,5 +318,4 @@
   }
 
   loadSafeMode();
-
 })();
