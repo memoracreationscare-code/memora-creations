@@ -2,17 +2,13 @@
 /*
 =========================================
  MEMORA CREATIONS
- COMMON FRONTEND APP - FAST NAVIGATION
+ COMMON FRONTEND APP
 
- FEATURES:
- - Shared authentication request
- - Navigation loading improvement
- - Customer login and logout
- - Cart counter
- - Product search
- - Mobile navigation
- - Wishlist navigation
- - Safe API error handling
+ Login, Navigation, Cart, Search,
+ Wishlist and Account Functions
+
+ FIX:
+ No false logout on slow Render backend.
 =========================================
 */
 
@@ -42,6 +38,7 @@ class ApiError extends Error {
     } = {}
   ) {
     super(message);
+
     this.name = 'ApiError';
     this.status = status;
     this.code = code;
@@ -80,7 +77,12 @@ async function api(path, options = {}) {
 
     throw new ApiError(
       'Server se connection nahi ho pa raha hai. Internet check karke dobara try karein.',
-      { code: 'NETWORK_ERROR' }
+      {
+        code:
+          error?.name === 'AbortError'
+            ? 'REQUEST_ABORTED'
+            : 'NETWORK_ERROR'
+      }
     );
   }
 
@@ -112,9 +114,11 @@ async function api(path, options = {}) {
 
     const fallback =
       errors[response.status] ||
-      (response.status >= 500
-        ? 'Server me temporary problem hai.'
-        : 'Something went wrong. Please try again.');
+      (
+        response.status >= 500
+          ? 'Server me temporary problem hai.'
+          : 'Something went wrong. Please try again.'
+      );
 
     throw new ApiError(
       data.message || fallback,
@@ -249,15 +253,14 @@ function showCartPopup() {
 
 
 /* =====================================
-   FAST CURRENT USER
+   SHARED CURRENT USER REQUEST
 
-   One shared authentication request.
-   Concurrent navbar requests reuse it.
+   Render Free backend may wake slowly.
+   Never interpret a 4-second delay
+   as proof that the user logged out.
 
-   Request timeout avoids indefinitely
-   blocking navigation.
-
-   Authentication cookie is not changed.
+   Failed network requests are not cached
+   permanently within the page.
 ===================================== */
 
 let mcCurrentUserPromise = null;
@@ -267,46 +270,47 @@ async function currentUser() {
     return mcCurrentUserPromise;
   }
 
-  mcCurrentUserPromise = (async () => {
-    const controller = new AbortController();
-
-    const timeout = setTimeout(() => {
-      controller.abort();
-    }, 4000);
-
+  const request = (async () => {
     try {
-      const data = await api('/auth/me', {
-        signal: controller.signal
-      });
+      const data = await api('/auth/me');
 
       return data.user || null;
 
     } catch (error) {
       if (
-        error?.status !== 401 &&
-        error?.code !== 'UNAUTHORIZED'
+        error?.status === 401 ||
+        error?.code === 'UNAUTHORIZED'
       ) {
-        console.warn(
-          'User authentication temporarily unavailable:',
-          error.message
-        );
+        return null;
       }
 
-      return null;
+      console.warn(
+        'Current user check unavailable:',
+        error.message
+      );
 
-    } finally {
-      clearTimeout(timeout);
+      // Backend/network failure must not
+      // be treated as a confirmed logout.
+      throw error;
     }
   })();
 
-  return mcCurrentUserPromise;
+  mcCurrentUserPromise = request;
+
+  try {
+    return await request;
+  } catch (error) {
+    mcCurrentUserPromise = null;
+    throw error;
+  }
 }
 
 
 /* =====================================
    REQUIRE LOGIN
 
-   Do not redirect on network errors.
+   Redirect only when login is
+   actually missing or expired.
 ===================================== */
 
 async function requireLogin() {
@@ -402,11 +406,13 @@ async function nav() {
 
   if (!element) return;
 
-  const user = await currentUser();
+  /*
+   Display basic navigation immediately.
+   This does not require Render backend.
+  */
 
   element.innerHTML = `
     <div class="container nav">
-
       <a
         class="brand"
         href="${BASE}/frontend/index.html"
@@ -427,7 +433,7 @@ async function nav() {
         </button>
       </form>
 
-      <div class="navlinks">
+      <div class="navlinks" id="mcDesktopNavLinks">
         <a href="${BASE}/frontend/index.html">
           Home
         </a>
@@ -436,45 +442,9 @@ async function nav() {
           Products
         </a>
 
-        ${
-          user
-            ? `
-              <a
-                href="${BASE}/frontend/wishlist.html"
-                aria-label="My Wishlist"
-              >
-                ♥ Wishlist
-              </a>
-
-              <a href="${BASE}/frontend/orders.html">
-                Orders
-              </a>
-
-              <a href="${BASE}/frontend/profile.html">
-                Profile
-              </a>
-
-              <a href="${BASE}/frontend/cart.html">
-                Cart (<span id="cartCount">0</span>)
-              </a>
-
-              <button
-                class="btn secondary"
-                id="logoutBtn"
-                type="button"
-              >
-                Logout
-              </button>
-            `
-            : `
-              <a
-                class="btn secondary"
-                href="${BASE}/frontend/login.html"
-              >
-                Login
-              </a>
-            `
-        }
+        <span class="muted" aria-live="polite">
+          Checking account...
+        </span>
       </div>
     </div>
   `;
@@ -493,6 +463,103 @@ async function nav() {
       '/frontend/products.html?q=' +
       encodeURIComponent(query);
   });
+
+  let user;
+
+  try {
+    user = await currentUser();
+  } catch (error) {
+    const links = $('#mcDesktopNavLinks');
+
+    if (links) {
+      links.innerHTML = `
+        <a href="${BASE}/frontend/index.html">
+          Home
+        </a>
+
+        <a href="${BASE}/frontend/products.html">
+          Products
+        </a>
+
+        <span class="muted" aria-live="polite">
+          Account temporarily unavailable
+        </span>
+
+        <button
+          class="btn secondary"
+          id="mcRetryNav"
+          type="button"
+        >
+          Retry
+        </button>
+      `;
+
+      $('#mcRetryNav')?.addEventListener(
+        'click',
+        () => {
+          mcCurrentUserPromise = null;
+          nav();
+          bottomNav();
+        }
+      );
+    }
+
+    return;
+  }
+
+  const links = $('#mcDesktopNavLinks');
+
+  if (!links) return;
+
+  links.innerHTML = `
+    <a href="${BASE}/frontend/index.html">
+      Home
+    </a>
+
+    <a href="${BASE}/frontend/products.html">
+      Products
+    </a>
+
+    ${
+      user
+        ? `
+          <a
+            href="${BASE}/frontend/wishlist.html"
+            aria-label="My Wishlist"
+          >
+            ♥ Wishlist
+          </a>
+
+          <a href="${BASE}/frontend/orders.html">
+            Orders
+          </a>
+
+          <a href="${BASE}/frontend/profile.html">
+            Profile
+          </a>
+
+          <a href="${BASE}/frontend/cart.html">
+            Cart (<span id="cartCount">0</span>)
+          </a>
+
+          <button
+            class="btn secondary"
+            id="logoutBtn"
+            type="button"
+          >
+            Logout
+          </button>
+        `
+        : `
+          <a
+            class="btn secondary"
+            href="${BASE}/frontend/login.html"
+          >
+            Login
+          </a>
+        `
+    }
+  `;
 
   $('#logoutBtn')?.addEventListener(
     'click',
@@ -528,7 +595,10 @@ async function updateCartCount() {
 
   } catch (error) {
     console.warn('Cart count unavailable:', error);
-    element.textContent = '0';
+
+    if (element) {
+      element.textContent = '0';
+    }
   }
 }
 
@@ -542,8 +612,6 @@ async function bottomNav() {
 
   if (!element) return;
 
-  const user = await currentUser();
-
   document.body.classList.add('has-bottomnav');
 
   const path = location.pathname.toLowerCase();
@@ -551,7 +619,7 @@ async function bottomNav() {
   const active = page =>
     path.includes(page) ? 'active' : '';
 
-  element.innerHTML = `
+  const homeLink = `
     <a
       href="${BASE}/frontend/index.html"
       class="${active('/frontend/index.html')}"
@@ -569,7 +637,9 @@ async function bottomNav() {
       </svg>
       <span>Home</span>
     </a>
+  `;
 
+  const productsLink = `
     <a
       href="${BASE}/frontend/products.html"
       class="${active('/frontend/products.html')}"
@@ -589,6 +659,62 @@ async function bottomNav() {
       </svg>
       <span>Products</span>
     </a>
+  `;
+
+  // Home and Products are available
+  // even if the backend is waking up.
+
+  element.innerHTML =
+    homeLink +
+    productsLink +
+    `
+      <span
+        class="mc-account-loading"
+        aria-live="polite"
+        style="font-size:11px;text-align:center"
+      >
+        Loading...
+      </span>
+    `;
+
+  let user;
+
+  try {
+    user = await currentUser();
+  } catch (error) {
+    element.innerHTML =
+      homeLink +
+      productsLink +
+      `
+        <button
+          id="mcRetryMobile"
+          type="button"
+          style="
+            border:0;
+            background:transparent;
+            font-size:11px;
+            color:inherit;
+          "
+        >
+          Retry
+        </button>
+      `;
+
+    $('#mcRetryMobile')?.addEventListener(
+      'click',
+      () => {
+        mcCurrentUserPromise = null;
+        nav();
+        bottomNav();
+      }
+    );
+
+    return;
+  }
+
+  element.innerHTML = `
+    ${homeLink}
+    ${productsLink}
 
     ${
       user
