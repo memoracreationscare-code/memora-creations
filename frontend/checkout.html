@@ -1,6 +1,7 @@
 
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
 
@@ -11,54 +12,77 @@
 
   <title>Checkout | MEMORA CREATIONS</title>
 
+  <!-- COMMON CSS -->
   <link
     rel="stylesheet"
     href="/memora-creations/frontend/css/style.css?v=13"
   >
 
+  <!-- CHECKOUT CSS -->
   <link
     rel="stylesheet"
     href="/memora-creations/frontend/css/checkout.css?v=1"
   >
 
+  <!-- PERFORMANCE -->
+  <link
+    rel="preconnect"
+    href="https://memora-creations.onrender.com"
+    crossorigin
+  >
+
+  <!-- EXTRA CHECKOUT STYLES -->
   <style>
+
+    /* WHATSAPP CONSENT */
+
     .mc-whatsapp-consent {
       display: flex;
       align-items: flex-start;
       gap: 13px;
+
       padding: 17px;
       margin: 20px 0;
+
       border: 1px solid #d9e8dd;
       border-radius: 14px;
+
       background: #f4faf5;
     }
 
     .mc-whatsapp-consent input {
       width: 19px;
       height: 19px;
+
       margin: 3px 0 0;
+
       accent-color: #178b4b;
       flex-shrink: 0;
     }
 
     .mc-whatsapp-consent strong {
       display: block;
+
       color: #215b39;
       font-size: 14px;
+
       margin-bottom: 6px;
     }
 
     .mc-whatsapp-consent p {
       color: #536b5b;
       font-size: 12px;
+
       line-height: 1.6;
       margin: 0;
     }
 
     .mc-whatsapp-consent small {
       display: block;
+
       color: #786853;
       font-size: 11px;
+
       margin-top: 8px;
     }
 
@@ -67,16 +91,21 @@
     .mc-gift-wrap {
       margin: 25px 0;
       padding: 22px;
+
       border-radius: 18px;
       border: 1px solid #ebd6c5;
+
       background: linear-gradient(
-        135deg, #fff9f3, #f8ebdf
+        135deg,
+        #fff9f3,
+        #f8ebdf
       );
     }
 
     .mc-gift-wrap-head {
       display: flex;
       align-items: flex-start;
+
       gap: 13px;
       margin-bottom: 19px;
     }
@@ -89,20 +118,24 @@
     .mc-gift-wrap-kicker {
       font-size: 11px;
       font-weight: 800;
+
       letter-spacing: .13em;
       color: #936548;
     }
 
     .mc-gift-wrap h2 {
       margin: 5px 0 6px;
+
       color: #39261b;
       font-size: 23px;
+
       font-family: Georgia, serif;
     }
 
     .mc-gift-wrap-head p {
       font-size: 13px;
       color: #7d6654;
+
       margin: 0;
       line-height: 1.7;
     }
@@ -110,16 +143,21 @@
     .mc-gift-wrap-choice {
       display: grid;
       gap: 10px;
+
       margin-bottom: 17px;
     }
 
     .mc-gift-wrap-option {
       display: flex;
       gap: 12px;
+
       align-items: center;
+
       background: #fff;
+
       border: 1px solid #e4cdb9;
       border-radius: 12px;
+
       padding: 15px;
     }
 
@@ -150,16 +188,20 @@
 
     .mc-gift-wrap-price {
       margin-left: auto;
+
       font-size: 18px;
       font-weight: 900;
+
       color: #805338;
       white-space: nowrap;
     }
 
     .mc-gift-wrap-message-label {
       display: block;
+
       font-size: 13px;
       font-weight: 800;
+
       margin-bottom: 7px;
       color: #4c3324;
     }
@@ -167,39 +209,61 @@
     .mc-gift-wrap textarea {
       box-sizing: border-box;
       width: 100%;
+
       border: 1px solid #e2cdb9;
       border-radius: 10px;
+
       min-height: 80px;
       padding: 12px;
+
       background: #faf5f0;
       color: #846e5f;
+
       font: inherit;
     }
 
     .mc-gift-wrap-note {
       font-size: 12px;
       line-height: 1.7;
+
       color: #866346;
+
       margin: 13px 0 0;
     }
 
     .mc-gift-wrap-test {
       display: inline-block;
+
       padding: 6px 10px;
       margin-top: 10px;
+
       border-radius: 8px;
+
       background: #fff;
       border: 1px solid #e6d0b7;
+
       font-size: 11px;
       font-weight: 800;
+
       color: #84583a;
     }
+
   </style>
+
 </head>
+
 
 <body class="checkout-body">
 
-  <header id="nav" class="topbar"></header>
+  <!-- NAVIGATION -->
+
+  <header
+    id="nav"
+    class="topbar"
+  ></header>
+
+
+  <!-- WATERMARK -->
 
   <div
     class="checkout-watermark"
@@ -208,40 +272,67 @@
     MEMORA CREATIONS
   </div>
 
+
+  <!-- MAIN CHECKOUT -->
+
   <main
     id="checkout"
     class="container checkout-page"
   >
 
+    <!-- CHECKOUT HERO -->
+
     <section class="checkout-hero">
+
       <div class="checkout-eyebrow">
         SECURE CHECKOUT
       </div>
 
-      <h1>Complete Your Order</h1>
+      <h1>
+        Complete Your Order
+      </h1>
 
       <p>
         Delivery address check karein,
         payment method select karein
         aur order confirm karein.
       </p>
+
     </section>
 
+
+    <!-- CHECKOUT LAYOUT -->
+
     <section class="checkout-layout">
+
+      <!-- CHECKOUT FORM -->
 
       <form
         id="checkoutForm"
         class="checkout-card"
       >
 
+        <!-- ADDRESS HEADING -->
+
         <div class="checkout-card-heading">
+
           <span>STEP 1</span>
-          <h2>Delivery Address</h2>
+
+          <h2>
+            Delivery Address
+          </h2>
+
         </div>
+
+
+        <!-- ADDRESS FIELDS -->
 
         <div class="checkout-form-grid">
 
+          <!-- NAME -->
+
           <div class="checkout-field">
+
             <label for="fullName">
               Full Name *
             </label>
@@ -253,9 +344,14 @@
               autocomplete="name"
               placeholder="Your full name"
             >
+
           </div>
 
+
+          <!-- MOBILE -->
+
           <div class="checkout-field">
+
             <label for="mobile">
               Mobile Number *
             </label>
@@ -271,9 +367,14 @@
               autocomplete="tel"
               placeholder="10 digit mobile number"
             >
+
           </div>
 
+
+          <!-- ADDRESS -->
+
           <div class="checkout-field full">
+
             <label for="addressLine">
               Full Address *
             </label>
@@ -285,9 +386,14 @@
               autocomplete="street-address"
               placeholder="House no, street, village / locality"
             ></textarea>
+
           </div>
 
+
+          <!-- PINCODE -->
+
           <div class="checkout-field">
+
             <label for="pinCode">
               PIN Code *
             </label>
@@ -302,9 +408,14 @@
               autocomplete="postal-code"
               placeholder="6 digit PIN"
             >
+
           </div>
 
+
+          <!-- CITY -->
+
           <div class="checkout-field">
+
             <label for="city">
               City
             </label>
@@ -315,9 +426,14 @@
               autocomplete="address-level2"
               placeholder="City"
             >
+
           </div>
 
+
+          <!-- STATE -->
+
           <div class="checkout-field full">
+
             <label for="state">
               State
             </label>
@@ -328,23 +444,33 @@
               autocomplete="address-level1"
               placeholder="State"
             >
+
           </div>
 
         </div>
 
 
-        <!-- PAYMENT METHODS -->
+        <!-- PAYMENT METHOD -->
 
         <div class="payment-section">
 
           <div class="checkout-card-heading">
+
             <span>STEP 2</span>
-            <h2>Payment Method</h2>
+
+            <h2>
+              Payment Method
+            </h2>
+
           </div>
+
 
           <div class="payment-options">
 
+            <!-- COD -->
+
             <label class="payment-option">
+
               <input
                 type="radio"
                 name="paymentMethod"
@@ -353,17 +479,30 @@
               >
 
               <span class="payment-radio-ui"></span>
-              <span class="payment-icon">💵</span>
+
+              <span class="payment-icon">
+                💵
+              </span>
 
               <span class="payment-copy">
-                <strong>Cash on Delivery</strong>
+
+                <strong>
+                  Cash on Delivery
+                </strong>
+
                 <small>
                   Pay when your order arrives
                 </small>
+
               </span>
+
             </label>
 
+
+            <!-- CASHFREE -->
+
             <label class="payment-option">
+
               <input
                 type="radio"
                 name="paymentMethod"
@@ -371,14 +510,23 @@
               >
 
               <span class="payment-radio-ui"></span>
-              <span class="payment-icon">💳</span>
+
+              <span class="payment-icon">
+                💳
+              </span>
 
               <span class="payment-copy">
-                <strong>Pay Online</strong>
+
+                <strong>
+                  Pay Online
+                </strong>
+
                 <small>
                   Secure online payment via Cashfree
                 </small>
+
               </span>
+
             </label>
 
           </div>
@@ -386,23 +534,7 @@
         </div>
 
 
-        <!--
-        =====================================
-        GIFT WRAPPING
-        PRICING DISPLAY PREPARATION
-
-        NORMAL  : INR 0
-        STANDARD: INR 29
-        PREMIUM : INR 59
-
-        IMPORTANT:
-        PAID OPTIONS ARE DISABLED.
-
-        Do not remove "disabled" until
-        separate sandbox environment and
-        complete testing are ready.
-        =====================================
-        -->
+        <!-- GIFT WRAPPING -->
 
         <section
           class="mc-gift-wrap"
@@ -411,6 +543,7 @@
         >
 
           <div class="mc-gift-wrap-head">
+
             <span
               class="mc-gift-wrap-emoji"
               aria-hidden="true"
@@ -419,6 +552,7 @@
             </span>
 
             <div>
+
               <span class="mc-gift-wrap-kicker">
                 AN EXTRA SPECIAL TOUCH
               </span>
@@ -432,15 +566,18 @@
                 and a personal message
                 for someone special.
               </p>
+
             </div>
+
           </div>
 
 
           <div class="mc-gift-wrap-choice">
 
-            <!-- NORMAL PACKAGING -->
+            <!-- FREE PACKAGING -->
 
             <label class="mc-gift-wrap-option">
+
               <input
                 type="radio"
                 name="mcGiftWrappingPreview"
@@ -450,6 +587,7 @@
               >
 
               <span>
+
                 <strong>
                   Normal Packaging
                 </strong>
@@ -457,19 +595,22 @@
                 <small>
                   Included with your order
                 </small>
+
               </span>
 
               <span class="mc-gift-wrap-price">
                 FREE
               </span>
+
             </label>
 
 
-            <!-- STANDARD WRAPPING -->
+            <!-- STANDARD GIFT WRAPPING -->
 
             <label
               class="mc-gift-wrap-option mc-gift-wrap-muted"
             >
+
               <input
                 type="radio"
                 name="mcGiftWrappingPreview"
@@ -478,6 +619,7 @@
               >
 
               <span>
+
                 <strong>
                   Standard Gift Wrapping
                 </strong>
@@ -486,19 +628,22 @@
                   Gift Paper + Ribbon +
                   Personal Message
                 </small>
+
               </span>
 
               <span class="mc-gift-wrap-price">
                 ₹29
               </span>
+
             </label>
 
 
-            <!-- PREMIUM WRAPPING -->
+            <!-- PREMIUM GIFT WRAPPING -->
 
             <label
               class="mc-gift-wrap-option mc-gift-wrap-muted"
             >
+
               <input
                 type="radio"
                 name="mcGiftWrappingPreview"
@@ -507,6 +652,7 @@
               >
 
               <span>
+
                 <strong>
                   Premium Gift Wrapping
                 </strong>
@@ -515,17 +661,19 @@
                   Premium Packing + Ribbon +
                   Message Card
                 </small>
+
               </span>
 
               <span class="mc-gift-wrap-price">
                 ₹59
               </span>
+
             </label>
 
           </div>
 
 
-          <!-- PERSONAL MESSAGE -->
+          <!-- GIFT MESSAGE -->
 
           <label
             for="mcGiftMessagePreview"
@@ -547,6 +695,7 @@
             Gift Wrapping — Testing Preparation
           </div>
 
+
           <p class="mc-gift-wrap-note">
             Gift wrapping is not available
             for purchase yet. The prices
@@ -559,12 +708,7 @@
         </section>
 
 
-        <!--
-        =====================================
-        WHATSAPP ORDER UPDATES
-        UI ONLY - NOT YET ACTIVE
-        =====================================
-        -->
+        <!-- WHATSAPP NOTIFICATIONS -->
 
         <div class="mc-whatsapp-consent">
 
@@ -577,6 +721,7 @@
           >
 
           <div>
+
             <label for="whatsappOptIn">
               <strong>
                 WhatsApp Order Updates
@@ -596,14 +741,16 @@
               notification setup
               is completed.
             </small>
+
           </div>
 
         </div>
 
 
-        <!-- CONFIRMATION -->
+        <!-- TERMS CONFIRMATION -->
 
         <label class="checkout-confirm">
+
           <input
             id="terms"
             type="checkbox"
@@ -615,7 +762,11 @@
             address and order details
             are correct.
           </span>
+
         </label>
+
+
+        <!-- SUBMIT BUTTON -->
 
         <button
           class="checkout-submit"
@@ -624,6 +775,9 @@
           Place Order / Pay
           <span>→</span>
         </button>
+
+
+        <!-- SECURITY NOTE -->
 
         <div class="checkout-safe-note">
           🔒 Secure checkout • Your details
@@ -638,29 +792,52 @@
       <aside class="checkout-summary-card">
 
         <div class="checkout-summary-heading">
-          <span>YOUR ORDER</span>
-          <h2>Order Summary</h2>
+
+          <span>
+            YOUR ORDER
+          </span>
+
+          <h2>
+            Order Summary
+          </h2>
+
         </div>
 
 
-        <!-- COUPON -->
+        <!-- COUPON AREA -->
 
         <section
           id="mcCouponArea"
           hidden
           aria-label="Apply coupon"
-          style="margin:18px 0;padding:16px;border:1px solid #e4d3c3;background:#fffaf5;border-radius:13px"
+          style="
+            margin:18px 0;
+            padding:16px;
+            border:1px solid #e4d3c3;
+            background:#fffaf5;
+            border-radius:13px;
+          "
         >
 
           <label
             for="mcCouponInput"
-            style="display:block;font-weight:750;color:#593922;margin-bottom:8px"
+            style="
+              display:block;
+              font-weight:750;
+              color:#593922;
+              margin-bottom:8px;
+            "
           >
             Have a coupon code?
           </label>
 
+
           <div
-            style="display:flex;gap:8px;flex-wrap:wrap"
+            style="
+              display:flex;
+              gap:8px;
+              flex-wrap:wrap;
+            "
           >
 
             <input
@@ -669,13 +846,27 @@
               maxlength="30"
               autocomplete="off"
               placeholder="WELCOME10"
-              style="min-width:135px;flex:1;padding:12px;border:1px solid #dfcdbd;border-radius:9px;text-transform:uppercase"
+              style="
+                min-width:135px;
+                flex:1;
+                padding:12px;
+                border:1px solid #dfcdbd;
+                border-radius:9px;
+                text-transform:uppercase;
+              "
             >
 
             <button
               type="button"
               id="mcCouponApply"
-              style="border:0;border-radius:9px;background:#805338;color:white;font-weight:700;padding:12px 17px"
+              style="
+                border:0;
+                border-radius:9px;
+                background:#805338;
+                color:white;
+                font-weight:700;
+                padding:12px 17px;
+              "
             >
               Apply
             </button>
@@ -684,29 +875,45 @@
               type="button"
               id="mcCouponRemove"
               hidden
-              style="border:1px solid #d7c5b5;border-radius:9px;background:white;color:#72492c;font-weight:700;padding:12px 15px"
+              style="
+                border:1px solid #d7c5b5;
+                border-radius:9px;
+                background:white;
+                color:#72492c;
+                font-weight:700;
+                padding:12px 15px;
+              "
             >
               Remove
             </button>
 
           </div>
 
+
           <p
             id="mcCouponMessage"
             role="status"
-            style="margin:8px 0 0;font-size:13px;color:#766252"
+            style="
+              margin:8px 0 0;
+              font-size:13px;
+              color:#766252;
+            "
           ></p>
 
         </section>
 
 
+        <!-- ORDER TOTALS -->
+
         <div
           id="summary"
           class="checkout-summary"
         >
+
           <div class="checkout-loading">
             Loading order...
           </div>
+
         </div>
 
 
@@ -718,15 +925,24 @@
         </a>
 
 
+        <!-- HELP -->
+
         <div class="checkout-support-mini">
+
           <div>💬</div>
 
           <p>
-            <strong>Need help?</strong>
+
+            <strong>
+              Need help?
+            </strong>
+
             <span>
               Contact Memora Customer Care
             </span>
+
           </p>
+
         </div>
 
       </aside>
@@ -739,21 +955,47 @@
     <section class="checkout-trust">
 
       <div>
+
         <span>🔒</span>
-        <strong>Secure Checkout</strong>
-        <small>Safe ordering process</small>
+
+        <strong>
+          Secure Checkout
+        </strong>
+
+        <small>
+          Safe ordering process
+        </small>
+
       </div>
 
+
       <div>
+
         <span>✓</span>
-        <strong>Quality Products</strong>
-        <small>Carefully selected items</small>
+
+        <strong>
+          Quality Products
+        </strong>
+
+        <small>
+          Carefully selected items
+        </small>
+
       </div>
 
+
       <div>
+
         <span>💬</span>
-        <strong>Customer Support</strong>
-        <small>WhatsApp & email help</small>
+
+        <strong>
+          Customer Support
+        </strong>
+
+        <small>
+          WhatsApp & email help
+        </small>
+
       </div>
 
     </section>
@@ -764,7 +1006,10 @@
     <section class="checkout-help">
 
       <div>
-        <small>MEMORA CUSTOMER CARE</small>
+
+        <small>
+          MEMORA CUSTOMER CARE
+        </small>
 
         <h2>
           Having trouble placing your order?
@@ -775,7 +1020,9 @@
           address se related help ke liye
           humse contact karein.
         </p>
+
       </div>
+
 
       <div class="checkout-help-actions">
 
@@ -816,76 +1063,46 @@
   </footer>
 
 
+  <!-- MOBILE NAVIGATION -->
+
   <nav
     id="bottomNav"
     class="bottomnav"
   ></nav>
 
 
-  <!-- CASHFREE SDK -->
+  <!-- CASHFREE PAYMENT SDK -->
 
   <script
     src="https://sdk.cashfree.com/js/v3/cashfree.js"
   ></script>
 
 
-  <!-- COMMON APPLICATION -->
+  <!-- UPDATED COMMON APPLICATION -->
 
   <script
-    src="/memora-creations/frontend/js/app.js?v=10"
+    src="/memora-creations/frontend/js/app.js?v=13"
   ></script>
 
 
-  <!-- SECURE CHECKOUT INITIALIZATION -->
+  <!--
+    CHECKOUT SCRIPT
 
-  <script>
-    (async function secureCheckoutPage() {
-      try {
-        const user =
-          await window.MC.requireLogin();
+    checkout.js already performs
+    customer login verification.
 
-        if (!user) {
-          return;
-        }
+    The duplicate authentication
+    request has been removed here.
 
-        const script =
-          document.createElement("script");
+    COD, Cashfree, coupon,
+    order summary and gift
+    logic remain in checkout.js.
+  -->
 
-        script.src =
-          "/memora-creations/frontend/js/checkout.js?v=17";
-
-        script.onerror = function () {
-          document.getElementById(
-            "summary"
-          ).textContent =
-            "Checkout load nahi hua. Page refresh karein.";
-
-          document.querySelector(
-            ".checkout-submit"
-          ).disabled = true;
-        };
-
-        document.body.appendChild(
-          script
-        );
-
-      } catch (error) {
-        console.error(
-          "Checkout initialization failed:",
-          error
-        );
-
-        document.getElementById(
-          "summary"
-        ).textContent =
-          "Checkout load nahi hua. Page refresh karein.";
-
-        document.querySelector(
-          ".checkout-submit"
-        ).disabled = true;
-      }
-    })();
-  </script>
+  <script
+    src="/memora-creations/frontend/js/checkout.js?v=17"
+  ></script>
 
 </body>
+
 </html>
