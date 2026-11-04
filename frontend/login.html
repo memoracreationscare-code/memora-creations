@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 
@@ -9,1891 +10,766 @@
     content="width=device-width, initial-scale=1"
   >
 
-  <title>
-    Login - MEMORA CREATIONS
-  </title>
+  <title>Login | MEMORA CREATIONS</title>
 
+  <meta
+    name="description"
+    content="Login to your Memora Creations account."
+  >
+
+  <!-- COMMON STYLE -->
   <link
     rel="stylesheet"
     href="/memora-creations/frontend/css/style.css?v=13"
   >
 
-  <style>
+  <link
+    rel="preconnect"
+    href="https://memora-creations.onrender.com"
+    crossorigin
+  >
 
-    *{
-      box-sizing:border-box;
+  <style>
+    * {
+      box-sizing: border-box;
     }
 
     html,
-    body{
-      min-height:100%;
+    body {
+      min-height: 100%;
     }
 
-    body{
-      min-height:100vh;
-      margin:0;
-
+    body {
+      margin: 0;
+      min-height: 100vh;
       background:
         radial-gradient(
           circle at top left,
-          rgba(138,90,59,.18) 0,
-          rgba(138,90,59,.18) 90px,
-          transparent 91px
+          rgba(138,90,59,.12),
+          transparent 280px
         ),
-
-        radial-gradient(
-          circle at bottom right,
-          rgba(138,90,59,.18) 0,
-          rgba(138,90,59,.18) 90px,
-          transparent 91px
-        ),
-
         linear-gradient(
           135deg,
           #f8f4ef,
           #fdfaf7
         );
-
-      color:#1f1c19;
+      color: #2b1b12;
+      font-family: Arial, sans-serif;
     }
 
-
-    .login-page{
-      min-height:100vh;
-
-      display:flex;
-      align-items:center;
-      justify-content:center;
-
-      padding:30px 16px;
-
-      position:relative;
-      overflow:hidden;
+    .login-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 35px 16px;
     }
 
-
-    .login-page::before,
-    .login-page::after{
-      content:"";
-
-      position:absolute;
-
-      width:220px;
-      height:220px;
-
-      border:
-        2px solid
-        rgba(138,90,59,.18);
-
-      border-radius:50%;
-
-      pointer-events:none;
-    }
-
-
-    .login-page::before{
-      top:-90px;
-      left:-90px;
-    }
-
-
-    .login-page::after{
-      right:-90px;
-      bottom:-90px;
-    }
-
-
-    .login-card{
-      width:min(1120px,100%);
-
-      display:grid;
-
-      grid-template-columns:
-        420px 1fr;
-
-      background:#fffaf6;
-
-      border:
-        1px solid #eadfd5;
-
-      border-radius:28px;
-
-      overflow:hidden;
-
+    .login-layout {
+      width: min(1050px,100%);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-radius: 28px;
+      overflow: hidden;
+      background: white;
+      border: 1px solid #eadfd5;
       box-shadow:
-        0 24px 60px
-        rgba(47,31,18,.14);
-
-      position:relative;
-
-      z-index:1;
+        0 25px 65px rgba(61,39,23,.12);
     }
 
-
-    /* =========================
-       LEFT SIDE
-    ========================= */
-
-    .login-left{
-      position:relative;
-
-      padding:28px;
-
+    .login-brand-panel {
+      padding: 55px 38px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
       background:
         linear-gradient(
           145deg,
-          rgba(54,28,12,.94),
-          rgba(138,90,59,.92)
-        ),
-        #6f4329;
-
-      color:#fff;
-
-      display:flex;
-
-      align-items:stretch;
-
-      min-height:700px;
-    }
-
-
-    .login-left-inner{
-      width:100%;
-
-      border-radius:24px;
-
-      padding:30px 24px;
-
-      background:
-        linear-gradient(
-          180deg,
-          rgba(255,255,255,.08),
-          rgba(255,255,255,.02)
+          #392319,
+          #855439
         );
-
-      border:
-        1px solid
-        rgba(255,255,255,.12);
-
-      display:flex;
-
-      flex-direction:column;
-
-      justify-content:space-between;
-
-      position:relative;
-
-      overflow:hidden;
+      color: white;
     }
 
-
-    .login-left-inner::before{
-      content:"";
-
-      position:absolute;
-
-      right:-70px;
-      bottom:-70px;
-
-      width:220px;
-      height:220px;
-
-      background:
-        radial-gradient(
-          circle,
-          rgba(255,255,255,.18),
-          transparent 65%
-        );
-
-      pointer-events:none;
+    .login-brand {
+      font-size: 23px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      line-height: 1.4;
     }
 
-
-    .brand-mark{
-      position:relative;
-      z-index:1;
+    .login-brand-panel h1 {
+      font-family: Georgia, serif;
+      font-size: clamp(40px,5vw,62px);
+      line-height: 1.05;
+      margin: 35px 0 20px;
+      color: #fffaf5;
     }
 
-
-    .brand-badge{
-      display:inline-flex;
-
-      align-items:center;
-      justify-content:center;
-
-      width:68px;
-      height:68px;
-
-      border-radius:18px;
-
-      border:
-        2px solid
-        rgba(255,255,255,.38);
-
-      margin-bottom:20px;
-
-      font-size:28px;
-
-      font-weight:800;
+    .login-brand-panel h1 span {
+      color: #e8c2a1;
     }
 
-
-    .brand-name{
-      margin:0;
-
-      font-size:52px;
-
-      line-height:.95;
-
-      font-weight:800;
-
-      letter-spacing:.01em;
-
-      color:#fff9f5;
+    .login-brand-panel p {
+      color: #e8d8cc;
+      line-height: 1.8;
+      font-size: 15px;
     }
 
-
-    .brand-sub{
-      margin:12px 0 0;
-
-      font-size:14px;
-
-      letter-spacing:.28em;
-
-      color:
-        rgba(255,244,236,.88);
-
-      text-transform:uppercase;
+    .brand-benefits {
+      display: grid;
+      gap: 15px;
+      margin-top: 28px;
     }
 
-
-    .brand-line{
-      width:120px;
-      height:3px;
-
-      background:
-        linear-gradient(
-          90deg,
-          #f2d5b8,
-          transparent
-        );
-
-      border-radius:999px;
-
-      margin:22px 0 18px;
+    .brand-benefit {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      color: #f4e6da;
     }
 
-
-    .brand-tagline{
-      margin:0 0 10px;
-
-      font-size:20px;
-
-      line-height:1.45;
-
-      color:#fff3ea;
-
-      font-weight:600;
+    .brand-benefit-icon {
+      width: 40px;
+      height: 40px;
+      flex-shrink: 0;
+      border-radius: 12px;
+      background: rgba(255,255,255,.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
     }
 
-
-    .brand-note{
-      margin:0;
-
-      font-size:16px;
-
-      color:
-        rgba(255,244,236,.85);
+    .login-form-panel {
+      padding: 50px 42px;
     }
 
-
-    /* =========================
-       DECORATION
-    ========================= */
-
-    .desk-visual{
-      position:relative;
-
-      z-index:1;
-
-      margin-top:28px;
-
-      min-height:220px;
+    .login-kicker {
+      color: #9b613c;
+      font-size: 12px;
+      letter-spacing: .17em;
+      font-weight: 900;
+      text-transform: uppercase;
     }
 
+    .login-form-panel h2 {
+      font-family: Georgia, serif;
+      font-size: 38px;
+      margin: 12px 0 12px;
+      color: #302118;
+    }
 
-    .desk-top{
-      position:absolute;
+    .login-intro {
+      color: #786e66;
+      line-height: 1.7;
+      font-size: 14px;
+      margin-bottom: 28px;
+    }
 
-      left:0;
-      right:0;
-      bottom:16px;
+    .login-field {
+      margin-bottom: 21px;
+    }
 
-      height:16px;
+    .login-field label {
+      display: block;
+      margin-bottom: 9px;
+      font-size: 14px;
+      font-weight: 800;
+      color: #3d2c22;
+    }
 
-      border-radius:999px;
+    .login-input {
+      width: 100%;
+      min-height: 53px;
+      padding: 13px 15px;
+      border: 1px solid #dccdc0;
+      border-radius: 12px;
+      background: #fffdfb;
+      color: #302118;
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+    }
 
-      background:
-        rgba(255,255,255,.18);
-
+    .login-input:focus {
+      border-color: #986343;
       box-shadow:
-        0 10px 25px
-        rgba(0,0,0,.18);
+        0 0 0 3px rgba(152,99,67,.12);
     }
 
-
-    .frame-box{
-      position:absolute;
-
-      left:90px;
-      bottom:44px;
-
-      width:120px;
-      height:96px;
-
-      background:#f7efe8;
-
-      border:
-        8px solid #caa17e;
-
-      border-bottom-width:12px;
-
-      border-radius:8px;
-
-      box-shadow:
-        0 12px 18px
-        rgba(0,0,0,.18);
-
-      overflow:hidden;
+    .password-wrap {
+      position: relative;
     }
 
-
-    .frame-box::before{
-      content:"";
-
-      position:absolute;
-
-      inset:0;
-
-      background:
-        linear-gradient(
-          180deg,
-          rgba(255,183,120,.55),
-          rgba(92,56,31,.12)
-        ),
-
-        linear-gradient(
-          135deg,
-          #ffe7c8 0%,
-          #f1c38f 35%,
-          #6e4a35 100%
-        );
+    .password-wrap .login-input {
+      padding-right: 80px;
     }
 
-
-    .mug{
-      position:absolute;
-
-      right:48px;
-      bottom:42px;
-
-      width:74px;
-      height:90px;
-
-      background:#f8efe7;
-
-      border-radius:
-        12px 12px 18px 18px;
-
-      box-shadow:
-        0 12px 18px
-        rgba(0,0,0,.14);
+    .password-toggle {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      min-width: 60px;
+      min-height: 37px;
+      border: none;
+      border-radius: 8px;
+      background: #f1e5da;
+      color: #71462d;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
     }
 
-
-    .mug::before{
-      content:"";
-
-      position:absolute;
-
-      right:-18px;
-      top:22px;
-
-      width:24px;
-      height:34px;
-
-      border:
-        5px solid #f8efe7;
-
-      border-left:none;
-
-      border-radius:
-        0 16px 16px 0;
+    .login-forgot {
+      text-align: right;
+      margin: -5px 0 23px;
     }
 
-
-    .mug::after{
-      content:"Good\A Vibes\A Only";
-
-      white-space:pre;
-
-      position:absolute;
-
-      inset:
-        16px 8px auto 8px;
-
-      text-align:center;
-
-      font-size:12px;
-
-      line-height:1.15;
-
-      color:#6f4329;
-
-      font-weight:700;
+    .login-forgot a,
+    .login-register a {
+      color: #895535;
+      font-weight: 800;
+      text-decoration: none;
     }
 
-
-    .plant{
-      position:absolute;
-
-      left:12px;
-      bottom:40px;
-
-      width:80px;
-      height:90px;
+    .login-forgot a {
+      font-size: 13px;
     }
 
-
-    .pot{
-      position:absolute;
-
-      left:18px;
-      bottom:0;
-
-      width:46px;
-      height:42px;
-
-      background:#efe6dd;
-
-      border-radius:
-        10px 10px 14px 14px;
-
-      box-shadow:
-        0 10px 16px
-        rgba(0,0,0,.14);
-    }
-
-
-    .leaf{
-      position:absolute;
-
-      bottom:34px;
-
-      width:18px;
-      height:54px;
-
-      background:
-        linear-gradient(
-          180deg,
-          #6f9c45,
-          #355e24
-        );
-
-      border-radius:
-        18px 18px 18px 0;
-
-      transform-origin:
-        bottom center;
-    }
-
-
-    .leaf.l1{
-      left:18px;
-      transform:rotate(-24deg);
-    }
-
-
-    .leaf.l2{
-      left:33px;
-      height:60px;
-      transform:rotate(-6deg);
-    }
-
-
-    .leaf.l3{
-      left:49px;
-      transform:rotate(18deg);
-
-      border-radius:
-        18px 18px 0 18px;
-    }
-
-
-    /* =========================
-       RIGHT SIDE
-    ========================= */
-
-    .login-right{
-      padding:36px 42px;
-
-      display:flex;
-
-      align-items:center;
-
-      justify-content:center;
-
-      background:#fffaf6;
-    }
-
-
-    .login-form-wrap{
-      width:100%;
-      max-width:560px;
-    }
-
-
-    .welcome-icon{
-      width:54px;
-      height:54px;
-
-      border-radius:50%;
-
-      background:#f3e6da;
-
-      display:flex;
-
-      align-items:center;
-      justify-content:center;
-
-      color:#8a5a3b;
-
-      font-size:24px;
-
-      margin-bottom:14px;
-    }
-
-
-    .login-form-wrap h1{
-      margin:0;
-
-      font-size:58px;
-
-      line-height:.95;
-
-      letter-spacing:-.02em;
-
-      color:#2b1b12;
-
-      font-family:
-        Georgia,
-        "Times New Roman",
-        serif;
-    }
-
-
-    .login-subtext{
-      margin:14px 0 0;
-
-      font-size:17px;
-
-      color:#786f69;
-
-      line-height:1.55;
-    }
-
-
-    .login-subtext strong{
-      color:#2a1e18;
-
-      display:block;
-
-      font-size:18px;
-
-      margin-top:3px;
-    }
-
-
-    .title-line{
-      width:86px;
-      height:4px;
-
-      border-radius:999px;
-
-      background:
-        linear-gradient(
-          90deg,
-          #b7835d,
-          #dec4af
-        );
-
-      margin:16px 0 24px;
-    }
-
-
-    /* =========================
-       INPUTS
-    ========================= */
-
-    .field{
-      margin:0 0 18px;
-    }
-
-
-    .fieldbox{
-      position:relative;
-    }
-
-
-    .fieldbox .input{
-      width:100%;
-
-      height:62px;
-
-      border:
-        1px solid #e8ddd2;
-
-      border-radius:18px;
-
-      background:#fffdfa;
-
-      padding:
-        0 56px 0 58px;
-
-      font-size:18px;
-
-      color:#1f1c19;
-
-      outline:none;
-
-      box-shadow:none;
-    }
-
-
-    .fieldbox .input:focus{
-      border-color:#b7835d;
-
-      box-shadow:
-        0 0 0 4px
-        rgba(183,131,93,.10);
-    }
-
-
-    .field-icon{
-      position:absolute;
-
-      top:50%;
-      left:18px;
-
-      transform:
-        translateY(-50%);
-
-      width:24px;
-      height:24px;
-
-      color:#8a5a3b;
-
-      opacity:.95;
-
-      pointer-events:none;
-
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-
-
-    .field-icon svg{
-      width:22px;
-      height:22px;
-
-      display:block;
-
-      stroke:currentColor;
-    }
-
-
-    .toggle-password{
-      position:absolute;
-
-      right:14px;
-      top:50%;
-
-      transform:
-        translateY(-50%);
-
-      border:0;
-
-      background:transparent;
-
-      width:36px;
-      height:36px;
-
-      display:flex;
-      align-items:center;
-      justify-content:center;
-
-      cursor:pointer;
-
-      color:#8a5a3b;
-
-      border-radius:50%;
-    }
-
-
-    .toggle-password:hover{
-      background:#f3e6da;
-    }
-
-
-    .toggle-password svg{
-      width:22px;
-      height:22px;
-
-      display:block;
-
-      stroke:currentColor;
-    }
-
-
-    /* =========================
-       LOGIN BUTTON
-    ========================= */
-
-    .login-btn{
-      width:100%;
-
-      height:62px;
-
-      border:0;
-
-      border-radius:999px;
-
+    .login-submit {
+      width: 100%;
+      min-height: 55px;
+      border: none;
+      border-radius: 999px;
       background:
         linear-gradient(
           180deg,
           #9b613c,
           #7e492a
         );
-
-      color:#fff;
-
-      font-size:18px;
-
-      font-weight:800;
-
-      letter-spacing:.02em;
-
-      display:flex;
-      align-items:center;
-      justify-content:center;
-
-      gap:12px;
-
-      cursor:pointer;
-
+      color: white;
+      font-weight: 900;
+      font-size: 16px;
+      cursor: pointer;
       box-shadow:
-        0 12px 24px
-        rgba(138,90,59,.22);
-
-      transition:
-        transform .18s ease,
-        box-shadow .18s ease;
-
-      margin-top:10px;
+        0 12px 25px rgba(138,90,59,.22);
     }
 
-
-    .login-btn:hover{
-      transform:translateY(-1px);
-
-      box-shadow:
-        0 16px 28px
-        rgba(138,90,59,.28);
+    .login-submit:disabled {
+      opacity: .65;
+      cursor: wait;
     }
 
-
-    .login-btn:disabled{
-      opacity:.7;
-      cursor:not-allowed;
+    .login-register {
+      text-align: center;
+      margin: 25px 0;
+      font-size: 14px;
+      color: #766c63;
+      line-height: 1.7;
     }
 
-
-    .login-btn span{
-      font-size:28px;
-      line-height:1;
-
-      margin-top:-2px;
+    .login-divider {
+      height: 1px;
+      background: #eee3d9;
+      margin: 28px 0;
     }
 
-
-    /* =========================
-       LOGIN LINKS
-    ========================= */
-
-    .link-row{
-      margin:24px 0 18px;
-
-      display:flex;
-      align-items:center;
-      justify-content:center;
-
-      gap:18px;
-
-      flex-wrap:wrap;
+    .login-support h3 {
+      color: #3c2a20;
+      font-size: 16px;
+      margin: 0 0 13px;
     }
 
-
-    .link-row::before,
-    .link-row::after{
-      content:"";
-
-      flex:1;
-
-      min-width:70px;
-
-      height:1px;
-
-      background:#e6d9cc;
+    .login-support-links {
+      display: grid;
+      gap: 11px;
     }
 
-
-    .link-row a{
-      font-size:15px;
-
-      font-weight:600;
-
-      color:#3c2b21;
-
-      text-decoration:none;
+    .login-support-links a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px;
+      border: 1px solid #eaded2;
+      background: #fffaf6;
+      border-radius: 12px;
+      color: #4b3426;
+      text-decoration: none;
+      font-size: 13px;
+      overflow-wrap: anywhere;
     }
 
-
-    .link-row a:hover{
-      color:#8a5a3b;
+    .login-support-links span {
+      font-size: 20px;
+      flex-shrink: 0;
     }
 
-
-    /* =========================
-       CUSTOMER CARE
-    ========================= */
-
-    .customer-care{
-      margin-top:24px;
-
-      padding:18px;
-
-      border:
-        1px solid #eadfd5;
-
-      border-radius:20px;
-
-      background:
-        linear-gradient(
-          145deg,
-          #fff,
-          #faf5f0
-        );
+    .login-security {
+      text-align: center;
+      font-size: 12px;
+      color: #8d8178;
+      margin-top: 25px;
     }
 
-
-    .care-heading{
-      display:flex;
-
-      align-items:center;
-
-      justify-content:space-between;
-
-      gap:12px;
-
-      margin-bottom:14px;
+    .login-back {
+      display: inline-flex;
+      margin-bottom: 28px;
+      color: #8b5739;
+      font-size: 13px;
+      font-weight: 800;
+      text-decoration: none;
     }
 
-
-    .care-heading-text{
-      min-width:0;
-    }
-
-
-    .care-eyebrow{
-      margin-bottom:3px;
-
-      font-size:11px;
-
-      font-weight:800;
-
-      letter-spacing:.16em;
-
-      color:#9b613c;
-
-      text-transform:uppercase;
-    }
-
-
-    .care-title{
-      margin:0;
-
-      font-size:18px;
-
-      color:#2b1b12;
-    }
-
-
-    .care-help-icon{
-      width:42px;
-      height:42px;
-
-      flex-shrink:0;
-
-      border-radius:13px;
-
-      display:flex;
-      align-items:center;
-      justify-content:center;
-
-      background:#f3e6da;
-
-      color:#8a5a3b;
-    }
-
-
-    .care-help-icon svg{
-      width:23px;
-      height:23px;
-
-      stroke:currentColor;
-    }
-
-
-    .care-links{
-      display:grid;
-
-      grid-template-columns:
-        repeat(2,minmax(0,1fr));
-
-      gap:10px;
-    }
-
-
-    .care-link{
-      min-width:0;
-
-      display:flex;
-
-      align-items:center;
-
-      gap:10px;
-
-      padding:12px;
-
-      border:
-        1px solid #eee3d9;
-
-      border-radius:14px;
-
-      background:#fff;
-
-      color:#2d211a;
-
-      text-decoration:none;
-
-      transition:
-        transform .18s ease,
-        border-color .18s ease,
-        box-shadow .18s ease;
-    }
-
-
-    .care-link:hover{
-      transform:
-        translateY(-1px);
-
-      border-color:#d7bca6;
-
-      box-shadow:
-        0 8px 18px
-        rgba(90,55,30,.08);
-    }
-
-
-    .care-icon{
-      width:40px;
-      height:40px;
-
-      flex-shrink:0;
-
-      display:flex;
-      align-items:center;
-      justify-content:center;
-
-      border-radius:12px;
-    }
-
-
-    .care-icon svg{
-      width:22px;
-      height:22px;
-
-      stroke:currentColor;
-    }
-
-
-    .care-icon.whatsapp{
-      color:#188c4b;
-
-      background:#eaf8ef;
-    }
-
-
-    .care-icon.email{
-      color:#8a5a3b;
-
-      background:#f5ece4;
-    }
-
-
-    .care-info{
-      min-width:0;
-      flex:1;
-    }
-
-
-    .care-name{
-      display:block;
-
-      margin-bottom:2px;
-
-      font-size:13px;
-
-      font-weight:800;
-    }
-
-
-    .care-value{
-      display:block;
-
-      font-size:11px;
-
-      color:#756b64;
-
-      overflow:hidden;
-
-      text-overflow:ellipsis;
-
-      white-space:nowrap;
-    }
-
-
-    .care-arrow{
-      flex-shrink:0;
-
-      color:#9c9188;
-
-      font-size:18px;
-    }
-
-
-    /* =========================
-       SECURITY
-    ========================= */
-
-    .secure-row{
-      margin-top:18px;
-
-      display:flex;
-
-      align-items:center;
-
-      justify-content:center;
-
-      gap:12px;
-
-      color:#8a5a3b;
-
-      font-size:13px;
-
-      font-weight:700;
-
-      letter-spacing:.22em;
-
-      text-transform:uppercase;
-
-      flex-wrap:wrap;
-    }
-
-
-    .secure-row::before,
-    .secure-row::after{
-      content:"";
-
-      width:72px;
-
-      height:1px;
-
-      background:#dcc9b8;
-    }
-
-
-    .secure-icon{
-      width:28px;
-      height:28px;
-
-      display:flex;
-      align-items:center;
-      justify-content:center;
-
-      color:#8a5a3b;
-    }
-
-
-    .secure-icon svg{
-      width:22px;
-      height:22px;
-
-      display:block;
-
-      stroke:currentColor;
-    }
-
-
-    /* =========================
-       TABLET
-    ========================= */
-
-    @media(max-width:980px){
-
-      .login-card{
-        grid-template-columns:1fr;
+    @media(max-width:800px) {
+      .login-layout {
+        grid-template-columns: 1fr;
       }
 
-
-      .login-left{
-        min-height:auto;
-        padding:20px;
+      .login-brand-panel {
+        padding: 35px 26px;
       }
 
-
-      .login-left-inner{
-        min-height:360px;
+      .login-brand-panel h1 {
+        font-size: 40px;
+        margin: 20px 0 12px;
       }
 
-
-      .login-right{
-        padding:
-          28px 22px 32px;
+      .brand-benefits {
+        grid-template-columns: 1fr 1fr;
       }
 
-
-      .login-form-wrap h1{
-        font-size:46px;
+      .login-form-panel {
+        padding: 35px 26px;
       }
-
     }
 
-
-    /* =========================
-       MOBILE
-    ========================= */
-
-    @media(max-width:640px){
-
-      .login-page{
-        padding:14px;
+    @media(max-width:480px) {
+      .login-page {
+        padding: 14px 10px;
       }
 
-
-      .login-left{
-        display:none;
+      .login-layout {
+        border-radius: 20px;
       }
 
-
-      .login-card{
-        border-radius:22px;
+      .login-brand-panel {
+        padding: 28px 20px;
       }
 
-
-      .login-right{
-        padding:
-          24px 18px 26px;
+      .login-brand {
+        font-size: 18px;
       }
 
-
-      .login-form-wrap h1{
-        font-size:38px;
+      .login-brand-panel h1 {
+        font-size: 34px;
       }
 
-
-      .login-subtext{
-        font-size:15px;
+      .login-brand-panel p {
+        font-size: 13px;
       }
 
-
-      .fieldbox .input{
-        height:56px;
-
-        font-size:16px;
-
-        padding-left:52px;
+      .brand-benefits {
+        grid-template-columns: 1fr;
+        gap: 9px;
       }
 
-
-      .login-btn{
-        height:58px;
-
-        font-size:17px;
+      .login-form-panel {
+        padding: 28px 20px;
       }
 
-
-      .link-row{
-        gap:12px;
+      .login-form-panel h2 {
+        font-size: 32px;
       }
-
-
-      .link-row::before,
-      .link-row::after{
-        min-width:30px;
-      }
-
-
-      .customer-care{
-        padding:15px;
-        border-radius:17px;
-      }
-
-
-      .care-links{
-        grid-template-columns:1fr;
-      }
-
-
-      .care-link{
-        padding:13px;
-      }
-
-
-      .care-value{
-        font-size:12px;
-
-        white-space:normal;
-
-        word-break:break-word;
-      }
-
-
-      .secure-row{
-        letter-spacing:.14em;
-
-        font-size:11px;
-      }
-
-
-      .secure-row::before,
-      .secure-row::after{
-        width:36px;
-      }
-
     }
-
   </style>
 </head>
-
 
 <body>
 
   <main class="login-page">
 
-    <section class="login-card">
+    <div class="login-layout">
 
+      <!-- BRAND PANEL -->
 
-      <!-- LEFT SIDE -->
+      <section class="login-brand-panel">
 
-      <div class="login-left">
+        <a
+          href="/memora-creations/frontend/index.html"
+          style="color:white;text-decoration:none"
+        >
+          <div class="login-brand">
+            MEMORA CREATIONS
+          </div>
+        </a>
 
-        <div class="login-left-inner">
+        <h1>
+          Welcome<br>
+          <span>Back.</span>
+        </h1>
 
-          <div class="brand-mark">
+        <p>
+          Login to your account to discover
+          beautiful products, manage your
+          orders and enjoy a smooth
+          shopping experience.
+        </p>
 
-            <div class="brand-badge">
-              🖼️
-            </div>
+        <div class="brand-benefits">
 
-            <h2 class="brand-name">
-              Memora
-              <br>
-              Creations
-            </h2>
-
-            <p class="brand-sub">
-              Photo Frames • Gifts • More
-            </p>
-
-            <div class="brand-line"></div>
-
-            <p class="brand-tagline">
-              Capture Moments,
-              <br>
-              Create Memories
-            </p>
-
-            <p class="brand-note">
-              Premium home decor,
-              custom gifts and memorable
-              creations for every special
-              corner of your life.
-            </p>
-
+          <div class="brand-benefit">
+            <div class="brand-benefit-icon">🛍️</div>
+            <span>Explore Products</span>
           </div>
 
+          <div class="brand-benefit">
+            <div class="brand-benefit-icon">📦</div>
+            <span>Track Your Orders</span>
+          </div>
 
-          <div class="desk-visual">
+          <div class="brand-benefit">
+            <div class="brand-benefit-icon">♡</div>
+            <span>Save Your Wishlist</span>
+          </div>
 
-            <div class="plant">
-
-              <div class="leaf l1"></div>
-
-              <div class="leaf l2"></div>
-
-              <div class="leaf l3"></div>
-
-              <div class="pot"></div>
-
-            </div>
-
-
-            <div class="frame-box"></div>
-
-            <div class="mug"></div>
-
-            <div class="desk-top"></div>
-
+          <div class="brand-benefit">
+            <div class="brand-benefit-icon">🔒</div>
+            <span>Secure Account</span>
           </div>
 
         </div>
 
-      </div>
+      </section>
 
 
-      <!-- RIGHT SIDE -->
+      <!-- LOGIN FORM -->
 
-      <div class="login-right">
+      <section class="login-form-panel">
 
-        <div class="login-form-wrap">
+        <a
+          class="login-back"
+          href="/memora-creations/frontend/index.html"
+        >
+          ← Back to Home
+        </a>
 
-          <div class="welcome-icon">
-            👤
-          </div>
+        <div class="login-kicker">
+          CUSTOMER ACCOUNT
+        </div>
 
+        <h2>
+          Sign In
+        </h2>
 
-          <h1>
-            Welcome Back
-          </h1>
+        <p class="login-intro">
+          Enter your registered mobile
+          number and password to
+          continue.
+        </p>
 
+        <!-- IDs AND FIELD NAMES MATCH auth.js -->
 
-          <p class="login-subtext">
+        <form
+          id="loginForm"
+          autocomplete="on"
+        >
 
-            Login to continue your journey with
+          <!-- MOBILE -->
 
-            <strong>
-              Memora Creations
-            </strong>
+          <div class="login-field">
 
-          </p>
+            <label for="loginMobile">
+              Mobile Number
+            </label>
 
-
-          <div class="title-line"></div>
-
-
-          <form id="loginForm">
-
-
-            <!-- MOBILE NUMBER -->
-
-            <div class="field">
-
-              <div class="fieldbox">
-
-                <span
-                  class="field-icon"
-                  aria-hidden="true"
-                >
-
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke-width="1.8"
-                  >
-
-                    <rect
-                      x="7"
-                      y="2.8"
-                      width="10"
-                      height="18.4"
-                      rx="2.2"
-                    ></rect>
-
-                    <path
-                      d="M10 18.2h4"
-                    ></path>
-
-                  </svg>
-
-                </span>
-
-
-                <input
-                  class="input"
-                  name="mobile"
-                  type="tel"
-                  placeholder="Mobile Number"
-                  required
-                  inputmode="numeric"
-                  pattern="[6-9][0-9]{9}"
-                  maxlength="10"
-                  autocomplete="tel"
-                >
-
-              </div>
-
-            </div>
-
-
-            <!-- PASSWORD -->
-
-            <div class="field">
-
-              <div class="fieldbox">
-
-                <span
-                  class="field-icon"
-                  aria-hidden="true"
-                >
-
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke-width="1.8"
-                  >
-
-                    <rect
-                      x="5"
-                      y="10"
-                      width="14"
-                      height="10"
-                      rx="2"
-                    ></rect>
-
-                    <path
-                      d="M8 10V7.5a4 4 0 1 1 8 0V10"
-                    ></path>
-
-                    <circle
-                      cx="12"
-                      cy="15"
-                      r="1.1"
-                    ></circle>
-
-                  </svg>
-
-                </span>
-
-
-                <input
-                  class="input"
-                  id="loginPassword"
-                  name="password"
-                  type="password"
-                  placeholder="Password"
-                  required
-                  autocomplete="current-password"
-                >
-
-
-                <button
-                  class="toggle-password"
-                  type="button"
-                  id="togglePassword"
-                  aria-label="Show password"
-                >
-
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke-width="1.8"
-                  >
-
-                    <path
-                      d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z"
-                    ></path>
-
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="3"
-                    ></circle>
-
-                  </svg>
-
-                </button>
-
-              </div>
-
-            </div>
-
-
-            <!-- LOGIN BUTTON -->
-
-            <button
-              class="login-btn"
-              type="submit"
+            <input
+              id="loginMobile"
+              class="login-input"
+              type="tel"
+              name="mobile"
+              placeholder="Enter registered mobile number"
+              inputmode="numeric"
+              pattern="[6-9][0-9]{9}"
+              minlength="10"
+              maxlength="10"
+              autocomplete="tel"
+              required
             >
 
-              Login
-
-              <span>
-                →
-              </span>
-
-            </button>
+          </div>
 
 
-            <!-- ACCOUNT LINKS -->
+          <!-- PASSWORD -->
 
-            <div class="link-row">
+          <div class="login-field">
 
-              <a
-                href="/memora-creations/frontend/signup.html"
+            <label for="loginPassword">
+              Password
+            </label>
+
+            <div class="password-wrap">
+
+              <input
+                id="loginPassword"
+                class="login-input"
+                type="password"
+                name="password"
+                placeholder="Enter your password"
+                autocomplete="current-password"
+                required
               >
-                Create account
-              </a>
 
-
-              <a
-                href="/memora-creations/frontend/forgot-password.html"
+              <button
+                id="togglePassword"
+                class="password-toggle"
+                type="button"
+                aria-label="Show password"
+                aria-pressed="false"
               >
-                Forgot password?
-              </a>
+                Show
+              </button>
 
             </div>
 
+          </div>
 
-            <!-- CUSTOMER CARE -->
 
-            <div class="customer-care">
+          <!-- FORGOT PASSWORD -->
 
-              <div class="care-heading">
+          <div class="login-forgot">
 
-                <div class="care-heading-text">
+            <a
+              href="/memora-creations/frontend/forgot-password.html"
+            >
+              Forgot Password?
+            </a>
 
-                  <div class="care-eyebrow">
-                    Need Help?
-                  </div>
+          </div>
 
-                  <h3 class="care-title">
-                    Customer Care
-                  </h3>
 
-                </div>
+          <!-- LOGIN BUTTON -->
 
+          <button
+            class="login-submit"
+            type="submit"
+          >
+            Login to Account →
+          </button>
 
-                <div class="care-help-icon">
+        </form>
 
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke-width="1.8"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
 
-                    <path
-                      d="M4 13v-2a8 8 0 0 1 16 0v2"
-                    ></path>
+        <!-- SIGNUP -->
 
-                    <path
-                      d="M4 13h2a2 2 0 0 1 2 2v3H6a2 2 0 0 1-2-2v-3Z"
-                    ></path>
+        <p class="login-register">
+          Don't have an account?
 
-                    <path
-                      d="M20 13h-2a2 2 0 0 0-2 2v3h2a2 2 0 0 0 2-2v-3Z"
-                    ></path>
+          <a href="/memora-creations/frontend/signup.html">
+            Create Account
+          </a>
+        </p>
 
-                    <path
-                      d="M16 20h-3"
-                    ></path>
 
-                  </svg>
+        <div class="login-divider"></div>
 
-                </div>
 
-              </div>
+        <!-- CUSTOMER SUPPORT -->
 
+        <div class="login-support">
 
-              <div class="care-links">
+          <h3>
+            Need help logging in?
+          </h3>
 
+          <div class="login-support-links">
 
-                <!-- WHATSAPP -->
+            <a
+              href="https://wa.me/918874050204?text=Namaste%20Memora%20Creations%2C%20mujhe%20login%20mein%20help%20chahiye."
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span>💬</span>
 
-                <a
-                  class="care-link"
-                  href="https://wa.me/918874050204?text=Namaste%20Memora%20Creations%2C%20mujhe%20customer%20support%20chahiye."
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+              WhatsApp Support
+            </a>
 
-                  <span class="care-icon whatsapp">
+            <a
+              href="mailto:memoracreations.care@gmail.com?subject=Memora%20Login%20Support"
+            >
+              <span>✉️</span>
 
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke-width="1.8"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
+              memoracreations.care@gmail.com
+            </a>
 
-                      <path
-                        d="M21 11.5a8.5 8.5 0 0 1-12.8 7.4L3 21l2.1-5.2A8.5 8.5 0 1 1 21 11.5Z"
-                      ></path>
-
-                      <path
-                        d="M8.5 8.5c.5 3.5 3 6 6.5 7"
-                      ></path>
-
-                    </svg>
-
-                  </span>
-
-
-                  <span class="care-info">
-
-                    <span class="care-name">
-                      WhatsApp
-                    </span>
-
-                    <span class="care-value">
-                      +91 88740 50204
-                    </span>
-
-                  </span>
-
-
-                  <span class="care-arrow">
-                    ›
-                  </span>
-
-                </a>
-
-
-                <!-- EMAIL -->
-
-                <a
-                  class="care-link"
-                  href="mailto:memoracreations.care@gmail.com?subject=Memora%20Creations%20Customer%20Support"
-                >
-
-                  <span class="care-icon email">
-
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke-width="1.8"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
-
-                      <rect
-                        x="3"
-                        y="5"
-                        width="18"
-                        height="14"
-                        rx="2"
-                      ></rect>
-
-                      <path
-                        d="M3 7l9 6 9-6"
-                      ></path>
-
-                    </svg>
-
-                  </span>
-
-
-                  <span class="care-info">
-
-                    <span class="care-name">
-                      Email Support
-                    </span>
-
-                    <span class="care-value">
-                      memoracreations.care@gmail.com
-                    </span>
-
-                  </span>
-
-
-                  <span class="care-arrow">
-                    ›
-                  </span>
-
-                </a>
-
-              </div>
-
-            </div>
-
-
-            <!-- SECURITY -->
-
-            <div class="secure-row">
-
-              <span
-                class="secure-icon"
-                aria-hidden="true"
-              >
-
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke-width="1.8"
-                >
-
-                  <path
-                    d="M12 3l7 3v5c0 4.6-2.8 8.7-7 10-4.2-1.3-7-5.4-7-10V6l7-3Z"
-                  ></path>
-
-                  <path
-                    d="M9.5 11.8l1.7 1.7 3.7-3.7"
-                  ></path>
-
-                </svg>
-
-              </span>
-
-              <span>Safe</span>
-
-              <span>•</span>
-
-              <span>Secure</span>
-
-              <span>•</span>
-
-              <span>Always</span>
-
-            </div>
-
-          </form>
+          </div>
 
         </div>
 
-      </div>
 
-    </section>
+        <!-- SECURITY -->
+
+        <div class="login-security">
+          🔒 Secure Customer Login • MEMORA CREATIONS
+        </div>
+
+      </section>
+
+    </div>
 
   </main>
 
 
-  <!-- COMMON JS -->
+  <!-- UPDATED COMMON APP -->
 
   <script
-    src="/memora-creations/frontend/js/app.js?v=10"
+    src="/memora-creations/frontend/js/app.js?v=13"
   ></script>
 
 
-  <!-- LOGIN JS -->
+  <!-- UPDATED AUTH SCRIPT -->
 
   <script
-    src="/memora-creations/frontend/js/auth.js?v=11"
+    src="/memora-creations/frontend/js/auth.js?v=12"
   ></script>
 
+
+  <!-- PASSWORD VISIBILITY + SESSION CHECK -->
 
   <script>
+    (() => {
+      'use strict';
 
-    /* =========================
-       PASSWORD SHOW / HIDE
-    ========================= */
+      /* SHOW / HIDE PASSWORD */
 
-    const togglePasswordBtn =
-      document.getElementById(
-        'togglePassword'
-      );
+      const toggle =
+        document.getElementById('togglePassword');
 
+      const password =
+        document.getElementById('loginPassword');
 
-    const loginPasswordInput =
-      document.getElementById(
-        'loginPassword'
-      );
+      if (toggle && password) {
 
+        toggle.addEventListener('click', () => {
 
-    if (
-      togglePasswordBtn &&
-      loginPasswordInput
-    ) {
+          const show =
+            password.type === 'password';
 
-      togglePasswordBtn
-        .addEventListener(
-          'click',
-          function () {
+          password.type =
+            show ? 'text' : 'password';
 
-            const hidden =
-              loginPasswordInput.type ===
-              'password';
+          toggle.textContent =
+            show ? 'Hide' : 'Show';
 
+          toggle.setAttribute(
+            'aria-label',
+            show ? 'Hide password' : 'Show password'
+          );
 
-            loginPasswordInput.type =
-              hidden
-                ? 'text'
-                : 'password';
+          toggle.setAttribute(
+            'aria-pressed',
+            String(show)
+          );
 
+        });
 
-            togglePasswordBtn
-              .setAttribute(
-                'aria-label',
-                hidden
-                  ? 'Hide password'
-                  : 'Show password'
-              );
-
-          }
-        );
-
-    }
-
-
-    /* =========================
-       ALREADY LOGGED IN
-    ========================= */
-
-    (async function redirectLoggedInUser() {
-
-      const user =
-        await window.MC.currentUser();
-
-
-      if (!user) {
-        return;
       }
 
 
-      const rawNext = new URLSearchParams(location.search).get('next');
-      const fallback = '/memora-creations/frontend/index.html';
-      let destination = fallback;
-      if (rawNext && rawNext.startsWith('/') &&
-          !rawNext.startsWith('//') && !rawNext.includes('\\')) {
-        try {
-          const url = new URL(rawNext, location.origin);
-          if (url.origin === location.origin &&
-              url.pathname.startsWith('/memora-creations/frontend/')) {
-            destination = url.pathname + url.search + url.hash;
-          }
-        } catch (_) {
-          destination = fallback;
+      /* SAFE REDIRECT AFTER SESSION CHECK */
+
+      function safeDestination() {
+
+        const fallback =
+          '/memora-creations/frontend/index.html';
+
+        const raw =
+          new URLSearchParams(location.search)
+            .get('next');
+
+        if (
+          !raw ||
+          !raw.startsWith('/') ||
+          raw.startsWith('//') ||
+          raw.includes('\\')
+        ) {
+          return fallback;
         }
+
+        try {
+
+          const url =
+            new URL(raw, location.origin);
+
+          if (
+            url.origin === location.origin &&
+            url.pathname.startsWith(
+              '/memora-creations/frontend/'
+            )
+          ) {
+            return url.pathname +
+              url.search +
+              url.hash;
+          }
+
+        } catch (error) {
+          console.warn(
+            'Invalid login redirect:',
+            error
+          );
+        }
+
+        return fallback;
       }
-      location.href = destination;
+
+
+      /* ALREADY LOGGED IN */
+
+      async function checkExistingSession() {
+
+        if (
+          !window.MC ||
+          typeof window.MC.currentUser !== 'function'
+        ) {
+          return;
+        }
+
+        try {
+
+          const user =
+            await window.MC.currentUser();
+
+          if (!user) return;
+
+          location.replace(
+            safeDestination()
+          );
+
+        } catch (error) {
+
+          /*
+           * A slow or unavailable backend
+           * does not prove logout.
+           *
+           * Keep the login form available
+           * rather than crashing the page.
+           */
+
+          console.warn(
+            'Session verification unavailable:',
+            error.message
+          );
+
+        }
+
+      }
+
+      checkExistingSession();
 
     })();
-
   </script>
 
 </body>
-
 </html>
