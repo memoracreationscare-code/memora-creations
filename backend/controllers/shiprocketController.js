@@ -4,25 +4,20 @@
 /*
 =========================================
  MEMORA CREATIONS
- SHIPROCKET CONTROLLER - TRACKING V2
+ SHIPROCKET CONTROLLER - TRACKING V3
 
- - Admin-only routes (adminRoutes)
- - Courier rate checking
- - Payment eligibility validation
- - Duplicate shipment prevention
- - Persist Shiprocket Shipment ID
- - Persist Courier and AWB
- - Safe handling of partial failures
-
- IMPORTANT:
- Does not alter payment, stock,
- cancellation or order status.
-
- If Shiprocket creates a shipment but
- a later step fails, an admin must
- reconcile it manually before retrying.
+ - Courier rates
+ - Selected courier ETA
+ - Save shipment and AWB
+ - Save estimated delivery date
+ - Prevent duplicate shipment requests
+ - Read existing shipment details
+ - Protect COD and prepaid orders
+ - No payment or stock modifications
 =========================================
 */
+
+const mongoose = require('mongoose');
 
 const {
   Order,
@@ -35,20 +30,35 @@ const {
   assignCourierAwb
 } = require('../services/shiprocketService');
 
+const {
+  getCourierEstimate
+} = require('../services/deliveryPincodeService');
+
 
 /* =====================================
    HELPERS
 ===================================== */
 
 async function getOrder(req) {
+
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    return null;
+  }
+
   return Order.findById(req.params.id)
     .populate('user', 'fullName mobile email');
 }
 
+
 function readPackage(body) {
+
   const weight = Number(body.weight);
   const length = Number(body.length);
-  const width = Number(body.width);
+
+  const width = Number(
+    body.width ?? body.breadth
+  );
+
   const height = Number(body.height);
 
   const values = [
@@ -59,10 +69,9 @@ function readPackage(body) {
   ];
 
   if (
-    values.some(
-      number =>
-        !Number.isFinite(number) ||
-        number <= 0
+    values.some(value =>
+      !Number.isFinite(value) ||
+      value <= 0
     ) ||
     weight > 100 ||
     length > 300 ||
@@ -80,7 +89,9 @@ function readPackage(body) {
   };
 }
 
+
 function shipmentEligibility(order) {
+
   if (!order) {
     return 'Order not found.';
   }
@@ -93,14 +104,14 @@ function shipmentEligibility(order) {
   }
 
   if (order.paymentMethod === 'COD') {
+
     if (
-      ![
-        'COD_PENDING',
-        'SUCCESS'
-      ].includes(order.paymentStatus)
+      !['COD_PENDING', 'SUCCESS']
+        .includes(order.paymentStatus)
     ) {
       return 'COD order is not ready for shipment.';
     }
+
   } else if (
     order.paymentStatus !== 'SUCCESS'
   ) {
@@ -110,7 +121,9 @@ function shipmentEligibility(order) {
   return null;
 }
 
+
 function getPickupLocation(body) {
+
   return String(
     body.pickupLocation ||
     process.env.SHIPROCKET_PICKUP_LOCATION ||
@@ -118,26 +131,59 @@ function getPickupLocation(body) {
   ).trim();
 }
 
+
 function getShiprocketOrderId(data) {
-  const value =
+
+  return String(
     data?.order_id ??
     data?.data?.order_id ??
-    '';
-
-  return String(value);
+    ''
+  );
 }
 
+
 function getShiprocketShipmentId(data) {
-  const value =
+
+  const value = Number(
     data?.shipment_id ??
-    data?.data?.shipment_id;
+    data?.data?.shipment_id
+  );
 
-  const id = Number(value);
+  return (
+    Number.isSafeInteger(value) &&
+    value > 0
+  )
+    ? value
+    : null;
+}
 
-  return Number.isSafeInteger(id) &&
-    id > 0
-      ? id
-      : null;
+
+/* =====================================
+   SHIPROCKET ESTIMATED DELIVERY
+
+   Use the selected courier only.
+   No date is invented locally.
+===================================== */
+
+function selectedCourierETA(courier) {
+
+  if (!courier) return null;
+
+  const estimate = getCourierEstimate([
+    courier
+  ]);
+
+  if (!estimate?.date) {
+    return null;
+  }
+
+  const date = new Date(
+    estimate.date + 'T00:00:00.000Z'
+  );
+
+  return Number.isFinite(date.getTime())
+    ? date
+    : null;
 }
 
 
@@ -146,7 +192,9 @@ function getShiprocketShipmentId(data) {
 ===================================== */
 
 async function checkCourierRates(req, res) {
+
   try {
+
     const order = await getOrder(req);
 
     if (!order) {
@@ -178,6 +226,11 @@ async function checkCourierRates(req, res) {
       });
     }
 
+    /*
+      Do not offer shipment creation
+      for an order already registered.
+    */
+
     const existing =
       await ShipmentTracking.findOne({
         order: order._id
@@ -187,8 +240,8 @@ async function checkCourierRates(req, res) {
       return res.status(409).json({
         success: false,
         message:
-          'A shipment record already exists for this order. ' +
-          'Check its status before proceeding.'
+          'Shipment record already exists. ' +
+          'Check shipment status before proceeding.'
       });
     }
 
@@ -213,36 +266,48 @@ async function checkCourierRates(req, res) {
 
       });
 
-    const couriers =
-      (result.couriers || [])
-        .filter(item =>
-          item &&
-          item.courier_company_id
-        )
-        .map(item => ({
-          courierCompanyId:
-            item.courier_company_id,
+    const couriers = (
+      Array.isArray(result.couriers)
+        ? result.couriers
+        : []
+    )
+      .filter(item =>
+        item &&
+        Number.isSafeInteger(
+          Number(item.courier_company_id)
+        ) &&
+        Number(item.courier_company_id) > 0
+      )
+      .map(item => ({
 
-          courierName:
-            item.courier_name,
+        courierCompanyId:
+          item.courier_company_id,
 
-          rate: item.rate,
+        courierName:
+          item.courier_name,
 
-          freightCharge:
-            item.freight_charge,
+        rate:
+          item.rate,
 
-          codCharges:
-            item.cod_charges,
+        freightCharge:
+          item.freight_charge,
 
-          etd: item.etd,
+        codCharges:
+          item.cod_charges,
 
-          estimatedDeliveryDays:
-            item.estimated_delivery_days,
+        etd:
+          item.etd,
 
-          rating: item.rating
-        }));
+        estimatedDeliveryDays:
+          item.estimated_delivery_days,
+
+        rating:
+          item.rating
+
+      }));
 
     return res.json({
+
       success: true,
 
       message: couriers.length
@@ -259,11 +324,13 @@ async function checkCourierRates(req, res) {
         result.deliveryPincode,
 
       couriers
+
     });
 
   } catch (error) {
+
     console.error(
-      'Courier rate check error:',
+      '[Shiprocket] Courier rate check failed:',
       error.message
     );
 
@@ -277,11 +344,109 @@ async function checkCourierRates(req, res) {
 
 
 /* =====================================
-   CREATE SHIPMENT + SAVE TRACKING
+   VIEW EXISTING SHIPMENT
 
-   Uses a unique Order reference to stop
-   duplicate requests from creating
-   multiple Shiprocket shipments.
+   Admin-only route can use this
+   controller in the next step.
+
+   Read-only: no Shiprocket request.
+===================================== */
+
+async function getShipmentStatus(req, res) {
+
+  try {
+
+    const order = await getOrder(req);
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found.'
+      });
+    }
+
+    const shipment =
+      await ShipmentTracking.findOne({
+        order: order._id
+      }).lean();
+
+    if (!shipment) {
+      return res.json({
+        success: true,
+        shipmentExists: false,
+        message:
+          'No shipment record exists for this order.'
+      });
+    }
+
+    return res.json({
+
+      success: true,
+      shipmentExists: true,
+
+      shipment: {
+
+        shiprocketOrderId:
+          shipment.shiprocketOrderId || null,
+
+        shipmentId:
+          shipment.shipmentId || null,
+
+        courierCompanyId:
+          shipment.courierCompanyId ?? null,
+
+        courierName:
+          shipment.courierName || null,
+
+        awbCode:
+          shipment.awbCode || null,
+
+        shipmentStatus:
+          shipment.shipmentStatus || 'NOT_CREATED',
+
+        shipmentCreatedAt:
+          shipment.shipmentCreatedAt || null,
+
+        awbAssignedAt:
+          shipment.awbAssignedAt || null,
+
+        estimatedDeliveryDate:
+          shipment.estimatedDeliveryDate || null,
+
+        pickedUpAt:
+          shipment.pickedUpAt || null,
+
+        deliveredAt:
+          shipment.deliveredAt || null,
+
+        lastTrackedAt:
+          shipment.lastTrackedAt || null
+
+      }
+
+    });
+
+  } catch (error) {
+
+    console.error(
+      '[Shiprocket] Shipment status read failed:',
+      error.message
+    );
+
+    return res.status(500).json({
+      success: false,
+      message:
+        'Failed to read shipment status.'
+    });
+  }
+}
+
+
+/* =====================================
+   CREATE SHIPMENT + AWB
+
+   Real Shiprocket operation.
+   One shipment record per order.
 ===================================== */
 
 async function createShipment(req, res) {
@@ -289,6 +454,7 @@ async function createShipment(req, res) {
   let trackingRecord = null;
 
   try {
+
     const order = await getOrder(req);
 
     if (!order) {
@@ -320,8 +486,9 @@ async function createShipment(req, res) {
       });
     }
 
-    const courierCompanyId =
-      Number(body.courierCompanyId);
+    const courierCompanyId = Number(
+      body.courierCompanyId
+    );
 
     if (
       !Number.isSafeInteger(courierCompanyId) ||
@@ -338,8 +505,8 @@ async function createShipment(req, res) {
       getPickupLocation(body);
 
     /*
-      Verify selected courier directly
-      against current Shiprocket response.
+      Recheck selected courier with
+      the actual parcel details.
     */
 
     const serviceability =
@@ -362,12 +529,15 @@ async function createShipment(req, res) {
 
       });
 
-    const selectedCourier =
-      (serviceability.couriers || [])
-        .find(item =>
-          Number(item.courier_company_id) ===
-          courierCompanyId
-        );
+    const selectedCourier = (
+      Array.isArray(serviceability.couriers)
+        ? serviceability.couriers
+        : []
+    ).find(item =>
+      item &&
+      Number(item.courier_company_id) ===
+      courierCompanyId
+    );
 
     if (!selectedCourier) {
       return res.status(400).json({
@@ -379,16 +549,31 @@ async function createShipment(req, res) {
     }
 
     /*
-      Unique database constraint provides
-      protection against two requests
-      creating a shipment for one order.
+      Important:
+      Estimate belongs to the
+      selected courier, not the
+      earliest of all couriers.
+    */
+
+    const estimatedDeliveryDate =
+      selectedCourierETA(selectedCourier);
+
+    /*
+      Atomic unique order lock.
+
+      Do not remove a lock automatically
+      if Shiprocket returns an error,
+      because the external shipment
+      may already exist.
     */
 
     try {
+
       trackingRecord =
         await ShipmentTracking.create({
 
-          order: order._id,
+          order:
+            order._id,
 
           courierCompanyId,
 
@@ -397,19 +582,22 @@ async function createShipment(req, res) {
               selectedCourier.courier_name || ''
             ).slice(0, 150),
 
+          estimatedDeliveryDate,
+
           shipmentStatus:
             'CREATION_STARTED'
 
         });
 
     } catch (error) {
+
       if (error.code === 11000) {
         return res.status(409).json({
           success: false,
           message:
-            'Shipment creation has already been started ' +
-            'for this order. Please check its status. ' +
-            'Do not create another shipment.'
+            'Shipment request already exists. ' +
+            'Check its status before retrying. ' +
+            'Do not create a duplicate shipment.'
         });
       }
 
@@ -417,8 +605,8 @@ async function createShipment(req, res) {
     }
 
     /*
-      External call 1:
-      Create shipment in Shiprocket.
+      STEP 1:
+      Create Shiprocket shipment.
     */
 
     const shiprocketOrder =
@@ -441,6 +629,7 @@ async function createShipment(req, res) {
       );
 
     if (!shipmentId) {
+
       trackingRecord.shipmentStatus =
         'NEEDS_MANUAL_REVIEW';
 
@@ -449,14 +638,16 @@ async function createShipment(req, res) {
       return res.status(502).json({
         success: false,
         message:
-          'Shiprocket did not return a valid shipment ID. ' +
-          'Check the Shiprocket dashboard before retrying.'
+          'Shiprocket did not return a valid ' +
+          'shipment ID. Check Shiprocket ' +
+          'dashboard before retrying.'
       });
     }
 
     /*
-      Persist Shipment ID immediately,
-      before requesting AWB assignment.
+      STEP 2:
+      Persist external shipment ID
+      before assigning AWB.
     */
 
     trackingRecord.shipmentId =
@@ -471,8 +662,8 @@ async function createShipment(req, res) {
     await trackingRecord.save();
 
     /*
-      External call 2:
-      Assign selected courier and AWB.
+      STEP 3:
+      Assign courier and AWB.
     */
 
     const awb =
@@ -482,6 +673,7 @@ async function createShipment(req, res) {
       });
 
     if (!awb.awbCode) {
+
       trackingRecord.shipmentStatus =
         'NEEDS_MANUAL_REVIEW';
 
@@ -490,10 +682,16 @@ async function createShipment(req, res) {
       return res.status(502).json({
         success: false,
         message:
-          'Shipment was created, but AWB could not ' +
-          'be confirmed. Check Shiprocket dashboard.'
+          'Shipment was created but AWB ' +
+          'could not be confirmed. Check ' +
+          'Shiprocket dashboard before retrying.'
       });
     }
+
+    /*
+      STEP 4:
+      Save real AWB and courier.
+    */
 
     trackingRecord.awbCode =
       String(awb.awbCode);
@@ -514,8 +712,8 @@ async function createShipment(req, res) {
     await trackingRecord.save();
 
     /*
-      Preserve response fields expected
-      by the existing Admin Orders page.
+      Preserve response expected by
+      existing Admin Orders UI.
     */
 
     return res.status(200).json({
@@ -530,6 +728,7 @@ async function createShipment(req, res) {
       awb,
 
       tracking: {
+
         shipmentId:
           trackingRecord.shipmentId,
 
@@ -545,8 +744,12 @@ async function createShipment(req, res) {
         awbAssignedAt:
           trackingRecord.awbAssignedAt,
 
+        estimatedDeliveryDate:
+          trackingRecord.estimatedDeliveryDate,
+
         shipmentStatus:
           trackingRecord.shipmentStatus
+
       }
 
     });
@@ -554,51 +757,66 @@ async function createShipment(req, res) {
   } catch (error) {
 
     console.error(
-      'Shiprocket shipment creation error:',
+      '[Shiprocket] Shipment creation failed:',
       error.message
     );
 
     /*
-      The external API might already have
-      created a shipment.
+      A failed response does not prove
+      that Shiprocket did not create
+      a shipment.
 
-      Keep the database lock, so an admin
-      can investigate instead of risking
-      duplicate shipment creation.
+      Preserve the record for review.
     */
 
     if (trackingRecord) {
+
       try {
+
         if (
           trackingRecord.shipmentStatus !==
           'AWB_ASSIGNED'
         ) {
+
           trackingRecord.shipmentStatus =
             'NEEDS_MANUAL_REVIEW';
 
           await trackingRecord.save();
         }
+
       } catch (saveError) {
+
         console.error(
-          'Shipment review state save failed:',
+          '[Shiprocket] Review state save failed:',
           saveError.message
         );
       }
     }
 
     return res.status(500).json({
+
       success: false,
 
       message: trackingRecord
         ? 'Shipment request needs manual review. ' +
-          'Check the Shiprocket dashboard before retrying.'
+          'Check Shiprocket dashboard before retrying.'
         : 'Failed to start shipment creation.'
+
     });
   }
 }
 
 
+/* =====================================
+   EXPORTS
+===================================== */
+
 module.exports = {
+
   checkCourierRates,
+
+  getShipmentStatus,
+
   createShipment
+
 };
