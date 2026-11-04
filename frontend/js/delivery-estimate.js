@@ -2,23 +2,21 @@
 /*
 =========================================
  MEMORA CREATIONS
- SHIPROCKET DELIVERY ESTIMATE - VERSION 3
+ SHIPROCKET DELIVERY ESTIMATE - VERSION 4
 
- - Actual courier availability
- - Trusted product weight from backend
+ - Live Shiprocket Courier Availability
+ - Verified Shiprocket Estimated Date
  - Cart and Buy Now support
  - COD and Cashfree support
- - Saved address PIN detection
- - Order success panel preserved
- - No order or payment modifications
- - No invented delivery dates
+ - Saved Address PIN auto-detection
+ - Order Success panel
+ - No changes to payments or orders
+ - Never invent delivery dates
 =========================================
 */
 
 (() => {
   'use strict';
-
-  const MC = window.MC;
 
   const CHECK_INTERVAL = 350;
   const REQUEST_DELAY = 700;
@@ -29,10 +27,12 @@
     );
   }
 
+  function getMC() {
+    return window.MC;
+  }
+
   function createPanel() {
-    const panel = document.createElement(
-      'section'
-    );
+    const panel = document.createElement('section');
 
     panel.id = 'mcDeliveryEstimate';
 
@@ -46,101 +46,200 @@
     ].join(';');
 
     const heading = document.createElement('h3');
-
-    heading.textContent =
-      'Estimated Delivery';
+    heading.textContent = 'Estimated Delivery';
 
     const result = document.createElement('p');
+    result.className = 'mc-estimate-result';
+    result.setAttribute('aria-live', 'polite');
 
-    result.className =
-      'mc-estimate-result';
-
-    result.setAttribute(
-      'aria-live',
-      'polite'
-    );
-
-    const note = document.createElement(
-      'small'
-    );
-
+    const note = document.createElement('small');
     note.textContent =
-      'Courier availability and delivery dates ' +
-      'are estimates, not guarantees.';
+      'Courier dates are estimates, not guarantees.';
 
-    panel.append(
-      heading,
-      result,
-      note
-    );
+    panel.append(heading, result, note);
 
     return panel;
   }
 
   function setMessage(panel, message) {
-    const result = panel.querySelector(
+    const target = panel.querySelector(
       '.mc-estimate-result'
     );
 
-    if (result) {
-      result.textContent = message;
+    if (target) {
+      target.textContent = message;
     }
   }
 
+  /*
+   =====================================
+   VERIFIED DATE FORMAT
+
+   Accept only YYYY-MM-DD returned
+   by the trusted backend.
+   =====================================
+  */
+
+  function formatDeliveryDate(value) {
+    if (
+      typeof value !== 'string' ||
+      !/^\d{4}-\d{2}-\d{2}$/.test(value)
+    ) {
+      return null;
+    }
+
+    const parts = value.split('-').map(Number);
+
+    const year = parts[0];
+    const month = parts[1];
+    const day = parts[2];
+
+    const date = new Date(
+      Date.UTC(year, month - 1, day)
+    );
+
+    if (
+      !Number.isFinite(date.getTime()) ||
+      date.getUTCFullYear() !== year ||
+      date.getUTCMonth() !== month - 1 ||
+      date.getUTCDate() !== day
+    ) {
+      return null;
+    }
+
+    return new Intl.DateTimeFormat('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      timeZone: 'UTC'
+    }).format(date);
+  }
+
+  /*
+   =====================================
+   PAYMENT METHOD
+   =====================================
+  */
+
   function paymentMethod() {
-    const selected =
-      document.querySelector(
-        'input[name="paymentMethod"]:checked'
-      );
+    const selected = document.querySelector(
+      'input[name="paymentMethod"]:checked'
+    );
 
     return selected?.value === 'COD'
       ? 'COD'
       : 'PREPAID';
   }
 
-  function getCheckoutItems() {
+  /*
+   =====================================
+   CART / BUY NOW ITEMS
+   =====================================
+  */
+
+  async function getCheckoutItems() {
     const params = new URLSearchParams(
       location.search
     );
 
-    const buyNow = params.get('buyNow');
+    const buyNowId = params.get('buyNow');
 
-    if (buyNow) {
-      const quantity = Number(
+    if (buyNowId) {
+      const rawQty = Number(
         params.get('qty') || 1
       );
 
-      return Promise.resolve([{
-        productId: buyNow,
-        quantity:
-          Number.isInteger(quantity) &&
-          quantity >= 1 &&
-          quantity <= 99
-            ? quantity
-            : 1
-      }]);
+      const quantity =
+        Number.isInteger(rawQty) &&
+        rawQty >= 1 &&
+        rawQty <= 99
+          ? rawQty
+          : 1;
+
+      return [{
+        productId: buyNowId,
+        quantity
+      }];
     }
 
+    const MC = getMC();
+
     if (!MC?.api) {
-      return Promise.reject(
-        new Error('Checkout API is unavailable.')
+      throw new Error(
+        'Delivery service is not ready.'
       );
     }
 
-    return MC.api('/cart').then(data => {
-      return (data.cart?.items || [])
-        .filter(item => item.product?._id)
-        .map(item => ({
-          productId: item.product._id,
-          quantity: Number(item.quantity)
-        }))
-        .filter(item =>
-          Number.isInteger(item.quantity) &&
-          item.quantity >= 1 &&
-          item.quantity <= 99
-        );
-    });
+    const data = await MC.api('/cart');
+
+    return (data.cart?.items || [])
+      .filter(item => item.product?._id)
+      .map(item => ({
+        productId: item.product._id,
+        quantity: Number(item.quantity)
+      }))
+      .filter(item =>
+        Number.isInteger(item.quantity) &&
+        item.quantity >= 1 &&
+        item.quantity <= 99
+      );
   }
+
+  /*
+   =====================================
+   FORMAT SHIPROCKET RESULT
+   =====================================
+  */
+
+  function deliveryMessage(result, pin) {
+    if (!result || result.success !== true) {
+      return (
+        result?.message ||
+        'Delivery availability could not be verified.'
+      );
+    }
+
+    if (result.available === false) {
+      return (
+        'No matching courier is currently ' +
+        'available for this PIN Code and ' +
+        'payment method.'
+      );
+    }
+
+    if (result.available !== true) {
+      return (
+        'Delivery availability could not be verified.'
+      );
+    }
+
+    const date = formatDeliveryDate(
+      result.estimatedDeliveryDate
+    );
+
+    if (date) {
+      return (
+        'Estimated Delivery: ' +
+        date +
+        '. This is the earliest available ' +
+        'Shiprocket courier estimate, ' +
+        'not a guaranteed arrival date.'
+      );
+    }
+
+    return (
+      'Delivery is available for PIN Code ' +
+      pin +
+      '. Estimated delivery date will be ' +
+      'confirmed after courier selection.'
+    );
+  }
+
+  /*
+   =====================================
+   CHECKOUT DELIVERY ESTIMATE
+   =====================================
+  */
 
   function initializeCheckout() {
     const pinInput = document.getElementById(
@@ -192,6 +291,14 @@
           return;
         }
 
+        const MC = getMC();
+
+        if (!MC?.api) {
+          throw new Error(
+            'Delivery service is unavailable.'
+          );
+        }
+
         const result = await MC.api(
           '/delivery/check',
           {
@@ -208,28 +315,10 @@
           return;
         }
 
-        if (result.available === true) {
-          setMessage(
-            panel,
-            'Delivery is available for PIN Code ' +
-            pin +
-            '. Estimated delivery date will be ' +
-            'confirmed after courier selection.'
-          );
-        } else if (result.available === false) {
-          setMessage(
-            panel,
-            'No matching courier is currently ' +
-            'available for this PIN Code and ' +
-            'payment method.'
-          );
-        } else {
-          setMessage(
-            panel,
-            result.message ||
-            'Delivery availability could not be verified.'
-          );
-        }
+        setMessage(
+          panel,
+          deliveryMessage(result, pin)
+        );
 
       } catch (err) {
         if (sequence !== requestSequence) {
@@ -258,7 +347,6 @@
       }
 
       lastKey = key;
-
       requestSequence += 1;
 
       const sequence = requestSequence;
@@ -273,7 +361,7 @@
         return;
       }
 
-      if (!MC?.api) {
+      if (!getMC()?.api) {
         setMessage(
           panel,
           'Delivery service is loading.'
@@ -322,8 +410,11 @@
 
     update(true);
 
-    // Detect asynchronous saved-address PIN.
-    // Watch only during initial checkout load.
+    /*
+      Detect saved-address PIN autofill.
+      Stop watching after initial loading.
+    */
+
     const startedAt = Date.now();
 
     const watcher = setInterval(() => {
@@ -345,6 +436,18 @@
     );
   }
 
+  /*
+   =====================================
+   ORDER SUCCESS DISPLAY
+
+   No new courier check here:
+   order may already have been placed.
+
+   Do not pretend the courier is
+   assigned or a date is confirmed.
+   =====================================
+  */
+
   async function initializeOrderSuccess() {
     const holder = document.getElementById(
       'orderSuccess'
@@ -354,11 +457,9 @@
       location.search
     ).get('id');
 
-    if (
-      !holder ||
-      !orderId ||
-      !MC?.api
-    ) {
+    const MC = getMC();
+
+    if (!holder || !orderId || !MC?.api) {
       return;
     }
 
@@ -368,9 +469,7 @@
         encodeURIComponent(orderId)
       );
 
-      const order = data.order;
-
-      if (!order) {
+      if (!data.order) {
         return;
       }
 
@@ -378,8 +477,8 @@
 
       setMessage(
         panel,
-        'Order placed. Delivery date will be ' +
-        'confirmed after courier selection.'
+        'Order placed. Your delivery date ' +
+        'will be confirmed after courier selection.'
       );
 
       function insertPanel() {
@@ -429,6 +528,12 @@
       );
     }
   }
+
+  /*
+   =====================================
+   INITIALIZATION
+   =====================================
+  */
 
   function initialize() {
     const path = location.pathname;
