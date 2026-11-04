@@ -533,6 +533,17 @@ function editProduct(id) {
 
   $('#stock').value = product.stock;
 
+  // Optional saved shipping fields for editing
+  for (const key of [
+    'shippingWeightKg',
+    'packageLengthCm',
+    'packageWidthCm',
+    'packageHeightCm'
+  ]) {
+    const input = document.getElementById(key);
+    if (input) input.value = product[key] ?? '';
+  }
+
   $('#keywords').value =
     (product.keywords || []).join(',');
 
@@ -634,6 +645,23 @@ window.MC.$('#productForm').addEventListener(
 
         stock:
           Number($('#stock').value),
+
+        // Read from the admin form. Empty means unknown.
+        shippingWeightKg:
+          $('#shippingWeightKg').value.trim() === ''
+            ? null : Number($('#shippingWeightKg').value),
+
+        packageLengthCm:
+          $('#packageLengthCm').value.trim() === ''
+            ? null : Number($('#packageLengthCm').value),
+
+        packageWidthCm:
+          $('#packageWidthCm').value.trim() === ''
+            ? null : Number($('#packageWidthCm').value),
+
+        packageHeightCm:
+          $('#packageHeightCm').value.trim() === ''
+            ? null : Number($('#packageHeightCm').value),
 
         keywords: $('#keywords').value
           .split(',')
