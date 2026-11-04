@@ -14,6 +14,7 @@
  SANDBOX CANCELLATION APPROVAL
  CLOUDINARY
  SHIPROCKET
+ SHIPROCKET SHIPMENT STATUS
  USERS
 =========================================
 */
@@ -75,6 +76,7 @@ router.post(
 
 router.use(requireAdmin);
 
+
 // ================================
 // ADMIN COUPON MANAGEMENT
 // GET /api/admin/coupons
@@ -84,21 +86,63 @@ router.use(requireAdmin);
 // PATCH /api/admin/coupons/:id/status
 // ================================
 
-router.use('/coupons', require('./couponAdminRoutes'));
+router.use(
+  '/coupons',
+  require('./couponAdminRoutes')
+);
 
-// MC_SANDBOX_REFUND_ROUTE_V1 — protected by router.use(requireAdmin), sandbox gate in controller
-// MC_REFUND_ENABLED_STATUS_V1: read-only, authenticated safety status.
-router.get('/cashfree/refunds/initiation-status', (req, res) => {
-  const enabled = process.env.CASHFREE_ENV === 'sandbox' &&
-    process.env.CASHFREE_SANDBOX_REFUNDS_ENABLED === 'true';
-  res.set('Cache-Control', 'no-store');
-  res.json({ success: true, enabled, sandboxOnly: true });
-});
 
-router.post('/orders/:id/cashfree/refunds/initiate', require('../controllers/cashfreeRefundInitiationController').initiateSandboxRefund);
+// =====================================
+// CASHFREE SANDBOX REFUND STATUS
+//
+// Protected by requireAdmin.
+// Read-only safety status.
+// =====================================
 
-// MC_REFUND_VERIFY_ROUTE_V1 — admin-authenticated, read-only
-router.get('/orders/:id/cashfree/refunds', require('../controllers/cashfreeRefundController').inspectRefunds);
+router.get(
+  '/cashfree/refunds/initiation-status',
+  (req, res) => {
+
+    const enabled =
+      process.env.CASHFREE_ENV === 'sandbox' &&
+      process.env.CASHFREE_SANDBOX_REFUNDS_ENABLED
+        === 'true';
+
+    res.set('Cache-Control', 'no-store');
+
+    res.json({
+      success: true,
+      enabled,
+      sandboxOnly: true
+    });
+
+  }
+);
+
+
+// =====================================
+// CASHFREE SANDBOX REFUND INITIATION
+// =====================================
+
+router.post(
+  '/orders/:id/cashfree/refunds/initiate',
+  require('../controllers/cashfreeRefundInitiationController')
+    .initiateSandboxRefund
+);
+
+
+// =====================================
+// CASHFREE REFUND VERIFICATION
+//
+// ADMIN AUTHENTICATED
+// READ ONLY
+// =====================================
+
+router.get(
+  '/orders/:id/cashfree/refunds',
+  require('../controllers/cashfreeRefundController')
+    .inspectRefunds
+);
 
 
 /* =====================================
@@ -113,9 +157,6 @@ router.get(
 
 /* =====================================
    CASHFREE APPROVAL CONFIGURATION
-
-   Single source of truth for the
-   approval status and route guard.
 
    Disabled by default.
 ===================================== */
@@ -147,13 +188,10 @@ function isSandboxApprovalEnabled() {
    GET:
    /api/admin/cashfree/approval-status
 
-   This endpoint never:
-   - Cancels an order
-   - Changes a payment
-   - Releases stock
-   - Initiates a refund
-
-   ADMIN LOGIN REQUIRED
+   Does not cancel orders,
+   modify payments,
+   release stock,
+   or initiate refunds.
 ===================================== */
 
 router.get(
@@ -463,6 +501,9 @@ router.get(
 
 /* =====================================
    SHIPROCKET COURIER RATES
+
+   POST:
+   /api/admin/orders/:id/check-couriers
 ===================================== */
 
 router.post(
@@ -473,11 +514,44 @@ router.post(
 
 /* =====================================
    SHIPROCKET SHIPMENT CREATION
+
+   POST:
+   /api/admin/orders/:id/create-shipment
+
+   Real shipment operation.
 ===================================== */
 
 router.post(
   '/orders/:id/create-shipment',
   shiprocketController.createShipment
+);
+
+
+/* =====================================
+   SHIPROCKET SHIPMENT STATUS
+
+   NEW ROUTE
+
+   GET:
+   /api/admin/orders/:id/shipment-status
+
+   ADMIN LOGIN REQUIRED
+
+   READ ONLY:
+   - Existing shipment
+   - Courier name
+   - Shipment ID
+   - AWB number
+   - Estimated delivery date
+   - Shipment status
+
+   Does not create a shipment.
+   Does not change orders or payments.
+===================================== */
+
+router.get(
+  '/orders/:id/shipment-status',
+  shiprocketController.getShipmentStatus
 );
 
 
