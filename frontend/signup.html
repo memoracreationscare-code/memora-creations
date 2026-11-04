@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 
@@ -9,725 +10,291 @@
     content="width=device-width, initial-scale=1"
   >
 
-  <title>
-    Create Account - MEMORA CREATIONS
-  </title>
+  <title>Create Account | MEMORA CREATIONS</title>
+
+  <meta
+    name="description"
+    content="Create your Memora Creations account and enjoy a simple shopping experience."
+  >
+
+  <!-- COMMON CSS -->
 
   <link
     rel="stylesheet"
     href="/memora-creations/frontend/css/style.css?v=13"
   >
 
+  <link
+    rel="preconnect"
+    href="https://memora-creations.onrender.com"
+    crossorigin
+  >
+
   <style>
 
-    *{
-      box-sizing:border-box;
+    * {
+      box-sizing: border-box;
     }
 
     html,
-    body{
-      min-height:100%;
+    body {
+      min-height: 100%;
     }
 
-    body{
-      margin:0;
-
-      min-height:100vh;
+    body {
+      margin: 0;
+      min-height: 100vh;
 
       background:
         radial-gradient(
           circle at top left,
-          rgba(138,90,59,.18) 0,
-          rgba(138,90,59,.18) 100px,
-          transparent 101px
+          rgba(138,90,59,.12),
+          transparent 300px
         ),
-
-        radial-gradient(
-          circle at bottom right,
-          rgba(138,90,59,.16) 0,
-          rgba(138,90,59,.16) 110px,
-          transparent 111px
-        ),
-
         linear-gradient(
           135deg,
           #f8f4ef,
-          #fdfaf7
+          #fffdfb
         );
 
-      color:#1f1c19;
+      color: #2b1b12;
+      font-family: Arial, sans-serif;
     }
 
-
-    .signup-page{
-      min-height:100vh;
-
-      display:flex;
-      align-items:center;
-      justify-content:center;
-
-      padding:30px 16px;
-
-      position:relative;
-      overflow:hidden;
+    .signup-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 35px 16px;
     }
 
+    .signup-layout {
+      width: min(1100px,100%);
+      display: grid;
+      grid-template-columns: .85fr 1.15fr;
 
-    .signup-page::before,
-    .signup-page::after{
-      content:"";
-
-      position:absolute;
-
-      width:260px;
-      height:260px;
-
-      border:
-        2px solid
-        rgba(138,90,59,.16);
-
-      border-radius:50%;
-
-      pointer-events:none;
-    }
-
-
-    .signup-page::before{
-      left:-110px;
-      top:-110px;
-    }
-
-
-    .signup-page::after{
-      right:-110px;
-      bottom:-110px;
-    }
-
-
-    .signup-card{
-      width:min(1180px,100%);
-
-      display:grid;
-
-      grid-template-columns:
-        400px 1fr;
-
-      background:#fffaf6;
-
-      border:
-        1px solid #eadfd5;
-
-      border-radius:30px;
-
-      overflow:hidden;
+      background: #fff;
+      border: 1px solid #eadfd5;
+      border-radius: 28px;
+      overflow: hidden;
 
       box-shadow:
-        0 28px 70px
-        rgba(47,31,18,.15);
-
-      position:relative;
-
-      z-index:2;
+        0 25px 65px rgba(61,39,23,.12);
     }
 
+    /* BRAND PANEL */
 
-    /* =========================
-       LEFT SIDE
-    ========================= */
-
-    .signup-left{
-      padding:28px;
+    .signup-brand-panel {
+      padding: 55px 38px;
 
       background:
         linear-gradient(
           145deg,
-          rgba(54,28,12,.96),
-          rgba(138,90,59,.93)
+          #392319,
+          #855439
         );
 
-      color:#fff;
+      color: white;
 
-      display:flex;
-
-      min-height:850px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
-
-    .signup-left-inner{
-      width:100%;
-
-      border:
-        1px solid
-        rgba(255,255,255,.14);
-
-      border-radius:24px;
-
-      padding:30px 24px;
-
-      background:
-        linear-gradient(
-          180deg,
-          rgba(255,255,255,.08),
-          rgba(255,255,255,.02)
-        );
-
-      display:flex;
-
-      flex-direction:column;
-
-      justify-content:space-between;
-
-      position:relative;
-
-      overflow:hidden;
+    .signup-brand {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      line-height: 1.4;
     }
 
+    .signup-brand-panel h1 {
+      font-family: Georgia, serif;
+      font-size: clamp(38px,5vw,60px);
+      line-height: 1.08;
 
-    .signup-left-inner::before{
-      content:"";
-
-      position:absolute;
-
-      right:-80px;
-      bottom:-80px;
-
-      width:260px;
-      height:260px;
-
-      border-radius:50%;
-
-      background:
-        radial-gradient(
-          circle,
-          rgba(255,255,255,.18),
-          transparent 65%
-        );
+      color: #fffaf5;
+      margin: 32px 0 20px;
     }
 
-
-    .brand-badge{
-      width:70px;
-      height:70px;
-
-      border-radius:20px;
-
-      border:
-        2px solid
-        rgba(255,255,255,.38);
-
-      display:flex;
-      align-items:center;
-      justify-content:center;
-
-      font-size:30px;
-
-      margin-bottom:22px;
+    .signup-brand-panel h1 span {
+      color: #e8c2a1;
     }
 
-
-    .brand-name{
-      margin:0;
-
-      font-size:50px;
-
-      line-height:.95;
-
-      font-weight:800;
-
-      color:#fff9f5;
+    .signup-brand-panel p {
+      color: #e8d8cc;
+      font-size: 15px;
+      line-height: 1.8;
     }
 
-
-    .brand-sub{
-      margin:14px 0 0;
-
-      font-size:13px;
-
-      letter-spacing:.22em;
-
-      text-transform:uppercase;
-
-      color:
-        rgba(255,244,236,.88);
+    .signup-benefits {
+      display: grid;
+      gap: 18px;
+      margin-top: 28px;
     }
 
-
-    .brand-line{
-      width:120px;
-      height:3px;
-
-      margin:24px 0 18px;
-
-      border-radius:999px;
-
-      background:
-        linear-gradient(
-          90deg,
-          #f2d5b8,
-          transparent
-        );
+    .signup-benefit {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #f4e6da;
+      font-size: 14px;
     }
 
+    .signup-benefit-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
 
-    .brand-tagline{
-      margin:0 0 10px;
+      width: 42px;
+      height: 42px;
 
-      font-size:22px;
-
-      line-height:1.4;
-
-      font-weight:700;
-
-      color:#fff3ea;
+      border-radius: 12px;
+      background: rgba(255,255,255,.12);
+      font-size: 20px;
     }
 
+    /* FORM PANEL */
 
-    .brand-note{
-      margin:0;
-
-      font-size:15px;
-
-      line-height:1.6;
-
-      color:
-        rgba(255,244,236,.85);
+    .signup-form-panel {
+      padding: 45px 42px;
     }
 
-
-    /* =========================
-       DECOR VISUAL
-    ========================= */
-
-    .decor-visual{
-      min-height:260px;
-
-      position:relative;
-
-      z-index:1;
-
-      margin-top:30px;
+    .signup-back {
+      display: inline-block;
+      margin-bottom: 27px;
+      color: #895535;
+      font-size: 13px;
+      font-weight: 800;
+      text-decoration: none;
     }
 
+    .signup-kicker {
+      font-size: 12px;
+      font-weight: 900;
+      color: #9b613c;
+      letter-spacing: .17em;
+    }
 
-    .decor-shelf{
-      position:absolute;
+    .signup-form-panel h2 {
+      margin: 10px 0;
+      font-family: Georgia, serif;
+      font-size: 38px;
+      color: #302118;
+    }
 
-      left:0;
-      right:0;
-      bottom:22px;
+    .signup-intro {
+      color: #786e66;
+      font-size: 14px;
+      line-height: 1.7;
+      margin: 0 0 27px;
+    }
 
-      height:16px;
+    /* FORM GRID */
 
-      border-radius:999px;
+    .signup-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 19px 16px;
+    }
 
-      background:
-        rgba(255,255,255,.18);
+    .signup-field {
+      min-width: 0;
+    }
 
+    .signup-field.full {
+      grid-column: 1 / -1;
+    }
+
+    .signup-field label {
+      display: block;
+      color: #3d2c22;
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 9px;
+    }
+
+    .signup-input {
+      display: block;
+      width: 100%;
+      min-height: 53px;
+      padding: 13px 15px;
+
+      border-radius: 12px;
+      border: 1px solid #dccdc0;
+
+      background: #fffdfb;
+      color: #302118;
+
+      font: inherit;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .signup-input:focus {
+      border-color: #986343;
       box-shadow:
-        0 10px 24px
-        rgba(0,0,0,.18);
+        0 0 0 3px rgba(152,99,67,.12);
     }
 
-
-    .decor-frame{
-      position:absolute;
-
-      left:85px;
-      bottom:55px;
-
-      width:130px;
-      height:108px;
-
-      border:
-        8px solid #caa17e;
-
-      border-bottom-width:12px;
-
-      border-radius:9px;
-
-      background:
-        linear-gradient(
-          135deg,
-          #ffe7c8,
-          #e4ae76,
-          #72503a
-        );
-
-      box-shadow:
-        0 12px 24px
-        rgba(0,0,0,.20);
+    textarea.signup-input {
+      min-height: 95px;
+      resize: vertical;
+      line-height: 1.6;
     }
 
-
-    .decor-vase{
-      position:absolute;
-
-      right:32px;
-      bottom:51px;
-
-      width:75px;
-      height:95px;
-
-      border-radius:
-        28px 28px 20px 20px;
-
-      background:#efe4da;
-
-      box-shadow:
-        0 12px 20px
-        rgba(0,0,0,.14);
+    .signup-password-wrap {
+      position: relative;
     }
 
-
-    .decor-vase::before,
-    .decor-vase::after{
-      content:"";
-
-      position:absolute;
-
-      width:18px;
-      height:80px;
-
-      bottom:70px;
-
-      border-radius:100% 0 100% 0;
-
-      background:
-        linear-gradient(
-          180deg,
-          #79a451,
-          #3b662a
-        );
-
-      transform-origin:
-        bottom center;
+    .signup-password-wrap .signup-input {
+      padding-right: 73px;
     }
 
+    .signup-toggle-password {
+      position: absolute;
+      top: 50%;
+      right: 8px;
 
-    .decor-vase::before{
-      left:25px;
-      transform:rotate(-22deg);
+      transform: translateY(-50%);
+
+      min-width: 57px;
+      min-height: 37px;
+
+      background: #f1e5da;
+      border: none;
+      border-radius: 9px;
+
+      color: #71462d;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
     }
 
-
-    .decor-vase::after{
-      right:24px;
-      transform:rotate(24deg);
+    .signup-hint {
+      font-size: 11px;
+      color: #897b70;
+      margin-top: 6px;
+      line-height: 1.5;
     }
 
+    /* SUBMIT */
 
-    .decor-candle{
-      position:absolute;
+    .signup-submit {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
 
-      left:20px;
-      bottom:51px;
+      width: 100%;
+      min-height: 55px;
 
-      width:52px;
-      height:78px;
+      margin-top: 27px;
 
-      border-radius:10px;
-
-      background:#f6eee7;
-
-      box-shadow:
-        0 12px 20px
-        rgba(0,0,0,.12);
-    }
-
-
-    .decor-candle::before{
-      content:"";
-
-      position:absolute;
-
-      left:20px;
-      top:-18px;
-
-      width:12px;
-      height:20px;
-
-      border-radius:
-        50% 50% 45% 45%;
-
-      background:
-        linear-gradient(
-          180deg,
-          #ffd682,
-          #ef8c36
-        );
-    }
-
-
-    /* =========================
-       RIGHT SIDE
-    ========================= */
-
-    .signup-right{
-      padding:38px 44px;
-
-      display:flex;
-
-      align-items:center;
-
-      justify-content:center;
-
-      background:#fffaf6;
-    }
-
-
-    .signup-form-wrap{
-      width:100%;
-
-      max-width:650px;
-    }
-
-
-    .welcome-icon{
-      width:56px;
-      height:56px;
-
-      border-radius:50%;
-
-      background:#f3e6da;
-
-      color:#8a5a3b;
-
-      display:flex;
-      align-items:center;
-      justify-content:center;
-
-      font-size:25px;
-
-      margin-bottom:14px;
-    }
-
-
-    .signup-form-wrap h1{
-      margin:0;
-
-      font-size:52px;
-
-      line-height:.98;
-
-      color:#2b1b12;
-
-      font-family:
-        Georgia,
-        "Times New Roman",
-        serif;
-    }
-
-
-    .signup-subtitle{
-      margin:12px 0 0;
-
-      font-size:16px;
-
-      line-height:1.55;
-
-      color:#786f69;
-    }
-
-
-    .title-line{
-      width:88px;
-      height:4px;
-
-      border-radius:999px;
-
-      background:
-        linear-gradient(
-          90deg,
-          #b7835d,
-          #dec4af
-        );
-
-      margin:17px 0 26px;
-    }
-
-
-    /* =========================
-       FORM GRID
-    ========================= */
-
-    .form-grid{
-      display:grid;
-
-      grid-template-columns:
-        repeat(2,minmax(0,1fr));
-
-      gap:16px;
-    }
-
-
-    .field{
-      margin:0;
-    }
-
-
-    .field.full{
-      grid-column:1/-1;
-    }
-
-
-    .field-label{
-      display:block;
-
-      margin-bottom:7px;
-
-      font-size:13px;
-
-      font-weight:800;
-
-      color:#49382d;
-    }
-
-
-    .fieldbox{
-      position:relative;
-    }
-
-
-    .fieldbox .input{
-      width:100%;
-
-      min-height:56px;
-
-      border:
-        1px solid #e8ddd2;
-
-      border-radius:16px;
-
-      background:#fffdfa;
-
-      padding:
-        0 50px;
-
-      outline:none;
-
-      font-size:16px;
-
-      color:#1f1c19;
-
-      transition:
-        border-color .18s ease,
-        box-shadow .18s ease;
-    }
-
-
-    .fieldbox textarea.input{
-      min-height:105px;
-
-      resize:vertical;
-
-      padding:
-        16px 16px 16px 50px;
-    }
-
-
-    .fieldbox .input:focus{
-      border-color:#b7835d;
-
-      box-shadow:
-        0 0 0 4px
-        rgba(183,131,93,.10);
-    }
-
-
-    .field-icon{
-      position:absolute;
-
-      left:16px;
-      top:50%;
-
-      transform:
-        translateY(-50%);
-
-      width:22px;
-      height:22px;
-
-      color:#8a5a3b;
-
-      display:flex;
-
-      align-items:center;
-      justify-content:center;
-
-      pointer-events:none;
-    }
-
-
-    textarea + .field-icon{
-      top:20px;
-
-      transform:none;
-    }
-
-
-    .field-icon svg{
-      width:21px;
-      height:21px;
-
-      stroke:currentColor;
-    }
-
-
-    .toggle-password{
-      position:absolute;
-
-      right:12px;
-      top:50%;
-
-      transform:
-        translateY(-50%);
-
-      width:36px;
-      height:36px;
-
-      border:0;
-
-      border-radius:50%;
-
-      background:transparent;
-
-      color:#8a5a3b;
-
-      display:flex;
-
-      align-items:center;
-      justify-content:center;
-
-      cursor:pointer;
-    }
-
-
-    .toggle-password:hover{
-      background:#f3e6da;
-    }
-
-
-    .toggle-password svg{
-      width:21px;
-      height:21px;
-
-      stroke:currentColor;
-    }
-
-
-    /* =========================
-       CREATE BUTTON
-    ========================= */
-
-    .signup-btn{
-      width:100%;
-
-      min-height:60px;
-
-      margin-top:22px;
-
-      border:0;
-
-      border-radius:999px;
+      border: none;
+      border-radius: 999px;
 
       background:
         linear-gradient(
@@ -736,226 +303,118 @@
           #7e492a
         );
 
-      color:#fff;
+      color: white;
 
-      font-size:17px;
-
-      font-weight:800;
-
-      cursor:pointer;
-
-      display:flex;
-
-      align-items:center;
-      justify-content:center;
-
-      gap:10px;
+      font-size: 16px;
+      font-weight: 900;
+      cursor: pointer;
 
       box-shadow:
-        0 12px 24px
-        rgba(138,90,59,.22);
-
-      transition:
-        transform .18s ease,
-        box-shadow .18s ease;
+        0 12px 25px rgba(138,90,59,.22);
     }
 
-
-    .signup-btn:hover{
-      transform:
-        translateY(-1px);
-
-      box-shadow:
-        0 16px 30px
-        rgba(138,90,59,.28);
+    .signup-submit:disabled {
+      opacity: .65;
+      cursor: wait;
     }
 
-
-    .signup-btn:disabled{
-      opacity:.7;
-
-      cursor:not-allowed;
+    .signup-login {
+      text-align: center;
+      color: #766c63;
+      margin-top: 23px;
+      font-size: 14px;
+      line-height: 1.6;
     }
 
-
-    .signup-btn span{
-      font-size:25px;
+    .signup-login a {
+      color: #895535;
+      font-weight: 800;
+      text-decoration: none;
     }
 
-
-    /* =========================
-       LOGIN LINK
-    ========================= */
-
-    .login-box{
-      margin-top:20px;
-
-      padding:15px;
-
-      border:
-        1px solid #eadfd5;
-
-      border-radius:16px;
-
-      background:#fbf6f1;
-
-      text-align:center;
-
-      font-size:14px;
-
-      color:#756b64;
+    .signup-security {
+      margin-top: 25px;
+      padding-top: 22px;
+      border-top: 1px solid #eee3d9;
+      text-align: center;
+      font-size: 12px;
+      color: #8d8178;
     }
 
+    /* MOBILE */
 
-    .login-box a{
-      margin-left:5px;
+    @media(max-width:850px) {
 
-      font-weight:800;
-
-      color:#8a5a3b;
-
-      text-decoration:none;
-    }
-
-
-    .login-box a:hover{
-      text-decoration:underline;
-    }
-
-
-    /* =========================
-       TRUST
-    ========================= */
-
-    .trust-row{
-      margin-top:18px;
-
-      display:flex;
-
-      justify-content:center;
-
-      align-items:center;
-
-      gap:10px;
-
-      flex-wrap:wrap;
-
-      font-size:11px;
-
-      font-weight:800;
-
-      letter-spacing:.13em;
-
-      text-transform:uppercase;
-
-      color:#8a5a3b;
-    }
-
-
-    .trust-line{
-      width:44px;
-      height:1px;
-
-      background:#dcc9b8;
-    }
-
-
-    /* =========================
-       TABLET
-    ========================= */
-
-    @media(max-width:980px){
-
-      .signup-card{
-        grid-template-columns:1fr;
+      .signup-layout {
+        grid-template-columns: 1fr;
       }
 
-
-      .signup-left{
-        min-height:auto;
-
-        padding:20px;
+      .signup-brand-panel {
+        padding: 35px 28px;
       }
 
-
-      .signup-left-inner{
-        min-height:360px;
+      .signup-brand-panel h1 {
+        margin: 20px 0 10px;
+        font-size: 40px;
       }
 
-
-      .signup-right{
-        padding:
-          30px 24px 34px;
+      .signup-benefits {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
       }
 
-
-      .signup-form-wrap h1{
-        font-size:44px;
+      .signup-form-panel {
+        padding: 35px 28px;
       }
 
     }
 
+    @media(max-width:540px) {
 
-    /* =========================
-       MOBILE
-    ========================= */
-
-    @media(max-width:640px){
-
-      .signup-page{
-        padding:14px;
+      .signup-page {
+        padding: 14px 10px;
       }
 
-
-      .signup-left{
-        display:none;
+      .signup-layout {
+        border-radius: 20px;
       }
 
-
-      .signup-card{
-        border-radius:22px;
+      .signup-brand-panel {
+        padding: 28px 20px;
       }
 
-
-      .signup-right{
-        padding:
-          24px 17px 28px;
+      .signup-brand {
+        font-size: 18px;
       }
 
-
-      .signup-form-wrap h1{
-        font-size:38px;
+      .signup-brand-panel h1 {
+        font-size: 34px;
       }
 
-
-      .signup-subtitle{
-        font-size:14px;
+      .signup-brand-panel p {
+        font-size: 13px;
       }
 
-
-      .form-grid{
-        grid-template-columns:1fr;
-
-        gap:14px;
+      .signup-benefits {
+        grid-template-columns: 1fr;
+        gap: 9px;
       }
 
-
-      .field.full{
-        grid-column:auto;
+      .signup-form-panel {
+        padding: 28px 20px;
       }
 
-
-      .fieldbox .input{
-        min-height:54px;
-
-        font-size:15px;
+      .signup-form-panel h2 {
+        font-size: 32px;
       }
 
+      .signup-form-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
 
-      .signup-btn{
-        min-height:57px;
-
-        font-size:16px;
+      .signup-field.full {
+        grid-column: auto;
       }
 
     }
@@ -964,649 +423,438 @@
 
 </head>
 
-
 <body>
 
   <main class="signup-page">
 
-    <section class="signup-card">
+    <div class="signup-layout">
 
+      <!-- BRAND SECTION -->
 
-      <!-- LEFT SIDE -->
+      <section class="signup-brand-panel">
 
-      <div class="signup-left">
+        <a
+          href="/memora-creations/frontend/index.html"
+          style="color:white;text-decoration:none"
+        >
+          <div class="signup-brand">
+            MEMORA CREATIONS
+          </div>
+        </a>
 
-        <div class="signup-left-inner">
+        <h1>
+          Join Our<br>
+          <span>Family.</span>
+        </h1>
 
-          <div>
+        <p>
+          Create your account and discover
+          beautiful home decor, thoughtful
+          gifts and a simple shopping
+          experience.
+        </p>
 
-            <div class="brand-badge">
-              ✨
-            </div>
+        <div class="signup-benefits">
 
-
-            <h2 class="brand-name">
-              Memora
-              <br>
-              Creations
-            </h2>
-
-
-            <p class="brand-sub">
-              Decor • Memories • Gifts
-            </p>
-
-
-            <div class="brand-line"></div>
-
-
-            <p class="brand-tagline">
-              Create your space.
-              <br>
-              Create your memories.
-            </p>
-
-
-            <p class="brand-note">
-              Join Memora Creations and discover
-              beautiful products made to make
-              every corner feel special.
-            </p>
-
+          <div class="signup-benefit">
+            <div class="signup-benefit-icon">🛍️</div>
+            <span>Shop Beautiful Products</span>
           </div>
 
+          <div class="signup-benefit">
+            <div class="signup-benefit-icon">📦</div>
+            <span>Track Your Orders</span>
+          </div>
 
-          <div class="decor-visual">
+          <div class="signup-benefit">
+            <div class="signup-benefit-icon">♡</div>
+            <span>Create Your Wishlist</span>
+          </div>
 
-            <div class="decor-candle"></div>
-
-            <div class="decor-frame"></div>
-
-            <div class="decor-vase"></div>
-
-            <div class="decor-shelf"></div>
-
+          <div class="signup-benefit">
+            <div class="signup-benefit-icon">🔒</div>
+            <span>Secure Customer Account</span>
           </div>
 
         </div>
 
-      </div>
+      </section>
 
 
-      <!-- RIGHT SIDE -->
+      <!-- REGISTRATION SECTION -->
 
-      <div class="signup-right">
+      <section class="signup-form-panel">
 
-        <div class="signup-form-wrap">
+        <a
+          href="/memora-creations/frontend/index.html"
+          class="signup-back"
+        >
+          ← Back to Home
+        </a>
 
-          <div class="welcome-icon">
-            ✨
-          </div>
+        <div class="signup-kicker">
+          CUSTOMER REGISTRATION
+        </div>
 
+        <h2>
+          Create Account
+        </h2>
 
-          <h1>
-            Create Account
-          </h1>
+        <p class="signup-intro">
+          Fill in your details to create
+          your Memora Creations account.
+        </p>
 
 
-          <p class="signup-subtitle">
-            Start your journey with
-            <strong>
-              Memora Creations
-            </strong>
-            and make your space special.
-          </p>
+        <!-- REGISTRATION FORM -->
 
+        <form
+          id="signupForm"
+          autocomplete="on"
+        >
 
-          <div class="title-line"></div>
+          <div class="signup-form-grid">
 
+            <!-- FULL NAME -->
 
-          <form id="signupForm">
+            <div class="signup-field">
 
-            <div class="form-grid">
+              <label for="signupFullName">
+                Full Name *
+              </label>
 
-
-              <!-- FULL NAME -->
-
-              <div class="field">
-
-                <label class="field-label">
-                  Full Name *
-                </label>
-
-                <div class="fieldbox">
-
-                  <input
-                    class="input"
-                    name="fullName"
-                    placeholder="Your full name"
-                    required
-                    autocomplete="name"
-                  >
-
-                  <span class="field-icon">
-
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke-width="1.8"
-                    >
-
-                      <circle
-                        cx="12"
-                        cy="8"
-                        r="4"
-                      ></circle>
-
-                      <path
-                        d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"
-                      ></path>
-
-                    </svg>
-
-                  </span>
-
-                </div>
-
-              </div>
-
-
-              <!-- MOBILE -->
-
-              <div class="field">
-
-                <label class="field-label">
-                  Mobile Number *
-                </label>
-
-                <div class="fieldbox">
-
-                  <input
-                    class="input"
-                    name="mobile"
-                    type="tel"
-                    placeholder="10 digit mobile"
-                    required
-                    inputmode="numeric"
-                    pattern="[6-9][0-9]{9}"
-                    maxlength="10"
-                    autocomplete="tel"
-                  >
-
-                  <span class="field-icon">
-
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke-width="1.8"
-                    >
-
-                      <rect
-                        x="7"
-                        y="2.8"
-                        width="10"
-                        height="18.4"
-                        rx="2.2"
-                      ></rect>
-
-                      <path
-                        d="M10 18.2h4"
-                      ></path>
-
-                    </svg>
-
-                  </span>
-
-                </div>
-
-              </div>
-
-
-              <!-- EMAIL -->
-
-              <div class="field">
-
-                <label class="field-label">
-                  Email
-                </label>
-
-                <div class="fieldbox">
-
-                  <input
-                    class="input"
-                    name="email"
-                    type="email"
-                    placeholder="Email address"
-                    autocomplete="email"
-                  >
-
-                  <span class="field-icon">
-
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke-width="1.8"
-                    >
-
-                      <rect
-                        x="3"
-                        y="5"
-                        width="18"
-                        height="14"
-                        rx="2"
-                      ></rect>
-
-                      <path
-                        d="M3 7l9 6 9-6"
-                      ></path>
-
-                    </svg>
-
-                  </span>
-
-                </div>
-
-              </div>
-
-
-              <!-- PASSWORD -->
-
-              <div class="field">
-
-                <label class="field-label">
-                  Password *
-                </label>
-
-                <div class="fieldbox">
-
-                  <input
-                    class="input"
-                    id="signupPassword"
-                    name="password"
-                    type="password"
-                    placeholder="Minimum 8 characters"
-                    minlength="8"
-                    required
-                    autocomplete="new-password"
-                  >
-
-                  <span class="field-icon">
-
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke-width="1.8"
-                    >
-
-                      <rect
-                        x="5"
-                        y="10"
-                        width="14"
-                        height="10"
-                        rx="2"
-                      ></rect>
-
-                      <path
-                        d="M8 10V7.5a4 4 0 1 1 8 0V10"
-                      ></path>
-
-                    </svg>
-
-                  </span>
-
-
-                  <button
-                    class="toggle-password"
-                    type="button"
-                    id="toggleSignupPassword"
-                    aria-label="Show password"
-                  >
-
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke-width="1.8"
-                    >
-
-                      <path
-                        d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z"
-                      ></path>
-
-                      <circle
-                        cx="12"
-                        cy="12"
-                        r="3"
-                      ></circle>
-
-                    </svg>
-
-                  </button>
-
-                </div>
-
-              </div>
-
-
-              <!-- ADDRESS -->
-
-              <div class="field full">
-
-                <label class="field-label">
-                  Address *
-                </label>
-
-                <div class="fieldbox">
-
-                  <textarea
-                    class="input"
-                    name="addressLine"
-                    placeholder="House no, street, village / locality"
-                    required
-                    autocomplete="street-address"
-                  ></textarea>
-
-                  <span class="field-icon">
-
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke-width="1.8"
-                    >
-
-                      <path
-                        d="M12 21s7-6 7-12a7 7 0 1 0-14 0c0 6 7 12 7 12Z"
-                      ></path>
-
-                      <circle
-                        cx="12"
-                        cy="9"
-                        r="2"
-                      ></circle>
-
-                    </svg>
-
-                  </span>
-
-                </div>
-
-              </div>
-
-
-              <!-- PIN -->
-
-              <div class="field">
-
-                <label class="field-label">
-                  PIN Code *
-                </label>
-
-                <div class="fieldbox">
-
-                  <input
-                    class="input"
-                    name="pinCode"
-                    placeholder="6 digit PIN"
-                    required
-                    inputmode="numeric"
-                    pattern="[0-9]{6}"
-                    maxlength="6"
-                    autocomplete="postal-code"
-                  >
-
-                  <span class="field-icon">
-
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke-width="1.8"
-                    >
-
-                      <path
-                        d="M4 5h16v14H4z"
-                      ></path>
-
-                      <path
-                        d="M8 9h8"
-                      ></path>
-
-                      <path
-                        d="M8 13h5"
-                      ></path>
-
-                    </svg>
-
-                  </span>
-
-                </div>
-
-              </div>
-
-
-              <!-- CITY -->
-
-              <div class="field">
-
-                <label class="field-label">
-                  City
-                </label>
-
-                <div class="fieldbox">
-
-                  <input
-                    class="input"
-                    name="city"
-                    placeholder="City"
-                    autocomplete="address-level2"
-                  >
-
-                  <span class="field-icon">
-
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke-width="1.8"
-                    >
-
-                      <path
-                        d="M3 21h18"
-                      ></path>
-
-                      <path
-                        d="M5 21V8h6v13"
-                      ></path>
-
-                      <path
-                        d="M11 21V4h8v17"
-                      ></path>
-
-                    </svg>
-
-                  </span>
-
-                </div>
-
-              </div>
-
-
-              <!-- STATE -->
-
-              <div class="field full">
-
-                <label class="field-label">
-                  State
-                </label>
-
-                <div class="fieldbox">
-
-                  <input
-                    class="input"
-                    name="state"
-                    placeholder="State"
-                    autocomplete="address-level1"
-                  >
-
-                  <span class="field-icon">
-
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke-width="1.8"
-                    >
-
-                      <path
-                        d="M4 20h16"
-                      ></path>
-
-                      <path
-                        d="M6 20V9l6-4 6 4v11"
-                      ></path>
-
-                    </svg>
-
-                  </span>
-
-                </div>
-
-              </div>
-
-            </div>
-
-
-            <!-- CREATE ACCOUNT -->
-
-            <button
-              class="signup-btn"
-              type="submit"
-            >
-
-              Create Account
-
-              <span>
-                →
-              </span>
-
-            </button>
-
-
-            <!-- LOGIN -->
-
-            <div class="login-box">
-
-              Already have an account?
-
-              <a
-                href="/memora-creations/frontend/login.html"
+              <input
+                id="signupFullName"
+                class="signup-input"
+                name="fullName"
+                type="text"
+                placeholder="Your full name"
+                autocomplete="name"
+                minlength="2"
+                maxlength="100"
+                required
               >
-                Login here
-              </a>
 
             </div>
 
 
-            <!-- TRUST -->
+            <!-- MOBILE -->
 
-            <div class="trust-row">
+            <div class="signup-field">
 
-              <span class="trust-line"></span>
+              <label for="signupMobile">
+                Mobile Number *
+              </label>
 
-              <span>
-                🔒 Secure Registration
-              </span>
-
-              <span class="trust-line"></span>
+              <input
+                id="signupMobile"
+                class="signup-input"
+                name="mobile"
+                type="tel"
+                placeholder="10 digit mobile number"
+                inputmode="numeric"
+                autocomplete="tel"
+                pattern="[6-9][0-9]{9}"
+                minlength="10"
+                maxlength="10"
+                required
+              >
 
             </div>
 
-          </form>
 
-        </div>
+            <!-- EMAIL -->
 
-      </div>
+            <div class="signup-field">
 
-    </section>
+              <label for="signupEmail">
+                Email Address
+              </label>
+
+              <input
+                id="signupEmail"
+                class="signup-input"
+                name="email"
+                type="email"
+                placeholder="Your email address"
+                autocomplete="email"
+                maxlength="150"
+              >
+
+            </div>
+
+
+            <!-- PASSWORD -->
+
+            <div class="signup-field">
+
+              <label for="signupPassword">
+                Password *
+              </label>
+
+              <div class="signup-password-wrap">
+
+                <input
+                  id="signupPassword"
+                  class="signup-input"
+                  name="password"
+                  type="password"
+                  placeholder="Minimum 8 characters"
+                  minlength="8"
+                  autocomplete="new-password"
+                  required
+                >
+
+                <button
+                  id="toggleSignupPassword"
+                  class="signup-toggle-password"
+                  type="button"
+                  aria-label="Show password"
+                  aria-pressed="false"
+                >
+                  Show
+                </button>
+
+              </div>
+
+              <div class="signup-hint">
+                Use at least 8 characters.
+              </div>
+
+            </div>
+
+
+            <!-- ADDRESS -->
+
+            <div class="signup-field full">
+
+              <label for="signupAddress">
+                Full Address *
+              </label>
+
+              <textarea
+                id="signupAddress"
+                class="signup-input"
+                name="addressLine"
+                placeholder="House no, street, village / locality"
+                autocomplete="street-address"
+                required
+              ></textarea>
+
+            </div>
+
+
+            <!-- PIN CODE -->
+
+            <div class="signup-field">
+
+              <label for="signupPinCode">
+                PIN Code *
+              </label>
+
+              <input
+                id="signupPinCode"
+                class="signup-input"
+                name="pinCode"
+                type="text"
+                placeholder="6 digit PIN Code"
+                inputmode="numeric"
+                autocomplete="postal-code"
+                pattern="[0-9]{6}"
+                minlength="6"
+                maxlength="6"
+                required
+              >
+
+            </div>
+
+
+            <!-- CITY -->
+
+            <div class="signup-field">
+
+              <label for="signupCity">
+                City
+              </label>
+
+              <input
+                id="signupCity"
+                class="signup-input"
+                name="city"
+                type="text"
+                placeholder="City"
+                autocomplete="address-level2"
+                maxlength="100"
+              >
+
+            </div>
+
+
+            <!-- STATE -->
+
+            <div class="signup-field full">
+
+              <label for="signupState">
+                State
+              </label>
+
+              <input
+                id="signupState"
+                class="signup-input"
+                name="state"
+                type="text"
+                placeholder="State"
+                autocomplete="address-level1"
+                maxlength="100"
+              >
+
+            </div>
+
+          </div>
+
+
+          <!-- SUBMIT -->
+
+          <button
+            class="signup-submit"
+            type="submit"
+          >
+            Create Account
+            <span>→</span>
+          </button>
+
+
+          <!-- LOGIN LINK -->
+
+          <div class="signup-login">
+
+            Already have an account?
+
+            <a
+              href="/memora-creations/frontend/login.html"
+            >
+              Login here
+            </a>
+
+          </div>
+
+
+          <!-- SECURITY -->
+
+          <div class="signup-security">
+            🔒 Secure Registration • MEMORA CREATIONS
+          </div>
+
+        </form>
+
+      </section>
+
+    </div>
 
   </main>
 
 
+  <!-- UPDATED COMMON APP -->
+
   <script
-    src="/memora-creations/frontend/js/app.js?v=10"
+    src="/memora-creations/frontend/js/app.js?v=13"
   ></script>
 
 
+  <!-- UPDATED AUTH -->
+
   <script
-    src="/memora-creations/frontend/js/auth.js?v=10"
+    src="/memora-creations/frontend/js/auth.js?v=12"
   ></script>
 
+
+  <!-- PASSWORD TOGGLE + SESSION CHECK -->
 
   <script>
 
-    /* PASSWORD SHOW / HIDE */
+    (() => {
+      'use strict';
 
-    const signupPassword =
-      document.getElementById(
-        'signupPassword'
-      );
+      /* PASSWORD SHOW / HIDE */
 
+      const password =
+        document.getElementById('signupPassword');
 
-    const toggleSignupPassword =
-      document.getElementById(
-        'toggleSignupPassword'
-      );
+      const toggle =
+        document.getElementById('toggleSignupPassword');
 
+      if (password && toggle) {
 
-    if (
-      signupPassword &&
-      toggleSignupPassword
-    ) {
+        toggle.addEventListener('click', () => {
 
-      toggleSignupPassword.addEventListener(
-        'click',
-        function () {
+          const show =
+            password.type === 'password';
 
-          const hidden =
-            signupPassword.type ===
-            'password';
+          password.type =
+            show ? 'text' : 'password';
 
+          toggle.textContent =
+            show ? 'Hide' : 'Show';
 
-          signupPassword.type =
-            hidden
-              ? 'text'
-              : 'password';
-
-
-          toggleSignupPassword.setAttribute(
+          toggle.setAttribute(
             'aria-label',
-            hidden
-              ? 'Hide password'
-              : 'Show password'
+            show ? 'Hide password' : 'Show password'
           );
 
-        }
-      );
+          toggle.setAttribute(
+            'aria-pressed',
+            String(show)
+          );
 
-    }
+        });
 
-
-    /* ALREADY LOGGED IN */
-
-    (async function redirectLoggedInUser() {
-
-      const user =
-        await window.MC.currentUser();
-
-
-      if (!user) {
-        return;
       }
 
 
-      location.href =
-        '/memora-creations/frontend/index.html';
+      /* ALREADY LOGGED IN */
+
+      async function checkExistingSession() {
+
+        if (
+          !window.MC ||
+          typeof window.MC.currentUser !== 'function'
+        ) {
+          return;
+        }
+
+        try {
+
+          const user =
+            await window.MC.currentUser();
+
+          if (!user) return;
+
+          location.replace(
+            '/memora-creations/frontend/index.html'
+          );
+
+        } catch (error) {
+
+          /*
+           * Slow Render backend or
+           * network failure should not
+           * crash the registration page.
+           */
+
+          console.warn(
+            'Signup session check unavailable:',
+            error.message
+          );
+
+        }
+
+      }
+
+      checkExistingSession();
 
     })();
 
   </script>
 
 </body>
-
 </html>
