@@ -42,6 +42,7 @@ jobs:
 
           # Convert GitHub Pages paths to Cloudflare paths
           python3 - <<'PY'
+          import re
           from pathlib import Path
 
           root = Path("dist")
@@ -61,10 +62,12 @@ jobs:
 
               data = file.read_bytes()
 
-              # Fix absolute frontend URLs
-              data = data.replace(
-                  b"/memora-creations/",
-                  b"/"
+              # Fix absolute frontend URLs, but keep full
+              # github.io links (canonical / Open Graph) intact
+              data = re.sub(
+                  rb"(?<!github\.io)/memora-creations/",
+                  b"/",
+                  data
               )
 
               # Fix JavaScript BASE constants

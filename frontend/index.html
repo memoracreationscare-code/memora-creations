@@ -6,7 +6,38 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>MEMORA CREATIONS | Make Your Space Special</title>
-  <meta name="description" content="Shop beautiful home decor, photo frames and thoughtful gifts at Memora Creations.">
+  <meta name="description" content="Memora Creations: shop beautiful home decor, photo frames, wall decor and thoughtful gifts online. Easy ordering with COD and online payment, support on WhatsApp.">
+  <meta name="theme-color" content="#8a5a3b">
+
+  <link rel="canonical" href="https://memoracreationscare-code.github.io/memora-creations/frontend/index.html">
+  <link rel="icon" type="image/svg+xml" href="/memora-creations/frontend/favicon.svg">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Memora Creations">
+  <meta property="og:title" content="MEMORA CREATIONS | Make Your Space Special">
+  <meta property="og:description" content="Beautiful home decor, photo frames and thoughtful gifts to make every corner feel personal.">
+  <meta property="og:url" content="https://memoracreationscare-code.github.io/memora-creations/frontend/index.html">
+  <meta property="og:image" content="https://memoracreationscare-code.github.io/memora-creations/frontend/images/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="MEMORA CREATIONS | Make Your Space Special">
+  <meta name="twitter:description" content="Beautiful home decor, photo frames and thoughtful gifts to make every corner feel personal.">
+  <meta name="twitter:image" content="https://memoracreationscare-code.github.io/memora-creations/frontend/images/og-image.png">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Store",
+    "name": "Memora Creations",
+    "description": "Home decor, photo frames and thoughtful gifts.",
+    "url": "https://memoracreationscare-code.github.io/memora-creations/frontend/index.html",
+    "image": "https://memoracreationscare-code.github.io/memora-creations/frontend/images/og-image.png",
+    "email": "memoracreations.care@gmail.com",
+    "telephone": "+918874050204",
+    "areaServed": "IN"
+  }
+  </script>
 
   <link rel="stylesheet" href="/memora-creations/frontend/css/style.css?v=13">
   <link rel="preconnect" href="https://memora-creations.onrender.com" crossorigin>
@@ -1325,11 +1356,30 @@
 
       // CATEGORY AND PRODUCT REQUESTS ARE INDEPENDENT
 
+      // Free hosting servers can take up to a minute to wake up.
+      // If loading is slow, tell the visitor to wait instead of
+      // leaving them on a plain "Loading..." text.
+      function showSlowHint(box, loadingText) {
+        setTimeout(() => {
+          const stillLoading =
+            box.querySelector('.home-load-message p')
+              ?.textContent === loadingText &&
+            !box.querySelector('[data-retry]');
+
+          if (!stillLoading) return;
+
+          box.innerHTML = message(
+            'Server shuru ho raha hai, kripya 30-60 second ruk kar dekhein...'
+          );
+        }, 6000);
+      }
+
       async function loadHomeCategories() {
         const box = $('#categories');
         if (!box) return;
 
         box.innerHTML = message('Loading categories...');
+        showSlowHint(box, 'Loading categories...');
 
         try {
           const data = await window.MC.api('/products/categories');
@@ -1357,6 +1407,7 @@
         if (!box) return;
 
         box.innerHTML = message('Loading products...');
+        showSlowHint(box, 'Loading products...');
 
         try {
           const data = await window.MC.api('/products?limit=24');
