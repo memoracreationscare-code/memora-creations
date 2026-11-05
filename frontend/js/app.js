@@ -416,8 +416,17 @@ async function nav() {
       <a
         class="brand"
         href="${BASE}/frontend/index.html"
+        aria-label="Memora Creations home"
       >
-        MEMORA CREATIONS
+        <img
+          class="brand-logo"
+          src="${BASE}/frontend/images/logo.png"
+          alt="Memora Creations logo"
+          width="52"
+          height="52"
+          decoding="async"
+        >
+        <span class="brand-text">MEMORA CREATIONS</span>
       </a>
 
       <form class="search" id="globalSearch">

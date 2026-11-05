@@ -278,3 +278,41 @@
     transition: none !important;
   }
 }
+
+
+/* =====================================
+   BRAND LOGO
+===================================== */
+
+#nav .brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#nav .brand-logo {
+  display: block;
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+@media (max-width: 1050px) {
+  #nav .brand-logo {
+    width: 46px;
+    height: 46px;
+  }
+}
+
+@media (max-width: 600px) {
+  #nav .brand {
+    justify-content: center;
+  }
+
+  #nav .brand-logo {
+    width: 40px;
+    height: 40px;
+  }
+}
