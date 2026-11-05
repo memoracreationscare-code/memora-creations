@@ -1,0 +1,50 @@
+name: Keep Render Backend Awake
+
+# Render's free plan puts the backend to sleep after ~15 minutes without
+# traffic, and the next visitor then waits up to a minute for products to
+# load. This job pings the lightweight health route every 10 minutes.
+#
+# Notes:
+# - GitHub scheduled runs are best effort and can be delayed a few minutes.
+# - GitHub pauses scheduled workflows after 60 days without repository
+#   activity. Re-enable it from the Actions tab if that ever happens.
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: keep-render-awake
+  cancel-in-progress: true
+
+jobs:
+  ping:
+    name: Ping backend health route
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Ping /api/health
+        shell: bash
+        run: |
+          URL="https://memora-creations.onrender.com/api/health"
+
+          # A sleeping backend can take up to a minute to answer, so allow
+          # a long timeout and a few retries before giving up.
+          if curl --fail --silent --show-error \
+                  --max-time 90 \
+                  --retry 3 --retry-delay 15 --retry-all-errors \
+                  --output /tmp/health.json \
+                  --write-out "HTTP %{http_code} in %{time_total}s\n" \
+                  "$URL"; then
+            echo "Backend is awake:"
+            cat /tmp/health.json
+            echo
+          else
+            # Do not fail the run: a failed scheduled run would email the
+            # repository owner every 10 minutes while Render is down.
+            echo "::warning::Backend did not answer at $URL after retries."
+          fi
