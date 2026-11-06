@@ -62,6 +62,27 @@ app.use(
 );
 
 /* ========================================
+   GZIP COMPRESSION
+   Order and product lists are large JSON;
+   compressing them makes pages load faster.
+======================================== */
+
+let compression = null;
+
+try {
+  compression = require('compression');
+} catch (err) {
+  // Never stop the shop because of an optional speed-up.
+  console.warn(
+    'compression package not installed; responses will not be gzipped.'
+  );
+}
+
+if (compression) {
+  app.use(compression());
+}
+
+/* ========================================
    CORS
 ======================================== */
 
