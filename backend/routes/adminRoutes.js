@@ -33,6 +33,9 @@ const {
   requireAdmin
 } = require('../middleware/auth');
 
+const abandonedCartController =
+  require('../controllers/abandonedCartController');
+
 const cloudinaryController =
   require('../controllers/cloudinaryController');
 
@@ -568,6 +571,16 @@ router.get(
 router.post(
   '/orders/:id/shipment-dry-run',
   shiprocketDryRunController.dryRunShipment
+);
+
+
+/* =====================================
+   ABANDONED CARTS (READ-ONLY)
+===================================== */
+
+router.get(
+  '/abandoned-carts',
+  abandonedCartController.listAbandonedCarts
 );
 
 

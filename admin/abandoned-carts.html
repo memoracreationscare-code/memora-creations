@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/png" sizes="48x48" href="/memora-creations/frontend/images/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/memora-creations/frontend/images/favicon-192.png">
+  <link rel="apple-touch-icon" href="/memora-creations/frontend/images/apple-touch-icon.png">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Abandoned Carts | Memora Creations</title>
+
+  <link rel="stylesheet" href="/memora-creations/admin/css/style.css?v=5">
+
+  <style>
+    :root {
+      --mc-dark: #302117;
+      --mc-brown: #8b5b3a;
+      --mc-cream: #f8f5f0;
+      --mc-border: #e9dfd4;
+      --mc-muted: #81776f;
+      --mc-green: #1f9d55;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--mc-cream);
+      color: var(--mc-dark);
+    }
+
+    /* ---------- NAVIGATION (same look as the other admin pages) ---------- */
+
+    .adminnav {
+      background: #241a14;
+      border-bottom: 1px solid #483428;
+      box-shadow: 0 8px 26px rgba(34, 22, 15, .12);
+    }
+
+    .adminnav .container {
+      min-height: 78px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .admin-brand {
+      display: flex;
+      flex-direction: column;
+      margin-right: auto;
+      padding: 8px 0;
+    }
+
+    .admin-brand strong {
+      color: #fff;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 1px;
+    }
+
+    .admin-brand span {
+      margin-top: 4px;
+      color: #d5a987;
+      font-size: 10px;
+      letter-spacing: 2px;
+    }
+
+    .adminnav a {
+      padding: 11px 15px;
+      border-radius: 11px;
+      color: #eadfd6;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: .2s ease;
+    }
+
+    .adminnav a:hover,
+    .adminnav a.active {
+      background: var(--mc-brown);
+      color: #fff;
+    }
+
+    .adminnav #logout {
+      border-radius: 11px;
+      margin-left: 6px;
+    }
+
+    /* ---------- PAGE ---------- */
+
+    .adminmain {
+      padding-top: 30px;
+      padding-bottom: 70px;
+    }
+
+    .ac-head h1 {
+      margin: 0 0 6px;
+      font-size: 30px;
+    }
+
+    .ac-head p {
+      margin: 0;
+      color: var(--mc-muted);
+      line-height: 1.6;
+      max-width: 760px;
+    }
+
+    .ac-panel {
+      margin-top: 22px;
+      background: #fff;
+      border: 1px solid var(--mc-border);
+      border-radius: 18px;
+      padding: 20px;
+    }
+
+    .ac-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      align-items: flex-end;
+    }
+
+    .ac-controls label {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .ac-controls select {
+      min-width: 190px;
+      padding: 11px 12px;
+      border: 1px solid var(--mc-border);
+      border-radius: 11px;
+      background: #fff;
+      font: inherit;
+    }
+
+    .ac-template {
+      margin-top: 18px;
+    }
+
+    .ac-template label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .ac-template textarea {
+      width: 100%;
+      min-height: 130px;
+      padding: 12px;
+      border: 1px solid var(--mc-border);
+      border-radius: 12px;
+      font: inherit;
+      line-height: 1.5;
+      resize: vertical;
+    }
+
+    .ac-hint {
+      margin-top: 6px;
+      color: var(--mc-muted);
+      font-size: 12.5px;
+      line-height: 1.5;
+    }
+
+    .ac-summary {
+      margin: 22px 0 10px;
+      font-weight: 800;
+    }
+
+    .ac-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .ac-card {
+      display: grid;
+      grid-template-columns: 1.2fr 2fr auto;
+      gap: 16px;
+      align-items: center;
+      background: #fff;
+      border: 1px solid var(--mc-border);
+      border-radius: 16px;
+      padding: 16px 18px;
+    }
+
+    .ac-card.sent {
+      background: #f3faf5;
+      border-color: #cfe8d6;
+    }
+
+    .ac-name { font-weight: 800; }
+
+    .ac-meta {
+      margin-top: 4px;
+      color: var(--mc-muted);
+      font-size: 13px;
+    }
+
+    .ac-items {
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .ac-items .oos {
+      color: #b3261e;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .ac-total {
+      margin-top: 4px;
+      font-weight: 800;
+    }
+
+    .ac-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: stretch;
+      min-width: 150px;
+    }
+
+    .ac-wa {
+      display: inline-block;
+      text-align: center;
+      padding: 11px 14px;
+      border-radius: 11px;
+      background: var(--mc-green);
+      color: #fff;
+      font-weight: 800;
+      font-size: 14px;
+      text-decoration: none;
+    }
+
+    .ac-wa:hover { filter: brightness(.94); }
+
+    .ac-mark {
+      padding: 8px 10px;
+      border: 1px solid var(--mc-border);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--mc-dark);
+      font: inherit;
+      font-size: 12.5px;
+      cursor: pointer;
+    }
+
+    .ac-state {
+      padding: 34px 16px;
+      text-align: center;
+      color: var(--mc-muted);
+      background: #fff;
+      border: 1px dashed var(--mc-border);
+      border-radius: 16px;
+    }
+
+    @media (max-width: 760px) {
+      .ac-card { grid-template-columns: 1fr; }
+      .ac-actions { flex-direction: row; }
+      .ac-actions > * { flex: 1; }
+      .ac-head h1 { font-size: 25px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav class="adminnav">
+    <div class="container">
+
+      <div class="admin-brand">
+        <strong>MEMORA CREATIONS</strong>
+        <span>ADMIN CONTROL CENTER</span>
+      </div>
+
+      <a href="/memora-creations/admin/dashboard.html">Dashboard</a>
+      <a href="/memora-creations/admin/products.html">Products</a>
+      <a href="/memora-creations/admin/orders.html">Orders</a>
+      <a href="/memora-creations/admin/users.html">Customers</a>
+      <a class="active" aria-current="page" href="/memora-creations/admin/abandoned-carts.html">Abandoned Carts</a>
+
+      <button id="logout" class="btn secondary" type="button">Logout</button>
+
+    </div>
+  </nav>
+
+  <main class="container adminmain">
+
+    <section class="ac-head">
+      <h1>Abandoned Carts</h1>
+      <p>
+        Customers who added products to their cart but did not order.
+        Press <b>Send WhatsApp</b> to open a chat with a ready message and
+        your website link, then press Send in WhatsApp. Nothing is sent
+        automatically. Customers who ordered after changing their cart
+        are not listed.
+      </p>
+    </section>
+
+    <section class="ac-panel">
+
+      <div class="ac-controls">
+        <label>
+          Cart left untouched for at least
+          <select id="acHours">
+            <option value="2">2 hours</option>
+            <option value="6">6 hours</option>
+            <option value="24" selected>24 hours</option>
+            <option value="72">3 days</option>
+            <option value="168">7 days</option>
+          </select>
+        </label>
+
+        <button id="acRefresh" class="btn" type="button">Refresh</button>
+      </div>
+
+      <div class="ac-template">
+        <label for="acTemplate">WhatsApp message (you can edit it)</label>
+        <textarea id="acTemplate"></textarea>
+        <div class="ac-hint">
+          Words in curly brackets are filled in for each customer:
+          <b>{name}</b>, <b>{items}</b> and <b>{link}</b>.
+          Your edits are remembered in this browser.
+        </div>
+      </div>
+
+    </section>
+
+    <div id="acSummary" class="ac-summary"></div>
+    <div id="acList" class="ac-list"></div>
+
+  </main>
+
+  <script src="/memora-creations/frontend/js/app.js?v=10"></script>
+  <script src="/memora-creations/admin/js/auth.js?v=5"></script>
+  <script src="/memora-creations/admin/js/abandoned-carts.js?v=1"></script>
+
+</body>
+
+</html>
