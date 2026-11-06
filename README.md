@@ -22,10 +22,11 @@ Full-stack e-commerce application using HTML/CSS/JavaScript, Node.js, Express an
 
 Things worth knowing:
 
+- Responses are gzip-compressed by the `compression` middleware in `backend/server.js` (optional: the server still starts if the package is missing). `admin/js/auth.js` makes simultaneous identical requests for `/admin/dashboard` and `/admin/orders` share one call, so admin pages do not ask the server for the same data twice.
 - The frontend finds the backend through the `API` constant at the top of `frontend/js/app.js`. Change it there if the backend moves.
 - The Cloudflare workflow rewrites `/memora-creations/` paths to `/` for the mirror and needs the repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`. `github.io` URLs (canonical and Open Graph tags) are intentionally left untouched.
 - The frontend and the API live on different domains, so in production the auth cookie is `SameSite=None; Secure` unless `COOKIE_SAMESITE` is set. `backend/server.js` always allows the `github.io` and `pages.dev` origins in CORS, plus anything listed in `CORS_ORIGIN`.
-- `.github/workflows/keep-render-awake.yml` pings `/api/health` every 10 minutes so a free Render instance does not fall asleep. Scheduled workflows pause after 60 days without repository activity; re-enable it from the Actions tab if that happens. The homepage also shows a "server is starting" message when the backend takes longer than 6 seconds.
+- `.github/workflows/keep-render-awake.yml` pings `/api/health` every 10 minutes so a free Render instance does not fall asleep. Scheduled workflows pause after 60 days without repository activity; re-enable it from the Actions tab if that happens. The homepage also shows a "server is starting" message when the backend takes longer than 6 seconds. The admin pages show the same kind of message.
 
 ## SEO
 
