@@ -55,6 +55,7 @@ Things worth knowing:
 - Delivery pincode check and delivery estimate, Shiprocket shipment tracking.
 - Gift wrapping (disabled unless `GIFT_WRAPPING_LIVE_ENABLED=true`).
 - Optional WhatsApp order-status notifications (disabled unless `WHATSAPP_SEND_ENABLED=true`).
+- Admin page **Abandoned Carts** (`admin/abandoned-carts.html`, API `GET /api/admin/abandoned-carts`): lists customers who left products in their cart and did not order, with a one-click "Send WhatsApp" button that opens a chat with a ready message and the cart link. It is read-only and sends nothing from the server, so it is free and cannot get the WhatsApp number banned. The cart rules live in `backend/utils/abandonedCarts.js` and are covered by `tests/abandoned-carts.test.js`.
 - Password reset email through Resend.
 
 ## Audit status (initial build)
