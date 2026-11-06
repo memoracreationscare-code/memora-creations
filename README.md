@@ -29,7 +29,7 @@ Things worth knowing:
 
 ## SEO
 
-- Public pages (home, products, about, contact, policies) have a canonical URL, Open Graph and Twitter tags. The sharing image is `frontend/images/og-image.png` (a simple placeholder banner; replace it with the real logo if available).
+- Public pages (home, products, about, contact, policies) have a canonical URL, Open Graph and Twitter tags. The sharing image is `frontend/images/og-image.png`, built from the brand logo. The logo files live in `frontend/images/` (`logo.png` for the header, `favicon-48.png`, `favicon-192.png` and `apple-touch-icon.png` for browser/phone icons). The header logo is added in `frontend/js/app.js` and styled at the end of `frontend/css/premium-navbar.css`.
 - Private pages (cart, checkout, login, orders, profile, wishlist, password reset) and every admin page carry `noindex, nofollow`.
 - `sitemap.xml` at the repository root lists the public pages. Submit `https://memoracreationscare-code.github.io/memora-creations/sitemap.xml` in Google Search Console. Add new public pages to it by hand.
 
