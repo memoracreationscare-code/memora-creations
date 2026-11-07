@@ -287,6 +287,81 @@
     }
   }
 
+  // Gives every product page its own title, description, address
+  // and Google "Product" data (no ratings are invented).
+  function applyProductSeo(product, images, stock) {
+    try {
+      const name = String(product.name || 'Product');
+      const text = String(product.description || '').replace(/\s+/g, ' ').trim();
+      const description = (text || `Buy ${name} online from Memora Creations.`).slice(0, 155);
+      const pageUrl = 'https://memoracreationscare-code.github.io/memora-creations/frontend/product.html?id=' + encodeURIComponent(product._id);
+
+      document.title = `${name} | Memora Creations`;
+
+      const setMeta = (selector, create, value) => {
+        let el = document.head.querySelector(selector);
+        if (!el) { el = create(); document.head.appendChild(el); }
+        el.setAttribute(el.tagName === 'LINK' ? 'href' : 'content', value);
+      };
+
+      setMeta('meta[name="description"]', () => {
+        const m = document.createElement('meta'); m.name = 'description'; return m;
+      }, description);
+
+      setMeta('link[rel="canonical"]', () => {
+        const l = document.createElement('link'); l.rel = 'canonical'; return l;
+      }, pageUrl);
+
+      setMeta('meta[property="og:title"]', () => {
+        const m = document.createElement('meta'); m.setAttribute('property', 'og:title'); return m;
+      }, document.title);
+
+      setMeta('meta[property="og:description"]', () => {
+        const m = document.createElement('meta'); m.setAttribute('property', 'og:description'); return m;
+      }, description);
+
+      if (images[0]?.url) {
+        setMeta('meta[property="og:image"]', () => {
+          const m = document.createElement('meta'); m.setAttribute('property', 'og:image'); return m;
+        }, images[0].url);
+      }
+
+      const price = Number(product.sellingPrice);
+
+      if (price > 0) {
+        const data = {
+          '@context': 'https://schema.org',
+          '@type': 'Product',
+          name,
+          description,
+          image: images.map(image => image.url),
+          url: pageUrl,
+          brand: { '@type': 'Brand', name: 'Memora Creations' },
+          offers: {
+            '@type': 'Offer',
+            url: pageUrl,
+            priceCurrency: 'INR',
+            price: price.toFixed(2),
+            availability: stock
+              ? 'https://schema.org/InStock'
+              : 'https://schema.org/OutOfStock',
+            itemCondition: 'https://schema.org/NewCondition'
+          }
+        };
+
+        document.head.querySelector('script[data-mc-product]')?.remove();
+        const script = document.createElement('script');
+        script.type = 'application/ld+json';
+        script.dataset.mcProduct = '1';
+        script.textContent = JSON.stringify(data);
+        document.head.appendChild(script);
+      }
+    } catch (error) {
+      // SEO tags must never break the product page.
+      console.warn('Product SEO skipped:', error);
+    }
+  }
+
   async function loadSingleProduct() {
     const box = $('#product');
     if (!box) return;
@@ -330,6 +405,7 @@
             </div>
           </div>
         </div>`;
+      applyProductSeo(product, images, stock);
       refreshWishlist();
       // FIX: querySelectorAll returns a list; querySelector does not.
       $$('.thumbs img', box).forEach(image => {
