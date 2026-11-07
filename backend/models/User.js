@@ -138,6 +138,15 @@ const userSchema =
       },
 
 
+      // Small profile photo stored as an image data URL
+      // (resized in the browser to about 256px).
+      avatar: {
+        type: String,
+        default: '',
+        maxlength: 120000
+      },
+
+
       addresses: {
         type: [
           addressSchema

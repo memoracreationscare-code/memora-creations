@@ -1025,7 +1025,7 @@ const listUsers = asyncHandler(async (_req, res) => {
 
   const users = await User.find()
     .select(
-      '-passwordHash -passwordResetTokenHash -passwordResetExpiresAt'
+      '-passwordHash -passwordResetTokenHash -passwordResetExpiresAt -avatar'
     )
     .sort({
       passwordResetRequestedAt: -1,

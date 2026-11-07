@@ -135,12 +135,189 @@ function renderProfileSummary(user) {
     .map(part => part[0].toUpperCase())
     .join('') || 'M';
 
-  window.MC.$('#profileAvatar').textContent = initials;
+  setAvatarView(user.avatar, initials);
   window.MC.$('#profileSummaryName').textContent = name || 'Welcome';
   window.MC.$('#profileSummaryMobile').textContent =
     user.mobile ? '+91 ' + user.mobile : '';
 
   box.hidden = false;
+
+}
+
+
+/* =========================
+   PROFILE PHOTO
+   The photo is cropped square and shrunk to
+   256px in the browser, so it stays small.
+========================= */
+
+function setAvatarView(avatar, initials) {
+
+  const box = window.MC.$('#profileAvatar');
+  const actions = window.MC.$('#avatarActions');
+
+  if (!box) {
+    return;
+  }
+
+  box.textContent = '';
+  box.style.backgroundImage = '';
+
+  if (avatar) {
+    box.style.backgroundImage = 'url("' + avatar + '")';
+    box.classList.add('has-photo');
+  } else {
+    box.classList.remove('has-photo');
+    box.textContent = initials || 'M';
+  }
+
+  if (actions) {
+    actions.hidden = !avatar;
+  }
+
+}
+
+
+function shrinkImage(file) {
+
+  return new Promise((resolve, reject) => {
+
+    const url = URL.createObjectURL(file);
+    const image = new Image();
+
+    image.onload = () => {
+
+      const size = 256;
+      const side = Math.min(image.width, image.height);
+      const canvas = document.createElement('canvas');
+
+      canvas.width = size;
+      canvas.height = size;
+
+      canvas.getContext('2d').drawImage(
+        image,
+        (image.width - side) / 2,
+        (image.height - side) / 2,
+        side,
+        side,
+        0,
+        0,
+        size,
+        size
+      );
+
+      URL.revokeObjectURL(url);
+
+      let quality = 0.85;
+      let data = canvas.toDataURL('image/jpeg', quality);
+
+      while (data.length > 90000 && quality > 0.4) {
+        quality -= 0.15;
+        data = canvas.toDataURL('image/jpeg', quality);
+      }
+
+      resolve(data);
+
+    };
+
+    image.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('Yeh photo khul nahi paayi.'));
+    };
+
+    image.src = url;
+
+  });
+
+}
+
+
+async function saveAvatar(avatar) {
+
+  const data = await window.MC.api('/profile/avatar', {
+    method: 'PUT',
+    body: JSON.stringify({ avatar })
+  });
+
+  if (profileUser) {
+    profileUser.avatar = data.avatar || '';
+  }
+
+  renderProfileSummary(profileUser);
+
+}
+
+
+const avatarPick = window.MC.$('#avatarPick');
+const avatarFile = window.MC.$('#avatarFile');
+const avatarRemove = window.MC.$('#avatarRemove');
+
+if (avatarPick && avatarFile) {
+
+  avatarPick.addEventListener('click', () => avatarFile.click());
+
+  avatarFile.addEventListener('change', async () => {
+
+    const file = avatarFile.files[0];
+    avatarFile.value = '';
+
+    if (!file) {
+      return;
+    }
+
+    if (!/^image\/(jpeg|png|webp)$/.test(file.type)) {
+      window.MC.toast('Sirf JPG, PNG ya WebP photo chunein.', 'error');
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      window.MC.toast('Photo 10 MB se chhoti honi chahiye.', 'error');
+      return;
+    }
+
+    avatarPick.disabled = true;
+
+    try {
+
+      await saveAvatar(await shrinkImage(file));
+      window.MC.toast('Profile photo save ho gayi.', 'success');
+
+    } catch (error) {
+
+      window.MC.toast(
+        error.message || 'Photo save nahi ho saki.',
+        'error'
+      );
+
+    } finally {
+
+      avatarPick.disabled = false;
+
+    }
+
+  });
+
+}
+
+if (avatarRemove) {
+
+  avatarRemove.addEventListener('click', async () => {
+
+    try {
+
+      await saveAvatar('');
+      window.MC.toast('Profile photo hata di gayi.', 'success');
+
+    } catch (error) {
+
+      window.MC.toast(
+        error.message || 'Photo nahi hati.',
+        'error'
+      );
+
+    }
+
+  });
 
 }
 

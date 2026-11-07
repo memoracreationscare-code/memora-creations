@@ -53,6 +53,9 @@ function publicUser(
     email:
       user.email || '',
 
+    avatar:
+      user.avatar || '',
+
     addresses:
       user.addresses,
 
