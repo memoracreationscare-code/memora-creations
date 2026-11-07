@@ -676,7 +676,9 @@ async function loadOrderDetails() {
 
           <strong>
             ${
-              order.paymentMethod === 'COD'
+              order.codAdvance?.enabled
+                ? 'Cash on Delivery (advance paid online)'
+                : order.paymentMethod === 'COD'
                 ? 'Cash on Delivery'
                 : 'Online Payment'
             }
@@ -760,6 +762,20 @@ async function loadOrderDetails() {
             )}
           </strong>
         </div>
+
+        ${order.codAdvance?.enabled ? `
+        <div class="order-summary-line">
+          <span>Advance paid online</span>
+          <strong>${orderMoney(order.codAdvance.advanceAmount)}</strong>
+        </div>
+
+        <div class="order-summary-line">
+          <span>${order.codAdvance.balanceStatus === 'RECEIVED'
+            ? 'Balance paid on delivery'
+            : 'To pay on delivery (cash)'}</span>
+          <strong>${orderMoney(order.codAdvance.balanceAmount)}</strong>
+        </div>` : ''}
+
 
 
         <div class="delivery-address">

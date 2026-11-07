@@ -549,6 +549,9 @@
       preview.grandTotal,
       true
     );
+
+    lastTotal = Number(preview.grandTotal) || 0;
+    updateAdvanceNotice();
   }
 
   /*
@@ -556,6 +559,101 @@
    PAYMENT METHOD + COUPONS
   ========================================
   */
+
+  /*
+  ========================================
+   COD WITH ADVANCE (only when the shop
+   switches it on in Render)
+  ========================================
+  */
+
+  let codAdvance = { enabled: false, percent: 30 };
+  let lastTotal = 0;
+
+  function advanceSplit(total) {
+    const paise = Math.round(Number(total || 0) * 100);
+
+    if (paise < 200) return null;
+
+    const advance = Math.max(
+      100,
+      Math.min(
+        Math.round((paise * codAdvance.percent) / 100),
+        paise - 100
+      )
+    );
+
+    return {
+      advance: advance / 100,
+      balance: (paise - advance) / 100
+    };
+  }
+
+  function updateAdvanceNotice() {
+    let box = $('#mcAdvanceNotice');
+
+    if (!codAdvance.enabled) {
+      if (box) box.hidden = true;
+      return;
+    }
+
+    if (!box) {
+      const label = document
+        .querySelector('input[name="paymentMethod"][value="COD"]')
+        ?.closest('label');
+
+      if (!label) return;
+
+      box = document.createElement('div');
+      box.id = 'mcAdvanceNotice';
+      box.style.cssText =
+        'margin:8px 0 0;padding:12px 14px;border-radius:12px;' +
+        'background:#fff7e6;border:1px solid #f0d9a8;color:#6b4a12;' +
+        'font-size:14px;line-height:1.6';
+      label.insertAdjacentElement('afterend', box);
+    }
+
+    const split = advanceSplit(lastTotal);
+
+    box.hidden = chosenMethod() !== 'COD' || !split;
+
+    if (split) {
+      box.innerHTML =
+        `<b>COD par ${codAdvance.percent}% advance zaroori hai.</b><br>` +
+        `Abhi online: <b>${MC.money(split.advance)}</b> &middot; ` +
+        `Delivery par cash: <b>${MC.money(split.balance)}</b><br>` +
+        'Advance ki wapsi ke liye Return &amp; Refund Policy dekhein.';
+    }
+  }
+
+  MC.api('/health')
+    .then(data => {
+      if (data?.codAdvance?.enabled === true) {
+        codAdvance = {
+          enabled: true,
+          percent: Number(data.codAdvance.percent) || 30
+        };
+
+        const hint = document
+          .querySelector('input[name="paymentMethod"][value="COD"]')
+          ?.closest('label')
+          ?.querySelector('small');
+
+        if (hint) {
+          hint.textContent =
+            `${codAdvance.percent}% advance online, baaki delivery par`;
+        }
+
+        updateAdvanceNotice();
+      }
+    })
+    .catch(() => {});
+
+  document.addEventListener('change', event => {
+    if (event.target?.name === 'paymentMethod') {
+      updateAdvanceNotice();
+    }
+  });
 
   function chosenMethod() {
     return $(
@@ -1097,9 +1195,10 @@
         '/orders/cod',
         {
           method: 'POST',
-          body: JSON.stringify(
-            payload()
-          )
+          body: JSON.stringify({
+              ...payload(),
+              ...(advanceMode ? { codAdvance: true } : {})
+            })
         }
       );
 
@@ -1132,7 +1231,8 @@
   ========================================
   */
 
-  async function placeCashfreeOrder() {
+  async function placeCashfreeOrder(options = {}) {
+    const advanceMode = options.codAdvance === true;
     setLoading(true);
 
     let orderId = null;
@@ -1222,8 +1322,12 @@
         verified.order?._id
       ) {
         showConfirmation(
-          'Payment Successful',
-          'Cashfree ne payment confirm kar diya hai.',
+          advanceMode
+            ? 'Order Placed Successfully'
+            : 'Payment Successful',
+          advanceMode
+            ? 'Advance payment mil gaya. Baaki rakam delivery par cash me dein.'
+            : 'Cashfree ne payment confirm kar diya hai.',
           verified.order._id
         );
 
@@ -1293,8 +1397,11 @@
           chosenMethod();
 
         if (method === 'COD') {
-          await placeCodOrder();
-
+          if (codAdvance.enabled) {
+            await placeCashfreeOrder({ codAdvance: true });
+          } else {
+            await placeCodOrder();
+          }
         } else if (
           method === 'CASHFREE'
         ) {

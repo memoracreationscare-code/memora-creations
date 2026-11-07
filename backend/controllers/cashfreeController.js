@@ -17,6 +17,7 @@
 */
 
 const crypto = require('crypto');
+const codAdvanceRules = require('../utils/codAdvance');
 const mongoose = require('mongoose');
 
 const {
@@ -131,8 +132,37 @@ const createOrder = asyncHandler(
         giftWrapping
       });
 
-    const amount =
+    const fullAmount =
       amountDetails.grandTotal;
+
+    /*
+      COD WITH ADVANCE (only when switched on).
+      The gateway collects just the advance share.
+    */
+    const useAdvance =
+      req.body?.codAdvance === true;
+
+    if (useAdvance && !codAdvanceRules.isEnabled()) {
+      throw error(
+        400,
+        'COD advance payment is not available.'
+      );
+    }
+
+    const split = useAdvance
+      ? codAdvanceRules.splitAdvance(fullAmount)
+      : null;
+
+    if (useAdvance && !split) {
+      throw error(
+        400,
+        'Order is too small for advance payment.'
+      );
+    }
+
+    const amount = useAdvance
+      ? split.advanceAmount
+      : fullAmount;
 
     if (
       !Number.isFinite(amount) ||
@@ -267,9 +297,8 @@ const createOrder = asyncHandler(
 
         couponCode,
 
-        expectedAmount:
-          amount,
-
+        expectedAmount: fullAmount,
+        codAdvance: useAdvance,
         clearCart:
           req.body?.clearCart === true,
 
@@ -323,9 +352,11 @@ const createOrder = asyncHandler(
       paymentSessionId:
         cashfreeOrder.payment_session_id,
 
-      amount:
-        order.grandTotal,
-
+      amount: amount,
+      totalAmount: order.grandTotal,
+      codAdvance: useAdvance
+        ? order.codAdvance
+        : undefined,
       currency:
         'INR',
 
@@ -429,7 +460,7 @@ const verifyPayment = asyncHandler(
     const paid =
       isCashfreePaymentSuccessful(
         gatewayOrder,
-        order.grandTotal
+        codAdvanceRules.onlineAmount(order)
       );
 
 

@@ -303,6 +303,19 @@ const orderSchema = new mongoose.Schema({
 
   /* CASHFREE FIELDS */
 
+  /* COD WITH ADVANCE (see backend/utils/codAdvance.js) */
+  codAdvance: {
+    enabled: { type: Boolean, default: false, index: true },
+    percent: { type: Number, min: 0, max: 100 },
+    advanceAmount: { type: Number, min: 0 },
+    balanceAmount: { type: Number, min: 0 },
+    balanceStatus: {
+      type: String,
+      enum: ['PENDING', 'RECEIVED']
+    },
+    balanceReceivedAt: Date
+  },
+
   cashfreeOrderId: {
     type: String,
     sparse: true,

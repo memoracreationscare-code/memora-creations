@@ -61,6 +61,17 @@ A logo loader (cream screen, round logo, turning gold ring) is added to every cu
 
 `admin/cod-remittance.html` (API `GET /api/admin/cod-remittance`) shows where the money of each Cash-on-Delivery order is: with the courier, delivered and awaited, received, or not collected, plus the live Shiprocket wallet balance. The amounts are order totals (Shiprocket deducts its charges before paying out). The page does not read Shiprocket's own remittance list because no documented API for it was found; the real payouts are under Billing > COD Remittance in Shiprocket. "Mark as received" uses the existing COD-paid route and only updates the owner's record. Rules are in `backend/utils/codRemittance.js` with tests in `tests/cod-remittance.test.js`.
 
+## COD with advance payment (off by default)
+
+When `COD_ADVANCE_ENABLED=true` in Render, a customer who chooses Cash on Delivery first pays `COD_ADVANCE_PERCENT` (default 30, allowed 5 to 90) of the total online through Cashfree and pays the rest to the courier. Without that variable nothing changes.
+
+- Such an order is stored as a normal Cashfree order whose gateway amount is only the advance, plus a `codAdvance` block on the order (`advanceAmount`, `balanceAmount`, `balanceStatus`). Rules and the exact-to-the-paisa split are in `backend/utils/codAdvance.js` with tests in `tests/cod-advance.test.js`.
+- Payment verification, the webhook and the cleanup service compare against the advance (`onlineAmount`) instead of the full total.
+- Shiprocket receives the order as COD and collects only the balance (`codFigures` in `backend/services/shiprocketService.js`). For every COD order the discount sent to Shiprocket is now worked out so the courier collects exactly what the customer owes.
+- The admin Orders label shows the cash to collect, the COD Remittance page uses the balance, and "Mark as received" on that page records the balance.
+- Refunds of the advance are done by hand in the Cashfree dashboard. The automatic cancellation/refund pages compare against the full total, so they refuse advance orders instead of refunding the wrong amount.
+- The checkout reads `GET /api/health` (`codAdvance.enabled`, `codAdvance.percent`) to decide whether to show the advance notice.
+
 ## SEO
 
 - Public pages (home, products, about, contact, policies) have a canonical URL, Open Graph and Twitter tags. The sharing image is `frontend/images/og-image.png`, built from the brand logo. The logo files live in `frontend/images/` (`logo.png` for the header, `favicon-48.png`, `favicon-192.png` and `apple-touch-icon.png` for browser/phone icons). The header logo is added in `frontend/js/app.js` and styled at the end of `frontend/css/premium-navbar.css`.

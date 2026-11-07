@@ -10,6 +10,7 @@ const rateLimit = require('express-rate-limit');
 
 const connectDatabase = require('./config/db');
 const { sanitizeRequest } = require('./middleware/sanitize');
+const codAdvanceRules = require('./utils/codAdvance');
 
 /* ========================================
    API ROUTES
@@ -310,7 +311,11 @@ app.get('/api/health', (_req, res) => {
   res.json({
     success: true,
     service: 'memora-creations-api',
-    whatsappOrder: false
+    whatsappOrder: false,
+    codAdvance: {
+      enabled: codAdvanceRules.isEnabled(),
+      percent: codAdvanceRules.percent()
+    }
   });
 });
 

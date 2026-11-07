@@ -36,7 +36,11 @@ function classifyCodOrder(order, shipment, now = new Date()) {
   let stage;
 
   if (order.orderStatus === 'Delivered') {
-    stage = order.paymentStatus === 'SUCCESS' ? 'received' : 'awaiting';
+    const settled = order.codAdvance && order.codAdvance.enabled
+      ? order.codAdvance.balanceStatus === 'RECEIVED'
+      : order.paymentStatus === 'SUCCESS';
+
+    stage = settled ? 'received' : 'awaiting';
   } else if (problem) {
     stage = 'notCollected';
   } else if (['Shipped', 'Out for Delivery'].includes(order.orderStatus)) {

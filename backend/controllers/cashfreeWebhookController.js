@@ -22,6 +22,7 @@ const {
   Order
 } = require('../models');
 
+const codAdvanceRules = require('../utils/codAdvance');
 const {
   verifyCashfreeWebhook
 } = require('../services/cashfreeWebhookService');
@@ -238,7 +239,7 @@ async function cashfreeWebhook(req, res) {
     const paid =
       isCashfreePaymentSuccessful(
         gatewayOrder,
-        order.grandTotal
+        codAdvanceRules.onlineAmount(order)
       );
 
     if (!paid) {

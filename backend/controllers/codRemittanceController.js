@@ -13,6 +13,7 @@ const { Order, ShipmentTracking } = require('../models');
 const { asyncHandler, ok } = require('../utils/http');
 const { configured, getWalletBalance } = require('../services/shiprocketService');
 const { classifyCodOrder, summarize } = require('../utils/codRemittance');
+const { cashOnDelivery } = require('../utils/codAdvance');
 
 const MAX_ORDERS = 500;
 
@@ -36,12 +37,15 @@ async function readWallet() {
 
 const listCodRemittance = asyncHandler(async (_req, res) => {
   const orders = await Order.find({
-    paymentMethod: 'COD',
+    $or: [
+      { paymentMethod: 'COD' },
+      { 'codAdvance.enabled': true }
+    ],
     orderStatus: { $ne: 'Cancelled' }
   })
     .sort({ createdAt: -1 })
     .limit(MAX_ORDERS)
-    .select('orderId createdAt orderStatus paymentStatus grandTotal shippingAddress statusHistory')
+    .select('orderId createdAt orderStatus paymentStatus paymentMethod grandTotal codAdvance shippingAddress statusHistory')
     .lean();
 
   const shipments = await ShipmentTracking.find({
@@ -63,7 +67,11 @@ const listCodRemittance = asyncHandler(async (_req, res) => {
       createdAt: order.createdAt,
       customer: order.shippingAddress?.fullName || '',
       mobile: order.shippingAddress?.mobile || '',
-      amount: Number(order.grandTotal || 0),
+      // Cash the courier collects (the balance if an advance was paid).
+      amount: cashOnDelivery(order),
+      advancePaid: order.codAdvance?.enabled
+        ? Number(order.codAdvance.advanceAmount || 0)
+        : 0,
       orderStatus: order.orderStatus,
       awbCode: shipment?.awbCode || '',
       courierName: shipment?.courierName || '',
