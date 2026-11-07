@@ -27,7 +27,7 @@
 
   <link
     rel="stylesheet"
-    href="/memora-creations/frontend/css/profile.css?v=1"
+    href="/memora-creations/frontend/css/profile.css?v=2"
   >
 
   <link rel="stylesheet" href="css/loader.css?v=1">
@@ -72,6 +72,19 @@
         Personal details, saved addresses
         aur customer support ko yahan manage karein.
       </p>
+
+      <div class="profile-summary" id="profileSummary" hidden>
+        <div class="profile-avatar" id="profileAvatar" aria-hidden="true">M</div>
+        <div class="profile-summary-text">
+          <strong id="profileSummaryName"></strong>
+          <span id="profileSummaryMobile"></span>
+        </div>
+        <div class="profile-quick-links">
+          <a href="/memora-creations/frontend/orders.html">📦 My Orders</a>
+          <a href="/memora-creations/frontend/wishlist.html">♡ Wishlist</a>
+          <a href="/memora-creations/frontend/cart.html">🛒 Cart</a>
+        </div>
+      </div>
 
     </section>
 
@@ -333,6 +346,7 @@
                 class="profile-input"
                 name="fullName"
                 required
+                autocomplete="name"
               >
 
             </div>
@@ -367,6 +381,7 @@
                 class="profile-input"
                 name="pinCode"
                 required
+                autocomplete="postal-code"
                 inputmode="numeric"
                 pattern="[0-9]{6}"
                 maxlength="6"
@@ -400,6 +415,7 @@
               <input
                 class="profile-input"
                 name="city"
+                autocomplete="address-level2"
               >
 
             </div>
@@ -414,6 +430,7 @@
               <input
                 class="profile-input"
                 name="state"
+                autocomplete="address-level1"
               >
 
             </div>
@@ -496,7 +513,7 @@
 
 
       script.src =
-        '/memora-creations/frontend/js/profile.js?v=10';
+        '/memora-creations/frontend/js/profile.js?v=11';
 
 
       document.body.appendChild(
