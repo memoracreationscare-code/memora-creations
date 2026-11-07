@@ -109,6 +109,129 @@ function fillProfile(
 
   resetAddressForm();
 
+  renderProfileSummary(user);
+
+}
+
+
+/* =========================
+   SUMMARY CARD (name, initials, quick links)
+========================= */
+
+function renderProfileSummary(user) {
+
+  const box = window.MC.$('#profileSummary');
+
+  if (!box || !user) {
+    return;
+  }
+
+  const name = String(user.fullName || '').trim();
+
+  const initials = name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(part => part[0].toUpperCase())
+    .join('') || 'M';
+
+  window.MC.$('#profileAvatar').textContent = initials;
+  window.MC.$('#profileSummaryName').textContent = name || 'Welcome';
+  window.MC.$('#profileSummaryMobile').textContent =
+    user.mobile ? '+91 ' + user.mobile : '';
+
+  box.hidden = false;
+
+}
+
+
+/* =========================
+   PIN CODE -> CITY / STATE
+   Free India Post lookup. If it fails,
+   the customer simply types the fields.
+========================= */
+
+const pinCache = new Map();
+
+async function lookupPin(pin) {
+
+  if (pinCache.has(pin)) {
+    return pinCache.get(pin);
+  }
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 5000);
+
+  try {
+
+    const response = await fetch(
+      'https://api.postalpincode.in/pincode/' + pin,
+      { signal: controller.signal }
+    );
+
+    const data = await response.json();
+    const office = data?.[0]?.PostOffice?.[0];
+
+    const result = office
+      ? {
+          city: office.District || '',
+          state: office.State || ''
+        }
+      : null;
+
+    pinCache.set(pin, result);
+
+    return result;
+
+  } catch {
+
+    return null;
+
+  } finally {
+
+    clearTimeout(timer);
+
+  }
+
+}
+
+
+function attachPinAutofill(form) {
+
+  const pinInput = form?.querySelector('[name="pinCode"]');
+  const cityInput = form?.querySelector('[name="city"]');
+  const stateInput = form?.querySelector('[name="state"]');
+
+  if (!pinInput || !cityInput || !stateInput) {
+    return;
+  }
+
+  pinInput.addEventListener('input', async () => {
+
+    const pin = pinInput.value.trim();
+
+    if (!isValidPin(pin)) {
+      return;
+    }
+
+    const place = await lookupPin(pin);
+
+    // Ignore the answer if the PIN changed meanwhile.
+    if (!place || pinInput.value.trim() !== pin) {
+      return;
+    }
+
+    // Never overwrite what the customer already typed.
+    if (!cityInput.value.trim()) {
+      cityInput.value = place.city;
+    }
+
+    if (!stateInput.value.trim()) {
+      stateInput.value = place.state;
+    }
+
+  });
+
 }
 
 
@@ -406,6 +529,8 @@ function renderAddresses(
    SAVE PROFILE
 ========================= */
 
+attachPinAutofill(window.MC.$('#addressForm'));
+
 const profileForm =
   window.MC.$(
     '#profileForm'
@@ -453,6 +578,21 @@ if (profileForm) {
 
         window.MC.toast(
           'Full Name required hai.',
+          'error'
+        );
+
+        return;
+
+      }
+
+
+      if (
+        email &&
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+      ) {
+
+        window.MC.toast(
+          'Valid email address dalo.',
           'error'
         );
 
@@ -979,6 +1119,31 @@ function openEditAddressDialog(
   document.body.appendChild(
     overlay
   );
+
+
+  attachPinAutofill(
+    overlay.querySelector('#editAddressForm')
+  );
+
+
+  const closeOnEscape = event => {
+
+    if (event.key === 'Escape') {
+      overlay.remove();
+    }
+
+  };
+
+  document.addEventListener('keydown', closeOnEscape);
+
+  new MutationObserver((_, observer) => {
+
+    if (!document.body.contains(overlay)) {
+      document.removeEventListener('keydown', closeOnEscape);
+      observer.disconnect();
+    }
+
+  }).observe(document.body, { childList: true });
 
 
   overlay
