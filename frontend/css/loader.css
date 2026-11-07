@@ -1,0 +1,129 @@
+/* =====================================
+   MEMORA CREATIONS
+   BRAND LOADER
+
+   Cream screen with the round logo and a
+   turning gold ring. It is shown by
+   frontend/js/loader.js and hidden again
+   when the page has loaded. Without
+   JavaScript it never appears.
+===================================== */
+
+.mc-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+  background: #f7f1e5;
+  opacity: 1;
+  transition: opacity .45s ease;
+}
+
+html.mc-loading .mc-loader {
+  display: flex;
+}
+
+html.mc-loading.mc-leaving .mc-loader {
+  opacity: 0;
+  pointer-events: none;
+}
+
+html.mc-loading body {
+  overflow: hidden;
+}
+
+.mc-loader-mark {
+  position: relative;
+  width: 156px;
+  height: 156px;
+  display: grid;
+  place-items: center;
+}
+
+.mc-loader-mark img {
+  display: block;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  box-shadow: 0 12px 32px rgba(138, 90, 59, .2);
+  animation: mc-loader-pulse 2.2s ease-in-out infinite;
+}
+
+.mc-loader-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    rgba(201, 154, 56, 0) 0deg,
+    #b98a2c 190deg,
+    #f2d98f 320deg,
+    rgba(201, 154, 56, 0) 360deg
+  );
+  -webkit-mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - 5px),
+    #000 calc(100% - 4px)
+  );
+  mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - 5px),
+    #000 calc(100% - 4px)
+  );
+  animation: mc-loader-spin 1.3s linear infinite;
+}
+
+.mc-loader-text {
+  color: #8a5a3b;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 12px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  animation: mc-loader-fade 1.8s ease-in-out infinite;
+}
+
+@keyframes mc-loader-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes mc-loader-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+@keyframes mc-loader-fade {
+  0%, 100% { opacity: .45; }
+  50% { opacity: 1; }
+}
+
+@media (max-width: 480px) {
+  .mc-loader-mark {
+    width: 136px;
+    height: 136px;
+  }
+
+  .mc-loader-mark img {
+    width: 104px;
+    height: 104px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mc-loader { transition-duration: .01s; }
+
+  .mc-loader-ring,
+  .mc-loader-mark img,
+  .mc-loader-text {
+    animation: none;
+  }
+
+  .mc-loader-text { opacity: 1; }
+}
+
+@media print {
+  .mc-loader { display: none !important; }
+}

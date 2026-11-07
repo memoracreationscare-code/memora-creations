@@ -28,6 +28,10 @@ Things worth knowing:
 - The frontend and the API live on different domains, so in production the auth cookie is `SameSite=None; Secure` unless `COOKIE_SAMESITE` is set. `backend/server.js` always allows the `github.io` and `pages.dev` origins in CORS, plus anything listed in `CORS_ORIGIN`.
 - `.github/workflows/keep-render-awake.yml` pings `/api/health` every 10 minutes so a free Render instance does not fall asleep. Scheduled workflows pause after 60 days without repository activity; re-enable it from the Actions tab if that happens. The homepage also shows a "server is starting" message when the backend takes longer than 6 seconds. The admin pages show the same kind of message.
 
+## Loader
+
+A logo loader (cream screen, round logo, turning gold ring) is added to every customer page: `frontend/css/loader.css`, `frontend/js/loader.js` and a `#mcLoader` block right after `<body>`. It shows for at least 1 second on the first page of a visit; on later pages it only appears if loading takes more than half a second. It never stays longer than 8 seconds.
+
 ## SEO
 
 - Public pages (home, products, about, contact, policies) have a canonical URL, Open Graph and Twitter tags. The sharing image is `frontend/images/og-image.png`, built from the brand logo. The logo files live in `frontend/images/` (`logo.png` for the header, `favicon-48.png`, `favicon-192.png` and `apple-touch-icon.png` for browser/phone icons). The header logo is added in `frontend/js/app.js` and styled at the end of `frontend/css/premium-navbar.css`.
