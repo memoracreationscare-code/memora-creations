@@ -422,6 +422,9 @@ if (require.main === module) {
   connectDatabase()
     .then(() => {
       app.listen(port, () => {
+        // Move orders to Shipped / Delivered from Shiprocket tracking.
+        require('./services/shipmentSync').startShipmentSync();
+
         console.log(
           `Memora Creations running on port ${port}`
         );

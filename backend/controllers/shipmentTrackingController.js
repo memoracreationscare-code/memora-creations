@@ -514,5 +514,6 @@ async function getShipmentTracking(req, res) {
 
 
 module.exports = {
-  getShipmentTracking
+  getShipmentTracking,
+  refreshShipmentTracking
 };
