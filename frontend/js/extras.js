@@ -19,6 +19,8 @@
     .mc-top{width:42px;height:42px;background:#8a5a3b;color:#fff;font-size:18px;line-height:1;opacity:0;pointer-events:none}
     .mc-top.show{opacity:1;pointer-events:auto}
     @media (max-width:768px){.mc-float{bottom:100px;right:12px}}
+    .mc-footer-address{display:block;margin:10px auto 0;font-size:13px;line-height:1.6;opacity:.85;text-align:center}
+    .premium-footer .footer-links .mc-footer-address{text-align:left;margin:8px 0 0}
     @media print{.mc-float{display:none}}
   `;
   document.head.appendChild(style);
@@ -46,8 +48,23 @@
 
   box.append(top, wa);
 
+  // Show the shop address in the footer of every page.
+  function addAddress() {
+    const footer = document.querySelector('footer');
+
+    if (!footer || footer.querySelector('.mc-footer-address')) return;
+
+    const line = document.createElement('p');
+    line.className = 'mc-footer-address';
+    line.textContent =
+      '📍 Memora Creations, Kotwa Kalan, Post Kotwa Bazar, ' +
+      'Kushinagar, Uttar Pradesh – 274305';
+    footer.appendChild(line);
+  }
+
   function mount() {
     document.body.appendChild(box);
+    addAddress();
     const toggle = () => top.classList.toggle('show', window.scrollY > 500);
     window.addEventListener('scroll', toggle, { passive: true });
     toggle();
