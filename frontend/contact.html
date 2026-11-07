@@ -95,6 +95,8 @@
       margin: 0;
     }
 
+    .contact-address-card { grid-column: 1 / -1; }
+
     .contact-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -362,6 +364,30 @@
 
       </section>
 
+      <section class="contact-card contact-address-card">
+
+        <div class="contact-icon"
+          aria-hidden="true">📍</div>
+
+        <h2>Our Address</h2>
+
+        <p>
+          Memora Creations<br>
+          Kotwa Kalan, Post Kotwa Bazar,<br>
+          Kushinagar, Uttar Pradesh &ndash; 274305
+        </p>
+
+        <a
+          class="contact-button"
+          href="https://www.google.com/maps/search/?api=1&amp;query=Kotwa+Bazar+Kushinagar+Uttar+Pradesh+274305"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          View on Map
+        </a>
+
+      </section>
+
     </div>
 
     <!-- HELP TOPICS -->
@@ -450,7 +476,7 @@
     src="/memora-creations/frontend/js/app.js?v=11"
   ></script>
 
-  <script src="js/extras.js?v=1" defer></script>
+  <script src="js/extras.js?v=2" defer></script>
   <script src="js/animations.js?v=1" defer></script>
 </body>
 </html>
