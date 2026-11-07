@@ -1,3 +1,5 @@
+const { cashOnDelivery } = require('../utils/codAdvance');
+
 const SHIPROCKET_BASE =
   'https://apiv2.shiprocket.in/v1/external';
 
@@ -342,6 +344,47 @@ async function checkCourierServiceability({
    CREATE SHIPROCKET ORDER
 ========================= */
 
+
+/* =========================
+   COD FIGURES
+   Shiprocket works out the cash the courier collects as
+   sub_total + shipping + gift wrap - total_discount.
+   For COD orders that must equal what the customer really
+   pays on delivery (the full total, or the balance after an
+   advance). Prepaid orders are left exactly as before.
+========================= */
+
+function shiprocketPaymentMethod(order) {
+  return order.paymentMethod === 'COD' || cashOnDelivery(order) > 0
+    ? 'COD'
+    : 'Prepaid';
+}
+
+function codFigures(order) {
+  const plainDiscount = Number(order.discount || 0);
+
+  if (shiprocketPaymentMethod(order) !== 'COD') {
+    return { giftwrap: 0, discount: plainDiscount };
+  }
+
+  const giftwrap =
+    order.giftWrapping?.selected === true
+      ? Number(order.giftWrapping.fee || 0)
+      : 0;
+
+  const gross =
+    Number(order.subtotal || 0) +
+    Number(order.deliveryCharge || 0) +
+    giftwrap;
+
+  const discount = Math.max(
+    0,
+    Math.round((gross - cashOnDelivery(order)) * 100) / 100
+  );
+
+  return { giftwrap, discount };
+}
+
 async function createShiprocketOrder(
   order,
   packageData
@@ -461,23 +504,20 @@ async function createShiprocketOrder(
       orderItems,
 
     payment_method:
-      order.paymentMethod === 'COD'
-        ? 'COD'
-        : 'Prepaid',
+      shiprocketPaymentMethod(order),
 
     shipping_charges:
       Number(
         order.deliveryCharge || 0
       ),
 
-    giftwrap_charges: 0,
+    giftwrap_charges:
+      codFigures(order).giftwrap,
 
     transaction_charges: 0,
 
     total_discount:
-      Number(
-        order.discount || 0
-      ),
+      codFigures(order).discount,
 
     sub_total:
       Number(
@@ -617,6 +657,10 @@ async function getWalletBalance() {
 ========================= */
 
 module.exports = {
+
+  codFigures,
+
+  shiprocketPaymentMethod,
 
   configured,
 

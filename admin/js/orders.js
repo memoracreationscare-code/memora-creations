@@ -100,6 +100,14 @@ function paymentReferenceHtml(order) {
           ${order.stockReserved === true ? 'YES' : 'NO'}
         </p>
 
+        ${order.codAdvance?.enabled ? `
+        <p style="padding:10px;background:#fff6ec;border-radius:10px">
+          <b>COD with advance:</b>
+          advance ${mcMoney(order.codAdvance.advanceAmount)} paid online,
+          courier collects <b>${mcMoney(order.codAdvance.balanceAmount)}</b> cash
+          (${order.codAdvance.balanceStatus === 'RECEIVED' ? 'balance received' : 'balance pending'}).
+          Mark the balance received from the COD Remittance page.
+        </p>` : ''}
         <p style="font-size:12px;color:#805333">
           Verify payment status in Cashfree
           before processing any unpaid order.
@@ -355,7 +363,9 @@ function printShippingLabel(order) {
     .join('');
 
   const paymentText =
-    order.paymentMethod === 'COD'
+    order.codAdvance?.enabled
+      ? `COD: ${mcMoney(order.codAdvance.balanceAmount)} (advance ${mcMoney(order.codAdvance.advanceAmount)} paid online)`
+      : order.paymentMethod === 'COD'
       ? `COD: ${mcMoney(order.grandTotal)}`
       : 'PREPAID';
 

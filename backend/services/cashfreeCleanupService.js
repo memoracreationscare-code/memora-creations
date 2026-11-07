@@ -19,6 +19,7 @@ const {
   Order
 } = require('../models');
 
+const codAdvanceRules = require('../utils/codAdvance');
 const {
   inspectCashfreeOrder,
   isCashfreePaymentSuccessful
@@ -111,7 +112,7 @@ async function inspectPendingCashfreeOrder(orderId) {
     Number(gatewayOrder.order_amount);
 
   const expectedAmount =
-    Number(order.grandTotal);
+    codAdvanceRules.onlineAmount(order);
 
   const amountMatches =
     Number.isFinite(actualAmount) &&
@@ -133,7 +134,7 @@ async function inspectPendingCashfreeOrder(orderId) {
   const paid =
     isCashfreePaymentSuccessful(
       gatewayOrder,
-      order.grandTotal
+      codAdvanceRules.onlineAmount(order)
     );
 
   if (

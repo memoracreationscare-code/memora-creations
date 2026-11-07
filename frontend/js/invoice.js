@@ -22,6 +22,14 @@
     });
 
   function paymentText(order) {
+    if (order.codAdvance?.enabled) {
+      return 'Advance ' + money(order.codAdvance.advanceAmount) +
+        ' paid online; ' + money(order.codAdvance.balanceAmount) +
+        (order.codAdvance.balanceStatus === 'RECEIVED'
+          ? ' paid on delivery'
+          : ' to pay on delivery (cash)');
+    }
+
     if (order.paymentMethod === 'COD') {
       return order.paymentStatus === 'SUCCESS'
         ? 'Cash on Delivery (paid)'

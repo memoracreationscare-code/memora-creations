@@ -91,7 +91,7 @@
               <td>${esc(r.courierName || '-')}<br><span class="rp-muted">${esc(r.awbCode)}</span></td>
               <td><span class="cr-stage ${esc(r.stage)}">${esc(STAGES[r.stage])}</span></td>
               <td>${timing(r)}</td>
-              <td class="num">${esc(money(r.amount))}</td>
+              <td class="num">${esc(money(r.amount))}${r.advancePaid ? `<br><span class="rp-muted" style="font-weight:400">after ₹${esc(r.advancePaid)} advance</span>` : ''}</td>
               <td>${r.stage === 'awaiting'
                 ? `<button class="cr-btn" type="button" data-paid="${esc(r.orderMongoId)}">Mark as received</button>`
                 : ''}</td>

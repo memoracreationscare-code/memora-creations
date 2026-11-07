@@ -48,6 +48,68 @@ const markCodPaid = asyncHandler(
         'Please confirm COD payment receipt.'
       );
     }
+    /*
+      COD WITH ADVANCE: the online advance is already paid.
+      Here the admin confirms that the remaining cash
+      collected by the courier has reached the bank.
+    */
+    const advanceOrder = await Order.findOneAndUpdate(
+      {
+        _id: orderId,
+        'codAdvance.enabled': true,
+        'codAdvance.balanceStatus': 'PENDING',
+        paymentStatus: 'SUCCESS',
+        orderStatus: 'Delivered'
+      },
+      {
+        $set: {
+          'codAdvance.balanceStatus': 'RECEIVED',
+          'codAdvance.balanceReceivedAt': new Date()
+        },
+        $push: {
+          statusHistory: {
+            status: 'Delivered',
+            note:
+              'Remaining COD balance received and confirmed by admin.',
+            changedAt: new Date()
+          }
+        }
+      },
+      { new: true }
+    );
+
+    if (advanceOrder) {
+      return ok(res, {
+        message:
+          'COD balance marked as received.',
+        order: advanceOrder
+      });
+    }
+
+    const alreadyReceived = await Order.exists({
+      _id: orderId,
+      'codAdvance.enabled': true,
+      'codAdvance.balanceStatus': 'RECEIVED'
+    });
+
+    if (alreadyReceived) {
+      return ok(res, {
+        message: 'COD balance already confirmed.'
+      });
+    }
+
+    const isAdvanceOrder = await Order.exists({
+      _id: orderId,
+      'codAdvance.enabled': true
+    });
+
+    if (isAdvanceOrder) {
+      throw error(
+        409,
+        'Only delivered orders with a pending COD balance can be marked received.'
+      );
+    }
+
 
     /*
       Only delivered COD orders

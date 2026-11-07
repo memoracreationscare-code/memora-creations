@@ -19,6 +19,7 @@
 
 const mongoose = require('mongoose');
 
+const { cashOnDelivery } = require('../utils/codAdvance');
 const {
   Order,
   ShipmentTracking
@@ -259,7 +260,7 @@ async function checkCourierRates(req, res) {
         ...packageData,
 
         cod:
-          order.paymentMethod === 'COD',
+          cashOnDelivery(order) > 0,
 
         declaredValue:
           Number(order.grandTotal || 0)
@@ -522,7 +523,7 @@ async function createShipment(req, res) {
         ...packageData,
 
         cod:
-          order.paymentMethod === 'COD',
+          cashOnDelivery(order) > 0,
 
         declaredValue:
           Number(order.grandTotal || 0)

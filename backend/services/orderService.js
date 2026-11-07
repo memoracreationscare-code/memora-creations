@@ -25,6 +25,7 @@ const {
 } = require('../models');
 
 const { error } = require('../utils/http');
+const { splitAdvance } = require('../utils/codAdvance');
 
 const {
   reserveCoupon
@@ -323,7 +324,7 @@ async function buildOrderDocument({
   whatsappOptIn = false,
 
   giftWrapping = null,
-
+  codAdvance = false,
   session
 }) {
   const allowedMethods = [
@@ -503,7 +504,23 @@ async function buildOrderDocument({
     },
 
     grandTotal: payableTotal,
+    codAdvance: (() => {
+      if (codAdvance !== true) return { enabled: false };
 
+      const split = splitAdvance(payableTotal);
+
+      if (!split) {
+        throw error(400, 'Order is too small for advance payment.');
+      }
+
+      return {
+        enabled: true,
+        percent: split.percent,
+        advanceAmount: split.advanceAmount,
+        balanceAmount: split.balanceAmount,
+        balanceStatus: 'PENDING'
+      };
+    })(),
     paymentMethod,
     paymentStatus,
 
@@ -779,11 +796,10 @@ async function createCashfreePendingOrder({
 
   couponCode = null,
   expectedAmount = null,
-
   clearCart = false,
   whatsappOptIn = false,
-
-  giftWrapping = null
+  giftWrapping = null,
+  codAdvance = false
 }) {
   if (!cashfreeOrderId) {
     throw error(
@@ -806,16 +822,13 @@ async function createCashfreePendingOrder({
           items,
 
           paymentMethod: 'CASHFREE',
-
           cashfreeOrderId,
           couponCode,
-
           clearCartOnPayment:
             clearCart,
-
           whatsappOptIn,
           giftWrapping,
-
+          codAdvance,
           session
         });
 
