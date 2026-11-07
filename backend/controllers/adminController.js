@@ -800,6 +800,11 @@ const deleteCategory = asyncHandler(async (req, res) => {
 });
 
 
+// Treat the search text as plain text, not as a regular expression.
+function escapeRegex(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 /* =====================================
    LIST ORDERS
 ===================================== */
@@ -811,9 +816,11 @@ const listOrders = asyncHandler(async (req, res) => {
   if (req.query.search) {
 
     filter.orderId = {
-      $regex: cleanString(
-        req.query.search,
-        50
+      $regex: escapeRegex(
+        cleanString(
+          req.query.search,
+          50
+        )
       ),
       $options: 'i'
     };
