@@ -36,6 +36,9 @@ const {
 const abandonedCartController =
   require('../controllers/abandonedCartController');
 
+const returnParcelController =
+  require('../controllers/returnParcelController');
+
 const cloudinaryController =
   require('../controllers/cloudinaryController');
 
@@ -581,6 +584,11 @@ router.post(
 router.get(
   '/abandoned-carts',
   abandonedCartController.listAbandonedCarts
+);
+
+router.get(
+  '/return-parcels',
+  returnParcelController.listReturnParcels
 );
 
 

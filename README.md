@@ -46,6 +46,10 @@ A logo loader (cream screen, round logo, turning gold ring) is added to every cu
 
 `backend/services/shipmentSync.js` runs every 30 minutes on the server. For orders whose shipment was created from the admin panel (so it has an AWB), it asks Shiprocket for the tracking status and moves the order forward: Shipped, Out for Delivery, Delivered. The new status shows in the admin panel and in the customer's order page. Orders only move forward; cancelled, returned (RTO), lost or damaged shipments are left for the owner. Payments, stock and coupons are not touched. Set `SHIPMENT_AUTO_SYNC=false` to turn it off. Shipments made directly in the Shiprocket website are not linked to orders and are not synced.
 
+## Return parcels (admin)
+
+`admin/return-parcels.html` (API `GET /api/admin/return-parcels`) lists shipments that did not reach the customer: Undelivered, returning (RTO), returned, lost or damaged. It reads the Shiprocket status already saved by the tracking sync, offers a WhatsApp "Contact customer" button with a ready message and a local "Mark as handled" check. It is read-only and sends nothing. The status rules are in `backend/utils/returnParcels.js` with tests in `tests/return-parcels.test.js`.
+
 ## SEO
 
 - Public pages (home, products, about, contact, policies) have a canonical URL, Open Graph and Twitter tags. The sharing image is `frontend/images/og-image.png`, built from the brand logo. The logo files live in `frontend/images/` (`logo.png` for the header, `favicon-48.png`, `favicon-192.png` and `apple-touch-icon.png` for browser/phone icons). The header logo is added in `frontend/js/app.js` and styled at the end of `frontend/css/premium-navbar.css`.

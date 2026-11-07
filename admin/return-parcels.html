@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/png" sizes="48x48" href="/memora-creations/frontend/images/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/memora-creations/frontend/images/favicon-192.png">
+  <link rel="apple-touch-icon" href="/memora-creations/frontend/images/apple-touch-icon.png">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Return Parcels | Memora Creations</title>
+
+  <link rel="stylesheet" href="/memora-creations/admin/css/style.css?v=5">
+
+  <style>
+    :root {
+      --mc-dark: #302117;
+      --mc-brown: #8b5b3a;
+      --mc-cream: #f8f5f0;
+      --mc-border: #e9dfd4;
+      --mc-muted: #81776f;
+      --mc-green: #1f9d55;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--mc-cream);
+      color: var(--mc-dark);
+    }
+
+    /* ---------- NAVIGATION (same look as the other admin pages) ---------- */
+
+    .adminnav {
+      background: #241a14;
+      border-bottom: 1px solid #483428;
+      box-shadow: 0 8px 26px rgba(34, 22, 15, .12);
+    }
+
+    .adminnav .container {
+      min-height: 78px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .admin-brand {
+      display: flex;
+      flex-direction: column;
+      margin-right: auto;
+      padding: 8px 0;
+    }
+
+    .admin-brand strong {
+      color: #fff;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 1px;
+    }
+
+    .admin-brand span {
+      margin-top: 4px;
+      color: #d5a987;
+      font-size: 10px;
+      letter-spacing: 2px;
+    }
+
+    .adminnav a {
+      padding: 11px 15px;
+      border-radius: 11px;
+      color: #eadfd6;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: .2s ease;
+    }
+
+    .adminnav a:hover,
+    .adminnav a.active {
+      background: var(--mc-brown);
+      color: #fff;
+    }
+
+    .adminnav #logout {
+      border-radius: 11px;
+      margin-left: 6px;
+    }
+
+    /* ---------- PAGE ---------- */
+
+    .adminmain {
+      padding-top: 30px;
+      padding-bottom: 70px;
+    }
+
+    .ac-head h1 {
+      margin: 0 0 6px;
+      font-size: 30px;
+    }
+
+    .ac-head p {
+      margin: 0;
+      color: var(--mc-muted);
+      line-height: 1.6;
+      max-width: 760px;
+    }
+
+    .ac-panel {
+      margin-top: 22px;
+      background: #fff;
+      border: 1px solid var(--mc-border);
+      border-radius: 18px;
+      padding: 20px;
+    }
+
+    .ac-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      align-items: flex-end;
+    }
+
+    .ac-controls label {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .ac-controls select {
+      min-width: 190px;
+      padding: 11px 12px;
+      border: 1px solid var(--mc-border);
+      border-radius: 11px;
+      background: #fff;
+      font: inherit;
+    }
+
+    .ac-template {
+      margin-top: 18px;
+    }
+
+    .ac-template label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .ac-template textarea {
+      width: 100%;
+      min-height: 130px;
+      padding: 12px;
+      border: 1px solid var(--mc-border);
+      border-radius: 12px;
+      font: inherit;
+      line-height: 1.5;
+      resize: vertical;
+    }
+
+    .ac-hint {
+      margin-top: 6px;
+      color: var(--mc-muted);
+      font-size: 12.5px;
+      line-height: 1.5;
+    }
+
+    .ac-summary {
+      margin: 22px 0 10px;
+      font-weight: 800;
+    }
+
+    .ac-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .ac-card {
+      display: grid;
+      grid-template-columns: 1.2fr 2fr auto;
+      gap: 16px;
+      align-items: center;
+      background: #fff;
+      border: 1px solid var(--mc-border);
+      border-radius: 16px;
+      padding: 16px 18px;
+    }
+
+    .ac-card.sent {
+      background: #f3faf5;
+      border-color: #cfe8d6;
+    }
+
+    .ac-name { font-weight: 800; }
+
+    .ac-meta {
+      margin-top: 4px;
+      color: var(--mc-muted);
+      font-size: 13px;
+    }
+
+    .ac-items {
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .ac-items .oos {
+      color: #b3261e;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .ac-total {
+      margin-top: 4px;
+      font-weight: 800;
+    }
+
+    .ac-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: stretch;
+      min-width: 150px;
+    }
+
+    .ac-wa {
+      display: inline-block;
+      text-align: center;
+      padding: 11px 14px;
+      border-radius: 11px;
+      background: var(--mc-green);
+      color: #fff;
+      font-weight: 800;
+      font-size: 14px;
+      text-decoration: none;
+    }
+
+    .ac-wa:hover { filter: brightness(.94); }
+
+    .ac-mark {
+      padding: 8px 10px;
+      border: 1px solid var(--mc-border);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--mc-dark);
+      font: inherit;
+      font-size: 12.5px;
+      cursor: pointer;
+    }
+
+    .ac-state {
+      padding: 34px 16px;
+      text-align: center;
+      color: var(--mc-muted);
+      background: #fff;
+      border: 1px dashed var(--mc-border);
+      border-radius: 16px;
+    }
+
+    @media (max-width: 760px) {
+      .ac-card { grid-template-columns: 1fr; }
+      .ac-actions { flex-direction: row; }
+      .ac-actions > * { flex: 1; }
+      .ac-head h1 { font-size: 25px; }
+    }
+  
+    .rp-tabs { display:flex; flex-wrap:wrap; gap:8px; margin-top:18px; }
+    .rp-tab { padding:9px 14px; border:1px solid var(--mc-border); border-radius:999px; background:#fff; font:inherit; font-size:13px; font-weight:700; cursor:pointer; color:var(--mc-dark); }
+    .rp-tab.active { background:var(--mc-brown); border-color:var(--mc-brown); color:#fff; }
+    .rp-card { display:grid; grid-template-columns:1.3fr 1.6fr auto; gap:16px; align-items:center; background:#fff; border:1px solid var(--mc-border); border-radius:16px; padding:16px 18px; }
+    .rp-card.done { background:#f3faf5; border-color:#cfe8d6; }
+    .rp-badge { display:inline-block; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:800; background:#fdecea; color:#b3261e; }
+    .rp-badge.returning { background:#fff4e0; color:#a15c00; }
+    .rp-badge.returned { background:#e8f3ff; color:#1459a8; }
+    .rp-badge.lost { background:#f1e6f7; color:#6b2c91; }
+    .rp-cod { display:inline-block; margin-left:6px; padding:3px 8px; border-radius:8px; background:#fff4e0; color:#a15c00; font-size:11.5px; font-weight:800; }
+    .rp-lines { font-size:14px; line-height:1.65; }
+    .rp-muted { color:var(--mc-muted); font-size:13px; }
+    .rp-help { margin-top:20px; padding:16px 18px; border-radius:14px; background:#fff; border:1px solid var(--mc-border); font-size:14px; line-height:1.7; }
+    .rp-help b { color:var(--mc-brown); }
+    @media (max-width:760px){ .rp-card{grid-template-columns:1fr;} }
+  </style>
+</head>
+
+<body>
+
+  <nav class="adminnav">
+    <div class="container">
+
+      <div class="admin-brand">
+        <strong>MEMORA CREATIONS</strong>
+        <span>ADMIN CONTROL CENTER</span>
+      </div>
+
+      <a href="/memora-creations/admin/dashboard.html">Dashboard</a>
+      <a href="/memora-creations/admin/products.html">Products</a>
+      <a href="/memora-creations/admin/orders.html">Orders</a>
+      <a href="/memora-creations/admin/users.html">Customers</a>
+      <a href="/memora-creations/admin/abandoned-carts.html">Abandoned Carts</a>
+      <a class="active" aria-current="page" href="/memora-creations/admin/return-parcels.html">Return Parcels</a>
+
+      <button id="logout" class="btn secondary" type="button">Logout</button>
+
+    </div>
+  </nav>
+
+  <main class="container adminmain">
+
+    <section class="ac-head">
+      <h1>Return Parcels</h1>
+      <p>
+        Parcels that did not reach the customer: customer not found
+        (Undelivered), on the way back to you (RTO), returned, or lost.
+        The list uses the tracking status from Shiprocket and refreshes
+        about every 30 minutes. Press <b>Contact customer</b> to open
+        WhatsApp with a ready message.
+      </p>
+    </section>
+
+    <section class="ac-panel">
+      <div class="ac-controls">
+        <button id="rpRefresh" class="btn" type="button">Refresh</button>
+      </div>
+
+      <div class="rp-tabs" id="rpTabs">
+        <button class="rp-tab active" type="button" data-kind="all">All</button>
+        <button class="rp-tab" type="button" data-kind="undelivered">Undelivered</button>
+        <button class="rp-tab" type="button" data-kind="returning">Returning (RTO)</button>
+        <button class="rp-tab" type="button" data-kind="returned">Returned to me</button>
+        <button class="rp-tab" type="button" data-kind="lost">Lost / damaged</button>
+      </div>
+
+      <div class="ac-summary" id="rpSummary"></div>
+      <div class="ac-list" id="rpList"></div>
+
+      <div class="rp-help">
+        <b>What to do next</b><br>
+        • <b>Undelivered:</b> call or WhatsApp the customer, confirm the address
+        and a good time, then ask the courier for another delivery attempt
+        from your Shiprocket account (the NDR / re-attempt option).<br>
+        • <b>Returning (RTO):</b> the parcel is coming back. When it reaches you,
+        check the product and put it back in stock from the Products page.<br>
+        • <b>Cash on delivery:</b> no payment was collected, so nothing needs
+        refunding. Online orders need a refund from the Cashfree dashboard
+        if the customer does not want the order.<br>
+        • <b>Lost / damaged:</b> raise a claim in your Shiprocket account.
+      </div>
+    </section>
+
+  </main>
+
+  <script src="/memora-creations/frontend/js/app.js?v=10"></script>
+  <script src="/memora-creations/admin/js/auth.js?v=6"></script>
+  <script src="/memora-creations/admin/js/return-parcels.js?v=1"></script>
+
+</body>
+</html>
