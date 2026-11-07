@@ -9,6 +9,7 @@ const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
 
 const connectDatabase = require('./config/db');
+const { sanitizeRequest } = require('./middleware/sanitize');
 
 /* ========================================
    API ROUTES
@@ -229,6 +230,9 @@ app.use(
 
 app.use(cookieParser());
 
+// Remove MongoDB operators ($...) from user input.
+app.use(sanitizeRequest);
+
 /* ========================================
    RATE LIMITING
 ======================================== */
@@ -403,6 +407,18 @@ app.use((err, _req, res, _next) => {
 const port = Number(process.env.PORT || 5000);
 
 if (require.main === module) {
+  if (!process.env.JWT_SECRET) {
+    console.error('JWT_SECRET is not set. Logins cannot be secured.');
+    process.exit(1);
+  }
+
+  if (process.env.JWT_SECRET.length < 32) {
+    console.warn(
+      'WARNING: JWT_SECRET is shorter than 32 characters. ' +
+      'Set a long random value in Render.'
+    );
+  }
+
   connectDatabase()
     .then(() => {
       app.listen(port, () => {

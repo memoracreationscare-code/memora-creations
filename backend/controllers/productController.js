@@ -39,6 +39,13 @@ const listProducts = asyncHandler(async (req, res) => {
     offers
   } = req.query;
 
+  if (typeof q !== 'string' || typeof category !== 'string') {
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid search.'
+    });
+  }
+
   const filter = {
     isActive: true
   };
