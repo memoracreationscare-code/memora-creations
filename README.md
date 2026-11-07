@@ -57,6 +57,10 @@ A logo loader (cream screen, round logo, turning gold ring) is added to every cu
 - Admin Orders: **Export CSV** (`admin/js/orders-export.js`) for accounts; exports the orders that match the search box.
 - Admin Products: search box (`admin/js/products-search.js`).
 
+## COD remittance (admin)
+
+`admin/cod-remittance.html` (API `GET /api/admin/cod-remittance`) shows where the money of each Cash-on-Delivery order is: with the courier, delivered and awaited, received, or not collected, plus the live Shiprocket wallet balance. The amounts are order totals (Shiprocket deducts its charges before paying out). The page does not read Shiprocket's own remittance list because no documented API for it was found; the real payouts are under Billing > COD Remittance in Shiprocket. "Mark as received" uses the existing COD-paid route and only updates the owner's record. Rules are in `backend/utils/codRemittance.js` with tests in `tests/cod-remittance.test.js`.
+
 ## SEO
 
 - Public pages (home, products, about, contact, policies) have a canonical URL, Open Graph and Twitter tags. The sharing image is `frontend/images/og-image.png`, built from the brand logo. The logo files live in `frontend/images/` (`logo.png` for the header, `favicon-48.png`, `favicon-192.png` and `apple-touch-icon.png` for browser/phone icons). The header logo is added in `frontend/js/app.js` and styled at the end of `frontend/css/premium-navbar.css`.

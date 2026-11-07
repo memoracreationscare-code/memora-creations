@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/png" sizes="48x48" href="/memora-creations/frontend/images/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/memora-creations/frontend/images/favicon-192.png">
+  <link rel="apple-touch-icon" href="/memora-creations/frontend/images/apple-touch-icon.png">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>COD Remittance | Memora Creations</title>
+
+  <link rel="stylesheet" href="/memora-creations/admin/css/style.css?v=5">
+
+  <style>
+    :root {
+      --mc-dark: #302117;
+      --mc-brown: #8b5b3a;
+      --mc-cream: #f8f5f0;
+      --mc-border: #e9dfd4;
+      --mc-muted: #81776f;
+      --mc-green: #1f9d55;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--mc-cream);
+      color: var(--mc-dark);
+    }
+
+    /* ---------- NAVIGATION (same look as the other admin pages) ---------- */
+
+    .adminnav {
+      background: #241a14;
+      border-bottom: 1px solid #483428;
+      box-shadow: 0 8px 26px rgba(34, 22, 15, .12);
+    }
+
+    .adminnav .container {
+      min-height: 78px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .admin-brand {
+      display: flex;
+      flex-direction: column;
+      margin-right: auto;
+      padding: 8px 0;
+    }
+
+    .admin-brand strong {
+      color: #fff;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 1px;
+    }
+
+    .admin-brand span {
+      margin-top: 4px;
+      color: #d5a987;
+      font-size: 10px;
+      letter-spacing: 2px;
+    }
+
+    .adminnav a {
+      padding: 11px 15px;
+      border-radius: 11px;
+      color: #eadfd6;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: .2s ease;
+    }
+
+    .adminnav a:hover,
+    .adminnav a.active {
+      background: var(--mc-brown);
+      color: #fff;
+    }
+
+    .adminnav #logout {
+      border-radius: 11px;
+      margin-left: 6px;
+    }
+
+    /* ---------- PAGE ---------- */
+
+    .adminmain {
+      padding-top: 30px;
+      padding-bottom: 70px;
+    }
+
+    .ac-head h1 {
+      margin: 0 0 6px;
+      font-size: 30px;
+    }
+
+    .ac-head p {
+      margin: 0;
+      color: var(--mc-muted);
+      line-height: 1.6;
+      max-width: 760px;
+    }
+
+    .ac-panel {
+      margin-top: 22px;
+      background: #fff;
+      border: 1px solid var(--mc-border);
+      border-radius: 18px;
+      padding: 20px;
+    }
+
+    .ac-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      align-items: flex-end;
+    }
+
+    .ac-controls label {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .ac-controls select {
+      min-width: 190px;
+      padding: 11px 12px;
+      border: 1px solid var(--mc-border);
+      border-radius: 11px;
+      background: #fff;
+      font: inherit;
+    }
+
+    .ac-template {
+      margin-top: 18px;
+    }
+
+    .ac-template label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .ac-template textarea {
+      width: 100%;
+      min-height: 130px;
+      padding: 12px;
+      border: 1px solid var(--mc-border);
+      border-radius: 12px;
+      font: inherit;
+      line-height: 1.5;
+      resize: vertical;
+    }
+
+    .ac-hint {
+      margin-top: 6px;
+      color: var(--mc-muted);
+      font-size: 12.5px;
+      line-height: 1.5;
+    }
+
+    .ac-summary {
+      margin: 22px 0 10px;
+      font-weight: 800;
+    }
+
+    .ac-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .ac-card {
+      display: grid;
+      grid-template-columns: 1.2fr 2fr auto;
+      gap: 16px;
+      align-items: center;
+      background: #fff;
+      border: 1px solid var(--mc-border);
+      border-radius: 16px;
+      padding: 16px 18px;
+    }
+
+    .ac-card.sent {
+      background: #f3faf5;
+      border-color: #cfe8d6;
+    }
+
+    .ac-name { font-weight: 800; }
+
+    .ac-meta {
+      margin-top: 4px;
+      color: var(--mc-muted);
+      font-size: 13px;
+    }
+
+    .ac-items {
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .ac-items .oos {
+      color: #b3261e;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .ac-total {
+      margin-top: 4px;
+      font-weight: 800;
+    }
+
+    .ac-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: stretch;
+      min-width: 150px;
+    }
+
+    .ac-wa {
+      display: inline-block;
+      text-align: center;
+      padding: 11px 14px;
+      border-radius: 11px;
+      background: var(--mc-green);
+      color: #fff;
+      font-weight: 800;
+      font-size: 14px;
+      text-decoration: none;
+    }
+
+    .ac-wa:hover { filter: brightness(.94); }
+
+    .ac-mark {
+      padding: 8px 10px;
+      border: 1px solid var(--mc-border);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--mc-dark);
+      font: inherit;
+      font-size: 12.5px;
+      cursor: pointer;
+    }
+
+    .ac-state {
+      padding: 34px 16px;
+      text-align: center;
+      color: var(--mc-muted);
+      background: #fff;
+      border: 1px dashed var(--mc-border);
+      border-radius: 16px;
+    }
+
+    @media (max-width: 760px) {
+      .ac-card { grid-template-columns: 1fr; }
+      .ac-actions { flex-direction: row; }
+      .ac-actions > * { flex: 1; }
+      .ac-head h1 { font-size: 25px; }
+    }
+  
+    .rp-tabs { display:flex; flex-wrap:wrap; gap:8px; margin-top:18px; }
+    .rp-tab { padding:9px 14px; border:1px solid var(--mc-border); border-radius:999px; background:#fff; font:inherit; font-size:13px; font-weight:700; cursor:pointer; color:var(--mc-dark); }
+    .rp-tab.active { background:var(--mc-brown); border-color:var(--mc-brown); color:#fff; }
+    .rp-card { display:grid; grid-template-columns:1.3fr 1.6fr auto; gap:16px; align-items:center; background:#fff; border:1px solid var(--mc-border); border-radius:16px; padding:16px 18px; }
+    .rp-card.done { background:#f3faf5; border-color:#cfe8d6; }
+    .rp-badge { display:inline-block; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:800; background:#fdecea; color:#b3261e; }
+    .rp-badge.returning { background:#fff4e0; color:#a15c00; }
+    .rp-badge.returned { background:#e8f3ff; color:#1459a8; }
+    .rp-badge.lost { background:#f1e6f7; color:#6b2c91; }
+    .rp-cod { display:inline-block; margin-left:6px; padding:3px 8px; border-radius:8px; background:#fff4e0; color:#a15c00; font-size:11.5px; font-weight:800; }
+    .rp-lines { font-size:14px; line-height:1.65; }
+    .rp-muted { color:var(--mc-muted); font-size:13px; }
+    .rp-help { margin-top:20px; padding:16px 18px; border-radius:14px; background:#fff; border:1px solid var(--mc-border); font-size:14px; line-height:1.7; }
+    .rp-help b { color:var(--mc-brown); }
+    @media (max-width:760px){ .rp-card{grid-template-columns:1fr;} }
+
+    .cr-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px; margin-top:18px; }
+    .cr-card { background:#fff; border:1px solid var(--mc-border); border-radius:16px; padding:16px; }
+    .cr-card small { display:block; color:var(--mc-muted); font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:.4px; }
+    .cr-card strong { display:block; font-size:24px; margin-top:6px; color:var(--mc-dark); }
+    .cr-card span { color:var(--mc-muted); font-size:13px; }
+    .cr-card.warn { border-color:#f0d9a8; background:#fffaf0; }
+    .cr-card.good { border-color:#cfe8d6; background:#f3faf5; }
+    .cr-table-wrap { overflow-x:auto; margin-top:16px; }
+    .cr-table { width:100%; border-collapse:collapse; background:#fff; border:1px solid var(--mc-border); border-radius:14px; font-size:14px; }
+    .cr-table th, .cr-table td { padding:11px 12px; text-align:left; border-bottom:1px solid #f0e8dc; vertical-align:top; }
+    .cr-table th { font-size:12px; text-transform:uppercase; letter-spacing:.4px; color:var(--mc-muted); background:#faf6ef; }
+    .cr-table td.num { text-align:right; white-space:nowrap; font-weight:700; }
+    .cr-stage { display:inline-block; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:800; background:#e8f3ff; color:#1459a8; white-space:nowrap; }
+    .cr-stage.awaiting { background:#fff4e0; color:#a15c00; }
+    .cr-stage.received { background:#e6f6ec; color:#1f7a3f; }
+    .cr-stage.notCollected { background:#fdecea; color:#b3261e; }
+    .cr-stage.notShipped { background:#eee; color:#555; }
+    .cr-btn { padding:8px 12px; border:0; border-radius:10px; background:var(--mc-brown); color:#fff; font:inherit; font-size:13px; font-weight:700; cursor:pointer; }
+    .cr-btn:disabled { opacity:.6; cursor:wait; }
+    .cr-note { margin-top:18px; padding:16px 18px; border-radius:14px; background:#fff; border:1px solid var(--mc-border); font-size:14px; line-height:1.7; }
+    .cr-note a { color:var(--mc-brown); font-weight:700; }
+  </style>
+</head>
+
+<body>
+
+  <nav class="adminnav">
+    <div class="container">
+
+      <div class="admin-brand">
+        <strong>MEMORA CREATIONS</strong>
+        <span>ADMIN CONTROL CENTER</span>
+      </div>
+
+      <a href="/memora-creations/admin/dashboard.html">Dashboard</a>
+      <a href="/memora-creations/admin/products.html">Products</a>
+      <a href="/memora-creations/admin/orders.html">Orders</a>
+      <a href="/memora-creations/admin/users.html">Customers</a>
+      <a href="/memora-creations/admin/abandoned-carts.html">Abandoned Carts</a>
+      <a href="/memora-creations/admin/return-parcels.html">Return Parcels</a>
+      <a class="active" aria-current="page" href="/memora-creations/admin/cod-remittance.html">COD Remittance</a>
+
+      <button id="logout" class="btn secondary" type="button">Logout</button>
+
+    </div>
+  </nav>
+
+  <main class="container adminmain">
+
+    <section class="ac-head">
+      <h1>COD Remittance</h1>
+      <p>
+        Where the money of your Cash on Delivery orders is: with the courier,
+        waiting to reach your bank, or already received. Amounts are what the
+        customer pays. Shiprocket deducts shipping and COD charges before it
+        pays you, so your bank credit will be a little lower.
+      </p>
+    </section>
+
+    <section class="ac-panel">
+      <div class="ac-controls">
+        <button id="crRefresh" class="btn" type="button">Refresh</button>
+      </div>
+
+      <div class="cr-cards" id="crCards"></div>
+
+      <div class="rp-tabs" id="crTabs">
+        <button class="rp-tab active" type="button" data-stage="all">All</button>
+        <button class="rp-tab" type="button" data-stage="atCourier">With courier</button>
+        <button class="rp-tab" type="button" data-stage="awaiting">Money awaited</button>
+        <button class="rp-tab" type="button" data-stage="received">Received</button>
+        <button class="rp-tab" type="button" data-stage="notCollected">Not collected</button>
+        <button class="rp-tab" type="button" data-stage="notShipped">Not shipped</button>
+      </div>
+
+      <div class="ac-summary" id="crSummary"></div>
+      <div class="cr-table-wrap"><div id="crList"></div></div>
+
+      <div class="cr-note">
+        <b>Check the real payout in Shiprocket:</b> log in to
+        <a href="https://app.shiprocket.in" target="_blank" rel="noopener noreferrer">Shiprocket</a>
+        and open <b>Billing &rarr; COD Remittance</b>. It shows each payout, its
+        date and the exact amount sent to your bank. This page does not read that
+        list, it only shows what your own orders say.<br>
+        <b>Mark as received</b> is only for your record: press it after the
+        money has reached your bank. It does not move any money.<br>
+        The &ldquo;expected&rdquo; dates assume about 8&ndash;9 days after delivery,
+        which is Shiprocket&rsquo;s usual time. Your plan may be different.
+      </div>
+    </section>
+
+  </main>
+
+  <script src="/memora-creations/frontend/js/app.js?v=10"></script>
+  <script src="/memora-creations/admin/js/auth.js?v=6"></script>
+  <script src="/memora-creations/admin/js/cod-remittance.js?v=1"></script>
+
+</body>
+</html>
