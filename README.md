@@ -32,6 +32,12 @@ Things worth knowing:
 
 A logo loader (cream screen, round logo, turning gold ring) is added to every customer page: `frontend/css/loader.css`, `frontend/js/loader.js` and a `#mcLoader` block right after `<body>`. It shows for at least 1 second on the first page of a visit; on later pages it only appears if loading takes more than half a second. It never stays longer than 8 seconds.
 
+## Extras
+
+- `frontend/js/extras.js` (every customer page): floating WhatsApp chat button and a back-to-top button.
+- Homepage FAQ section (`#faq` in `frontend/index.html`).
+- `404.html` at the repository root is the branded "page not found" page on GitHub Pages.
+
 ## SEO
 
 - Public pages (home, products, about, contact, policies) have a canonical URL, Open Graph and Twitter tags. The sharing image is `frontend/images/og-image.png`, built from the brand logo. The logo files live in `frontend/images/` (`logo.png` for the header, `favicon-48.png`, `favicon-192.png` and `apple-touch-icon.png` for browser/phone icons). The header logo is added in `frontend/js/app.js` and styled at the end of `frontend/css/premium-navbar.css`.
