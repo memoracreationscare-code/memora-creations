@@ -36,6 +36,9 @@ const {
 const abandonedCartController =
   require('../controllers/abandonedCartController');
 
+const codRemittanceController =
+  require('../controllers/codRemittanceController');
+
 const returnParcelController =
   require('../controllers/returnParcelController');
 
@@ -584,6 +587,11 @@ router.post(
 router.get(
   '/abandoned-carts',
   abandonedCartController.listAbandonedCarts
+);
+
+router.get(
+  '/cod-remittance',
+  codRemittanceController.listCodRemittance
 );
 
 router.get(
