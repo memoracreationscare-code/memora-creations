@@ -10,6 +10,13 @@ const updateProfile = asyncHandler(async (req, res) => {
   req.user.fullName = fullName; req.user.email = email; await req.user.save();
   return ok(res, { user: req.user });
 });
+const AVATAR_PATTERN = /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/;
+const updateAvatar = asyncHandler(async (req, res) => {
+  const avatar = typeof req.body.avatar === 'string' ? req.body.avatar.trim() : '';
+  if (avatar && (avatar.length > 100000 || !AVATAR_PATTERN.test(avatar))) throw error(400, 'Invalid photo. Please choose a smaller JPG, PNG or WebP image.');
+  req.user.avatar = avatar; await req.user.save();
+  return ok(res, { avatar: req.user.avatar });
+});
 const addAddress = asyncHandler(async (req, res) => {
   const a = req.body; if (!cleanString(a.fullName, 100) || !validMobile(a.mobile) || !cleanString(a.addressLine, 300) || !validPin(a.pinCode)) throw error(400, 'Invalid address.');
   if (a.isDefault) req.user.addresses.forEach(x => { x.isDefault = false; });
@@ -28,4 +35,4 @@ const deleteAddress = asyncHandler(async (req, res) => {
   const a = req.user.addresses.id(req.params.id); if (!a) throw error(404, 'Address not found.');
   a.deleteOne(); await req.user.save(); return ok(res, { addresses: req.user.addresses });
 });
-module.exports = { getProfile, updateProfile, addAddress, updateAddress, deleteAddress };
+module.exports = { getProfile, updateProfile, updateAvatar, addAddress, updateAddress, deleteAddress };

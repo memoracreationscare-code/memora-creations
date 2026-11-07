@@ -27,7 +27,7 @@
 
   <link
     rel="stylesheet"
-    href="/memora-creations/frontend/css/profile.css?v=2"
+    href="/memora-creations/frontend/css/profile.css?v=3"
   >
 
   <link rel="stylesheet" href="css/loader.css?v=1">
@@ -74,11 +74,19 @@
       </p>
 
       <div class="profile-summary" id="profileSummary" hidden>
-        <div class="profile-avatar" id="profileAvatar" aria-hidden="true">M</div>
+        <div class="profile-avatar-wrap">
+          <div class="profile-avatar" id="profileAvatar" aria-hidden="true">M</div>
+          <button type="button" class="profile-avatar-edit" id="avatarPick" aria-label="Change profile photo" title="Change photo">📷</button>
+          <input type="file" id="avatarFile" accept="image/jpeg,image/png,image/webp" hidden>
+        </div>
         <div class="profile-summary-text">
           <strong id="profileSummaryName"></strong>
           <span id="profileSummaryMobile"></span>
         </div>
+        <div class="profile-avatar-actions" id="avatarActions" hidden>
+          <button type="button" id="avatarRemove">Photo hatayein</button>
+        </div>
+
         <div class="profile-quick-links">
           <a href="/memora-creations/frontend/orders.html">📦 My Orders</a>
           <a href="/memora-creations/frontend/wishlist.html">♡ Wishlist</a>
@@ -205,7 +213,7 @@
 
           <a
             class="profile-support-link"
-            href="https://wa.me/917054242294?text=Namaste%20Memora%20Creations%2C%20mujhe%20customer%20support%20chahiye."
+            href="https://wa.me/918874050204?text=Namaste%20Memora%20Creations%2C%20mujhe%20customer%20support%20chahiye."
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -221,7 +229,7 @@
               </strong>
 
               <span>
-                +91 70542 42294
+                +91 88740 50204
               </span>
 
             </div>
@@ -513,7 +521,7 @@
 
 
       script.src =
-        '/memora-creations/frontend/js/profile.js?v=11';
+        '/memora-creations/frontend/js/profile.js?v=12';
 
 
       document.body.appendChild(
