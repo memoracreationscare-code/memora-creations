@@ -5,6 +5,12 @@ const CART_BASE =
 let cartUpdating =
   false;
 
+// Quantity changes show on screen at once and are sent to the
+// server after a short pause (one request, however many clicks).
+const qtyTimers = new Map();
+const qtyPending = new Set();
+let cartUser = null;
+
 
 /* =========================
    LOAD CART
@@ -12,8 +18,12 @@ let cartUpdating =
 
 async function loadCartPage() {
 
+  // Ask the server who is logged in only once per page visit.
   const user =
+    cartUser ||
     await window.MC.requireLogin();
+
+  cartUser = user || null;
 
 
   if (!user) {
@@ -106,6 +116,7 @@ async function loadCartPage() {
 
                   <div
                     class="cartrow"
+                    data-price="${Number(product.sellingPrice || 0)}"
                   >
 
                     <img
@@ -180,7 +191,7 @@ async function loadCartPage() {
 
                     <div>
 
-                      <b>
+                      <b class="cart-line-total">
 
                         ${window.MC.money(
                           item.lineTotal
@@ -430,60 +441,60 @@ async function loadCartPage() {
    CHANGE QUANTITY
 ========================= */
 
-async function changeCartQuantity(
+function changeCartQuantity(
   id,
   delta,
   stock = 0
 ) {
 
-  if (cartUpdating) {
-    return;
-  }
-
-
-  const button =
+  const decButton =
     document.querySelector(
-      `.cart-dec[data-id="${CSS.escape(id)}"], .cart-inc[data-id="${CSS.escape(id)}"]`
+      `.cart-dec[data-id="${CSS.escape(id)}"]`
     );
 
+  const incButton =
+    document.querySelector(
+      `.cart-inc[data-id="${CSS.escape(id)}"]`
+    );
 
   const cartRow =
-    button?.closest(
+    (decButton || incButton)?.closest(
       '.cartrow'
     );
-
 
   const quantityBox =
     cartRow?.querySelector(
       '.cart-qty-value'
     );
 
+  if (!cartRow || !quantityBox) {
+    return;
+  }
+
+  const maxStock =
+    stock ||
+    Number(incButton?.dataset.stock || 0);
 
   const currentQty =
     Math.max(
       1,
       Number(
-        quantityBox?.textContent ||
+        quantityBox.textContent ||
         1
       )
     );
-
 
   const newQty =
     currentQty +
     Number(delta || 0);
 
-
   if (newQty < 1) {
-
     return;
-
   }
 
-
   if (
-    stock > 0 &&
-    newQty > stock
+    maxStock > 0 &&
+    newQty > maxStock
   ) {
 
     window.MC.toast(
@@ -491,15 +502,77 @@ async function changeCartQuantity(
       'error'
     );
 
-
     return;
 
   }
 
+  /* Show the new quantity immediately. */
 
-  cartUpdating =
-    true;
+  quantityBox.textContent = newQty;
 
+  if (decButton) {
+    decButton.disabled = newQty <= 1;
+  }
+
+  if (incButton) {
+    incButton.disabled =
+      maxStock < 1 || newQty >= maxStock;
+  }
+
+  const price = Number(cartRow.dataset.price || 0);
+  const lineBox = cartRow.querySelector('.cart-line-total');
+
+  if (price > 0 && lineBox) {
+    lineBox.textContent = window.MC.money(price * newQty);
+  }
+
+  showProvisionalSubtotal();
+
+  /* Send only the final number, after a short pause. */
+
+  qtyPending.add(id);
+  clearTimeout(qtyTimers.get(id));
+
+  qtyTimers.set(
+    id,
+    setTimeout(
+      () => sendCartQuantity(id, newQty),
+      350
+    )
+  );
+
+}
+
+
+function showProvisionalSubtotal() {
+
+  let sum = 0;
+
+  document.querySelectorAll('.cartrow').forEach(row => {
+    sum +=
+      Number(row.dataset.price || 0) *
+      Number(
+        row.querySelector('.cart-qty-value')?.textContent || 1
+      );
+  });
+
+  const lines = document.querySelectorAll('#summary .summaryline');
+
+  if (lines[0] && sum > 0) {
+    lines[0].querySelector('b').textContent = window.MC.money(sum);
+  }
+
+  // Delivery and total are confirmed by the server a moment later.
+  if (lines[2]) {
+    lines[2].style.opacity = '.5';
+  }
+
+}
+
+
+async function sendCartQuantity(id, quantity) {
+
+  qtyTimers.delete(id);
 
   try {
 
@@ -507,26 +580,21 @@ async function changeCartQuantity(
       '/cart/' +
       encodeURIComponent(id),
       {
-
-        method:
-          'PUT',
-
-        body:
-          JSON.stringify({
-
-            quantity:
-              newQty
-
-          })
-
+        method: 'PUT',
+        body: JSON.stringify({ quantity })
       }
     );
 
+    qtyPending.delete(id);
 
-    await loadCartPage();
-
+    // Refresh totals once every change has been saved.
+    if (!qtyPending.size && !qtyTimers.size) {
+      await loadCartPage();
+    }
 
   } catch (error) {
+
+    qtyPending.delete(id);
 
     window.MC.toast(
       error.message ||
@@ -534,11 +602,10 @@ async function changeCartQuantity(
       'error'
     );
 
-
-  } finally {
-
-    cartUpdating =
-      false;
+    // Put the real quantities back.
+    if (!qtyPending.size && !qtyTimers.size) {
+      await loadCartPage();
+    }
 
   }
 
@@ -553,7 +620,7 @@ async function removeCartItem(
   id
 ) {
 
-  if (cartUpdating) {
+  if (cartUpdating || qtyPending.size) {
     return;
   }
 
