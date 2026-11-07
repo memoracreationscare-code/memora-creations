@@ -400,6 +400,7 @@
             </div>
             <div class="actions">
               <button type="button" class="mc-wish-toggle mc-wish-single" data-wish-id="${esc(product._id)}" aria-label="Add to wishlist" aria-pressed="false">♡ Save to Wishlist</button>
+              <button class="btn secondary" id="shareBtn" type="button">Share on WhatsApp</button>
               <button class="btn" id="addBtn" type="button" ${stock ? '' : 'disabled'}>Add to Cart</button>
               <button class="btn secondary" id="buyBtn" type="button" ${stock ? '' : 'disabled'}>Order Now</button>
             </div>
@@ -413,6 +414,11 @@
           const mainImage = $('#mainImage', box);
           if (mainImage) mainImage.src = image.dataset.url;
         });
+      });
+      $('#shareBtn')?.addEventListener('click', () => {
+        const link = 'https://memoracreationscare-code.github.io/memora-creations/frontend/product.html?id=' + encodeURIComponent(product._id);
+        const text = `${product.name} - Memora Creations\n${link}`;
+        window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank', 'noopener');
       });
       const quantity = () => safeQuantity($('#qty')?.value, stock);
       $('#addBtn')?.addEventListener('click', () => {
