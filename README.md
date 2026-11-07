@@ -57,7 +57,7 @@ Things worth knowing:
 - Gift wrapping (disabled unless `GIFT_WRAPPING_LIVE_ENABLED=true`).
 - Optional WhatsApp order-status notifications (disabled unless `WHATSAPP_SEND_ENABLED=true`).
 - Admin page **Abandoned Carts** (`admin/abandoned-carts.html`, API `GET /api/admin/abandoned-carts`): lists customers who left products in their cart and did not order, with a one-click "Send WhatsApp" button that opens a chat with a ready message and the cart link. It is read-only and sends nothing from the server, so it is free and cannot get the WhatsApp number banned. The cart rules live in `backend/utils/abandonedCarts.js` and are covered by `tests/abandoned-carts.test.js`.
-- Password reset email through Resend.
+- Password reset goes through support: the customer asks on the forgot-password page (the request is saved), then the owner sets a new password from the **Customers** page in the admin panel. The Resend email code in `backend/services/emailService.js` exists but nothing calls it yet.
 
 ## Audit status (initial build)
 
@@ -82,7 +82,7 @@ The source was syntax-checked successfully and all local HTML asset references w
 - MongoDB Atlas or MongoDB server
 - Cashfree account for online payments
 - Cloudinary account for product images
-- Resend account for password reset email (optional during local development, required for actual email delivery)
+- Resend account (optional, currently unused: password reset is handled by support, see above)
 - Optional: Shiprocket account, WhatsApp Cloud API access
 
 ## Setup
@@ -144,14 +144,14 @@ CLOUDINARY_API_SECRET=...
 
 The browser receives a short-lived signed upload payload from the protected admin API; the Cloudinary API secret remains server-side.
 
-## Email reset (Resend)
+## Email (Resend, currently unused)
 
 ```env
 RESEND_API_KEY=...
 MAIL_FROM="MEMORA CREATIONS <no-reply@your-verified-domain.com>"
 ```
 
-`MAIL_FROM` must be a sender your Resend account is allowed to use.
+`MAIL_FROM` must be a sender your Resend account is allowed to use. These values are only needed if email sending is wired in later; the shop works without them.
 
 ## Optional integrations
 
@@ -180,9 +180,9 @@ GIFT_WRAPPING_LIVE_ENABLED=false
 1. Create a production MongoDB database.
 2. Create Cashfree production credentials and set `CASHFREE_ENV=production`.
 3. Create Cloudinary production credentials.
-4. Configure Resend (`RESEND_API_KEY`, `MAIL_FROM`).
+4. Resend is optional (not used by the current password-reset flow).
 5. Set `NODE_ENV=production`.
-6. Set `CLIENT_URL` and `CORS_ORIGIN` to the real HTTPS website address.
+6. Set `CORS_ORIGIN` to the real HTTPS website address (the `github.io` and `pages.dev` addresses are always allowed). `CLIENT_URL` is only used by the unused email code.
 7. Set a long random `JWT_SECRET` (32+ characters).
 8. Run `npm install --omit=dev`.
 9. Run `npm run seed:admin` once.

@@ -251,6 +251,22 @@ app.use('/api/admin/login', authLimiter);
 app.use('/api/payment', authLimiter);
 app.use('/api/cashfree', authLimiter);
 
+// Password-reset requests only need a few tries per person.
+const resetLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message:
+      'Too many requests. Please try again later.'
+  }
+});
+
+app.use('/api/auth/forgot-password', resetLimiter);
+app.use('/api/auth/reset-password', resetLimiter);
+
 /* ========================================
    REVIEW RATE LIMITING
 ======================================== */
