@@ -8,6 +8,7 @@
   const BASE = '/memora-creations/admin/';
   const ITEMS = [
     { key: 'returns', page: 'return-requests.html', label: 'return/replacement request' },
+    { key: 'cancelFollowUps', page: 'cancellation-requests.html', label: 'cancelled order needs a refund/Shiprocket check' },
     { key: 'cancellations', page: 'cancellation-requests.html', label: 'cancellation request' }
   ];
 

@@ -110,6 +110,25 @@ function onlinePaymentDetailsHtml(order) {
   `;
 }
 
+function autoCancelHtml(order) {
+
+  const a = order.autoCancel;
+
+  if (!a || !a.at) return '';
+
+  const bad = a.refundStatus === 'FAILED' || a.shiprocket === 'FAILED';
+
+  return `
+    <p style="padding:10px;border-radius:10px;background:${bad ? '#fff1f0' : '#eef8ee'}">
+      <b>Cancelled automatically</b>
+      ${a.shiprocket === 'CANCELLED' ? ' · Shiprocket order cancelled' : ''}
+      ${a.refundStatus === 'SUBMITTED' ? ' · refund of ' + mcMoney(a.refundAmount) + ' sent to Cashfree' : ''}
+      ${a.refundStatus === 'FAILED' ? ' · <b>refund FAILED, refund by hand in Cashfree</b>' : ''}
+      ${a.shiprocket === 'FAILED' ? ' · <b>Shiprocket cancel FAILED, cancel by hand</b>' : ''}
+    </p>
+  `;
+}
+
 function paymentReferenceHtml(order) {
 
   if (order.paymentMethod === 'CASHFREE') {
@@ -137,6 +156,8 @@ function paymentReferenceHtml(order) {
         </p>
 
         ${onlinePaymentDetailsHtml(order)}
+
+        ${autoCancelHtml(order)}
 
         <p>
           <b>Payment Status:</b>

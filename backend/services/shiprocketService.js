@@ -656,7 +656,31 @@ async function getWalletBalance() {
    EXPORTS
 ========================= */
 
+/* Cancels a Shiprocket order that the courier has not picked up yet. */
+async function cancelShiprocketOrder(shiprocketOrderIds) {
+
+  const ids = (Array.isArray(shiprocketOrderIds) ? shiprocketOrderIds : [shiprocketOrderIds])
+    .map(id => Number(id))
+    .filter(id => Number.isFinite(id) && id > 0);
+
+  if (!ids.length) {
+    throw new Error('No Shiprocket order to cancel.');
+  }
+
+  return shiprocketRequest(
+    '/orders/cancel',
+    {
+      method: 'POST',
+      body: JSON.stringify({ ids })
+    }
+  );
+}
+
+
 module.exports = {
+
+  cancelShiprocketOrder,
+
 
   codFigures,
 

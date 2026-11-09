@@ -863,7 +863,7 @@ function orderActionsHtml(order) {
         type="button"
         data-id="${safeId}"
       >
-        ${order.paymentStatus === 'SUCCESS' ? 'Request Cancellation / Refund' : 'Request Cancellation'}
+        ${order.paymentStatus === 'SUCCESS' ? 'Cancel Order' : 'Cancel Order'}
       </button>
     `;
 
@@ -1360,12 +1360,12 @@ async function requestCashfreeCancellation(
   if (orderActionRunning) return;
 
   const confirmed = await askOrderConfirmation({
-    title: 'Request Cancellation / Refund Review?',
+    title: 'Cancel this order?',
     message:
-      'Request admin ko bheji jayegi. Paid order ka refund ' +
-      'automatic nahi hoga. Payment/refund verification ke baad ' +
-      'hi koi cancellation process hogi.',
-    confirmText: 'Submit Request'
+      'Order cancel ho jayega. Agar aapne online payment kiya hai ' +
+      'to paisa wapas aapke account me bheja jayega ' +
+      '(5-7 working days).',
+    confirmText: 'Yes, Cancel Order'
   });
 
   if (!confirmed || orderActionRunning) {
@@ -1393,6 +1393,7 @@ async function requestCashfreeCancellation(
     );
 
     if (
+      result.requestStatus !== 'CANCELLED' &&
       result.requestStatus !== 'REQUESTED' &&
       result.requestStatus !== 'ALREADY_REQUESTED'
     ) {
@@ -1402,8 +1403,10 @@ async function requestCashfreeCancellation(
     }
 
     orderUI.toast(
-      'Request submitted for admin review. ' +
-      'Order is not cancelled and no refund is initiated.',
+      result.requestStatus === 'CANCELLED'
+        ? (result.message || 'Order cancelled.')
+        : 'Request submitted for admin review. ' +
+          'Order is not cancelled and no refund is initiated.',
       'success'
     );
 

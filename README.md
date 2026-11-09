@@ -264,3 +264,18 @@ On every admin page, a red banner and red numbers on the menu links show how man
 customer **return/replacement** and **cancellation** requests are waiting for you
 (also shown in the browser tab title, e.g. `(3) Orders`). It refreshes every minute
 and disappears when nothing is pending.
+
+## Automatic cancellation, refund and cleanup
+
+- **Customer cancels** an order that is not shipped yet (Order Placed / Confirmed):
+  the order is cancelled at once, stock and coupon are given back, and a booked
+  Shiprocket order is cancelled too.
+- **Paid online orders** are refunded through Cashfree automatically when you set
+  `AUTO_REFUND_ENABLED=true` in Render (off by default). Without it the customer
+  sends a request and you handle it as before.
+- If the refund or the Shiprocket cancel fails, the order is still cancelled and a
+  red box appears on the **Cancellation Requests** page (and in the admin banner)
+  with what to finish by hand. Press **Done** afterwards.
+- **Unpaid online orders** are cancelled automatically 40 minutes after they were
+  placed (stock returns); if Cashfree says it was actually paid, the order is marked
+  paid. Turn off with `PENDING_PAYMENT_AUTO_CANCEL=false`.

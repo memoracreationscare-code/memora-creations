@@ -8,6 +8,7 @@ const schema = new mongoose.Schema({
   amount: { type: Number, required: true, min: 0.01 },
   state: { type: String, enum: ['IN_FLIGHT', 'SUBMITTED', 'UNKNOWN_REQUIRES_REVIEW'], default: 'IN_FLIGHT' },
   gatewayStatus: { type: String, default: '' },
-  admin: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin', required: true }
+  admin: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
+  automatic: { type: Boolean, default: false }
 }, { timestamps: true });
 module.exports = mongoose.model('CashfreeRefundAttempt', schema);

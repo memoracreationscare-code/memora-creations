@@ -66,6 +66,56 @@ const requestCancellation = asyncHandler(
     }
 
     /*
+      AUTOMATIC PATH
+
+      Unpaid orders, and paid orders when
+      AUTO_REFUND_ENABLED=true, are cancelled
+      (and refunded) right away. Otherwise the
+      old "request for admin review" path runs.
+    */
+
+    const candidate = await Order.findOne({
+      _id: orderId,
+      user: userId
+    });
+
+    if (
+      candidate &&
+      candidate.paymentMethod === 'CASHFREE' &&
+      ['Order Placed', 'Confirmed'].includes(candidate.orderStatus)
+    ) {
+      try {
+        const cancelled =
+          await require('../services/orderCancellation')
+            .autoCancelOrder(candidate);
+
+        const refund = cancelled.autoCancel?.refundStatus;
+
+        return ok(res, {
+          message:
+            refund === 'SUBMITTED'
+              ? 'Order cancelled. Your refund has been started and usually reaches your account in 5-7 working days.'
+              : refund === 'FAILED'
+                ? 'Order cancelled. Your refund is being processed by our team.'
+                : 'Order cancelled.',
+
+          requestStatus: 'CANCELLED',
+
+          orderId: cancelled.orderId,
+
+          orderStatus: cancelled.orderStatus,
+
+          paymentStatus: cancelled.paymentStatus
+        });
+
+      } catch (err) {
+        if (err.message !== 'AUTO_REFUND_DISABLED') {
+          throw err;
+        }
+      }
+    }
+
+    /*
       Prevent the same customer
       from creating duplicate requests.
 
