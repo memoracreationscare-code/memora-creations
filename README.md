@@ -257,3 +257,10 @@ For Cashfree orders the admin order view shows the payment method, payer UPI ID,
 UTR / bank reference, bank, card last 4 digits, amount and time. They are saved
 automatically when the payment is confirmed (webhook or verification). For older
 paid orders press **Refresh payment details** in the order view.
+
+## Admin request alerts
+
+On every admin page, a red banner and red numbers on the menu links show how many
+customer **return/replacement** and **cancellation** requests are waiting for you
+(also shown in the browser tab title, e.g. `(3) Orders`). It refreshes every minute
+and disappears when nothing is pending.
