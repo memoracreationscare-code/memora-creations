@@ -370,6 +370,14 @@ async function cashfreeWebhook(req, res) {
 
     };
 
+    const details =
+      require('../utils/paymentDetails')
+        .extractPaymentDetails(payment);
+
+    if (details) {
+      update.$set.paymentDetails = details;
+    }
+
     if (
       payment.cf_payment_id != null
     ) {

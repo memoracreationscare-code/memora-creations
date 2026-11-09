@@ -51,6 +51,7 @@ const {
   getCashfreeConfig,
   createCashfreeOrder,
   fetchCashfreeOrder,
+  fetchCashfreePayments,
   isCashfreePaymentSuccessful
 } = require('../services/cashfreeService');
 
@@ -529,6 +530,28 @@ const verifyPayment = asyncHandler(
       order can become SUCCESS.
     */
 
+    /*
+      Save UPI ID / UTR / method for the admin.
+      Best effort: a failure here never blocks the order.
+    */
+
+    let paymentDetails = null;
+
+    try {
+      const paymentsUtil = require('../utils/paymentDetails');
+
+      paymentDetails = paymentsUtil.extractPaymentDetails(
+        paymentsUtil.pickSuccessfulPayment(
+          await fetchCashfreePayments(order.cashfreeOrderId)
+        )
+      );
+    } catch (detailsError) {
+      console.warn(
+        'Could not read Cashfree payment details:',
+        detailsError.message
+      );
+    }
+
     const updatedOrder =
       await Order.findOneAndUpdate(
 
@@ -559,7 +582,19 @@ const verifyPayment = asyncHandler(
 
           $set: {
             paymentStatus:
-              'SUCCESS'
+              'SUCCESS',
+
+            ...(paymentDetails
+              ? {
+                  paymentDetails,
+                  ...(paymentDetails.cfPaymentId
+                    ? {
+                        cashfreePaymentId:
+                          paymentDetails.cfPaymentId
+                      }
+                    : {})
+                }
+              : {})
           },
 
           $push: {

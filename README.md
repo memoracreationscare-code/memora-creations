@@ -250,3 +250,10 @@ button in My Orders (default window: 7 days from delivery, change with
 Requests** with Approve / Reject / Completed buttons and a WhatsApp link.
 A request never refunds money or changes the order status by itself:
 refund online orders from the Cashfree dashboard.
+
+## Online payment details in admin
+
+For Cashfree orders the admin order view shows the payment method, payer UPI ID,
+UTR / bank reference, bank, card last 4 digits, amount and time. They are saved
+automatically when the payment is confirmed (webhook or verification). For older
+paid orders press **Refresh payment details** in the order view.

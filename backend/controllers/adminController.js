@@ -1164,7 +1164,49 @@ const resetUserPassword = asyncHandler(async (req, res) => {
    EXPORTS
 ===================================== */
 
+/* =====================================
+   REFRESH ONLINE PAYMENT DETAILS
+
+   POST /api/admin/orders/:id/refresh-payment
+
+   Reads the payment from Cashfree and saves
+   UPI ID / UTR / method. Read-only on Cashfree;
+   never changes payment or order status.
+===================================== */
+
+const refreshPaymentDetails = asyncHandler(async (req, res) => {
+
+  const order = await Order.findById(req.params.id);
+
+  if (!order || order.paymentMethod !== 'CASHFREE' || !order.cashfreeOrderId) {
+    throw error(404, 'Online payment order not found.');
+  }
+
+  const util = require('../utils/paymentDetails');
+  const { fetchCashfreePayments } =
+    require('../services/cashfreeService');
+
+  const payment = util.pickSuccessfulPayment(
+    await fetchCashfreePayments(order.cashfreeOrderId)
+  );
+
+  if (!payment) {
+    throw error(404, 'No successful payment found in Cashfree for this order yet.');
+  }
+
+  const details = util.extractPaymentDetails(payment);
+
+  await Order.updateOne(
+    { _id: order._id },
+    { $set: { paymentDetails: details } }
+  );
+
+  return ok(res, { paymentDetails: details });
+});
+
+
 module.exports = {
+  refreshPaymentDetails,
 
   login,
   logout,
