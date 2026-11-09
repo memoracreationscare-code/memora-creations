@@ -381,21 +381,26 @@ const createProduct = asyncHandler(async (req, res) => {
 
   const b = req.body;
 
-  if (
-    !cleanString(b.name, 180) ||
-    !cleanString(b.description, 5000) ||
-    !b.category ||
-    !nonNegativeNumber(b.originalPrice) ||
-    !nonNegativeNumber(b.sellingPrice) ||
-    Number(b.sellingPrice) >
-      Number(b.originalPrice) ||
-    !Number.isInteger(Number(b.stock)) ||
-    Number(b.stock) < 0
-  ) {
-    throw error(
-      400,
-      'Invalid product details.'
-    );
+  // Say exactly which field is wrong, so the owner can fix it at once.
+  const problem =
+    !cleanString(b.name, 180)
+      ? 'Product name is required.'
+      : !cleanString(b.description, 5000)
+        ? 'Product description is required.'
+        : !b.category
+          ? 'Please choose a category (add one first if the list is empty).'
+          : !nonNegativeNumber(b.originalPrice)
+            ? 'Original price (MRP) must be a number.'
+            : !nonNegativeNumber(b.sellingPrice)
+              ? 'Selling price must be a number.'
+              : Number(b.sellingPrice) > Number(b.originalPrice)
+                ? 'Selling price cannot be more than the original price (MRP).'
+                : (!Number.isInteger(Number(b.stock)) || Number(b.stock) < 0)
+                  ? 'Stock must be a whole number (0 or more).'
+                  : '';
+
+  if (problem) {
+    throw error(400, problem);
   }
 
   const slug = slugify(b.name);

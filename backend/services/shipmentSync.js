@@ -152,6 +152,12 @@ function startShipmentSync() {
       if (result.updated) {
         console.log('[Shipment Sync] orders updated:', result.updated);
       }
+
+      const cod = await require('./codAutoReceive').autoReceiveCod();
+
+      if (cod.updated) {
+        console.log('[COD] marked received automatically:', cod.updated);
+      }
     } catch (err) {
       console.warn('[Shipment Sync] failed:', err.message);
     }

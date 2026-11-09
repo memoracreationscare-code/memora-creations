@@ -362,6 +362,38 @@
     }
   }
 
+  // "You may also like": other products from the same category.
+  async function showRelatedProducts(product, box) {
+    try {
+      const categoryId = product.category?._id || product.category;
+      if (!categoryId || typeof categoryId !== 'string') return;
+      const data = await MC.api('/products?category=' + encodeURIComponent(categoryId) + '&limit=9');
+      const others = (data.products || [])
+        .filter(item => String(item._id) !== String(product._id))
+        .slice(0, 4);
+      if (!others.length) return;
+      const section = document.createElement('section');
+      section.className = 'mc-related';
+      section.style.cssText = 'margin-top:34px';
+      section.innerHTML = `
+        <h2 style="margin:0 0 14px">You may also like</h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px">
+          ${others.map(item => `
+            <a href="product.html?id=${encodeURIComponent(item._id)}"
+               style="text-decoration:none;color:inherit;background:#fff;border-radius:14px;
+                      padding:10px;box-shadow:0 4px 14px rgba(0,0,0,.07);display:block">
+              <img src="${esc(pictureOf(item))}" alt="${esc(item.name)}" loading="lazy"
+                   style="width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:10px">
+              <div style="margin-top:8px;font-weight:600;font-size:14px">${esc(item.name)}</div>
+              <div style="font-size:14px">${priceMarkup(item)}</div>
+            </a>`).join('')}
+        </div>`;
+      box.appendChild(section);
+    } catch (error) {
+      console.warn('Related products skipped:', error);
+    }
+  }
+
   async function loadSingleProduct() {
     const box = $('#product');
     if (!box) return;
@@ -393,7 +425,7 @@
             <h1>${esc(product.name)}</h1>
             <p>${esc(product.description || '')}</p>
             <div class="price">${priceMarkup(product)}</div>
-            <p>${stock ? `✅ In Stock (${stock})` : '❌ OUT OF STOCK'}</p>
+            <p>${stock ? (stock <= 5 ? `🔥 Only ${stock} left - order soon` : `✅ In Stock (${stock})`) : '❌ OUT OF STOCK'}</p>
             <div class="field">
               <label for="qty">Quantity</label>
               <input id="qty" class="input" type="number" min="1" max="${Math.max(1, stock)}" value="1" ${stock ? '' : 'disabled'}>
@@ -407,6 +439,7 @@
           </div>
         </div>`;
       applyProductSeo(product, images, stock);
+      void showRelatedProducts(product, box);
       refreshWishlist();
       // FIX: querySelectorAll returns a list; querySelector does not.
       $$('.thumbs img', box).forEach(image => {
