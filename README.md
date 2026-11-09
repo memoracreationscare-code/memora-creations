@@ -297,3 +297,12 @@ A refund you make by hand in the Cashfree dashboard shows as "Refund processing"
 "Refunded" in the admin and on the customer's order. If the whole payment was refunded and the
 order was not shipped, the order is cancelled, stock/coupon return and a booked Shiprocket order
 is cancelled. Switch off with `REFUND_SYNC=false`.
+
+## Admin: Online Payments page
+
+**Admin → Online Payments** lists every online payment with method, UPI ID, UTR, bank,
+Cashfree IDs and refund status (refreshes every 30 seconds, searchable by order, UPI ID or UTR).
+- **Verify** asks Cashfree if the payment is really PAID for the right amount and saves the details.
+- **Refund** sends a full or part refund through Cashfree (you confirm twice). A full refund of an
+  order that is not shipped also cancels it (stock, coupon, Shiprocket). The refund then shows
+  as "Refund processing / Refunded" on the website and in the admin.

@@ -603,6 +603,21 @@ router.get(
 );
 
 router.get(
+  '/payments',
+  require('../controllers/adminPaymentController').listPayments
+);
+
+router.post(
+  '/payments/:id/verify',
+  require('../controllers/adminPaymentController').verifyPayment
+);
+
+router.post(
+  '/payments/:id/refund',
+  require('../controllers/adminPaymentController').refundPayment
+);
+
+router.get(
   '/cancel-followups',
   require('../controllers/adminAlertsController').listCancelFollowUps
 );
