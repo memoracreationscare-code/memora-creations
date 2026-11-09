@@ -64,6 +64,52 @@ function notify(message, type = 'success') {
   window.MC.toast(message, type);
 }
 
+function onlinePaymentDetailsHtml(order) {
+
+  const d = order.paymentDetails || {};
+  const has = d.method || d.upiId || d.bankReference;
+  const row = (label, value) => value
+    ? `<p><b>${label}:</b> ${mcEscape(String(value))}</p>`
+    : '';
+
+  const paidAt = d.paidAt
+    ? new Date(d.paidAt).toLocaleString('en-IN')
+    : '';
+
+  const card = d.cardLast4
+    ? [d.cardNetwork, '•••• ' + d.cardLast4].filter(Boolean).join(' ')
+    : '';
+
+  return `
+    <div style="margin:10px 0;padding:12px;background:#fff;border-radius:10px;
+      border:1px solid #eadfd3">
+      <b>Online payment details</b>
+      ${has ? `
+        ${row('Payment method', d.method)}
+        ${row('UPI ID (payer)', d.upiId)}
+        ${row('UPI app', d.upiChannel)}
+        ${row('UTR / Bank reference', d.bankReference)}
+        ${row('Bank', d.bankName)}
+        ${row('Card', card)}
+        ${row('Wallet / app', d.appProvider)}
+        ${row('Amount paid', d.amount != null ? mcMoney(d.amount) : '')}
+        ${row('Paid at', paidAt)}
+      ` : `
+        <p style="color:#805333">
+          Details not saved yet
+          ${order.paymentStatus === 'SUCCESS'
+            ? '(older order). Press the button below to fetch them from Cashfree.'
+            : '(payment not completed).'}
+        </p>`}
+      ${order.paymentStatus === 'SUCCESS' ? `
+        <button type="button" class="btn secondary refresh-payment"
+          data-id="${mcEscape(String(order._id))}">
+          Refresh payment details
+        </button>` : ''}
+    </div>
+  `;
+}
+
 function paymentReferenceHtml(order) {
 
   if (order.paymentMethod === 'CASHFREE') {
@@ -89,6 +135,8 @@ function paymentReferenceHtml(order) {
           <b>Cashfree Payment ID:</b>
           ${mcEscape(displayValue(order.cashfreePaymentId))}
         </p>
+
+        ${onlinePaymentDetailsHtml(order)}
 
         <p>
           <b>Payment Status:</b>
@@ -1290,6 +1338,33 @@ async function updateAdminOrderStatus(select) {
 /* =====================================
    BIND BUTTONS
 ===================================== */
+
+document.addEventListener('click', async event => {
+
+  const button = event.target.closest('.refresh-payment');
+
+  if (!button) return;
+
+  button.disabled = true;
+
+  try {
+    const data = await window.MC.api(
+      '/admin/orders/' + encodeURIComponent(button.dataset.id) + '/refresh-payment',
+      { method: 'POST' }
+    );
+
+    const order = adminOrders.find(o => String(o._id) === button.dataset.id);
+
+    if (order) order.paymentDetails = data.paymentDetails;
+
+    notify('Payment details updated.');
+    openOrderDetails(button.dataset.id);
+
+  } catch (e) {
+    button.disabled = false;
+    notify(e.message || 'Could not fetch payment details.', 'error');
+  }
+});
 
 function bindOrderButtons() {
 

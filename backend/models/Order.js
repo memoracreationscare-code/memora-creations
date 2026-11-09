@@ -330,6 +330,21 @@ const orderSchema = new mongoose.Schema({
     type: String
   },
 
+  /* ONLINE PAYMENT DETAILS (UPI ID, UTR, method...) */
+  paymentDetails: {
+    cfPaymentId: String,
+    method: String,
+    upiId: String,
+    upiChannel: String,
+    bankReference: String,
+    bankName: String,
+    cardNetwork: String,
+    cardLast4: String,
+    appProvider: String,
+    amount: Number,
+    paidAt: Date
+  },
+
   cashfreeEventId: {
     type: String,
     sparse: true

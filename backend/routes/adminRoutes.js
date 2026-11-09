@@ -342,6 +342,11 @@ router.get(
   adminController.listOrders
 );
 
+router.post(
+  '/orders/:id/refresh-payment',
+  adminController.refreshPaymentDetails
+);
+
 router.put(
   '/orders/:id',
   adminController.updateOrder
