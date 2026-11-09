@@ -352,44 +352,6 @@ const cancelOrder = asyncHandler(
     }
 
 
-    /* CHECK ORDER STATUS */
-
-    if (
-      order.orderStatus === 'Cancelled'
-    ) {
-      throw error(
-        409,
-        'This order is already cancelled.'
-      );
-    }
-
-    if (
-      ![
-        'Order Placed',
-        'Confirmed'
-      ].includes(
-        order.orderStatus
-      )
-    ) {
-      throw error(
-        400,
-        'This order can no longer be cancelled.'
-      );
-    }
-
-
-    /* CASHFREE PROTECTION */
-
-    if (
-      order.paymentMethod === 'CASHFREE'
-    ) {
-      throw error(
-        409,
-        'Cashfree orders require support-assisted cancellation. Please contact customer care.'
-      );
-    }
-
-
     /* LEGACY RAZORPAY PROTECTION */
 
     if (
@@ -401,168 +363,32 @@ const cancelOrder = asyncHandler(
       );
     }
 
+    /*
+      One shared routine does everything:
+      stock, coupon, Shiprocket and refund.
+      See services/orderCancellation.js
+    */
 
-    /* COD ONLY */
-
-    if (
-      order.paymentMethod !== 'COD'
-    ) {
-      throw error(
-        400,
-        'Unsupported payment method.'
-      );
-    }
-
-    if (
-      order.paymentStatus !== 'COD_PENDING'
-    ) {
-      throw error(
-        409,
-        'This COD order cannot be cancelled automatically.'
-      );
-    }
-
-
-    /* DATABASE TRANSACTION */
-
-    const session =
-      await mongoose.startSession();
-
-    let cancelledOrder = null;
+    let cancelledOrder;
 
     try {
-
-      await session.withTransaction(
-        async () => {
-
-          const freshOrder =
-            await Order.findOne({
-
-              _id:
-                order._id,
-
-              user:
-                req.user._id
-
-            }).session(session);
-
-          if (!freshOrder) {
-            throw error(
-              404,
-              'Order not found.'
-            );
-          }
-
-
-          /* RECHECK STATUS */
-
-          if (
-            ![
-              'Order Placed',
-              'Confirmed'
-            ].includes(
-              freshOrder.orderStatus
-            )
-          ) {
-            throw error(
-              409,
-              'Order status has changed. Please refresh.'
-            );
-          }
-
-
-          /* RECHECK PAYMENT */
-
-          if (
-            freshOrder.paymentMethod !== 'COD' ||
-            freshOrder.paymentStatus !== 'COD_PENDING'
-          ) {
-            throw error(
-              409,
-              'Payment details changed. Cancellation stopped.'
-            );
-          }
-
-
-          /* RELEASE STOCK */
-
-          await releaseStock(
-            freshOrder,
-            session
-          );
-
-
-          /* RELEASE RESERVED COUPON */
-
-          if (
-            freshOrder.couponUsageReserved === true
-          ) {
-
-            if (!freshOrder.coupon) {
-              throw error(
-                409,
-                'Order coupon reservation is incomplete.'
-              );
-            }
-
-            await releaseCoupon({
-
-              couponId:
-                freshOrder.coupon,
-
-              userId:
-                freshOrder.user,
-
-              session
-
-            });
-
-            freshOrder.couponUsageReserved =
-              false;
-          }
-
-
-          /* UPDATE ORDER */
-
-          freshOrder.orderStatus =
-            'Cancelled';
-
-          freshOrder.paymentStatus =
-            'CANCELLED';
-
-
-          /* STATUS HISTORY */
-
-          freshOrder.statusHistory.push({
-
-            status:
-              'Cancelled',
-
-            note:
-              'COD order cancelled by customer.',
-
-            changedAt:
-              new Date()
-
+      cancelledOrder =
+        await require('../services/orderCancellation')
+          .autoCancelOrder(order, {
+            reason:
+              order.paymentMethod === 'COD'
+                ? 'COD order cancelled by customer.'
+                : 'Order cancelled by customer.'
           });
+    } catch (err) {
+      if (err.message === 'AUTO_REFUND_DISABLED') {
+        throw error(
+          409,
+          'Paid orders need a cancellation request. Please use Request Cancellation / Refund.'
+        );
+      }
 
-
-          /* SAVE */
-
-          await freshOrder.save({
-            session
-          });
-
-          cancelledOrder =
-            freshOrder;
-
-        }
-      );
-
-    } finally {
-
-      await session.endSession();
-
+      throw err;
     }
 
     return ok(res, {

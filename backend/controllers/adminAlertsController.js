@@ -10,18 +10,65 @@
 const { Order } = require('../models');
 const { asyncHandler, ok } = require('../utils/http');
 
+const FOLLOW_UP = {
+  resolved: { $ne: true },
+  $or: [
+    { 'autoCancel.refundStatus': 'FAILED' },
+    { 'autoCancel.shiprocket': 'FAILED' }
+  ]
+};
+
+const followUpFilter = () => ({
+  'autoCancel.resolved': { $ne: true },
+  $or: FOLLOW_UP.$or
+});
+
 const pendingCounts = asyncHandler(async (_req, res) => {
-  const [cancellations, returns] = await Promise.all([
+  const [cancellations, returns, cancelFollowUps] = await Promise.all([
     Order.countDocuments({
       orderStatus: { $ne: 'Cancelled' },
       statusHistory: {
         $elemMatch: { note: { $regex: '^CUSTOMER_CASHFREE_CANCEL_REQUEST' } }
       }
     }),
-    Order.countDocuments({ 'returnRequest.status': 'REQUESTED' })
+    Order.countDocuments({ 'returnRequest.status': 'REQUESTED' }),
+    Order.countDocuments(followUpFilter())
   ]);
 
-  return ok(res, { cancellations, returns });
+  return ok(res, { cancellations, returns, cancelFollowUps });
 });
 
-module.exports = { pendingCounts };
+/* Orders cancelled automatically where a refund or Shiprocket step failed. */
+const listCancelFollowUps = asyncHandler(async (_req, res) => {
+  const orders = await Order.find(followUpFilter())
+    .sort({ 'autoCancel.at': -1 })
+    .limit(100)
+    .lean();
+
+  return ok(res, {
+    orders: orders.map(o => ({
+      id: String(o._id),
+      orderId: o.orderId,
+      amount: Number(o.grandTotal || 0),
+      fullName: o.shippingAddress?.fullName || '',
+      mobile: o.shippingAddress?.mobile || '',
+      cashfreeOrderId: o.cashfreeOrderId || '',
+      refundStatus: o.autoCancel?.refundStatus || '',
+      refundAmount: o.autoCancel?.refundAmount || 0,
+      shiprocket: o.autoCancel?.shiprocket || '',
+      error: o.autoCancel?.error || '',
+      at: o.autoCancel?.at || null
+    }))
+  });
+});
+
+const resolveCancelFollowUp = asyncHandler(async (req, res) => {
+  await Order.updateOne(
+    { _id: req.params.id },
+    { $set: { 'autoCancel.resolved': true } }
+  );
+
+  return ok(res, { resolved: true });
+});
+
+module.exports = { pendingCounts, listCancelFollowUps, resolveCancelFollowUp };

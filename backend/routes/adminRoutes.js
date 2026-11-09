@@ -603,6 +603,16 @@ router.get(
 );
 
 router.get(
+  '/cancel-followups',
+  require('../controllers/adminAlertsController').listCancelFollowUps
+);
+
+router.post(
+  '/cancel-followups/:id/done',
+  require('../controllers/adminAlertsController').resolveCancelFollowUp
+);
+
+router.get(
   '/pending-counts',
   require('../controllers/adminAlertsController').pendingCounts
 );

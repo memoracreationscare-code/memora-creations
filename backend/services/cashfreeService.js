@@ -554,6 +554,102 @@ async function inspectCashfreeOrder(orderId) {
 
 
 /* =====================================
+   REFUND (production capable, idempotent)
+
+   refundId is also sent as the idempotency
+   key, so sending the same refund twice can
+   never refund twice.
+===================================== */
+
+async function createCashfreeRefund({
+  orderId,
+  refundId,
+  amount,
+  note
+}) {
+
+  const id = validateOrderId(orderId);
+
+  if (!/^[A-Za-z0-9_-]{3,40}$/.test(String(refundId || ''))) {
+    throw cashfreeError('Invalid refund reference.', 400);
+  }
+
+  const value = Math.round(Number(amount) * 100) / 100;
+
+  if (!Number.isFinite(value) || value <= 0) {
+    throw cashfreeError('Invalid refund amount.', 400);
+  }
+
+  const config = getCashfreeConfig();
+
+  let response;
+
+  try {
+    response = await fetch(
+      config.baseUrl + '/orders/' + id + '/refunds',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'x-client-id': config.clientId,
+          'x-client-secret': config.clientSecret,
+          'x-api-version': CASHFREE_API_VERSION,
+          'x-idempotency-key': refundId
+        },
+        body: JSON.stringify({
+          refund_id: refundId,
+          refund_amount: value,
+          refund_note: String(note || 'Order cancelled by customer').slice(0, 100),
+          refund_speed: 'STANDARD'
+        }),
+        signal: AbortSignal.timeout(20000)
+      }
+    );
+  } catch (_) {
+    throw cashfreeError('Cashfree refund response uncertain.', 502);
+  }
+
+  let data = {};
+
+  try { data = await response.json(); } catch (_) { /* handled below */ }
+
+  if (!response.ok) {
+    throw cashfreeError(
+      'Cashfree rejected the refund' +
+      (data && data.message ? ': ' + String(data.message).slice(0, 120) : '.'),
+      502
+    );
+  }
+
+  if (
+    String(data.refund_id || '') !== refundId ||
+    Math.round(Number(data.refund_amount) * 100) !== Math.round(value * 100)
+  ) {
+    throw cashfreeError('Refund response mismatch.', 502);
+  }
+
+  return data;
+}
+
+
+/* Stops an unpaid order so nobody can pay it after it is cancelled. */
+
+async function terminateCashfreeOrder(orderId) {
+
+  const id = validateOrderId(orderId);
+
+  return cashfreeRequest(
+    '/orders/' + id,
+    {
+      method: 'PATCH',
+      body: { order_status: 'TERMINATED' }
+    }
+  );
+}
+
+
+/* =====================================
    EXPORT FUNCTIONS
 ===================================== */
 
@@ -566,6 +662,10 @@ module.exports = {
   fetchCashfreeOrder,
 
   fetchCashfreePayments,
+
+  createCashfreeRefund,
+
+  terminateCashfreeOrder,
 
   isCashfreePaymentSuccessful,
 

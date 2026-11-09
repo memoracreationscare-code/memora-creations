@@ -400,6 +400,24 @@ const orderSchema = new mongoose.Schema({
     index: true
   },
 
+  /* AUTOMATIC CANCELLATION RESULT (see services/orderCancellation.js) */
+
+  autoCancel: {
+    at: Date,
+    shiprocket: {
+      type: String,
+      enum: ['NOT_NEEDED', 'CANCELLED', 'FAILED']
+    },
+    refundStatus: {
+      type: String,
+      enum: ['NOT_NEEDED', 'SUBMITTED', 'FAILED']
+    },
+    refundId: String,
+    refundAmount: Number,
+    error: { type: String, maxlength: 300 },
+    resolved: { type: Boolean, default: false }
+  },
+
   /* CUSTOMER RETURN / REPLACEMENT REQUEST (after delivery) */
 
   returnRequest: {

@@ -430,6 +430,9 @@ if (require.main === module) {
         // Move orders to Shipped / Delivered from Shiprocket tracking.
         require('./services/shipmentSync').startShipmentSync();
 
+        // Cancel online orders that were never paid (and fix missed webhooks).
+        require('./services/pendingPaymentSweeper').startPendingPaymentSweeper();
+
         console.log(
           `Memora Creations running on port ${port}`
         );
