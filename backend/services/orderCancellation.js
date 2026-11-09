@@ -129,19 +129,9 @@ async function checkBeforeCancel(order) {
   return { needsRefund: false, terminate: false };
 }
 
-async function autoCancelOrder(order, { reason = 'Order cancelled by customer.' } = {}) {
 
-  const plan = await checkBeforeCancel(order);
-
-  if (plan.terminate) {
-    try {
-      await terminateCashfreeOrder(order.cashfreeOrderId);
-    } catch (e) {
-      throw error(409, 'Could not close the payment link. Please try again in a minute.');
-    }
-  }
-
-  /* 1. Database changes, all or nothing */
+/* Cancels in our database: status, stock and coupon. All or nothing. */
+async function cancelInDatabase(order, { reason, keepPaymentSuccess }) {
 
   const session = await mongoose.startSession();
   let cancelled = null;
@@ -178,7 +168,7 @@ async function autoCancelOrder(order, { reason = 'Order cancelled by customer.' 
       fresh.orderStatus = 'Cancelled';
 
       // A paid order keeps SUCCESS until the refund is recorded.
-      if (!plan.needsRefund) {
+      if (!keepPaymentSuccess) {
         fresh.paymentStatus = 'CANCELLED';
       }
 
@@ -202,9 +192,11 @@ async function autoCancelOrder(order, { reason = 'Order cancelled by customer.' 
     await session.endSession();
   }
 
-  const notes = [];
+  return cancelled;
+}
 
-  /* 2. Shiprocket: stop a shipment that was already booked */
+/* Cancels a booked Shiprocket order. Returns a short note, or ''. */
+async function cancelShiprocketIfBooked(cancelled) {
 
   try {
     const shipment = await ShipmentTracking.findOne({ order: cancelled._id }).lean();
@@ -213,13 +205,43 @@ async function autoCancelOrder(order, { reason = 'Order cancelled by customer.' 
       await cancelShiprocketOrder(shipment.shiprocketOrderId);
 
       cancelled.autoCancel.shiprocket = 'CANCELLED';
-      notes.push('Shiprocket order cancelled automatically.');
+      return 'Shiprocket order cancelled automatically.';
     }
   } catch (e) {
     cancelled.autoCancel.shiprocket = 'FAILED';
     cancelled.autoCancel.error = 'Shiprocket: ' + shortError(e);
-    notes.push('Shiprocket cancel FAILED - cancel it in Shiprocket.');
+    return 'Shiprocket cancel FAILED - cancel it in Shiprocket.';
   }
+
+  return '';
+}
+
+async function autoCancelOrder(order, { reason = 'Order cancelled by customer.' } = {}) {
+
+  const plan = await checkBeforeCancel(order);
+
+  if (plan.terminate) {
+    try {
+      await terminateCashfreeOrder(order.cashfreeOrderId);
+    } catch (e) {
+      throw error(409, 'Could not close the payment link. Please try again in a minute.');
+    }
+  }
+
+  /* 1. Database changes, all or nothing */
+
+  const cancelled = await cancelInDatabase(order, {
+    reason,
+    keepPaymentSuccess: plan.needsRefund
+  });
+
+  const notes = [];
+
+  /* 2. Shiprocket: stop a shipment that was already booked */
+
+  const srNote = await cancelShiprocketIfBooked(cancelled);
+
+  if (srNote) notes.push(srNote);
 
   /* 3. Refund the money */
 
@@ -284,4 +306,9 @@ async function autoCancelOrder(order, { reason = 'Order cancelled by customer.' 
   return cancelled;
 }
 
-module.exports = { autoCancelOrder, autoRefundEnabled };
+module.exports = {
+  autoCancelOrder,
+  autoRefundEnabled,
+  cancelInDatabase,
+  cancelShiprocketIfBooked
+};

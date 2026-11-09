@@ -802,6 +802,23 @@ function orderPaymentNotice(order) {
     `;
   }
 
+  if (order.refund && order.refund.status) {
+
+    const done = order.refund.status === 'REFUNDED';
+
+    return `
+      <div class="mc-order-notice success">
+
+        ${done
+          ? 'Refund of ' + orderUI.money(order.refund.amount) +
+            ' completed. It reaches your bank/UPI account in 5-7 working days.'
+          : 'Refund of ' + orderUI.money(order.refund.amount) +
+            ' is being processed (5-7 working days).'}
+
+      </div>
+    `;
+  }
+
   if (
     order.paymentMethod === 'CASHFREE' &&
     order.paymentStatus === 'SUCCESS'

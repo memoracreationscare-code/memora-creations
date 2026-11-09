@@ -289,3 +289,11 @@ and disappears when nothing is pending.
 - **Low stock alert:** the admin banner shows how many products have 3 or fewer left.
 - **Website:** "You may also like" on every product page and "Only N left" when stock is 5 or less.
 - **Add product errors:** the admin product form now says exactly which field is wrong and keeps the message on screen.
+
+## Cashfree refunds read back automatically
+
+Every 15 minutes the server reads refunds from Cashfree for paid orders (last 60 days).
+A refund you make by hand in the Cashfree dashboard shows as "Refund processing" /
+"Refunded" in the admin and on the customer's order. If the whole payment was refunded and the
+order was not shipped, the order is cancelled, stock/coupon return and a booked Shiprocket order
+is cancelled. Switch off with `REFUND_SYNC=false`.

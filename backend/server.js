@@ -433,6 +433,9 @@ if (require.main === module) {
         // Cancel online orders that were never paid (and fix missed webhooks).
         require('./services/pendingPaymentSweeper').startPendingPaymentSweeper();
 
+        // Read Cashfree refunds back into orders (also manual refunds).
+        require('./services/refundSync').startRefundSync();
+
         console.log(
           `Memora Creations running on port ${port}`
         );
