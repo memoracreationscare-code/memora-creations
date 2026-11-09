@@ -8,6 +8,7 @@
   const BASE = '/memora-creations/admin/';
   const ITEMS = [
     { key: 'returns', page: 'return-requests.html', label: 'return/replacement request' },
+    { key: 'lowStock', page: 'products.html', label: 'product low on stock (3 or less)' },
     { key: 'cancelFollowUps', page: 'cancellation-requests.html', label: 'cancelled order needs a refund/Shiprocket check' },
     { key: 'cancellations', page: 'cancellation-requests.html', label: 'cancellation request' }
   ];
@@ -73,7 +74,7 @@
     banner.replaceChildren();
 
     const text = document.createElement('span');
-    text.textContent = '🔔 Customer ne request bheji hai, aapka jawab baaki hai:';
+    text.textContent = '🔔 Aapka dhyan chahiye:';
     banner.appendChild(text);
 
     active.forEach(item => {

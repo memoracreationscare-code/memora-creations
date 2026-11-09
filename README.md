@@ -279,3 +279,13 @@ and disappears when nothing is pending.
 - **Unpaid online orders** are cancelled automatically 40 minutes after they were
   placed (stock returns); if Cashfree says it was actually paid, the order is marked
   paid. Turn off with `PENDING_PAYMENT_AUTO_CANCEL=false`.
+
+## More automatic things
+
+- **COD money:** Shiprocket pays you a few days after delivery and has no API to read it.
+  Set `COD_AUTO_RECEIVE_DAYS` (for example `8`) in Render and delivered COD orders are marked
+  "payment received" by themselves after that many days. Compare with Shiprocket -> Billing ->
+  COD Remittance. Empty or 0 = off.
+- **Low stock alert:** the admin banner shows how many products have 3 or fewer left.
+- **Website:** "You may also like" on every product page and "Only N left" when stock is 5 or less.
+- **Add product errors:** the admin product form now says exactly which field is wrong and keeps the message on screen.

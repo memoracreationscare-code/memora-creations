@@ -693,9 +693,11 @@ window.MC.$('#productForm').addEventListener(
       );
 
       window.MC.toast(
-        'Product saved successfully.',
+        'Product saved. It now shows on the website (refresh the website page).',
         'success'
       );
+
+      showProductFormMessage('');
 
       clearProductForm();
 
@@ -703,14 +705,40 @@ window.MC.$('#productForm').addEventListener(
 
     } catch (error) {
 
-      window.MC.toast(
-        error.message,
-        'error'
-      );
+      const text =
+        error.message ||
+        'Product could not be saved. Please check all fields and the photo.';
+
+      window.MC.toast(text, 'error');
+
+      // Stays on screen (a toast disappears), so the reason is not missed.
+      showProductFormMessage(text);
 
     }
   }
 );
+
+function showProductFormMessage(text) {
+
+  const form = document.getElementById('productForm');
+
+  if (!form) return;
+
+  let box = document.getElementById('productFormMsg');
+
+  if (!box) {
+    box = document.createElement('p');
+    box.id = 'productFormMsg';
+    box.setAttribute('role', 'alert');
+    box.style.cssText =
+      'margin:10px 0;padding:10px 12px;border-radius:10px;' +
+      'background:#fff1f0;border:1px solid #d62828;color:#7a1212;font-weight:600';
+    form.appendChild(box);
+  }
+
+  box.textContent = text;
+  box.style.display = text ? 'block' : 'none';
+}
 
 
 /* ==========================================
