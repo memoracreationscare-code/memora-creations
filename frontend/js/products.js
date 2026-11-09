@@ -362,6 +362,42 @@
     }
   }
 
+  // Small reassurance row under the buy buttons (like big shopping sites).
+  async function showTrustBadges(box) {
+    try {
+      let days = 7;
+      let codOn = true;
+      let returnsOn = true;
+
+      try {
+        const data = await MC.api('/settings');
+        days = Number(data.settings?.returnWindowDays) || 7;
+        codOn = data.settings?.codEnabled !== false;
+        returnsOn = data.settings?.returnsEnabled !== false;
+      } catch { /* defaults are fine */ }
+
+      const actions = box.querySelector('.actions');
+      if (!actions || box.querySelector('.mc-trust')) return;
+
+      const items = [
+        '🔒 Secure online payment',
+        returnsOn ? `↩️ ${days}-day return / replacement` : '',
+        codOn ? '💵 Cash on delivery available' : '',
+        '🚚 Tracked delivery all over India'
+      ].filter(Boolean);
+
+      const row = document.createElement('ul');
+      row.className = 'mc-trust';
+      row.style.cssText =
+        'list-style:none;margin:16px 0 0;padding:12px 14px;display:grid;gap:6px;' +
+        'background:#fff8ea;border-radius:12px;font-size:13.5px;font-weight:600;color:#5b3a24';
+      row.innerHTML = items.map(text => `<li>${esc(text)}</li>`).join('');
+      actions.insertAdjacentElement('afterend', row);
+    } catch (error) {
+      console.warn('Trust badges skipped:', error);
+    }
+  }
+
   // "You may also like": other products from the same category.
   async function showRelatedProducts(product, box) {
     try {
@@ -439,6 +475,7 @@
           </div>
         </div>`;
       applyProductSeo(product, images, stock);
+      void showTrustBadges(box);
       void showRelatedProducts(product, box);
       refreshWishlist();
       // FIX: querySelectorAll returns a list; querySelector does not.

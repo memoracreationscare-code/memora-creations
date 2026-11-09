@@ -182,6 +182,18 @@ const preview = asyncHandler(
 const createCod = asyncHandler(
   async (req, res) => {
 
+    const siteSettings =
+      require('../services/settingsService');
+
+    siteSettings.assertStoreOpen(error);
+
+    if (!siteSettings.peek().codEnabled) {
+      throw error(
+        400,
+        'Cash on Delivery is not available right now. Please pay online.'
+      );
+    }
+
     const address =
       req.body.address;
 

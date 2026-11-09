@@ -83,6 +83,21 @@ function getGiftWrapping(value) {
 const createOrder = asyncHandler(
   async (req, res) => {
 
+    const siteSettings =
+      require('../services/settingsService');
+
+    siteSettings.assertStoreOpen(error);
+
+    if (
+      req.body?.codAdvance === true &&
+      !siteSettings.peek().codEnabled
+    ) {
+      throw error(
+        400,
+        'Cash on Delivery is not available right now. Please pay online.'
+      );
+    }
+
     const address =
       req.body?.address;
 

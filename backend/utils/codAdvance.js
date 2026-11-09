@@ -16,11 +16,11 @@
 */
 
 function isEnabled() {
-  return String(process.env.COD_ADVANCE_ENABLED || '').toLowerCase() === 'true';
+  return require('../services/settingsService').peek().codAdvanceEnabled === true;
 }
 
 function percent() {
-  const value = Number(process.env.COD_ADVANCE_PERCENT || 30);
+  const value = Number(require('../services/settingsService').peek().codAdvancePercent || 30);
 
   if (!Number.isFinite(value)) return 30;
 

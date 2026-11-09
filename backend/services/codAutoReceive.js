@@ -14,7 +14,7 @@
 const DAY = 24 * 60 * 60 * 1000;
 
 function days() {
-  const n = Number(process.env.COD_AUTO_RECEIVE_DAYS);
+  const n = Number(require('./settingsService').peek().codAutoReceiveDays);
 
   return Number.isFinite(n) && n >= 1 && n <= 60 ? Math.floor(n) : 0;
 }
