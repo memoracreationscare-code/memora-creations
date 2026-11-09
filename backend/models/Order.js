@@ -400,6 +400,19 @@ const orderSchema = new mongoose.Schema({
     index: true
   },
 
+  /* REFUND STATUS, read from Cashfree (done by us or by hand in Cashfree) */
+
+  refund: {
+    status: {
+      type: String,
+      enum: ['PROCESSING', 'REFUNDED']
+    },
+    amount: Number,
+    updatedAt: Date
+  },
+
+  refundCheckedAt: Date,
+
   /* AUTOMATIC CANCELLATION RESULT (see services/orderCancellation.js) */
 
   autoCancel: {

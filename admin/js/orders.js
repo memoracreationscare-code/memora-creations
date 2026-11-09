@@ -110,6 +110,20 @@ function onlinePaymentDetailsHtml(order) {
   `;
 }
 
+function refundHtml(order) {
+
+  const r = order.refund;
+
+  if (!r || !r.status) return '';
+
+  return `
+    <p style="padding:10px;border-radius:10px;background:#fff7e6">
+      <b>${r.status === 'REFUNDED' ? 'Refunded' : 'Refund processing'}:</b>
+      ${mcEscape(mcMoney(r.amount))} (read from Cashfree)
+    </p>
+  `;
+}
+
 function autoCancelHtml(order) {
 
   const a = order.autoCancel;
@@ -158,6 +172,8 @@ function paymentReferenceHtml(order) {
         ${onlinePaymentDetailsHtml(order)}
 
         ${autoCancelHtml(order)}
+
+        ${refundHtml(order)}
 
         <p>
           <b>Payment Status:</b>
@@ -1528,6 +1544,13 @@ async function loadAdminOrders() {
               <span class="mini">
                 ${mcEscape(order.paymentStatus)}
               </span>
+
+              ${order.refund && order.refund.status
+                ? `<br><span class="mini" style="color:#b45309;font-weight:800">
+                    ${order.refund.status === 'REFUNDED' ? 'REFUNDED' : 'REFUND PROCESSING'}
+                    ${mcEscape(mcMoney(order.refund.amount))}
+                  </span>`
+                : ''}
 
             </td>
 
