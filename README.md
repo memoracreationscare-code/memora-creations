@@ -241,3 +241,12 @@ npm test
 ```
 
 The included automated tests cover API health, API 404 handling and anonymous cart protection. Full payment testing requires Cashfree sandbox credentials and a reachable MongoDB instance.
+
+## Return / Replacement requests
+
+After an order is **Delivered**, the customer sees a "Return / Replacement"
+button in My Orders (default window: 7 days from delivery, change with
+`RETURN_WINDOW_DAYS` in Render). The request appears in **Admin → Return
+Requests** with Approve / Reject / Completed buttons and a WhatsApp link.
+A request never refunds money or changes the order status by itself:
+refund online orders from the Cashfree dashboard.

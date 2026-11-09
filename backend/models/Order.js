@@ -385,6 +385,24 @@ const orderSchema = new mongoose.Schema({
     index: true
   },
 
+  /* CUSTOMER RETURN / REPLACEMENT REQUEST (after delivery) */
+
+  returnRequest: {
+    type: {
+      type: String,
+      enum: ['RETURN', 'REPLACEMENT']
+    },
+    status: {
+      type: String,
+      enum: ['REQUESTED', 'APPROVED', 'REJECTED', 'COMPLETED']
+    },
+    reason: { type: String, trim: true, maxlength: 120 },
+    details: { type: String, trim: true, maxlength: 1000 },
+    requestedAt: Date,
+    adminNote: { type: String, trim: true, maxlength: 500 },
+    resolvedAt: Date
+  },
+
   statusHistory: [{
     status: {
       type: String,

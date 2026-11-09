@@ -458,6 +458,142 @@ function canRequestCashfreeCancel(order) {
 }
 
 
+
+/* =====================================
+   RETURN / REPLACEMENT REQUEST
+===================================== */
+
+const RETURN_STATUS_TEXT = {
+  REQUESTED: 'Return request sent - under review',
+  APPROVED: 'Return request approved - we will contact you',
+  REJECTED: 'Return request was not approved',
+  COMPLETED: 'Return request completed'
+};
+
+function returnRequestHtml(order, safeId) {
+
+  const request = order.returnRequest;
+
+  if (request && request.status) {
+
+    const text = RETURN_STATUS_TEXT[request.status] || 'Return request sent';
+
+    return `
+      <span class="mc-request-sent">
+        ${orderUI.esc(text)}
+      </span>
+      ${request.adminNote
+        ? `<span class="mc-request-sent">${orderUI.esc(request.adminNote)}</span>`
+        : ''}
+    `;
+  }
+
+  if (order.orderStatus === 'Delivered' && order.returnEligible) {
+
+    return `
+      <button
+        class="mc-cancel-request-btn return-request-btn"
+        type="button"
+        data-id="${safeId}"
+      >
+        Return / Replacement
+      </button>
+    `;
+  }
+
+  return '';
+}
+
+function openReturnDialog(orderId, button) {
+
+  const old = document.getElementById('mcReturnDialog');
+  if (old) old.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'mcReturnDialog';
+  overlay.style.cssText =
+    'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.45);' +
+    'display:flex;align-items:center;justify-content:center;padding:16px;';
+
+  overlay.innerHTML = `
+    <form style="background:#fff;border-radius:16px;max-width:420px;width:100%;
+      padding:22px;display:grid;gap:12px;max-height:90vh;overflow:auto;
+      font-family:inherit;color:#3b2a1d">
+      <h3 style="margin:0">Return / Replacement request</h3>
+      <label>I want
+        <select name="type" style="width:100%;padding:10px;margin-top:4px">
+          <option value="RETURN">Return (refund)</option>
+          <option value="REPLACEMENT">Replacement</option>
+        </select>
+      </label>
+      <label>Reason
+        <select name="reason" style="width:100%;padding:10px;margin-top:4px">
+          <option>Product damaged</option>
+          <option>Wrong product received</option>
+          <option>Product defective</option>
+          <option>Item missing</option>
+          <option>Not as shown in photos</option>
+          <option>Other</option>
+        </select>
+      </label>
+      <label>Tell us what happened
+        <textarea name="details" rows="4" maxlength="1000" required
+          style="width:100%;padding:10px;margin-top:4px"
+          placeholder="Please describe the problem"></textarea>
+      </label>
+      <small>Please also send clear photos of the product and parcel on
+        WhatsApp 88740 50204 with your Order ID.</small>
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button type="button" data-close class="btn secondary">Close</button>
+        <button type="submit" class="btn">Send request</button>
+      </div>
+    </form>`;
+
+  document.body.appendChild(overlay);
+
+  const close = () => overlay.remove();
+
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay || e.target.closest('[data-close]')) close();
+  });
+
+  overlay.querySelector('form').addEventListener('submit', async e => {
+    e.preventDefault();
+
+    const form = e.currentTarget;
+    const submit = form.querySelector('[type=submit]');
+
+    submit.disabled = true;
+
+    try {
+      await orderUI.api(
+        '/orders/' + encodeURIComponent(orderId) + '/return-request',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            type: form.type.value,
+            reason: form.reason.value,
+            details: form.details.value
+          })
+        }
+      );
+
+      close();
+      orderUI.toast('Return request sent. We will contact you soon.', 'success');
+
+      if (button) {
+        button.outerHTML =
+          '<span class="mc-request-sent">Return request sent - under review</span>';
+      }
+
+    } catch (error) {
+      submit.disabled = false;
+      orderUI.toast(error.message || 'Could not send request.', 'error');
+    }
+  });
+}
+
+
 /* =====================================
    REVIEW ELIGIBILITY
 
@@ -747,6 +883,7 @@ function orderActionsHtml(order) {
     <div class="order-actions">
       ${trackButton}
       ${actionButton}
+      ${returnRequestHtml(order, safeId)}
     </div>
   `;
 }
@@ -1299,6 +1436,12 @@ async function requestCashfreeCancellation(
 ===================================== */
 
 function bindOrderActionButtons() {
+
+  orderUI.$$('.return-request-btn').forEach(button => {
+    button.addEventListener('click', () => {
+      openReturnDialog(button.dataset.id, button);
+    });
+  });
 
   orderUI.$$('.cancel-order').forEach(
     button => {

@@ -21,6 +21,9 @@ const router = require('express').Router();
 const orderController =
   require('../controllers/orderController');
 
+const returnRequestController =
+  require('../controllers/returnRequestController');
+
 const cancellationRequestController =
   require('../controllers/cancellationRequestController');
 
@@ -83,6 +86,18 @@ router.get(
 router.post(
   '/:id/cancel-request',
   cancellationRequestController.requestCancellation
+);
+
+
+/* =====================================
+   RETURN / REPLACEMENT REQUEST
+
+   POST /api/orders/:id/return-request
+===================================== */
+
+router.post(
+  '/:id/return-request',
+  returnRequestController.requestReturn
 );
 
 
