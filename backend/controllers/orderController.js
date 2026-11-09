@@ -266,6 +266,12 @@ const listOrders = asyncHandler(
         })
         .lean();
 
+    const { checkEligibility } = require('../utils/returnRequests');
+
+    orders.forEach(order => {
+      order.returnEligible = checkEligibility(order).ok;
+    });
+
     return ok(res, {
       orders
     });
@@ -298,6 +304,10 @@ const getOrder = asyncHandler(
         'Order not found.'
       );
     }
+
+    order.returnEligible =
+      require('../utils/returnRequests')
+        .checkEligibility(order).ok;
 
     return ok(res, {
       order

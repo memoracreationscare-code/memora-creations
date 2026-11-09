@@ -26,6 +26,9 @@
 
 const router = require('express').Router();
 
+const returnRequestController =
+  require('../controllers/returnRequestController');
+
 const adminController =
   require('../controllers/adminController');
 
@@ -592,6 +595,16 @@ router.get(
 router.get(
   '/cod-remittance',
   codRemittanceController.listCodRemittance
+);
+
+router.get(
+  '/return-requests',
+  returnRequestController.listReturnRequests
+);
+
+router.patch(
+  '/return-requests/:id',
+  returnRequestController.updateReturnRequest
 );
 
 router.get(
