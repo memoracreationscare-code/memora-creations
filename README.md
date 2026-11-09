@@ -306,3 +306,13 @@ Cashfree IDs and refund status (refreshes every 30 seconds, searchable by order,
 - **Refund** sends a full or part refund through Cashfree (you confirm twice). A full refund of an
   order that is not shipped also cancels it (stock, coupon, Shiprocket). The refund then shows
   as "Refund processing / Refunded" on the website and in the admin.
+
+## Admin: Store Settings (control the website from the admin)
+
+**Admin → Store Settings** changes, without touching code or Render:
+store open/closed (pause orders), WhatsApp / phone / email / address / social links,
+delivery charge and free-delivery limit, Cash on Delivery on/off, COD advance and percent,
+return days and on/off, automatic refund and COD auto-receive days, and the homepage first-screen text.
+Saved values win over Render values; the website picks them up within about a minute.
+Other things already controlled from the admin: products, categories, coupons, announcement popup,
+orders, payments and refunds, reviews, customers, return requests.

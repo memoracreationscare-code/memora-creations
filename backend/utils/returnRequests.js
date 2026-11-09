@@ -11,7 +11,7 @@
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 function windowDays() {
-  const n = Number(process.env.RETURN_WINDOW_DAYS);
+  const n = Number(require('../services/settingsService').peek().returnWindowDays);
 
   return Number.isFinite(n) && n >= 1 && n <= 60 ? Math.floor(n) : 7;
 }
@@ -30,6 +30,10 @@ function deliveredAt(order) {
 
 // Returns { ok: true } or { ok: false, message }.
 function checkEligibility(order, now = new Date()) {
+  if (!require('../services/settingsService').peek().returnsEnabled) {
+    return { ok: false, message: 'Returns are not being accepted right now.' };
+  }
+
   if (!order || order.orderStatus !== 'Delivered') {
     return { ok: false, message: 'Return can be requested only after the order is delivered.' };
   }

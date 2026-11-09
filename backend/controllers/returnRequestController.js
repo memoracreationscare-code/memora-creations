@@ -29,6 +29,10 @@ const requestReturn = asyncHandler(async (req, res) => {
 
   if (!userId) throw error(401, 'Please login to continue.');
 
+  if (!require('../services/settingsService').peek().returnsEnabled) {
+    throw error(400, 'Returns are not being accepted right now. Please contact us on WhatsApp.');
+  }
+
   if (!mongoose.isValidObjectId(req.params.id)) {
     throw error(400, 'Invalid order ID.');
   }

@@ -38,6 +38,7 @@
   );
 
   const wa = document.createElement('a');
+  const wa_link = wa;
   wa.className = 'mc-wa';
   wa.href = 'https://wa.me/918874050204?text=' +
     encodeURIComponent('Namaste Memora Creations, mujhe ek sawal poochna hai.');
@@ -62,9 +63,186 @@
     footer.appendChild(line);
   }
 
+  /* =====================================
+     SHOP SETTINGS (Admin -> Store Settings)
+
+     Contact details, hero text, store-closed
+     notice, COD on/off and the free-delivery
+     bar all come from the admin panel.
+  ===================================== */
+
+  let settings = null;
+
+  const DEFAULT_WA = '918874050204';
+
+  function prettyPhone(digits) {
+    const d = String(digits || '');
+
+    return d.length === 12 && d.startsWith('91')
+      ? '+91 ' + d.slice(2, 7) + ' ' + d.slice(7)
+      : '+' + d;
+  }
+
+  function applyContact(s) {
+    const wa = String(s.whatsapp || DEFAULT_WA);
+
+    if (wa !== DEFAULT_WA) {
+      document.querySelectorAll('a[href*="wa.me/' + DEFAULT_WA + '"]').forEach(a => {
+        a.href = a.href.replace('wa.me/' + DEFAULT_WA, 'wa.me/' + wa);
+      });
+
+      const pretty = prettyPhone(wa);
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      const hits = [];
+
+      while (walker.nextNode()) {
+        if (walker.currentNode.nodeValue.includes('+91 88740 50204')) hits.push(walker.currentNode);
+      }
+
+      hits.forEach(n => { n.nodeValue = n.nodeValue.replace(/\+91 88740 50204/g, pretty); });
+    }
+
+    wa_link.href = 'https://wa.me/' + wa + '?text=' +
+      encodeURIComponent('Namaste Memora Creations, mujhe ek sawal poochna hai.');
+
+    const line = document.querySelector('.mc-footer-address');
+
+    if (line && s.address) line.textContent = '📍 Memora Creations, ' + s.address;
+
+    const footer = document.querySelector('footer');
+
+    if (footer && !footer.querySelector('.mc-footer-social')) {
+      const links = [
+        ['Instagram', s.instagram],
+        ['Facebook', s.facebook],
+        ['YouTube', s.youtube],
+        ['Email', s.email ? 'mailto:' + s.email : ''],
+        ['Call', s.phone ? 'tel:' + s.phone : '']
+      ].filter(x => x[1]);
+
+      if (links.length) {
+        const p = document.createElement('p');
+        p.className = 'mc-footer-address mc-footer-social';
+
+        links.forEach(([label, url], i) => {
+          const a = document.createElement('a');
+          a.textContent = label;
+          a.href = url;
+          a.style.cssText = 'color:inherit;margin:0 8px;text-decoration:underline';
+          if (/^https?:/.test(url)) { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+          p.appendChild(a);
+        });
+
+        footer.appendChild(p);
+      }
+    }
+  }
+
+  function applyHero(s) {
+    const hero = document.querySelector('.home-hero');
+
+    if (!hero) return;
+
+    const set = (sel, text) => {
+      const el = hero.querySelector(sel);
+      if (el && text) el.textContent = text;
+    };
+
+    set('.hero-kicker', s.heroKicker);
+    set('.hero-description', s.heroDescription);
+    set('.hero-primary', s.heroButtonText);
+
+    const h1 = hero.querySelector('h1');
+
+    if (h1 && (s.heroLine1 || s.heroHighlight)) {
+      h1.textContent = '';
+      h1.append(s.heroLine1 || '', document.createElement('br'));
+
+      const span = document.createElement('span');
+      span.textContent = s.heroHighlight || '';
+      h1.appendChild(span);
+    }
+  }
+
+  function applyStoreState(s) {
+    if (s.storeOpen === false && !document.getElementById('mcClosedBar')) {
+      const bar = document.createElement('div');
+      bar.id = 'mcClosedBar';
+      bar.setAttribute('role', 'alert');
+      bar.style.cssText =
+        'position:sticky;top:0;z-index:99998;background:#7a1212;color:#fff;' +
+        'text-align:center;padding:10px 14px;font-weight:700;font-size:14px';
+      bar.textContent = '🔒 ' + (s.storeClosedMessage || 'Orders are paused right now.');
+      document.body.prepend(bar);
+    }
+
+    if (s.codEnabled === false) {
+      const cod = document.querySelector('input[name="paymentMethod"][value="COD"]');
+
+      if (cod) {
+        const label = cod.closest('.payment-option') || cod.parentElement;
+        const other = document.querySelector('input[name="paymentMethod"]:not([value="COD"])');
+
+        if (label) label.style.display = 'none';
+
+        if (other) {
+          other.checked = true;
+          other.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      }
+    }
+  }
+
+  // Cart: "Add Rs X more for FREE delivery".
+  window.mcApplyFreeShip = function () {
+    const s = settings;
+
+    document.querySelectorAll('.mc-freeship').forEach(el => {
+      const subtotal = Number(el.dataset.subtotal || 0);
+      const limit = Number(s && s.freeDeliveryAbove);
+
+      if (!s || s.freeDeliveryBar === false || !(limit > 0) || !(subtotal > 0)) {
+        el.hidden = true;
+        return;
+      }
+
+      const left = Math.ceil(limit - subtotal);
+      const pct = Math.min(100, Math.round((subtotal / limit) * 100));
+
+      el.hidden = false;
+      el.innerHTML =
+        '<div style="font-size:13px;font-weight:700;margin-bottom:6px;color:#5b3a24">' +
+        (left > 0
+          ? '🚚 Add ₹' + left + ' more for <b>FREE delivery</b>'
+          : '🎉 You get <b>FREE delivery</b> on this order!') +
+        '</div>' +
+        '<div style="height:8px;border-radius:99px;background:#eadfd3;overflow:hidden">' +
+        '<div style="height:100%;width:' + pct + '%;background:#b98a2c;transition:width .4s"></div></div>';
+      el.style.cssText = 'margin:0 0 14px;padding:10px 12px;border-radius:12px;background:#fff8ea';
+    });
+  };
+
+  function loadSettings() {
+    if (!window.MC || typeof window.MC.api !== 'function') return;
+
+    window.MC.api('/settings')
+      .then(data => {
+        settings = data.settings || null;
+
+        if (!settings) return;
+
+        applyContact(settings);
+        applyHero(settings);
+        applyStoreState(settings);
+        window.mcApplyFreeShip();
+      })
+      .catch(() => { /* the built-in text stays: never break the page */ });
+  }
+
   function mount() {
     document.body.appendChild(box);
     addAddress();
+    loadSettings();
     const toggle = () => top.classList.toggle('show', window.scrollY > 500);
     window.addEventListener('scroll', toggle, { passive: true });
     toggle();

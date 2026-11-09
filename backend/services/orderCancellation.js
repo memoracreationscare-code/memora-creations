@@ -47,7 +47,7 @@ const { cancelShiprocketOrder } = require('./shiprocketService');
 const CANCELLABLE = ['Order Placed', 'Confirmed'];
 
 function autoRefundEnabled() {
-  return String(process.env.AUTO_REFUND_ENABLED || '').toLowerCase() === 'true';
+  return require('./settingsService').peek().autoRefundEnabled === true;
 }
 
 function shortError(e) {

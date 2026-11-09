@@ -336,6 +336,7 @@ app.use('/api/coupons', couponRoutes);
 app.use('/api/delivery', deliveryRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/announcement', announcementRoutes);
+app.use('/api/settings', require('./routes/settingsRoutes'));
 
 /* ========================================
    SAFE STATIC FILE SERVING
@@ -435,6 +436,9 @@ if (require.main === module) {
 
         // Read Cashfree refunds back into orders (also manual refunds).
         require('./services/refundSync').startRefundSync();
+
+        // Owner-editable shop settings (Admin -> Store Settings).
+        require('./services/settingsService').startSettingsRefresh();
 
         console.log(
           `Memora Creations running on port ${port}`

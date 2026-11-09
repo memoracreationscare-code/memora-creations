@@ -77,13 +77,11 @@ function money(value) {
 ===================================== */
 
 function deliveryFor(subtotal) {
-  const threshold = Number(
-    process.env.FREE_DELIVERY_THRESHOLD ?? 499
-  );
+  const settings = require('./settingsService').peek();
 
-  const charge = Number(
-    process.env.DELIVERY_CHARGE ?? 49
-  );
+  const threshold = Number(settings.freeDeliveryAbove);
+
+  const charge = Number(settings.deliveryCharge);
 
   if (
     !Number.isFinite(threshold) ||

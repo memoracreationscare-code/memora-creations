@@ -603,6 +603,16 @@ router.get(
 );
 
 router.get(
+  '/settings',
+  require('../controllers/adminSettingsController').getSettings
+);
+
+router.put(
+  '/settings',
+  require('../controllers/adminSettingsController').updateSettings
+);
+
+router.get(
   '/payments',
   require('../controllers/adminPaymentController').listPayments
 );

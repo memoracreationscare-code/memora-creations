@@ -236,6 +236,8 @@ async function loadCartPage() {
 
     summaryBox.innerHTML = `
 
+      <div class="mc-freeship" data-subtotal="${Number(cart.subtotal) || 0}" hidden></div>
+
       <div class="summaryline">
 
         <span>
@@ -297,6 +299,11 @@ async function loadCartPage() {
       </button>
 
     `;
+
+    if (typeof window.mcApplyFreeShip === 'function') {
+      window.mcApplyFreeShip();
+    }
+
 
 
     /* =========================

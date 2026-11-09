@@ -6,7 +6,8 @@ async function hydrate(cart) {
   await cart.populate({ path: 'items.product', select: 'productId name images sellingPrice originalPrice stock isActive category' });
   const items = cart.items.filter(i => i.product && i.product.isActive).map(i => ({ id: i._id, product: i.product, quantity: i.quantity, lineTotal: Math.round(i.product.sellingPrice * i.quantity * 100) / 100 }));
   const subtotal = Math.round(items.reduce((s, i) => s + i.lineTotal, 0) * 100) / 100;
-  const delivery = subtotal >= Number(process.env.FREE_DELIVERY_THRESHOLD || 499) ? 0 : (items.length ? Number(process.env.DELIVERY_CHARGE || 49) : 0);
+  const settings = require('../services/settingsService').peek();
+  const delivery = subtotal >= settings.freeDeliveryAbove ? 0 : (items.length ? settings.deliveryCharge : 0);
   return { items, subtotal, deliveryCharge: delivery, grandTotal: Math.round((subtotal + delivery) * 100) / 100 };
 }
 
