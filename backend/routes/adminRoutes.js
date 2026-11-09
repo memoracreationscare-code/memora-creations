@@ -603,6 +603,11 @@ router.get(
 );
 
 router.get(
+  '/pending-counts',
+  require('../controllers/adminAlertsController').pendingCounts
+);
+
+router.get(
   '/return-requests',
   returnRequestController.listReturnRequests
 );
