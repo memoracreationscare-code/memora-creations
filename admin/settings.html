@@ -384,6 +384,34 @@
       </div>
 
       <div class="st-box">
+        <h2>✉️ Messages to customers (email)</h2>
+        <p id="mailState" style="margin:0 0 10px;font-weight:700"></p>
+        <label class="st-c"><input id="emailNotificationsEnabled" type="checkbox"><span><b>Email the customer on every order update</b><small>Order placed, shipped, out for delivery, delivered, cancelled and refunded. Only orders placed after you switch this on.</small></span></label>
+        <div style="margin-top:10px"><label class="st-c"><input id="abandonedReminderEnabled" type="checkbox"><span><b>Remind customers who left things in the cart</b><small>One email per cart. Only carts that change after you switch this on.</small></span></label></div>
+        <div class="st-grid" style="margin-top:10px"><label class="st-f"><span>Send the reminder after (hours)</span><input id="abandonedReminderHours" class="input" type="number" placeholder="24"></label></div>
+      </div>
+
+      <div class="st-box">
+        <h2>🎁 First-order discount (code WELCOME)</h2>
+        <label class="st-c"><input id="welcomeEnabled" type="checkbox"><span><b>Give new customers a discount on their first order</b><small>Code <b>WELCOME</b> works only on a customer's first order. It is created and kept up to date for you.</small></span></label>
+        <div class="st-grid" style="margin-top:10px">
+          <label class="st-f"><span>Discount (%)</span><input id="welcomePercent" class="input" type="number" placeholder="10"></label>
+          <label class="st-f"><span>Maximum discount (₹)</span><input id="welcomeMaxDiscount" class="input" type="number" placeholder="100"></label>
+          <label class="st-f"><span>Minimum order (₹)</span><input id="welcomeMinOrder" class="input" type="number" placeholder="299"></label>
+        </div>
+      </div>
+
+      <div class="st-box">
+        <h2>🤝 Refer &amp; Earn</h2>
+        <label class="st-c"><input id="referralEnabled" type="checkbox"><span><b>Customers can refer friends</b><small>Each customer gets a code on their Profile page. The friend gets a coupon when they sign up; the referrer gets one when the friend's first order is delivered. Coupons are one-time and expire in 60 days.</small></span></label>
+        <div class="st-grid" style="margin-top:10px">
+          <label class="st-f"><span>Friend gets (₹ off)</span><input id="referralFriendAmount" class="input" type="number" placeholder="50"></label>
+          <label class="st-f"><span>Referrer gets (₹ off)</span><input id="referralRewardAmount" class="input" type="number" placeholder="50"></label>
+          <label class="st-f"><span>Minimum order for these (₹)</span><input id="referralMinOrder" class="input" type="number" placeholder="299"></label>
+        </div>
+      </div>
+
+      <div class="st-box">
         <h2>🏠 Homepage first screen</h2>
         <div class="st-grid">
           <label class="st-f"><span>Small title</span><input id="heroKicker" class="input" type="text" placeholder="MEMORA CREATIONS"></label>
@@ -402,7 +430,7 @@
 
   <script src="/memora-creations/frontend/js/app.js?v=10"></script>
   <script src="/memora-creations/admin/js/auth.js?v=9"></script>
-  <script src="/memora-creations/admin/js/settings.js?v=1"></script>
+  <script src="/memora-creations/admin/js/settings.js?v=3"></script>
 
 </body>
 </html>

@@ -95,6 +95,7 @@ function buildAbandonedCarts({
       userId: String(user._id),
       fullName: user.fullName || '',
       mobile: user.mobile || '',
+      email: user.email || '',
       items,
       itemCount: items.reduce((sum, i) => sum + i.quantity, 0),
       total: roundMoney(items.reduce((sum, i) => sum + i.lineTotal, 0)),

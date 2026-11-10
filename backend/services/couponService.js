@@ -115,6 +115,26 @@ async function validateCoupon({
     );
   }
 
+  if (coupon.allowedUser && String(coupon.allowedUser) !== String(userId || '')) {
+    throw error(400, 'This coupon is not available for your account.');
+  }
+
+  if (coupon.firstOrderOnly) {
+    if (!userId) {
+      throw error(400, 'Please login to use this first-order coupon.');
+    }
+
+    const earlier = await Order.countDocuments({
+      user: userId,
+      orderStatus: { $ne: 'Cancelled' },
+      paymentStatus: { $nin: ['FAILED', 'CANCELLED'] }
+    });
+
+    if (earlier > 0) {
+      throw error(400, 'This coupon is only for your first order.');
+    }
+  }
+
   if (userId) {
     // MC_COUPON_COUNTER_PREVIEW_V1: count both legacy orders and atomic reservations.
     const customerUsage = await CouponUserUsage.findOne({

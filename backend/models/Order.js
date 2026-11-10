@@ -25,6 +25,11 @@ const orderItemSchema = new mongoose.Schema({
     required: true
   },
 
+  variantId: {
+    type: mongoose.Schema.Types.ObjectId,
+    default: undefined
+  },
+
   name: {
     type: String,
     required: true,
@@ -344,6 +349,9 @@ const orderSchema = new mongoose.Schema({
     amount: Number,
     paidAt: Date
   },
+
+  /* emails already sent for this order (see services/notificationSweeper.js) */
+  notificationsSent: { type: [String], default: undefined },
 
   cashfreeEventId: {
     type: String,

@@ -26,6 +26,7 @@ const {
 
 const { error } = require('../utils/http');
 const { splitAdvance } = require('../utils/codAdvance');
+const { findVariant, hasVariants, virtualProduct } = require('../utils/variants');
 
 const {
   reserveCoupon
@@ -129,6 +130,20 @@ async function getTrustedItems(items) {
       item.productId || item.product || ''
     );
 
+    const variantId = item.variantId
+      ? String(item.variantId)
+      : '';
+
+    if (
+      variantId &&
+      !mongoose.isValidObjectId(variantId)
+    ) {
+      throw error(
+        400,
+        'Invalid product option.'
+      );
+    }
+
     const quantity = Number(item.quantity);
 
     if (
@@ -143,7 +158,11 @@ async function getTrustedItems(items) {
       );
     }
 
-    const previous = merged.get(productId) || 0;
+    const key = variantId
+      ? productId + '|' + variantId
+      : productId;
+
+    const previous = merged.get(key) || 0;
     const total = previous + quantity;
 
     if (total > 99) {
@@ -153,10 +172,14 @@ async function getTrustedItems(items) {
       );
     }
 
-    merged.set(productId, total);
+    merged.set(key, total);
   }
 
-  const ids = [...merged.keys()];
+  const ids = [
+    ...new Set(
+      [...merged.keys()].map(k => k.split('|')[0])
+    )
+  ];
 
   const products = await Product.find({
     _id: { $in: ids },
@@ -179,9 +202,46 @@ async function getTrustedItems(items) {
     ])
   );
 
-  return ids.map(id => {
-    const product = productMap.get(id);
-    const quantity = merged.get(id);
+  return [...merged.keys()].map(key => {
+    const [id, variantId] = key.split('|');
+    const baseProduct = productMap.get(id);
+    const quantity = merged.get(key);
+
+    if (!baseProduct) {
+      throw error(
+        404,
+        'Product not found.'
+      );
+    }
+
+    // Size / colour products must name the option; the option brings
+    // its own name, price and stock.
+    let product = baseProduct;
+
+    if (hasVariants(baseProduct)) {
+      const variant = findVariant(
+        baseProduct,
+        variantId
+      );
+
+      if (!variant) {
+        throw error(
+          400,
+          `Please choose an option for ${baseProduct.name}.`
+        );
+      }
+
+      product = virtualProduct(
+        baseProduct,
+        variant
+      );
+
+    } else if (variantId) {
+      throw error(
+        400,
+        'This product has no such option.'
+      );
+    }
 
     if (!product) {
       throw error(
@@ -212,7 +272,7 @@ async function getTrustedItems(items) {
       );
     }
 
-    return { product, quantity };
+    return { product, quantity, variantId: product.variantId };
   });
 }
 
@@ -417,9 +477,10 @@ async function buildOrderDocument({
   /* ORDER ITEMS */
 
   const orderItems = trusted.map(
-    ({ product, quantity }) => ({
+    ({ product, quantity, variantId }) => ({
       product: product._id,
       productId: product.productId,
+      ...(variantId ? { variantId } : {}),
       name: product.name,
       imageUrl:
         product.images?.[0]?.url || '',
@@ -575,18 +636,36 @@ async function reserveStock(order, session) {
   for (const item of order.items) {
     const updated =
       await Product.findOneAndUpdate(
-        {
-          _id: item.product,
-          isActive: true,
-          stock: {
-            $gte: item.quantity
-          }
-        },
-        {
-          $inc: {
-            stock: -item.quantity
-          }
-        },
+        item.variantId
+          ? {
+              _id: item.product,
+              isActive: true,
+              variants: {
+                $elemMatch: {
+                  _id: item.variantId,
+                  stock: { $gte: item.quantity }
+                }
+              }
+            }
+          : {
+              _id: item.product,
+              isActive: true,
+              stock: {
+                $gte: item.quantity
+              }
+            },
+        item.variantId
+          ? {
+              $inc: {
+                stock: -item.quantity,
+                'variants.$.stock': -item.quantity
+              }
+            }
+          : {
+              $inc: {
+                stock: -item.quantity
+              }
+            },
         {
           new: true,
           session
@@ -627,14 +706,26 @@ async function releaseStock(order, session) {
   for (const item of order.items) {
     const result =
       await Product.updateOne(
-        {
-          _id: item.product
-        },
-        {
-          $inc: {
-            stock: item.quantity
-          }
-        },
+        item.variantId
+          ? {
+              _id: item.product,
+              'variants._id': item.variantId
+            }
+          : {
+              _id: item.product
+            },
+        item.variantId
+          ? {
+              $inc: {
+                stock: item.quantity,
+                'variants.$.stock': item.quantity
+              }
+            }
+          : {
+              $inc: {
+                stock: item.quantity
+              }
+            },
         {
           session
         }

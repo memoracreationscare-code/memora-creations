@@ -322,3 +322,27 @@ orders, payments and refunds, reviews, customers, return requests.
 Add banners with a photo, optional heading, sub-text, button and link, set the order and an optional
 start/end date. Active banners slide on the homepage (auto, arrows, dots, swipe on mobile).
 With no banners the homepage looks as before.
+
+## Customer emails (order updates + abandoned cart reminder)
+
+Switch them on in **Admin → Store Settings → Messages to customers**. Needs a free email service:
+
+**Brevo (recommended, free 300 emails a day, no domain needed)**
+1. Sign up at brevo.com, then *SMTP & API → API keys → Generate a new API key*.
+2. In Brevo, *Senders, Domains → Senders → Add a sender* with your Gmail address and click the link they email you.
+3. In Render → Environment add `BREVO_API_KEY` (the key), `MAIL_FROM_EMAIL` (that Gmail address) and, if you like, `MAIL_FROM_NAME` = `Memora Creations`.
+
+The server then sends: order placed, shipped, out for delivery, delivered, cancelled, refunded, and one
+reminder for a cart left for 24 hours (change in settings). Each email goes once, only for orders and carts that
+appear after you switched the option on, and never for checkouts that were never paid.
+WhatsApp messages need Meta business approval and paid templates, so email is the automatic channel; the
+Abandoned Carts page still has the one-tap WhatsApp button.
+
+## First-order discount and Refer & Earn (Admin → Store Settings)
+
+- **First-order discount:** switch on, choose percent, maximum and minimum order. The code **WELCOME** is created for you and works only on a customer's first order. It shows on the customer's Profile page.
+- **Refer & Earn:** every customer has a code and a WhatsApp share button on the Profile page. The friend gets a one-time coupon when they sign up with it; the referrer gets one when the friend's first order is **delivered**. Coupons are personal (only that customer), single use and expire in 60 days.
+
+## Product options (size / colour)
+
+In Admin → Products, use **"+ Option jodo"** to add options (e.g. "Large / Red") with their own stock and, optionally, their own price/MRP. Products without options work exactly as before. With options, the product's stock is the total of its options; customers must pick an option on the product page, and stock is reduced/restored per option on orders and cancellations.

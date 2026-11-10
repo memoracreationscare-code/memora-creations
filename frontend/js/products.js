@@ -136,11 +136,11 @@
     }
   }
 
-  async function addToCart(id, quantity = 1) {
+  async function addToCart(id, quantity = 1, variantId) {
     try {
       await MC.api('/cart', {
         method: 'POST',
-        body: JSON.stringify({ productId: id, quantity })
+        body: JSON.stringify({ productId: id, quantity, ...(variantId ? { variantId } : {}) })
       });
       await MC.updateCartCount();
       closePopup();
@@ -152,10 +152,14 @@
     }
   }
 
-  function buyNow(id, quantity = 1) {
+  function buyNow(id, quantity = 1, variantId) {
     location.href = BASE + '/frontend/checkout.html?buyNow=' +
-      encodeURIComponent(id) + '&qty=' + encodeURIComponent(quantity);
+      encodeURIComponent(id) + '&qty=' + encodeURIComponent(quantity) +
+      (variantId ? '&variant=' + encodeURIComponent(variantId) : '');
   }
+
+  const hasVariants = product => Array.isArray(product?.variants) && product.variants.length > 0;
+  const productPageUrl = product => BASE + '/frontend/product.html?id=' + encodeURIComponent(product._id);
 
   function openPopup(product) {
     closePopup();
@@ -179,10 +183,14 @@
             <label for="mcPopupQty">Quantity</label>
             <input id="mcPopupQty" class="input popup-qty" type="number" min="1" max="${Math.max(1, stock)}" value="1" ${stock ? '' : 'disabled'}>
           </div>
+          ${hasVariants(product) ? `
+          <div class="product-popup-actions">
+            <a class="btn" href="${esc(productPageUrl(product))}">Size / Colour chuno</a>
+          </div>` : `
           <div class="product-popup-actions">
             <button class="btn popup-add-cart" type="button" ${stock ? '' : 'disabled'}>Add to Cart</button>
             <button class="btn secondary popup-order-now" type="button" ${stock ? '' : 'disabled'}>Order Now</button>
-          </div>
+          </div>`}
         </div>
       </div>`;
     document.body.appendChild(overlay);
@@ -462,6 +470,14 @@
             <p>${esc(product.description || '')}</p>
             <div class="price">${priceMarkup(product)}</div>
             <p>${stock ? (stock <= 5 ? `🔥 Only ${stock} left - order soon` : `✅ In Stock (${stock})`) : '❌ OUT OF STOCK'}</p>
+            ${hasVariants(product) ? `
+            <div class="field">
+              <label for="variantPick">Option (size / colour)</label>
+              <select id="variantPick" class="input">
+                <option value="">-- Option chuno --</option>
+                ${product.variants.map(v => `<option value="${esc(v._id)}" ${Number(v.stock) > 0 ? '' : 'disabled'}>${esc(v.label)}${Number(v.stock) > 0 ? '' : ' (Out of stock)'}</option>`).join('')}
+              </select>
+            </div>` : ''}
             <div class="field">
               <label for="qty">Quantity</label>
               <input id="qty" class="input" type="number" min="1" max="${Math.max(1, stock)}" value="1" ${stock ? '' : 'disabled'}>
@@ -490,12 +506,30 @@
         const text = `${product.name} - Memora Creations\n${link}`;
         window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank', 'noopener');
       });
-      const quantity = () => safeQuantity($('#qty')?.value, stock);
+      let chosen = null;
+      const stockNow = () => chosen ? Number(chosen.stock) || 0 : stock;
+      const quantity = () => safeQuantity($('#qty')?.value, stockNow());
+      const needOption = () => {
+        if (hasVariants(product) && !chosen) { MC.toast('Pehle option (size / colour) chuno', 'error'); return true; }
+        return false;
+      };
+      $('#variantPick')?.addEventListener('change', event => {
+        chosen = product.variants.find(v => String(v._id) === event.target.value) || null;
+        const shown = chosen
+          ? { sellingPrice: chosen.price ?? product.sellingPrice, originalPrice: chosen.originalPrice ?? product.originalPrice }
+          : product;
+        const priceBox = $('.price', box);
+        if (priceBox) priceBox.innerHTML = priceMarkup(shown);
+        const qtyInput = $('#qty');
+        if (qtyInput) { qtyInput.max = Math.max(1, stockNow()); qtyInput.value = 1; }
+      });
       $('#addBtn')?.addEventListener('click', () => {
-        if (quantity()) addToCart(product._id, quantity());
+        if (needOption()) return;
+        if (quantity()) addToCart(product._id, quantity(), chosen?._id);
       });
       $('#buyBtn')?.addEventListener('click', () => {
-        if (quantity()) buyNow(product._id, quantity());
+        if (needOption()) return;
+        if (quantity()) buyNow(product._id, quantity(), chosen?._id);
       });
     } catch (error) {
       console.error('Single product loading:', error);
@@ -512,12 +546,14 @@
       return;
     }
     const add = event.target.closest('#productGrid .add[data-id]');
-    if (add && !add.disabled) {
-      addToCart(add.dataset.id, 1);
-      return;
-    }
     const buy = event.target.closest('#productGrid .buy[data-id]');
-    if (buy && !buy.disabled) buyNow(buy.dataset.id);
+    const picked = add || buy;
+    if (picked && !picked.disabled) {
+      const item = productsCache.find(p => String(p._id) === picked.dataset.id);
+      // Size / colour products need the option chosen on their own page.
+      if (hasVariants(item)) { location.href = productPageUrl(item); return; }
+      if (add) addToCart(add.dataset.id, 1); else buyNow(buy.dataset.id);
+    }
   });
 
   const filterForm = $('#filterForm');

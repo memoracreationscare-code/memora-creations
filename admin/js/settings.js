@@ -10,13 +10,27 @@
 
   const NUMBER = [
     'deliveryCharge', 'freeDeliveryAbove', 'codAdvancePercent',
-    'returnWindowDays', 'codAutoReceiveDays'
+    'returnWindowDays', 'codAutoReceiveDays', 'abandonedReminderHours',
+    'welcomePercent', 'welcomeMaxDiscount', 'welcomeMinOrder',
+    'referralFriendAmount', 'referralRewardAmount', 'referralMinOrder'
   ];
 
   const BOOL = [
     'storeOpen', 'freeDeliveryBar', 'codEnabled', 'codAdvanceEnabled',
-    'returnsEnabled', 'autoRefundEnabled'
+    'returnsEnabled', 'autoRefundEnabled', 'emailNotificationsEnabled',
+    'abandonedReminderEnabled', 'welcomeEnabled', 'referralEnabled'
   ];
+
+  function showMail(configured) {
+    const box = $('#mailState');
+
+    if (!box || configured === undefined) return;
+
+    box.style.color = configured ? '#1b6e2d' : '#b42318';
+    box.textContent = configured
+      ? '✔ Email service is connected.'
+      : '✖ Email service is not connected yet, so nothing can be sent. Add BREVO_API_KEY and MAIL_FROM_EMAIL in Render (steps are in the README).';
+  }
 
   function fill(s) {
     TEXT.forEach(k => { $('#' + k).value = s[k] || ''; });
@@ -36,6 +50,7 @@
       const data = await api('/admin/settings');
 
       fill(data.settings || {});
+      showMail(data.mailConfigured);
 
     } catch (e) {
       message('Could not load settings. If the server was asleep, wait a minute and reload.', false);
@@ -63,6 +78,7 @@
       const data = await api('/admin/settings', { method: 'PUT', body: JSON.stringify(body) });
 
       fill(data.settings || {});
+      showMail(data.mailConfigured);
       message('✔ ' + (data.message || 'Saved.'), true);
       toast('Settings saved.', 'success');
 

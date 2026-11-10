@@ -1015,6 +1015,9 @@
 
       items = [{
         productId: buyNowId,
+        ...(params.get('variant')
+          ? { variantId: params.get('variant') }
+          : {}),
 
         quantity: Number.isFinite(qty)
           ? Math.min(
@@ -1037,6 +1040,7 @@
         .filter(x => x.product?._id)
         .map(x => ({
           productId: x.product._id,
+          ...(x.variantId ? { variantId: x.variantId } : {}),
           quantity: Number(x.quantity) || 1
         }));
     }

@@ -237,6 +237,15 @@ const register =
         });
 
 
+      // Refer & Earn: never blocks sign-up.
+      await require('../services/referralService')
+        .applyReferralAtSignup(
+          user,
+          req.body.referralCode,
+          require('../services/settingsService').peek()
+        );
+
+
       setAuthCookie(
         res,
         {

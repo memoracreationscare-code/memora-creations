@@ -532,6 +532,7 @@ function editProduct(id) {
     product.sellingPrice;
 
   $('#stock').value = product.stock;
+  setVariantRows(product.variants || []);
 
   // Optional saved shipping fields for editing
   for (const key of [
@@ -645,6 +646,8 @@ window.MC.$('#productForm').addEventListener(
 
         stock:
           Number($('#stock').value),
+
+        variants: readVariantRows(),
 
         // Read from the admin form. Empty means unknown.
         shippingWeightKg:
@@ -792,6 +795,67 @@ async function deleteProduct(id) {
 
 
 /* ==========================================
+   VARIANT (SIZE / COLOUR) ROWS
+========================================== */
+
+function variantRowHtml(v) {
+  const e = window.MC.esc;
+  return `<div class="variant-row" data-id="${e(v._id || '')}" style="display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap">
+    <input class="input v-label" placeholder="Option (e.g. Large / Red)" value="${e(v.label || '')}" style="flex:2;min-width:140px">
+    <input class="input v-price" type="number" min="0" placeholder="Price (optional)" value="${v.price ?? ''}" style="flex:1;min-width:100px">
+    <input class="input v-mrp" type="number" min="0" placeholder="MRP (optional)" value="${v.originalPrice ?? ''}" style="flex:1;min-width:100px">
+    <input class="input v-stock" type="number" min="0" step="1" placeholder="Stock" value="${v.stock ?? ''}" style="flex:1;min-width:80px">
+    <button type="button" class="btn btn-secondary v-del">Hatao</button>
+  </div>`;
+}
+
+function syncStockField() {
+  const has = document.querySelectorAll('#variantRows .variant-row').length > 0;
+  const stock = document.getElementById('stock');
+  stock.required = !has;
+  stock.readOnly = has;
+  if (has) {
+    stock.value = [...document.querySelectorAll('#variantRows .v-stock')]
+      .reduce((sum, i) => sum + (Number(i.value) || 0), 0);
+  }
+}
+
+function setVariantRows(list) {
+  document.getElementById('variantRows').innerHTML = list.map(variantRowHtml).join('');
+  syncStockField();
+}
+
+function readVariantRows() {
+  return [...document.querySelectorAll('#variantRows .variant-row')].map(row => {
+    const out = {
+      label: row.querySelector('.v-label').value,
+      stock: Number(row.querySelector('.v-stock').value || 0)
+    };
+    if (row.dataset.id) out._id = row.dataset.id;
+    const price = row.querySelector('.v-price').value;
+    const mrp = row.querySelector('.v-mrp').value;
+    if (price !== '') out.price = Number(price);
+    if (mrp !== '') out.originalPrice = Number(mrp);
+    return out;
+  });
+}
+
+document.getElementById('addVariant').onclick = () => {
+  document.getElementById('variantRows').insertAdjacentHTML('beforeend', variantRowHtml({}));
+  syncStockField();
+};
+
+document.getElementById('variantRows').addEventListener('click', e => {
+  if (e.target.classList.contains('v-del')) {
+    e.target.closest('.variant-row').remove();
+    syncStockField();
+  }
+});
+
+document.getElementById('variantRows').addEventListener('input', syncStockField);
+
+
+/* ==========================================
    CLEAR FORM
 ========================================== */
 
@@ -800,6 +864,8 @@ function clearProductForm() {
   window.MC.$('#productForm').reset();
 
   window.MC.$('#editId').value = '';
+
+  setVariantRows([]);
 
 }
 

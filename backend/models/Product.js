@@ -115,6 +115,27 @@ const productSchema = new mongoose.Schema({
     index: true
   },
 
+  /* =========================
+     VARIANTS (size / colour ...)
+
+     Optional. A product without
+     variants works exactly as before.
+     With variants, each option has its
+     own stock (and optionally its own
+     price) and `stock` above is the
+     total of all options.
+  ========================= */
+
+  variants: {
+    type: [{
+      label: { type: String, required: true, trim: true, maxlength: 60 },
+      price: { type: Number, min: 0, default: undefined },
+      originalPrice: { type: Number, min: 0, default: undefined },
+      stock: { type: Number, required: true, min: 0, default: 0 }
+    }],
+    default: []
+  },
+
 
   /* =========================
      SHIPROCKET PACKAGE DETAILS
@@ -246,6 +267,16 @@ productSchema.index({
 ========================= */
 
 productSchema.pre('validate', function(next) {
+
+  if (Array.isArray(this.variants) && this.variants.length) {
+
+    this.stock = this.variants.reduce(
+      (sum, v) => sum + (Number(v.stock) || 0),
+      0
+    );
+
+  }
+
 
   if (
     this.sellingPrice >

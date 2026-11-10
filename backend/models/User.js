@@ -20,6 +20,26 @@ const addressSchema =
         default: 'Home'
       },
 
+      // Refer & Earn
+      referralCode: {
+        type: String,
+        unique: true,
+        sparse: true,
+        uppercase: true,
+        trim: true
+      },
+
+      referredBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        default: undefined
+      },
+
+      referralRewarded: {
+        type: Boolean,
+        default: undefined
+      },
+
       fullName: {
         type: String,
         required: true,

@@ -99,6 +99,26 @@ const couponSchema = new mongoose.Schema(
       index: true
     },
 
+    // Only for a customer who has never placed an order.
+    firstOrderOnly: {
+      type: Boolean,
+      default: false
+    },
+
+    // Personal coupon: only this customer can use it (referral rewards).
+    allowedUser: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
+      index: true
+    },
+
+    source: {
+      type: String,
+      enum: ['ADMIN', 'WELCOME', 'REFERRAL_FRIEND', 'REFERRAL_REWARD'],
+      default: 'ADMIN'
+    },
+
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Admin',

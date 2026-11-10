@@ -58,7 +58,23 @@ function defaults() {
     heroDescription: '',
     heroButtonText: '',
 
-    freeDeliveryBar: true
+    freeDeliveryBar: true,
+
+    emailNotificationsEnabled: false,
+    emailNotificationsSince: null,
+    abandonedReminderEnabled: false,
+    abandonedReminderSince: null,
+    abandonedReminderHours: 24,
+
+    welcomeEnabled: false,
+    welcomePercent: 10,
+    welcomeMaxDiscount: 100,
+    welcomeMinOrder: 299,
+
+    referralEnabled: false,
+    referralFriendAmount: 50,
+    referralRewardAmount: 50,
+    referralMinOrder: 299
   };
 }
 
