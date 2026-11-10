@@ -1,4 +1,142 @@
 /*
+  Admin pop-ups: toast messages, confirm and prompt dialogs.
+  - window.mcToast(message, type)   type: success | error | warning | message
+  - window.mcConfirm(message, opts) -> Promise<boolean>
+  - window.mcPrompt(message, opts)  -> Promise<string|null>
+  app.js's toast() hands over to mcToast, so every existing "toast(...)" call
+  in the admin now shows a floating message with an icon instead of a bar at
+  the top of the page. window.alert is also shown as a dialog.
+*/
+(() => {
+  if (window.mcToast) return;
+
+  const style = document.createElement('style');
+  style.textContent = `
+    #mcToasts{position:fixed;top:16px;right:16px;z-index:100000;display:flex;flex-direction:column;gap:10px;width:min(380px,calc(100vw - 32px));pointer-events:none}
+    .mc-t{pointer-events:auto;display:flex;gap:12px;align-items:flex-start;background:#fff;color:#302117;border-radius:14px;padding:13px 14px;
+      box-shadow:0 12px 36px rgba(48,33,23,.22);border:1px solid #eadfd4;border-left:5px solid #805137;position:relative;overflow:hidden;
+      animation:mcIn .22s ease-out;font:600 14px/1.45 Arial,sans-serif}
+    .mc-t.success{border-left-color:#1f9d55}.mc-t.error{border-left-color:#c0362c}.mc-t.warning{border-left-color:#d98e04}
+    .mc-t .ic{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:14px;background:#805137}
+    .mc-t.success .ic{background:#1f9d55}.mc-t.error .ic{background:#c0362c}.mc-t.warning .ic{background:#d98e04}
+    .mc-t .tx{flex:1;word-break:break-word;padding-top:2px}
+    .mc-t .x{background:none;border:0;font-size:20px;line-height:1;color:#8a7c70;cursor:pointer;padding:0 2px}
+    .mc-t .bar{position:absolute;left:0;bottom:0;height:3px;background:rgba(48,33,23,.18);animation:mcBar linear forwards}
+    .mc-t.out{opacity:0;transform:translateX(30px);transition:.2s}
+    @keyframes mcIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
+    @keyframes mcBar{from{width:100%}to{width:0}}
+    .mc-ov{position:fixed;inset:0;background:rgba(30,20,13,.55);z-index:100001;display:grid;place-items:center;padding:16px;animation:mcFade .15s}
+    @keyframes mcFade{from{opacity:0}to{opacity:1}}
+    .mc-dlg{background:#fff;color:#302117;border-radius:18px;width:min(440px,100%);padding:22px;box-shadow:0 24px 70px rgba(0,0,0,.35);font-family:Arial,sans-serif}
+    .mc-dlg h3{margin:0 0 8px;font-size:19px}
+    .mc-dlg p{margin:0 0 14px;white-space:pre-line;line-height:1.55;color:#5b4a3e;font-size:14.5px}
+    .mc-dlg input{width:100%;box-sizing:border-box;padding:11px;border:1px solid #d9c9bd;border-radius:10px;font-size:15px;margin-bottom:14px}
+    .mc-dlg .row{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+    .mc-dlg button{border:0;border-radius:10px;padding:11px 18px;font-weight:700;font-size:14px;cursor:pointer;background:#805137;color:#fff}
+    .mc-dlg button.no{background:#f1e8df;color:#302117}.mc-dlg button.danger{background:#c0362c}
+    @media(prefers-reduced-motion:reduce){.mc-t,.mc-ov{animation:none}}`;
+  document.head.appendChild(style);
+
+  const ICONS = { success: '✓', error: '✕', warning: '!', message: 'i' };
+
+  function box() {
+    let b = document.getElementById('mcToasts');
+    if (!b) {
+      b = document.createElement('div');
+      b.id = 'mcToasts';
+      b.setAttribute('aria-live', 'polite');
+      document.body.appendChild(b);
+    }
+    return b;
+  }
+
+  window.mcToast = function (message, type = 'message') {
+    if (!document.body) return;
+    const kind = ICONS[type] ? type : 'message';
+    const ms = kind === 'error' ? 7000 : 4000;
+    const el = document.createElement('div');
+    el.className = 'mc-t ' + kind;
+    el.setAttribute('role', kind === 'error' ? 'alert' : 'status');
+    const ic = document.createElement('span'); ic.className = 'ic'; ic.textContent = ICONS[kind];
+    const tx = document.createElement('span'); tx.className = 'tx'; tx.textContent = String(message ?? '');
+    const x = document.createElement('button'); x.className = 'x'; x.type = 'button'; x.setAttribute('aria-label', 'Close'); x.textContent = '×';
+    const bar = document.createElement('i'); bar.className = 'bar'; bar.style.animationDuration = ms + 'ms';
+    el.append(ic, tx, x, bar);
+    const close = () => { el.classList.add('out'); setTimeout(() => el.remove(), 220); };
+    x.onclick = close;
+    box().appendChild(el);
+    while (box().children.length > 4) box().firstChild.remove();
+    setTimeout(close, ms);
+  };
+
+  function dialog({ title, message, ok = 'OK', cancel = 'Cancel', danger = false, input = null, single = false }) {
+    return new Promise(resolve => {
+      const prev = document.activeElement;
+      const ov = document.createElement('div');
+      ov.className = 'mc-ov';
+      const d = document.createElement('div');
+      d.className = 'mc-dlg';
+      d.setAttribute('role', 'dialog');
+      d.setAttribute('aria-modal', 'true');
+      const h = document.createElement('h3'); h.textContent = title;
+      const p = document.createElement('p'); p.textContent = message || '';
+      d.append(h, p);
+      let field = null;
+      if (input) {
+        field = document.createElement('input');
+        field.value = input.value || '';
+        field.placeholder = input.placeholder || '';
+        d.appendChild(field);
+      }
+      const row = document.createElement('div'); row.className = 'row';
+      const no = document.createElement('button'); no.type = 'button'; no.className = 'no'; no.textContent = cancel;
+      const yes = document.createElement('button'); yes.type = 'button'; yes.textContent = ok;
+      if (danger) yes.className = 'danger';
+      if (!single) row.appendChild(no);
+      row.appendChild(yes);
+      d.appendChild(row);
+      ov.appendChild(d);
+      document.body.appendChild(ov);
+
+      const done = value => {
+        document.removeEventListener('keydown', key, true);
+        ov.remove();
+        if (prev && prev.focus) prev.focus();
+        resolve(value);
+      };
+      const key = e => {
+        if (e.key === 'Escape') { e.preventDefault(); done(single ? true : (field ? null : false)); }
+        if (e.key === 'Enter' && e.target !== no) { e.preventDefault(); yes.click(); }
+      };
+      document.addEventListener('keydown', key, true);
+      yes.onclick = () => done(field ? field.value : true);
+      no.onclick = () => done(field ? null : false);
+      ov.addEventListener('mousedown', e => { if (e.target === ov && !single) no.click(); });
+      (field || (danger ? no : yes)).focus();
+    });
+  }
+
+  window.mcConfirm = (message, opts = {}) => dialog({
+    title: opts.title || 'Pakka karna hai?',
+    message,
+    ok: opts.okText || 'Haan, karo',
+    cancel: opts.cancelText || 'Nahi',
+    danger: Boolean(opts.danger)
+  });
+
+  window.mcPrompt = (message, opts = {}) => dialog({
+    title: opts.title || 'Details likhein',
+    message,
+    ok: opts.okText || 'OK',
+    cancel: opts.cancelText || 'Cancel',
+    input: { value: opts.defaultValue || '', placeholder: opts.placeholder || '' }
+  });
+
+  // Plain alert() -> dialog (cannot block, which is fine for a notice).
+  window.alert = message => { dialog({ title: 'Dhyan dein', message: String(message ?? ''), ok: 'Theek hai', single: true }); };
+})();
+
+/*
   One shared admin menu for every admin page.
   It replaces each page's own (different) menu, so the order and the names
   are the same everywhere. To add or remove a page, edit GROUPS below.

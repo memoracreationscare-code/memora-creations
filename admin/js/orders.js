@@ -1330,9 +1330,10 @@ async function updateAdminOrderStatus(select) {
 
   if (
     newStatus === 'Cancelled' &&
-    !window.confirm(
-      'Cancel this order? Reserved stock may be returned.'
-    )
+    !(await window.mcConfirm(
+      'Cancel this order? Reserved stock may be returned.',
+      { title: 'Order cancel karna hai?', okText: 'Haan, cancel karo', danger: true }
+    ))
   ) {
 
     select.value = order.orderStatus;

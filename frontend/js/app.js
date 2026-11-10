@@ -171,6 +171,9 @@ function esc(value) {
 ===================================== */
 
 function toast(message, type = 'message') {
+  // Admin pages define a nicer floating toast (admin/js/nav.js).
+  if (typeof window.mcToast === 'function') return window.mcToast(message, type);
+
   document.querySelector('.message')?.remove();
 
   const element = document.createElement('div');

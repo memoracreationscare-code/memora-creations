@@ -337,11 +337,11 @@
   </main>
 
   <script
-    src="/memora-creations/frontend/js/app.js?v=10"
+    src="/memora-creations/frontend/js/app.js?v=20"
   ></script>
 
   <script
-    src="/memora-creations/admin/js/auth.js?v=10"
+    src="/memora-creations/admin/js/auth.js?v=11"
   ></script>
 
   <script>
@@ -826,11 +826,12 @@
             ...verifiedOrder
           };
 
-          const typed = window.prompt(
+          const typed = await window.mcPrompt(
             'Sandbox cancellation can change ' +
             'the order and release stock.\n\n' +
             'Type the exact Order ID:\n' +
-            selected.orderId
+            selected.orderId,
+            { title: 'Order ID likh kar confirm karein', okText: 'Aage badho' }
           );
 
           if (typed !== selected.orderId) {
@@ -840,11 +841,12 @@
             return;
           }
 
-          const confirmed = window.confirm(
+          const confirmed = await window.mcConfirm(
             'FINAL CONFIRMATION\n\n' +
             'Cancel sandbox order ' +
             selected.orderId +
-            ' and release reserved stock?'
+            ' and release reserved stock?',
+            { title: 'Aakhri confirmation', okText: 'Haan, cancel karo', danger: true }
           );
 
           if (!confirmed) return;

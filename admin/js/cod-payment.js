@@ -293,7 +293,7 @@
       mean that cash was received.
     */
 
-    const confirmed = window.confirm(
+    const confirmed = await window.mcConfirm(
       'COD PAYMENT CONFIRMATION\n\n' +
       'Have you actually received the ' +
       'cash payment for this order?\n\n' +

@@ -114,11 +114,11 @@
     let note = '';
 
     if (status !== 'COMPLETED') {
-      note = window.prompt(
+      note = await window.mcPrompt(
         status === 'REJECTED'
           ? 'Reason to show the customer (optional):'
           : 'Message for the customer (optional):',
-        ''
+        { title: status === 'REJECTED' ? 'Request reject karna hai?' : 'Customer ke liye message', okText: 'Save' }
       );
 
       if (note === null) return;

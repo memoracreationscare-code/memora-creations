@@ -66,7 +66,7 @@
     NUMBER.forEach(k => { body[k] = $('#' + k).value; });
     BOOL.forEach(k => { body[k] = $('#' + k).checked; });
 
-    if (!body.storeOpen && !window.confirm('The store will be CLOSED: customers cannot place orders. Continue?')) {
+    if (!body.storeOpen && !(await window.mcConfirm('The store will be CLOSED: customers cannot place orders. Continue?', { title: 'Store band karna hai?', okText: 'Haan, band karo', danger: true }))) {
       return;
     }
 
