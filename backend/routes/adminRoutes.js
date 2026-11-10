@@ -602,6 +602,11 @@ router.get(
   codRemittanceController.listCodRemittance
 );
 
+router.get('/banners', require('../controllers/bannerController').listBanners);
+router.post('/banners', require('../controllers/bannerController').createBanner);
+router.put('/banners/:id', require('../controllers/bannerController').updateBanner);
+router.delete('/banners/:id', require('../controllers/bannerController').deleteBanner);
+
 router.get(
   '/settings',
   require('../controllers/adminSettingsController').getSettings

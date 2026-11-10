@@ -316,3 +316,9 @@ return days and on/off, automatic refund and COD auto-receive days, and the home
 Saved values win over Render values; the website picks them up within about a minute.
 Other things already controlled from the admin: products, categories, coupons, announcement popup,
 orders, payments and refunds, reviews, customers, return requests.
+
+## Homepage banner slider (Admin → Banners)
+
+Add banners with a photo, optional heading, sub-text, button and link, set the order and an optional
+start/end date. Active banners slide on the homepage (auto, arrows, dots, swipe on mobile).
+With no banners the homepage looks as before.
