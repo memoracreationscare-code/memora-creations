@@ -17,6 +17,7 @@
 
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
+const { cleanVariants } = require('../utils/variants');
 
 const {
   Admin,
@@ -377,6 +378,15 @@ const listProducts = asyncHandler(async (_req, res) => {
    CREATE PRODUCT
 ===================================== */
 
+function readVariants(body) {
+  try {
+    const variants = cleanVariants(body.variants);
+    return variants === undefined ? {} : { variants };
+  } catch (e) {
+    throw error(400, e.message);
+  }
+}
+
 const createProduct = asyncHandler(async (req, res) => {
 
   const b = req.body;
@@ -483,6 +493,8 @@ const createProduct = asyncHandler(async (req, res) => {
 
     stock: Number(b.stock),
 
+    ...readVariants(b),
+
     ...shippingDetails,
 
     isFeatured: Boolean(
@@ -547,6 +559,10 @@ const updateProduct = asyncHandler(async (req, res) => {
     }
 
   });
+
+  if (body.variants !== undefined) {
+    product.variants = readVariants(body).variants;
+  }
 
   const shippingDetails =
     readShippingDetails(body);

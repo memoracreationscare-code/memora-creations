@@ -158,6 +158,9 @@
 
       return [{
         productId: buyNowId,
+        ...(params.get('variant')
+          ? { variantId: params.get('variant') }
+          : {}),
         quantity
       }];
     }
@@ -176,6 +179,7 @@
       .filter(item => item.product?._id)
       .map(item => ({
         productId: item.product._id,
+        ...(item.variantId ? { variantId: item.variantId } : {}),
         quantity: Number(item.quantity)
       }))
       .filter(item =>

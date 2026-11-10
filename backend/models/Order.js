@@ -25,6 +25,11 @@ const orderItemSchema = new mongoose.Schema({
     required: true
   },
 
+  variantId: {
+    type: mongoose.Schema.Types.ObjectId,
+    default: undefined
+  },
+
   name: {
     type: String,
     required: true,
