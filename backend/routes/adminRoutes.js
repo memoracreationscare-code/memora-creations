@@ -94,6 +94,14 @@ router.post(
 
 router.use(requireAdmin);
 
+// Every change made from the admin panel is written to the activity log.
+router.use(require('../middleware/auditLog').auditLog);
+
+router.get(
+  '/activity',
+  require('../controllers/adminActivityController').list
+);
+
 
 /* =====================================
    ADMIN COUPON MANAGEMENT

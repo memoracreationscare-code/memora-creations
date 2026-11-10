@@ -169,6 +169,7 @@
       ['wishlist.html', '♡', 'Wishlist']
     ] },
     { title: 'Website', items: [['settings.html', '⚙', 'Store Settings'],
+      ['activity-log.html', '🕘', 'Activity Log'],
       ['test-cleanup.html', '🧹', 'Test Orders Cleanup']] }
   ];
 
