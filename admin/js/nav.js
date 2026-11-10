@@ -102,4 +102,12 @@
 
   // Let alerts.js put its red numbers on the new links.
   window.dispatchEvent(new Event('mc-nav-ready'));
+
+  // Standalone pages (coupons, wishlist) have no login check of their own:
+  // send visitors without an admin session to the login page.
+  if (!window.requireAdmin) {
+    fetch('https://memora-creations.onrender.com/api/admin/dashboard', { credentials: 'include' })
+      .then(r => { if (r.status === 401 || r.status === 403) location.href = B + 'index.html'; })
+      .catch(() => {});
+  }
 })();
