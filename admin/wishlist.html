@@ -43,4 +43,5 @@ async function loadReport(){if(busy)return;busy=true;$('refreshBtn').disabled=tr
 async function toggleWishlist(){if(!loaded||busy)return;const next=!enabled;if(!confirm(next?'Enable customer wishlist?':'Disable customer wishlist? Existing saves will be retained.'))return;busy=true;renderSettings();try{const data=await request('/wishlist/admin/settings',{method:'PUT',body:JSON.stringify({enabled:next})});enabled=data.settings?.enabled===true;message(data.message||'Wishlist setting updated.');}catch(err){message(err.message,true);}finally{busy=false;renderSettings();}}
 $('refreshBtn').addEventListener('click',loadReport);$('toggleBtn').addEventListener('click',toggleWishlist);loadReport();
 </script>
+<script src="/memora-creations/admin/js/nav.js?v=1"></script>
 </body></html>
