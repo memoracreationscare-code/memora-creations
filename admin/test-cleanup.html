@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Test Orders Cleanup | Memora Admin</title>
+  <link rel="stylesheet" href="/memora-creations/admin/css/style.css?v=5">
+  <style>
+    body{margin:0;background:#f8f5f0;color:#302117;font-family:Arial,sans-serif}
+    .wrap{max-width:900px;margin:0 auto;padding:28px 18px 60px}
+    .panel{background:#fff;border:1px solid #e9dfd4;border-radius:16px;padding:22px;margin-bottom:18px}
+    h1{margin:0 0 6px}.muted{color:#81776f}
+    .warn{background:#fff4df;border-radius:10px;padding:12px 14px;margin:14px 0;line-height:1.5}
+    label{font-weight:700;display:block;margin:12px 0 6px}
+    input{padding:11px;border:1px solid #d9c9bd;border-radius:9px;min-width:240px;font-size:15px}
+    button{padding:12px 20px;border:0;border-radius:9px;background:#805137;color:#fff;font-weight:700;cursor:pointer;font-size:15px}
+    button.danger{background:#b42318}button:disabled{opacity:.5;cursor:not-allowed}
+    table{border-collapse:collapse;width:100%;margin-top:10px;font-size:14px}
+    th,td{text-align:left;padding:9px;border-bottom:1px solid #eaded6}th{background:#f5eee8}
+    .big{font-size:26px;font-weight:800}.ok{color:#1b6e2d}.bad{color:#b42318}
+    .scroll{overflow-x:auto}
+  </style>
+</head>
+<body>
+<main class="wrap">
+  <h1>Test Orders Cleanup</h1>
+  <p class="muted">Website chalu hone se pehle ke test orders hatao, taaki Dashboard ke numbers (orders, revenue) saaf ho jayein.</p>
+
+  <div class="warn">
+    ✅ Hatane se pehle har order ka <b>backup</b> database me (<code>orders_backup</code>) save hota hai.<br>
+    ✅ Test order me jo stock ghata tha wo <b>wapas</b> aa jata hai.<br>
+    ✅ Jis order me online payment aaya hai par <b>refund nahi hua</b>, wo hataya nahi jata (neeche alag dikhta hai) taaki paisa na bhoolein.<br>
+    ⚠️ Customers, products, coupons aur reviews nahi hatenge. Sirf is date se <b>pehle</b> ke orders hatenge.
+  </div>
+
+  <section class="panel">
+    <label for="before">Is date se pehle ke orders hatao (12 Nov 2026 = launch ka din)</label>
+    <input id="before" type="datetime-local" value="2026-11-12T00:00">
+    <p><button id="check" type="button">Pehle dekho kitne hain</button></p>
+    <p id="msg" aria-live="polite"></p>
+  </section>
+
+  <section class="panel" id="result" hidden>
+    <div><span class="big" id="count">0</span> order hatenge · ₹<span id="total">0</span> ke</div>
+    <div class="scroll"><table><thead><tr><th>Order</th><th>Date</th><th>Status</th><th>Payment</th><th>Total</th></tr></thead><tbody id="rows"></tbody></table></div>
+    <p class="muted" id="more"></p>
+
+    <div id="skipBox" hidden>
+      <h3 class="bad">Ye nahi hatenge (online paisa aaya, refund baaki)</h3>
+      <div class="scroll"><table><thead><tr><th>Order</th><th>Date</th><th>Payment</th><th>Total</th><th>Wajah</th></tr></thead><tbody id="skipRows"></tbody></table></div>
+      <p class="muted">Inka refund "Online Payments &amp; Refunds" page se karein, phir yahan dobara chalayein.</p>
+    </div>
+
+    <div id="delBox">
+      <label for="confirm">Pakka hatana hai? Neeche <b>DELETE</b> likho</label>
+      <input id="confirm" placeholder="DELETE" autocomplete="off">
+      <p><button id="del" class="danger" type="button" disabled>Test orders hatao</button></p>
+    </div>
+  </section>
+</main>
+
+<script src="/memora-creations/frontend/js/app.js?v=11"></script>
+<script src="/memora-creations/admin/js/auth.js?v=10"></script>
+<script src="/memora-creations/admin/js/test-cleanup.js?v=1"></script>
+</body>
+</html>
