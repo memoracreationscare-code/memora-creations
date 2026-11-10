@@ -18,7 +18,7 @@ const TEXT = {
 const BOOL = [
   'storeOpen', 'codEnabled', 'codAdvanceEnabled', 'returnsEnabled',
   'autoRefundEnabled', 'freeDeliveryBar', 'emailNotificationsEnabled',
-  'abandonedReminderEnabled'
+  'abandonedReminderEnabled', 'welcomeEnabled', 'referralEnabled'
 ];
 
 const NUMBER = {
@@ -27,7 +27,13 @@ const NUMBER = {
   codAdvancePercent: [5, 90],
   returnWindowDays: [1, 60],
   codAutoReceiveDays: [0, 60],
-  abandonedReminderHours: [1, 168]
+  abandonedReminderHours: [1, 168],
+  welcomePercent: [1, 90],
+  welcomeMaxDiscount: [0, 100000],
+  welcomeMinOrder: [0, 100000],
+  referralFriendAmount: [1, 5000],
+  referralRewardAmount: [1, 5000],
+  referralMinOrder: [0, 100000]
 };
 
 const NUMBER_LABEL = {
@@ -36,7 +42,13 @@ const NUMBER_LABEL = {
   codAdvancePercent: 'COD advance percent',
   returnWindowDays: 'Return days',
   codAutoReceiveDays: 'COD auto-receive days',
-  abandonedReminderHours: 'Reminder hours'
+  abandonedReminderHours: 'Reminder hours',
+  welcomePercent: 'Welcome discount percent',
+  welcomeMaxDiscount: 'Welcome maximum discount',
+  welcomeMinOrder: 'Welcome minimum order',
+  referralFriendAmount: 'Friend reward',
+  referralRewardAmount: 'Referrer reward',
+  referralMinOrder: 'Referral minimum order'
 };
 
 const isUrl = v => !v || /^https?:\/\/[^\s]+$/i.test(v);
@@ -117,6 +129,13 @@ const updateSettings = asyncHandler(async (req, res) => {
   ).lean();
 
   settings.setStored(doc);
+
+  // Keep the WELCOME coupon in step with the settings.
+  try {
+    await require('../services/referralService').syncWelcomeCoupon(settings.peek());
+  } catch (err) {
+    console.warn('[Welcome coupon]', err.message);
+  }
 
   return ok(res, { settings: settings.peek(), mailConfigured: require('../services/mailService').mailConfigured(), message: 'Settings saved. The website now uses them.' });
 });

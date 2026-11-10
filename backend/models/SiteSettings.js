@@ -49,7 +49,17 @@ const schema = new mongoose.Schema({
   emailNotificationsSince: Date,
   abandonedReminderEnabled: Boolean,
   abandonedReminderSince: Date,
-  abandonedReminderHours: { type: Number, min: 1, max: 168 }
+  abandonedReminderHours: { type: Number, min: 1, max: 168 },
+
+  welcomeEnabled: Boolean,
+  welcomePercent: { type: Number, min: 1, max: 90 },
+  welcomeMaxDiscount: { type: Number, min: 0, max: 100000 },
+  welcomeMinOrder: { type: Number, min: 0, max: 100000 },
+
+  referralEnabled: Boolean,
+  referralFriendAmount: { type: Number, min: 1, max: 5000 },
+  referralRewardAmount: { type: Number, min: 1, max: 5000 },
+  referralMinOrder: { type: Number, min: 0, max: 100000 }
 }, { timestamps: true });
 
 module.exports = mongoose.model('SiteSettings', schema);

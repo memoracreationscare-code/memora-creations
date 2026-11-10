@@ -331,3 +331,8 @@ reminder for a cart left for 24 hours (change in settings). Each email goes once
 appear after you switched the option on, and never for checkouts that were never paid.
 WhatsApp messages need Meta business approval and paid templates, so email is the automatic channel; the
 Abandoned Carts page still has the one-tap WhatsApp button.
+
+## First-order discount and Refer & Earn (Admin → Store Settings)
+
+- **First-order discount:** switch on, choose percent, maximum and minimum order. The code **WELCOME** is created for you and works only on a customer's first order. It shows on the customer's Profile page.
+- **Refer & Earn:** every customer has a code and a WhatsApp share button on the Profile page. The friend gets a one-time coupon when they sign up with it; the referrer gets one when the friend's first order is **delivered**. Coupons are personal (only that customer), single use and expire in 60 days.

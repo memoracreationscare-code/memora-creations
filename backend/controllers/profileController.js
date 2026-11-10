@@ -35,4 +35,49 @@ const deleteAddress = asyncHandler(async (req, res) => {
   const a = req.user.addresses.id(req.params.id); if (!a) throw error(404, 'Address not found.');
   a.deleteOne(); await req.user.save(); return ok(res, { addresses: req.user.addresses });
 });
-module.exports = { getProfile, updateProfile, updateAvatar, addAddress, updateAddress, deleteAddress };
+/* My offers: referral code + personal coupons that can still be used. */
+const getOffers = asyncHandler(async (req, res) => {
+  const settings = require('../services/settingsService').peek();
+  const referral = require('../services/referralService');
+  const { Coupon, Order } = require('../models');
+
+  const [code, coupons, earlier] = await Promise.all([
+    settings.referralEnabled ? referral.ensureReferralCode(req.user._id) : '',
+    Coupon.find({
+      allowedUser: req.user._id,
+      isActive: true,
+      usedCount: 0,
+      expiresAt: { $gt: new Date() }
+    }).sort({ expiresAt: 1 }).limit(10).lean(),
+    Order.exists({
+      user: req.user._id,
+      orderStatus: { $ne: 'Cancelled' },
+      paymentStatus: { $nin: ['FAILED', 'CANCELLED'] }
+    })
+  ]);
+
+  return ok(res, {
+    referral: {
+      enabled: settings.referralEnabled === true,
+      code,
+      friendAmount: settings.referralFriendAmount,
+      rewardAmount: settings.referralRewardAmount
+    },
+    welcome: {
+      available: settings.welcomeEnabled === true && !earlier,
+      code: referral.WELCOME_CODE,
+      percent: settings.welcomePercent,
+      maxDiscount: settings.welcomeMaxDiscount,
+      minOrder: settings.welcomeMinOrder
+    },
+    coupons: coupons.map(c => ({
+      code: c.code,
+      description: c.description,
+      value: c.discountValue,
+      minOrder: c.minOrderAmount,
+      expiresAt: c.expiresAt
+    }))
+  });
+});
+
+module.exports = { getOffers, getProfile, updateProfile, updateAvatar, addAddress, updateAddress, deleteAddress };

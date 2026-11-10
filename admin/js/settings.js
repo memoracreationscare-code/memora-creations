@@ -10,13 +10,15 @@
 
   const NUMBER = [
     'deliveryCharge', 'freeDeliveryAbove', 'codAdvancePercent',
-    'returnWindowDays', 'codAutoReceiveDays', 'abandonedReminderHours'
+    'returnWindowDays', 'codAutoReceiveDays', 'abandonedReminderHours',
+    'welcomePercent', 'welcomeMaxDiscount', 'welcomeMinOrder',
+    'referralFriendAmount', 'referralRewardAmount', 'referralMinOrder'
   ];
 
   const BOOL = [
     'storeOpen', 'freeDeliveryBar', 'codEnabled', 'codAdvanceEnabled',
     'returnsEnabled', 'autoRefundEnabled', 'emailNotificationsEnabled',
-    'abandonedReminderEnabled'
+    'abandonedReminderEnabled', 'welcomeEnabled', 'referralEnabled'
   ];
 
   function showMail(configured) {

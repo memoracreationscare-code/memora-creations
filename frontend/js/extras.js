@@ -73,6 +73,21 @@
 
   let settings = null;
 
+  // A friend's link (?ref=CODE) is remembered until sign-up.
+  try {
+    const ref = new URLSearchParams(location.search).get('ref');
+
+    if (ref && /^[A-Za-z0-9]{4,12}$/.test(ref)) localStorage.setItem('mc_ref', ref.toUpperCase());
+  } catch { /* storage blocked: fine */ }
+
+  function prefillReferral() {
+    const input = document.querySelector('#signupForm input[name="referralCode"]');
+
+    if (!input || input.value) return;
+
+    try { input.value = localStorage.getItem('mc_ref') || ''; } catch { /* ignore */ }
+  }
+
   const DEFAULT_WA = '918874050204';
 
   function prettyPhone(digits) {
@@ -242,6 +257,7 @@
   function mount() {
     document.body.appendChild(box);
     addAddress();
+    prefillReferral();
     loadSettings();
     const toggle = () => top.classList.toggle('show', window.scrollY > 500);
     window.addEventListener('scroll', toggle, { passive: true });
