@@ -14,6 +14,8 @@ module.exports = {
 
   Admin: require('./Admin'),
 
+  ActivityLog: require('./ActivityLog'),
+
   Category: require('./Category'),
 
   Product: require('./Product'),

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Activity Log | Memora Admin</title>
+  <style>
+    body{margin:0;background:#f8f5f0;color:#302117;font-family:Arial,sans-serif}
+    .wrap{max-width:1000px;margin:0 auto;padding:28px 18px 60px}
+    h1{margin:0 0 6px}.muted{color:#81776f}
+    .panel{background:#fff;border:1px solid #e9dfd4;border-radius:16px;padding:18px;margin-top:16px}
+    input{padding:11px;border:1px solid #d9c9bd;border-radius:9px;width:100%;max-width:340px;font-size:15px;box-sizing:border-box}
+    table{border-collapse:collapse;width:100%;font-size:14px;margin-top:12px}
+    th,td{text-align:left;padding:10px;border-bottom:1px solid #eaded6;vertical-align:top}
+    th{background:#f5eee8}
+    code{background:#f5eee8;padding:2px 6px;border-radius:6px;font-size:12px}
+    .scroll{overflow-x:auto}
+  </style>
+</head>
+<body>
+<main class="wrap">
+  <h1>Activity Log</h1>
+  <p class="muted">Admin panel me kisne, kab, kya badla. Refund, status, product, settings, sab record hota hai (6 mahine tak). Password ya keys kabhi save nahi hoti.</p>
+
+  <section class="panel">
+    <input id="q" type="search" placeholder="Dhundo: refund, product, order ID...">
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Kab</th><th>Kisne</th><th>Kya kiya</th><th>Record</th></tr></thead>
+        <tbody id="rows"><tr><td colspan="4">Loading...</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<script src="/memora-creations/frontend/js/app.js?v=20"></script>
+<script src="/memora-creations/admin/js/auth.js?v=12"></script>
+<script src="/memora-creations/admin/js/activity-log.js?v=1"></script>
+</body>
+</html>
