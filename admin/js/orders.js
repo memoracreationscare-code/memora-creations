@@ -1643,6 +1643,19 @@ document.querySelector('#search')
    START
 ===================================== */
 
+// Links like orders.html?status=Shipped,Out%20for%20Delivery (from the Dashboard).
+(() => {
+  const wanted = new URLSearchParams(location.search).get('status');
+
+  if (!wanted) return;
+
+  window.mcOrderStatusFilter = wanted;
+
+  document.querySelectorAll('#statusFilter button').forEach(b => {
+    b.classList.toggle('on', b.dataset.status === wanted);
+  });
+})();
+
 loadAdminOrders();
 
 
