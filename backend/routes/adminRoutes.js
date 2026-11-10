@@ -653,6 +653,11 @@ router.post(
 );
 
 router.get(
+  '/today',
+  require('../controllers/adminTodayController').today
+);
+
+router.get(
   '/pending-counts',
   require('../controllers/adminAlertsController').pendingCounts
 );
