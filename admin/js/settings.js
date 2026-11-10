@@ -94,4 +94,17 @@
     if (await window.requireAdmin()) load();
   })();
 
+
+  // Shiprocket connection check (moved here from the Dashboard).
+  $('#testShiprocket')?.addEventListener('click', async () => {
+    const out = $('#shiprocketResult');
+    out.textContent = 'Testing Shiprocket connection...';
+    try {
+      const data = await api('/admin/shiprocket/test');
+      out.textContent = '✅ ' + (data.message || 'Shiprocket connected.');
+    } catch (e) {
+      out.textContent = '❌ ' + (e.message || 'Shiprocket connection failed.');
+    }
+  });
+
 })();
