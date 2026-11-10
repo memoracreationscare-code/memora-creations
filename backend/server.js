@@ -440,6 +440,9 @@ if (require.main === module) {
         // Owner-editable shop settings (Admin -> Store Settings).
         require('./services/settingsService').startSettingsRefresh();
 
+        // Automatic customer emails: order updates + abandoned cart reminder.
+        require('./services/notificationSweeper').startNotificationSweeper();
+
         console.log(
           `Memora Creations running on port ${port}`
         );

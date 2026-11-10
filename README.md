@@ -316,3 +316,18 @@ return days and on/off, automatic refund and COD auto-receive days, and the home
 Saved values win over Render values; the website picks them up within about a minute.
 Other things already controlled from the admin: products, categories, coupons, announcement popup,
 orders, payments and refunds, reviews, customers, return requests.
+
+## Customer emails (order updates + abandoned cart reminder)
+
+Switch them on in **Admin → Store Settings → Messages to customers**. Needs a free email service:
+
+**Brevo (recommended, free 300 emails a day, no domain needed)**
+1. Sign up at brevo.com, then *SMTP & API → API keys → Generate a new API key*.
+2. In Brevo, *Senders, Domains → Senders → Add a sender* with your Gmail address and click the link they email you.
+3. In Render → Environment add `BREVO_API_KEY` (the key), `MAIL_FROM_EMAIL` (that Gmail address) and, if you like, `MAIL_FROM_NAME` = `Memora Creations`.
+
+The server then sends: order placed, shipped, out for delivery, delivered, cancelled, refunded, and one
+reminder for a cart left for 24 hours (change in settings). Each email goes once, only for orders and carts that
+appear after you switched the option on, and never for checkouts that were never paid.
+WhatsApp messages need Meta business approval and paid templates, so email is the automatic channel; the
+Abandoned Carts page still has the one-tap WhatsApp button.

@@ -43,7 +43,13 @@ const schema = new mongoose.Schema({
   heroDescription: str(300),
   heroButtonText: str(40),
 
-  freeDeliveryBar: Boolean
+  freeDeliveryBar: Boolean,
+
+  emailNotificationsEnabled: Boolean,
+  emailNotificationsSince: Date,
+  abandonedReminderEnabled: Boolean,
+  abandonedReminderSince: Date,
+  abandonedReminderHours: { type: Number, min: 1, max: 168 }
 }, { timestamps: true });
 
 module.exports = mongoose.model('SiteSettings', schema);

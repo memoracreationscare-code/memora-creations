@@ -17,7 +17,8 @@ const TEXT = {
 
 const BOOL = [
   'storeOpen', 'codEnabled', 'codAdvanceEnabled', 'returnsEnabled',
-  'autoRefundEnabled', 'freeDeliveryBar'
+  'autoRefundEnabled', 'freeDeliveryBar', 'emailNotificationsEnabled',
+  'abandonedReminderEnabled'
 ];
 
 const NUMBER = {
@@ -25,7 +26,8 @@ const NUMBER = {
   freeDeliveryAbove: [0, 1000000],
   codAdvancePercent: [5, 90],
   returnWindowDays: [1, 60],
-  codAutoReceiveDays: [0, 60]
+  codAutoReceiveDays: [0, 60],
+  abandonedReminderHours: [1, 168]
 };
 
 const NUMBER_LABEL = {
@@ -33,7 +35,8 @@ const NUMBER_LABEL = {
   freeDeliveryAbove: 'Free delivery above',
   codAdvancePercent: 'COD advance percent',
   returnWindowDays: 'Return days',
-  codAutoReceiveDays: 'COD auto-receive days'
+  codAutoReceiveDays: 'COD auto-receive days',
+  abandonedReminderHours: 'Reminder hours'
 };
 
 const isUrl = v => !v || /^https?:\/\/[^\s]+$/i.test(v);
@@ -85,11 +88,27 @@ function clean(body) {
 }
 
 const getSettings = asyncHandler(async (_req, res) => {
-  return ok(res, { settings: await settings.load(true) });
+  return ok(res, {
+    settings: await settings.load(true),
+    mailConfigured: require('../services/mailService').mailConfigured()
+  });
 });
 
 const updateSettings = asyncHandler(async (req, res) => {
   const changes = clean(req.body || {});
+
+  // Emails only go for orders/carts that appear AFTER the owner switches
+  // them on, so old customers never get a surprise email.
+  const before = settings.peek();
+  const now = new Date();
+
+  if (changes.emailNotificationsEnabled === true && !before.emailNotificationsEnabled) {
+    changes.emailNotificationsSince = now;
+  }
+
+  if (changes.abandonedReminderEnabled === true && !before.abandonedReminderEnabled) {
+    changes.abandonedReminderSince = now;
+  }
 
   const doc = await SiteSettings.findOneAndUpdate(
     { key: 'main' },
@@ -99,7 +118,7 @@ const updateSettings = asyncHandler(async (req, res) => {
 
   settings.setStored(doc);
 
-  return ok(res, { settings: settings.peek(), message: 'Settings saved. The website now uses them.' });
+  return ok(res, { settings: settings.peek(), mailConfigured: require('../services/mailService').mailConfigured(), message: 'Settings saved. The website now uses them.' });
 });
 
 module.exports = { getSettings, updateSettings, clean };

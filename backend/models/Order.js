@@ -345,6 +345,9 @@ const orderSchema = new mongoose.Schema({
     paidAt: Date
   },
 
+  /* emails already sent for this order (see services/notificationSweeper.js) */
+  notificationsSent: { type: [String], default: undefined },
+
   cashfreeEventId: {
     type: String,
     sparse: true

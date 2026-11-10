@@ -58,7 +58,13 @@ function defaults() {
     heroDescription: '',
     heroButtonText: '',
 
-    freeDeliveryBar: true
+    freeDeliveryBar: true,
+
+    emailNotificationsEnabled: false,
+    emailNotificationsSince: null,
+    abandonedReminderEnabled: false,
+    abandonedReminderSince: null,
+    abandonedReminderHours: 24
   };
 }
 
