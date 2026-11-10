@@ -1203,6 +1203,20 @@ function orderDetailsHtml(order) {
 
       ${paymentReferenceHtml(order)}
 
+      <h3>📝 Private note (sirf aapko dikhega)</h3>
+
+      <textarea
+        class="input admin-note"
+        rows="3"
+        maxlength="1000"
+        placeholder="Jaise: customer ne call kiya, Sunday ke baad delivery chahiye"
+        style="width:100%;box-sizing:border-box"
+      >${mcEscape(order.adminNote?.text || '')}</textarea>
+
+      <p style="margin:8px 0 18px">
+        <button class="btn secondary save-note" type="button">Note save karo</button>
+      </p>
+
       <h3>Status History</h3>
 
       ${history || '<p>No status history.</p>'}
@@ -1260,6 +1274,37 @@ function openOrderDetails(id) {
   `;
 
   detailsRow.style.display = 'table-row';
+
+  detailsRow
+    .querySelector('.save-note')
+    ?.addEventListener('click', async event => {
+
+      const button = event.currentTarget;
+      const text = detailsRow.querySelector('.admin-note').value;
+
+      button.disabled = true;
+
+      try {
+        const result = await mcApi(
+          '/admin/orders/' + encodeURIComponent(order._id) + '/note',
+          {
+            method: 'PUT',
+            body: JSON.stringify({ text })
+          }
+        );
+
+        order.adminNote = result.adminNote || undefined;
+        window.MC.toast(result.message, 'success');
+
+        // little marker next to the order number in the list
+        const mark = document.querySelector(`.note-mark[data-id="${order._id}"]`);
+        if (mark) mark.hidden = !order.adminNote;
+      } catch (error) {
+        window.MC.toast(error.message || 'Note save nahi hua.', 'error');
+      } finally {
+        button.disabled = false;
+      }
+    });
 
   detailsRow
     .querySelector('.print-label')
@@ -1505,6 +1550,13 @@ async function loadAdminOrders() {
               <span class="mini">
                 ${formatDate(order.createdAt)}
               </span>
+
+              <span
+                class="note-mark"
+                data-id="${mcEscape(order._id)}"
+                title="${mcEscape(order.adminNote?.text || '')}"
+                ${order.adminNote?.text ? '' : 'hidden'}
+              > 📝 note</span>
 
               <br><br>
 

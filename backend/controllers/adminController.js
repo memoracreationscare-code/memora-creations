@@ -836,7 +836,8 @@ const listOrders = asyncHandler(async (req, res) => {
 
   if (req.query.search) {
 
-    filter.orderId = {
+    // Order ID, customer name, mobile or email.
+    const pattern = {
       $regex: escapeRegex(
         cleanString(
           req.query.search,
@@ -845,6 +846,15 @@ const listOrders = asyncHandler(async (req, res) => {
       ),
       $options: 'i'
     };
+
+    filter.$or = [
+      { orderId: pattern },
+      { 'customer.fullName': pattern },
+      { 'customer.mobile': pattern },
+      { 'customer.email': pattern },
+      { 'shippingAddress.fullName': pattern },
+      { 'shippingAddress.mobile': pattern }
+    ];
 
   }
 
