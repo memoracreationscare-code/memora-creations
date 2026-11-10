@@ -848,6 +848,21 @@ const listOrders = asyncHandler(async (req, res) => {
 
   }
 
+  // Optional status filter: one or more statuses, comma separated.
+  if (req.query.status) {
+
+    const wanted = String(req.query.status)
+      .split(',')
+      .map(x => cleanString(x, 40))
+      .filter(Boolean)
+      .slice(0, 12);
+
+    if (wanted.length) {
+      filter.orderStatus = { $in: wanted };
+    }
+
+  }
+
   const orders = await Order.find(filter)
     .populate(
       'user',

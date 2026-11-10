@@ -1449,7 +1449,10 @@ async function loadAdminOrders() {
 
     const data = await mcApi(
       '/admin/orders?search=' +
-      encodeURIComponent(search)
+      encodeURIComponent(search) +
+      (window.mcOrderStatusFilter
+        ? '&status=' + encodeURIComponent(window.mcOrderStatusFilter)
+        : '')
     );
 
     adminOrders = Array.isArray(data.orders)
@@ -1640,3 +1643,24 @@ document.querySelector('#search')
 ===================================== */
 
 loadAdminOrders();
+
+
+/* =====================================
+   STATUS FILTER (Sab / Ship karne hain / ...)
+===================================== */
+
+document.querySelector('#statusFilter')
+  ?.addEventListener('click', event => {
+
+    const button = event.target.closest('button[data-status]');
+
+    if (!button) return;
+
+    document.querySelectorAll('#statusFilter button')
+      .forEach(b => b.classList.toggle('on', b === button));
+
+    window.mcOrderStatusFilter = button.dataset.status;
+
+    loadAdminOrders();
+
+  });

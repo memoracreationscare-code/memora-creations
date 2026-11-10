@@ -102,6 +102,11 @@
       font-size: 12px;
     }
 
+    .orders-filter { display:flex; gap:8px; flex-wrap:wrap; margin:0 0 14px; }
+    .orders-filter button { border:1px solid #e0d2c6; background:#fff; color:#302117; padding:8px 14px;
+      border-radius:999px; font-weight:700; cursor:pointer; font-size:13px; }
+    .orders-filter button.on { background:#805137; border-color:#805137; color:#fff; }
+
     .orders-search {
       display: flex;
       gap: 10px;
@@ -480,6 +485,16 @@
 
       </div>
 
+      <!-- STATUS FILTER -->
+
+      <div class="orders-filter" id="statusFilter" role="tablist" aria-label="Filter orders">
+        <button type="button" class="on" data-status="">Sab orders</button>
+        <button type="button" data-status="Order Placed,Confirmed,Packed">Ship karne hain</button>
+        <button type="button" data-status="Shipped,Out for Delivery">Raaste me</button>
+        <button type="button" data-status="Delivered">Delivered</button>
+        <button type="button" data-status="Cancelled">Cancelled</button>
+      </div>
+
       <!-- ORDERS TABLE -->
 
       <div class="orders-table-wrap">
@@ -549,7 +564,7 @@
   <!-- EXISTING ORDER MANAGEMENT -->
 
   <script
-    src="/memora-creations/admin/js/orders.js?v=9"
+    src="/memora-creations/admin/js/orders.js?v=10"
   ></script>
 
   <!-- COD PAYMENT MANAGEMENT -->
