@@ -337,6 +337,7 @@ app.use('/api/delivery', deliveryRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/announcement', announcementRoutes);
 app.use('/api/settings', require('./routes/settingsRoutes'));
+app.use('/api/banners', require('./routes/bannerRoutes'));
 
 /* ========================================
    SAFE STATIC FILE SERVING
