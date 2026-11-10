@@ -128,10 +128,10 @@
       }
 
       const left = Number(p.amount) - Number(p.refund?.amount || 0);
-      const input = window.prompt(
+      const input = await window.mcPrompt(
         `Refund amount for ${p.orderId} (paid ${money(p.amount)}).\n` +
         `Leave as it is for a FULL refund of ${left.toFixed(2)}, or type a smaller amount:`,
-        left.toFixed(2)
+        { title: 'Refund amount', defaultValue: left.toFixed(2), okText: 'Aage badho' }
       );
 
       if (input === null) { button.disabled = false; busy = false; return; }
@@ -145,10 +145,11 @@
         return;
       }
 
-      if (!window.confirm(
+      if (!(await window.mcConfirm(
         `Send a refund of ${money(amount)} to ${p.fullName || 'the customer'} for order ${p.orderId}?\n\n` +
-        'This sends real money back through Cashfree and cannot be undone.'
-      )) {
+        'This sends real money back through Cashfree and cannot be undone.',
+        { title: 'Refund bhejna hai?', okText: 'Haan, refund bhejo', danger: true }
+      ))) {
         button.disabled = false;
         busy = false;
         return;

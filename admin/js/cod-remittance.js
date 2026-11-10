@@ -122,7 +122,7 @@
 
     if (!button) return;
 
-    if (!confirm('Has this COD money reached your bank? This only updates your record.')) return;
+    if (!(await window.mcConfirm('Has this COD money reached your bank? This only updates your record.', { title: 'COD paisa bank me aaya?', okText: 'Haan, aa gaya' }))) return;
 
     button.disabled = true;
 

@@ -609,13 +609,13 @@
   <!-- COMMON API -->
 
   <script
-    src="/memora-creations/frontend/js/app.js?v=11"
+    src="/memora-creations/frontend/js/app.js?v=20"
   ></script>
 
   <!-- ADMIN AUTH -->
 
   <script
-    src="/memora-creations/admin/js/auth.js?v=10"
+    src="/memora-creations/admin/js/auth.js?v=11"
   ></script>
 
   <!-- CUSTOMER REVIEWS MANAGEMENT -->
@@ -770,9 +770,10 @@
             ? 'Approve'
             : 'Reject';
 
-        if (!window.confirm(
-          action + ' this customer review?'
-        )) {
+        if (!(await window.mcConfirm(
+          action + ' this customer review?',
+          { title: action + ' review?', okText: 'Haan, ' + action.toLowerCase() + ' karo', danger: status !== 'APPROVED' }
+        ))) {
           return;
         }
 

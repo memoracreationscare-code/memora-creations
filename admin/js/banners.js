@@ -154,7 +154,7 @@
       }
 
       if (button.dataset.act === 'delete') {
-        if (!window.confirm('Delete this banner?')) return;
+        if (!(await window.mcConfirm('Delete this banner?', { title: 'Banner hatana hai?', okText: 'Haan, hatao', danger: true }))) return;
         await api('/admin/banners/' + encodeURIComponent(id), { method: 'DELETE' });
       }
 
