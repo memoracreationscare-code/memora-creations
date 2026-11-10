@@ -95,6 +95,6 @@
 // One shared side menu on every admin page.
 (() => {
   const script = document.createElement('script');
-  script.src = '/memora-creations/admin/js/nav.js?v=1';
+  script.src = '/memora-creations/admin/js/nav.js?v=2';
   document.head.appendChild(script);
 })();

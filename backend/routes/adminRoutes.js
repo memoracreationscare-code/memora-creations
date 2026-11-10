@@ -643,6 +643,16 @@ router.post(
 );
 
 router.get(
+  '/test-orders',
+  require('../controllers/adminCleanupController').preview
+);
+
+router.post(
+  '/test-orders/delete',
+  require('../controllers/adminCleanupController').cleanup
+);
+
+router.get(
   '/pending-counts',
   require('../controllers/adminAlertsController').pendingCounts
 );

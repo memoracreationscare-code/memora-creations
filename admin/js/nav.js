@@ -30,7 +30,8 @@
       ['abandoned-carts.html', '🛒', 'Abandoned Carts'],
       ['wishlist.html', '♡', 'Wishlist']
     ] },
-    { title: 'Website', items: [['settings.html', '⚙', 'Store Settings']] }
+    { title: 'Website', items: [['settings.html', '⚙', 'Store Settings'],
+      ['test-cleanup.html', '🧹', 'Test Orders Cleanup']] }
   ];
 
   const here = location.pathname.split('/').pop() || 'dashboard.html';
