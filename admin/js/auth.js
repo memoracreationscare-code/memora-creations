@@ -91,3 +91,10 @@
   script.src = '/memora-creations/admin/js/alerts.js?v=3';
   document.head.appendChild(script);
 })();
+
+// One shared side menu on every admin page.
+(() => {
+  const script = document.createElement('script');
+  script.src = '/memora-creations/admin/js/nav.js?v=1';
+  document.head.appendChild(script);
+})();
