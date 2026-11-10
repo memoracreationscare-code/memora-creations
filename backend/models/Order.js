@@ -408,6 +408,13 @@ const orderSchema = new mongoose.Schema({
     index: true
   },
 
+  /* PRIVATE NOTE: written by the owner in the admin panel, never shown to the customer */
+
+  adminNote: {
+    text: { type: String, trim: true, maxlength: 1000 },
+    updatedAt: Date
+  },
+
   /* REFUND STATUS, read from Cashfree (done by us or by hand in Cashfree) */
 
   refund: {

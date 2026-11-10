@@ -348,6 +348,11 @@ router.post(
 );
 
 router.put(
+  '/orders/:id/note',
+  require('../controllers/adminNoteController').saveNote
+);
+
+router.put(
   '/orders/:id',
   adminController.updateOrder
 );
