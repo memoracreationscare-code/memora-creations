@@ -670,6 +670,11 @@ router.post(
   require('../controllers/adminCleanupController').cleanup
 );
 
+router.get('/2fa/status', require('../controllers/adminTwoFactorController').status);
+router.post('/2fa/setup', require('../controllers/adminTwoFactorController').setup);
+router.post('/2fa/enable', require('../controllers/adminTwoFactorController').enable);
+router.post('/2fa/disable', require('../controllers/adminTwoFactorController').disable);
+
 router.get(
   '/launch-check',
   require('../controllers/adminLaunchCheckController').check

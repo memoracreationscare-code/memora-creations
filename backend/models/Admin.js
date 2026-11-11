@@ -7,7 +7,15 @@ const adminSchema = new mongoose.Schema({
   passwordHash: { type: String, required: true, select: false },
   role: { type: String, enum: ['admin'], default: 'admin' },
   isActive: { type: Boolean, default: true, index: true },
-  lastLoginAt: { type: Date }
+  lastLoginAt: { type: Date },
+
+  // 2-step login (authenticator app). Hidden unless asked for with select().
+  twoFactor: {
+    enabled: { type: Boolean, default: false, select: false },
+    secretEnc: { type: String, select: false },
+    recoveryHashes: { type: [String], default: undefined, select: false },
+    lastStep: { type: Number, select: false }
+  }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Admin', adminSchema);

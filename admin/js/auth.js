@@ -46,12 +46,23 @@
     e.preventDefault();
 
     try {
-      await api('/admin/login', {
+      const result = await api('/admin/login', {
         method: 'POST',
         body: JSON.stringify(
           Object.fromEntries(new FormData(e.currentTarget))
         )
       });
+
+      // 2-step login: password was right, ask for the app code and submit again.
+      if (result && result.requiresOtp) {
+        const box = $('#otpField');
+
+        box.hidden = false;
+        $('#adminOtp').focus();
+        toast(result.message || 'Authenticator code daalein.', 'message');
+
+        return;
+      }
 
       location.href = '/memora-creations/admin/dashboard.html';
     } catch (x) {

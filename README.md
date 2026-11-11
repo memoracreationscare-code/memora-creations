@@ -346,3 +346,11 @@ Abandoned Carts page still has the one-tap WhatsApp button.
 ## Product options (size / colour)
 
 In Admin → Products, use **"+ Option jodo"** to add options (e.g. "Large / Red") with their own stock and, optionally, their own price/MRP. Products without options work exactly as before. With options, the product's stock is the total of its options; customers must pick an option on the product page, and stock is reduced/restored per option on orders and cancellations.
+
+## Admin 2-step login
+
+Admin → Store Settings → "Admin security" turns on 2-step login (Google / Microsoft Authenticator). After the password the login asks for the 6 digit code. Eight one-time recovery codes are shown once when it is switched on. If the phone AND the recovery codes are lost, set `ADMIN_2FA_DISABLE=true` in Render, log in with the password only, turn 2-step off and on again, then remove the variable.
+
+## Sitemap
+
+`.github/workflows/update-sitemap.yml` rebuilds `sitemap.xml` (all live products) every day and can be run by hand from the GitHub Actions tab ("Update sitemap" → Run workflow).
