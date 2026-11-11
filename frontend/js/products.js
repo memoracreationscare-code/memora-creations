@@ -429,18 +429,30 @@
   // "You may also like": other products from the same category.
   async function showRelatedProducts(product, box) {
     try {
-      const categoryId = product.category?._id || product.category;
-      if (!categoryId || typeof categoryId !== 'string') return;
-      const data = await MC.api('/products?category=' + encodeURIComponent(categoryId) + '&limit=9');
-      const others = (data.products || [])
-        .filter(item => String(item._id) !== String(product._id))
-        .slice(0, 4);
+      // 1) what other customers really bought together with this product
+      let others = [];
+      let heading = 'You may also like';
+      try {
+        const bought = await MC.api('/products/' + encodeURIComponent(product._id) + '/also-bought');
+        others = (bought.products || []).slice(0, 4);
+        if (others.length) heading = 'Customers also bought';
+      } catch (_) { /* fall back to the same category */ }
+
+      // 2) not enough order history yet: same category
+      if (!others.length) {
+        const categoryId = product.category?._id || product.category;
+        if (!categoryId || typeof categoryId !== 'string') return;
+        const data = await MC.api('/products?category=' + encodeURIComponent(categoryId) + '&limit=9');
+        others = (data.products || [])
+          .filter(item => String(item._id) !== String(product._id))
+          .slice(0, 4);
+      }
       if (!others.length) return;
       const section = document.createElement('section');
       section.className = 'mc-related';
       section.style.cssText = 'margin-top:34px';
       section.innerHTML = `
-        <h2 style="margin:0 0 14px">You may also like</h2>
+        <h2 style="margin:0 0 14px">${esc(heading)}</h2>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px">
           ${others.map(item => `
             <a href="product.html?id=${encodeURIComponent(item._id)}"
@@ -488,6 +500,15 @@
             <p>${esc(product.description || '')}</p>
             <div class="price">${priceMarkup(product)}</div>
             <p>${stock ? (stock <= 5 ? `🔥 Only ${stock} left - order soon` : `✅ In Stock (${stock})`) : '❌ OUT OF STOCK'}</p>
+            ${stock ? '' : `
+            <form id="notifyForm" novalidate style="margin:12px 0;padding:14px;border:1px solid #eadfce;border-radius:14px;background:#fffaf3">
+              <b style="display:block;margin-bottom:8px">🔔 Stock aane par email chahiye?</b>
+              <div style="display:flex;gap:8px">
+                <input id="notifyEmail" type="email" class="input" placeholder="Aapka email" autocomplete="email" style="flex:1;min-width:0">
+                <button class="btn" type="submit">Notify me</button>
+              </div>
+              <div id="notifyMsg" style="margin-top:8px;font-size:13px" aria-live="polite"></div>
+            </form>`}
             ${hasVariants(product) ? `
             <div class="field">
               <label for="variantPick">Option (size / colour)</label>
@@ -515,6 +536,24 @@
       refreshWishlist();
       // FIX: querySelectorAll returns a list; querySelector does not.
       MC.initGallery(box);
+      $('#notifyForm')?.addEventListener('submit', async event => {
+        event.preventDefault();
+        const msg = $('#notifyMsg');
+        const email = $('#notifyEmail').value.trim();
+        msg.style.color = '#7a6a58';
+        msg.textContent = 'Ruko…';
+        try {
+          const result = await MC.api('/products/' + encodeURIComponent(product._id) + '/notify-me', {
+            method: 'POST',
+            body: JSON.stringify({ email })
+          });
+          msg.style.color = '#1f7a4a';
+          msg.textContent = result.message || 'Done!';
+        } catch (error) {
+          msg.style.color = '#b3261e';
+          msg.textContent = error?.message || 'Abhi save nahi ho paya. Dobara try karein.';
+        }
+      });
       // the Share button (data-share-id) is handled by js/share.js
       let chosen = null;
       const stockNow = () => chosen ? Number(chosen.stock) || 0 : stock;

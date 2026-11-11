@@ -209,6 +209,7 @@ function startNotificationSweeper() {
 
   const run = async () => {
     try {
+      await require('./stockAlertSweeper').sweepStockAlerts().catch(err => console.warn('[Stock alert]', err.message));
       await require('./lowStockAlert').sweepLowStock().catch(err => console.warn('[Low stock]', err.message));
 
       const r = await sweepNotifications();
