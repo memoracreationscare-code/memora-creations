@@ -257,6 +257,12 @@
     const sort = $('#filterForm [name="sort"]');
     if (search) search.value = params.get('q') || '';
     if (sort) sort.value = params.get('sort') || 'newest';
+    ['minPrice', 'maxPrice'].forEach(name => {
+      const field = $('#filterForm [name="' + name + '"]');
+      if (field) field.value = params.get(name) || '';
+    });
+    const stock = $('#filterForm [name="inStock"]');
+    if (stock) stock.checked = params.get('inStock') === 'true';
   }
 
   async function loadCategories(params) {
@@ -288,8 +294,11 @@
       const count = $('#resultCount');
       const total = Number(result.pagination?.total ?? productsCache.length);
       if (count) count.textContent = `${total} ${total === 1 ? 'product' : 'products'}`;
+      const hint = result.didYouMean
+        ? `<div class="products-empty" style="grid-column:1/-1;padding:10px 0;text-align:left"><span>Exact match nahi mila. Ye dikha rahe hain: <b>${esc(result.didYouMean)}</b></span></div>`
+        : '';
       grid.innerHTML = productsCache.length
-        ? productsCache.map(productCard).join('')
+        ? hint + productsCache.map(productCard).join('')
         : listError('No products found', false);
       refreshWishlist();
     } catch (error) {

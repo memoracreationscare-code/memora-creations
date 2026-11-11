@@ -441,6 +441,15 @@
           </option>
         </select>
 
+        <!-- PRICE + STOCK -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;grid-column:1/-1">
+        <input name="minPrice" type="number" min="0" inputmode="numeric" class="products-select" placeholder="Min ₹" aria-label="Minimum price">
+        <input name="maxPrice" type="number" min="0" inputmode="numeric" class="products-select" placeholder="Max ₹" aria-label="Maximum price">
+        <label class="products-select" style="grid-column:1/-1;display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap">
+          <input name="inStock" type="checkbox" value="true"> In stock
+        </label>
+        </div>
+
         <!-- APPLY -->
         <button
           class="products-filter-btn"
@@ -585,7 +594,7 @@
 
   <!-- PRODUCTS JS - ORIGINAL PRESERVED -->
   <script
-    src="/memora-creations/frontend/js/products.js?v=15"
+    src="/memora-creations/frontend/js/products.js?v=17"
   ></script>
   <script src="/memora-creations/frontend/js/share.js?v=1" defer></script>
 

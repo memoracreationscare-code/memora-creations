@@ -1,6 +1,20 @@
 const { Product, Category } = require('../models');
 const { asyncHandler, error, ok } = require('../utils/http');
 const { cleanString } = require('../utils/validation');
+const { fuzzyMatch, words } = require('../utils/fuzzySearch');
+
+/* name + keywords of live products, kept for a minute, for "did you mean" search */
+let vocabCache = { at: 0, list: [] };
+
+async function searchVocabulary() {
+  if (Date.now() - vocabCache.at < 60000) return vocabCache.list;
+
+  const list = await Product.find({ isActive: true }).select('name keywords').limit(3000).lean();
+
+  vocabCache = { at: Date.now(), list };
+
+  return list;
+}
 
 function slugify(s) {
   return cleanString(s, 180)
@@ -36,7 +50,10 @@ const listProducts = asyncHandler(async (req, res) => {
     featured,
     newArrival,
     bestSeller,
-    offers
+    offers,
+    minPrice,
+    maxPrice,
+    inStock
   } = req.query;
 
   if (typeof q !== 'string' || typeof category !== 'string') {
@@ -79,35 +96,48 @@ const listProducts = asyncHandler(async (req, res) => {
   }
 
 
-  /* SEARCH */
+  /* PRICE + STOCK FILTERS */
 
-  const searchText = q.trim();
+  const low = Number(minPrice);
+  const high = Number(maxPrice);
 
-  if (searchText) {
+  if (minPrice !== undefined && minPrice !== '' && Number.isFinite(low) && low >= 0) {
+    filter.sellingPrice = { ...(filter.sellingPrice || {}), $gte: low };
+  }
 
-    const safeSearch = escapeRegex(searchText);
+  if (maxPrice !== undefined && maxPrice !== '' && Number.isFinite(high) && high > 0) {
+    filter.sellingPrice = { ...(filter.sellingPrice || {}), $lte: high };
+  }
 
-    filter.$or = [
-      {
-        name: {
-          $regex: safeSearch,
-          $options: 'i'
-        }
-      },
-      {
-        description: {
-          $regex: safeSearch,
-          $options: 'i'
-        }
-      },
-      {
-        keywords: {
-          $regex: safeSearch,
-          $options: 'i'
-        }
-      }
-    ];
+  if (inStock === 'true') {
+    filter.stock = { $gt: 0 };
+  }
 
+
+  /* SEARCH: every typed word must appear in name, description, keywords or category */
+
+  const searchText = q.trim().slice(0, 100);
+  const typedWords = words(searchText).slice(0, 6);
+  let fuzzySuggestion = '';
+
+  const wordFilter = async list => {
+    const ands = [];
+
+    for (const word of list) {
+      const re = { $regex: escapeRegex(word), $options: 'i' };
+      const cats = await Category.find({ name: re }).select('_id').limit(10).lean();
+      const or = [{ name: re }, { description: re }, { keywords: re }];
+
+      if (cats.length) or.push({ category: { $in: cats.map(c => c._id) } });
+
+      ands.push({ $or: or });
+    }
+
+    return ands;
+  };
+
+  if (typedWords.length) {
+    filter.$and = await wordFilter(typedWords);
   }
 
 
@@ -153,32 +183,42 @@ const listProducts = asyncHandler(async (req, res) => {
     );
 
 
-  const [products, total] =
-    await Promise.all([
+  const run = f => Promise.all([
 
-      Product
-        .find(filter)
-        .populate(
-          'category',
-          'name slug'
-        )
-        .sort(
-          sortMap[sort] ||
-          sortMap.newest
-        )
-        .skip(
-          (pageNum - 1) *
-          pageSize
-        )
-        .limit(pageSize)
-        .lean(),
+    Product
+      .find(f)
+      .populate('category', 'name slug')
+      .sort(sortMap[sort] || sortMap.newest)
+      .skip((pageNum - 1) * pageSize)
+      .limit(pageSize)
+      .lean(),
 
-      Product.countDocuments(filter)
+    Product.countDocuments(f)
 
-    ]);
+  ]);
+
+  let [products, total] = await run(filter);
+
+  /* Nothing found: try again forgiving small spelling mistakes ("candel", "lamb"). */
+  if (total === 0 && typedWords.length && pageNum === 1) {
+    try {
+      const { ids, suggestion } = fuzzyMatch(await searchVocabulary(), searchText);
+
+      if (ids.length) {
+        const { $and, ...rest } = filter;
+
+        [products, total] = await run({ ...rest, _id: { $in: ids } });
+        fuzzySuggestion = total ? suggestion : '';
+      }
+    } catch (err) {
+      console.warn('[Search] fuzzy fallback skipped:', err.message);
+    }
+  }
 
 
   return ok(res, {
+
+    ...(fuzzySuggestion ? { didYouMean: fuzzySuggestion } : {}),
 
     products:
       products.map(serialize),
