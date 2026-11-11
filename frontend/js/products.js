@@ -171,7 +171,7 @@
       <div class="product-popup" role="dialog" aria-modal="true" aria-label="Product quick view">
         <button class="product-popup-close" type="button" aria-label="Close">×</button>
         <div class="product-popup-imagebox">
-          <img src="${esc(pictureOf(product))}" alt="${esc(product.name)}" decoding="async">
+          ${MC.galleryHtml(product.images, product.name)}
         </div>
         <div class="product-popup-info">
           <span class="pill">${esc(product.category?.name || 'Collection')}</span>
@@ -194,6 +194,7 @@
         </div>
       </div>`;
     document.body.appendChild(overlay);
+    MC.initGallery(overlay);
     document.body.style.overflow = 'hidden';
     $('.product-popup-close', overlay)?.addEventListener('click', closePopup);
     overlay.addEventListener('click', event => {
@@ -460,10 +461,7 @@
       box.innerHTML = `
         <div class="two">
           <div class="gallery">
-            <div class="thumbs">${images.map(image => `
-              <img src="${esc(image.url)}" data-url="${esc(image.url)}" alt="${esc(product.name)}" loading="lazy" decoding="async">
-            `).join('')}</div>
-            <img class="mainimage" id="mainImage" src="${esc(pictureOf(product))}" alt="${esc(product.name)}">
+            ${MC.galleryHtml(images, product.name, { thumbs: true })}
           </div>
           <div>
             <span class="pill">${esc(product.category?.name || 'Category')}</span>
@@ -496,12 +494,7 @@
       void showRelatedProducts(product, box);
       refreshWishlist();
       // FIX: querySelectorAll returns a list; querySelector does not.
-      $$('.thumbs img', box).forEach(image => {
-        image.addEventListener('click', () => {
-          const mainImage = $('#mainImage', box);
-          if (mainImage) mainImage.src = image.dataset.url;
-        });
-      });
+      MC.initGallery(box);
       // the Share button (data-share-id) is handled by js/share.js
       let chosen = null;
       const stockNow = () => chosen ? Number(chosen.stock) || 0 : stock;

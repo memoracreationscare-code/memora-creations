@@ -508,7 +508,7 @@ const createProduct = asyncHandler(async (req, res) => {
       : [],
 
     images: Array.isArray(b.images)
-      ? b.images
+      ? b.images.slice(0, 8)
       : [],
 
     category: b.category,

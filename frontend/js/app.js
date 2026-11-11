@@ -167,25 +167,113 @@ function esc(value) {
 
 
 /* =====================================
-   TOAST MESSAGE
+   CUSTOMER UI: toast, cart popup, gallery
 ===================================== */
 
+(function injectUiStyles() {
+  if (document.getElementById('mc-ui-style')) return;
+  const css = `
+.mc-toasts{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:100000;display:flex;flex-direction:column;gap:10px;width:min(420px,calc(100vw - 24px));pointer-events:none}
+.mc-toast{pointer-events:auto;display:flex;align-items:flex-start;gap:12px;padding:13px 14px;background:#fff;color:#241c16;border-radius:14px;border:1px solid #eee3d6;border-left:5px solid #8a6d4b;box-shadow:0 14px 40px rgba(40,25,10,.22);font:600 14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;animation:mcIn .28s cubic-bezier(.2,.9,.3,1.2)}
+.mc-toast.out{animation:mcOut .2s ease forwards}
+.mc-toast-ico{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:15px;background:#8a6d4b}
+.mc-toast.success{border-left-color:#2f8f5b}.mc-toast.success .mc-toast-ico{background:#2f8f5b}
+.mc-toast.error{border-left-color:#d64541}.mc-toast.error .mc-toast-ico{background:#d64541}
+.mc-toast-msg{flex:1;padding-top:3px;word-break:break-word}
+.mc-toast-x{flex:none;border:0;background:transparent;color:#8b7f73;font-size:20px;line-height:1;cursor:pointer;padding:2px 4px}
+@keyframes mcIn{from{opacity:0;transform:translateY(-14px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes mcOut{to{opacity:0;transform:translateY(-10px)}}
+
+.mc-sheet-ov{position:fixed;inset:0;z-index:99990;background:rgba(25,18,12,.55);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:16px;animation:mcFade .2s ease}
+.mc-sheet{width:min(400px,100%);background:#fff;border-radius:22px;padding:26px 22px 20px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.3);animation:mcPop .3s cubic-bezier(.2,.9,.3,1.25)}
+.mc-sheet-check{width:64px;height:64px;margin:0 auto 14px;border-radius:50%;background:#e8f6ee;display:grid;place-items:center}
+.mc-sheet-check svg{width:34px;height:34px;stroke:#2f8f5b;stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:30;stroke-dashoffset:30;animation:mcDraw .5s .15s ease forwards}
+.mc-sheet h2{margin:0 0 6px;font-size:21px}
+.mc-sheet p{margin:0;color:#7a6f63;font-size:14px}
+.mc-sheet-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+.mc-sheet-actions .btn{width:100%;padding:13px 10px;text-align:center;justify-content:center}
+@keyframes mcFade{from{opacity:0}to{opacity:1}}
+@keyframes mcPop{from{opacity:0;transform:translateY(20px) scale(.94)}to{opacity:1;transform:none}}
+@keyframes mcDraw{to{stroke-dashoffset:0}}
+@media(max-width:600px){.mc-sheet-ov{align-items:flex-end;padding:0}.mc-sheet{border-radius:24px 24px 0 0;width:100%;padding-bottom:26px;animation:mcUp .3s ease}@keyframes mcUp{from{transform:translateY(100%)}to{transform:none}}}
+
+.mc-gal{position:relative;width:100%;user-select:none}
+.mc-gal-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;border-radius:16px;background:#f5f0eb;scroll-behavior:smooth}
+.mc-gal-track::-webkit-scrollbar{display:none}
+.mc-gal-slide{flex:0 0 100%;scroll-snap-align:center;display:flex;align-items:center;justify-content:center;aspect-ratio:1/1}
+.mc-gal-slide img{width:100%;height:100%;object-fit:contain;display:block;-webkit-user-drag:none}
+.mc-gal-nav{position:absolute;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:50%;border:0;background:rgba(255,255,255,.92);box-shadow:0 4px 14px rgba(0,0,0,.2);font-size:22px;line-height:1;cursor:pointer;color:#241c16;z-index:2}
+.mc-gal-nav.prev{left:8px}.mc-gal-nav.next{right:8px}
+.mc-gal-nav[disabled]{opacity:0;pointer-events:none}
+.mc-gal-count{position:absolute;right:10px;top:10px;background:rgba(30,22,16,.7);color:#fff;font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;z-index:2}
+.mc-gal-dots{display:flex;justify-content:center;gap:6px;margin-top:10px}
+.mc-gal-dots i{width:7px;height:7px;border-radius:50%;background:#d8cdbf;transition:.2s}
+.mc-gal-dots i.on{background:#8a6d4b;width:20px;border-radius:99px}
+.mc-gal-thumbs{display:flex;gap:8px;margin-top:10px;overflow-x:auto;scrollbar-width:thin}
+.mc-gal-thumbs img{flex:none;width:62px;height:62px;object-fit:cover;border-radius:10px;border:2px solid transparent;cursor:pointer;opacity:.7}
+.mc-gal-thumbs img.on{border-color:#8a6d4b;opacity:1}
+@media(max-width:600px){.mc-gal-nav{display:none}.mc-gal-thumbs{display:none}}
+
+html body #product .gallery{display:block!important}
+html body .product-popup-overlay{background:rgba(25,18,12,.6)!important;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);animation:mcFade .2s ease}
+html body .product-popup{border-radius:24px!important;box-shadow:0 30px 90px rgba(0,0,0,.35)!important;animation:mcPop .3s cubic-bezier(.2,.9,.3,1.2)}
+html body .product-popup-close{top:12px!important;right:12px!important;width:36px!important;height:36px!important;background:rgba(255,255,255,.95)!important;box-shadow:0 2px 10px rgba(0,0,0,.18);transition:transform .15s}
+html body .product-popup-close:hover{transform:scale(1.08)}
+html body .product-popup-imagebox{background:transparent!important;padding:0!important;display:block!important;min-height:0!important;height:auto!important;max-height:none!important}
+html body .product-popup-info .pill{font-size:12px}
+html body .product-popup-price{color:#241c16}
+html body .product-popup-actions .btn{border-radius:12px}
+@media(max-width:700px){
+html body .product-popup-overlay{align-items:flex-end!important;padding:0!important}
+html body .product-popup{max-width:none!important;width:100%!important;max-height:92dvh!important;border-radius:24px 24px 0 0!important;padding:14px!important;animation:mcUp .3s ease}
+html body .product-popup-imagebox{height:auto!important;min-height:0!important;max-height:none!important}
+html body .product-popup-imagebox .mc-gal-slide{aspect-ratio:1/1;max-height:42vh}
+}
+`;
+  const el = document.createElement('style');
+  el.id = 'mc-ui-style';
+  el.textContent = css;
+  document.head.appendChild(el);
+})();
+
 function toast(message, type = 'message') {
-  // Admin pages define a nicer floating toast (admin/js/nav.js).
+  // Admin pages define their own floating toast (admin/js/nav.js).
   if (typeof window.mcToast === 'function') return window.mcToast(message, type);
 
-  document.querySelector('.message')?.remove();
+  let stack = document.querySelector('.mc-toasts');
+  if (!stack) {
+    stack = document.createElement('div');
+    stack.className = 'mc-toasts';
+    stack.setAttribute('role', 'status');
+    stack.setAttribute('aria-live', 'polite');
+    document.body.appendChild(stack);
+  }
+  while (stack.children.length >= 3) stack.firstChild.remove();
 
-  const element = document.createElement('div');
+  const kind = type === 'success' || type === 'error' ? type : 'message';
+  const icon = kind === 'success' ? '✓' : kind === 'error' ? '!' : 'i';
+  const el = document.createElement('div');
+  el.className = `mc-toast ${kind}`;
+  const ico = document.createElement('span');
+  ico.className = 'mc-toast-ico';
+  ico.textContent = icon;
+  const msg = document.createElement('span');
+  msg.className = 'mc-toast-msg';
+  msg.textContent = message;
+  const x = document.createElement('button');
+  x.type = 'button';
+  x.className = 'mc-toast-x';
+  x.setAttribute('aria-label', 'Close');
+  x.textContent = '×';
+  el.append(ico, msg, x);
+  stack.appendChild(el);
 
-  element.className = `message ${type}`;
-  element.textContent = message;
-
-  document.body.prepend(element);
-
-  setTimeout(() => {
-    element.remove();
-  }, 3500);
+  const close = () => {
+    el.classList.add('out');
+    setTimeout(() => el.remove(), 200);
+  };
+  x.addEventListener('click', close);
+  setTimeout(close, kind === 'error' ? 5000 : 3200);
 }
 
 
@@ -197,60 +285,92 @@ function showCartPopup() {
   document.querySelector('#cartSuccessPopup')?.remove();
 
   const overlay = document.createElement('div');
-
   overlay.id = 'cartSuccessPopup';
-  overlay.className = 'modal show';
-
+  overlay.className = 'mc-sheet-ov';
   overlay.innerHTML = `
-    <div
-      class="modalbox"
-      style="max-width:420px;text-align:center"
-    >
-      <div style="font-size:52px;margin-bottom:10px">
-        ✅
+    <div class="mc-sheet" role="dialog" aria-modal="true" aria-label="Added to cart">
+      <div class="mc-sheet-check">
+        <svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
       </div>
-
-      <h2 style="margin:0 0 10px">
-        Added to Cart
-      </h2>
-
-      <p class="muted">
-        Product successfully cart me add ho gaya hai.
-      </p>
-
-      <div
-        class="actions"
-        style="justify-content:center;margin-top:20px"
-      >
-        <button
-          class="btn secondary cart-popup-close"
-          type="button"
-        >
-          Continue Shopping
-        </button>
-
-        <a
-          class="btn"
-          href="${BASE}/frontend/cart.html"
-        >
-          View Cart
-        </a>
+      <h2>Cart me add ho gaya!</h2>
+      <p>Aapka product cart me safe hai.</p>
+      <div class="mc-sheet-actions">
+        <button class="btn secondary cart-popup-close" type="button">Shopping jaari rakho</button>
+        <a class="btn" href="${BASE}/frontend/cart.html">Cart dekho</a>
       </div>
-    </div>
-  `;
-
+    </div>`;
   document.body.appendChild(overlay);
 
-  overlay
-    .querySelector('.cart-popup-close')
-    ?.addEventListener('click', () => {
-      overlay.remove();
-    });
+  const close = () => {
+    overlay.remove();
+    document.removeEventListener('keydown', onKey);
+  };
+  const onKey = event => { if (event.key === 'Escape') close(); };
+  document.addEventListener('keydown', onKey);
+  overlay.querySelector('.cart-popup-close')?.addEventListener('click', close);
+  overlay.addEventListener('click', event => { if (event.target === overlay) close(); });
+  overlay.querySelector('a.btn')?.focus();
+}
 
-  overlay.addEventListener('click', event => {
-    if (event.target === overlay) {
-      overlay.remove();
-    }
+
+/* =====================================
+   SWIPEABLE PHOTO GALLERY
+   MC.galleryHtml(images, alt, {thumbs}) + MC.initGallery(root)
+===================================== */
+
+function galleryHtml(images, alt, opts = {}) {
+  const list = (Array.isArray(images) ? images : [])
+    .map(x => (typeof x === 'string' ? x : x?.url))
+    .filter(Boolean);
+  if (!list.length) list.push('https://placehold.co/600x600?text=Memora');
+  const many = list.length > 1;
+  return `
+    <div class="mc-gal" data-count="${list.length}">
+      ${many ? `<span class="mc-gal-count">1/${list.length}</span>
+        <button class="mc-gal-nav prev" type="button" aria-label="Pichli photo" disabled>‹</button>
+        <button class="mc-gal-nav next" type="button" aria-label="Agli photo">›</button>` : ''}
+      <div class="mc-gal-track">
+        ${list.map((u, i) => `<div class="mc-gal-slide"><img src="${esc(u)}" alt="${esc(alt || '')}" ${i ? 'loading="lazy"' : ''} decoding="async" draggable="false"${i === 0 ? ' id="mainImage"' : ''}></div>`).join('')}
+      </div>
+      ${many ? `<div class="mc-gal-dots">${list.map((_, i) => `<i class="${i ? '' : 'on'}"></i>`).join('')}</div>` : ''}
+      ${many && opts.thumbs ? `<div class="mc-gal-thumbs">${list.map((u, i) => `<img src="${esc(u)}" alt="" class="${i ? '' : 'on'}" data-i="${i}" loading="lazy">`).join('')}</div>` : ''}
+    </div>`;
+}
+
+function initGallery(root) {
+  (root || document).querySelectorAll('.mc-gal').forEach(gal => {
+    if (gal.dataset.ready) return;
+    gal.dataset.ready = '1';
+    const track = gal.querySelector('.mc-gal-track');
+    const n = Number(gal.dataset.count) || 1;
+    if (n < 2) return;
+    const dots = [...gal.querySelectorAll('.mc-gal-dots i')];
+    const thumbs = [...gal.querySelectorAll('.mc-gal-thumbs img')];
+    const prev = gal.querySelector('.prev');
+    const next = gal.querySelector('.next');
+    const count = gal.querySelector('.mc-gal-count');
+    const go = i => {
+      i = Math.max(0, Math.min(n - 1, i));
+      track.scrollTo({ left: i * track.clientWidth, behavior: 'smooth' });
+    };
+    const sync = () => {
+      const i = Math.round(track.scrollLeft / (track.clientWidth || 1));
+      dots.forEach((d, k) => d.classList.toggle('on', k === i));
+      thumbs.forEach((t, k) => t.classList.toggle('on', k === i));
+      if (count) count.textContent = `${i + 1}/${n}`;
+      if (prev) prev.disabled = i === 0;
+      if (next) next.disabled = i === n - 1;
+      gal.dataset.index = i;
+    };
+    const cur = () => Number(gal.dataset.index) || 0;
+    track.addEventListener('scroll', () => requestAnimationFrame(sync), { passive: true });
+    prev?.addEventListener('click', () => go(cur() - 1));
+    next?.addEventListener('click', () => go(cur() + 1));
+    thumbs.forEach(t => t.addEventListener('click', () => go(Number(t.dataset.i))));
+    gal.addEventListener('keydown', e => {
+      if (e.key === 'ArrowLeft') go(cur() - 1);
+      if (e.key === 'ArrowRight') go(cur() + 1);
+    });
   });
 }
 
@@ -871,6 +991,8 @@ window.MC = {
   esc,
   toast,
   showCartPopup,
+  galleryHtml,
+  initGallery,
   currentUser,
   requireLogin,
   updateCartCount,

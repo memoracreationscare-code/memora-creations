@@ -855,6 +855,18 @@
         transition: none;
       }
     }
+      .photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-top:14px;width:100%}
+    .photo-tile{position:relative;border:1px solid #e5dccf;border-radius:12px;overflow:hidden;background:#fff}
+    .photo-tile img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
+    .photo-main,.photo-new{position:absolute;top:6px;left:6px;background:#2f6f4f;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px}
+    .photo-new{left:auto;right:6px;background:#b8860b}
+    .photo-tools{display:flex;border-top:1px solid #eee}
+    .photo-tools button{flex:1;border:0;background:#faf7f2;padding:7px 0;cursor:pointer;font-size:14px}
+    .photo-tools button:hover:not(:disabled){background:#f0e6d6}
+    .photo-tools button:disabled{opacity:.35;cursor:default}
+    .photo-tools button[data-act="del"]{color:#c0392b}
+    .photo-hint{font-size:12px;color:#7a6f63;margin:8px 0 0;width:100%}
+    #preview{display:block}
   </style>
 
 </head>
@@ -1181,8 +1193,8 @@
               </div>
 
               <p class="upload-description">
-                Select one or more clear product
-                images from your computer.
+                Ek saath 2-3 (max 6) photo chuno. Baad me aur bhi
+                jod sakte ho. Pehli photo main hoti hai.
               </p>
 
               <input
@@ -1394,7 +1406,7 @@
   <!-- COMMON API -->
 
   <script
-    src="/memora-creations/frontend/js/app.js?v=20"
+    src="/memora-creations/frontend/js/app.js?v=14"
   ></script>
 
   <!-- ADMIN AUTH -->
@@ -1406,7 +1418,7 @@
   <!-- PRODUCT MANAGEMENT -->
 
   <script
-    src="/memora-creations/admin/js/products.js?v=9"
+    src="/memora-creations/admin/js/products.js?v=10"
   ></script>
 
   <!-- =====================================
