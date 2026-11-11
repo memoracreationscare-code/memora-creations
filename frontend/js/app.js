@@ -1007,6 +1007,7 @@ window.MC = {
   toast,
   showCartPopup,
   galleryHtml,
+  API_BASE: API,
   ratingHtml,
   initGallery,
   currentUser,
