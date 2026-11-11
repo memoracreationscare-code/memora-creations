@@ -28,4 +28,18 @@ const saveNote = asyncHandler(async (req, res) => {
   return ok(res, { adminNote: order.adminNote || null, message: text ? 'Note saved.' : 'Note removed.' });
 });
 
-module.exports = { saveNote };
+// PATCH /api/admin/products/:id/visibility  { isActive }
+// Show or hide a product on the website without touching anything else.
+const setProductVisibility = asyncHandler(async (req, res) => {
+  if (!mongoose.isValidObjectId(req.params.id)) throw error(400, 'Invalid product.');
+  if (typeof req.body?.isActive !== 'boolean') throw error(400, 'isActive must be true or false.');
+
+  const { Product } = require('../models');
+  const result = await Product.updateOne({ _id: req.params.id }, { $set: { isActive: req.body.isActive } });
+
+  if (!result.matchedCount) throw error(404, 'Product not found.');
+
+  return ok(res, { isActive: req.body.isActive, message: req.body.isActive ? 'Product website par dikh raha hai.' : 'Product website se chhup gaya.' });
+});
+
+module.exports = { saveNote, setProductVisibility };
