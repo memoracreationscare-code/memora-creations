@@ -1012,7 +1012,7 @@
 
   <!-- COMMON APP -->
 
-  <script src="/memora-creations/frontend/js/app.js?v=14"></script>
+  <script src="/memora-creations/frontend/js/app.js?v=15"></script>
 
   <!-- HOME PAGE LOGIC -->
 
@@ -1141,6 +1141,8 @@
                   ${esc(product.name)}
                 </h3>
 
+                ${window.MC.ratingHtml(product)}
+
                 <div class="product-price-row">
 
                   <span class="current-price">
@@ -1227,6 +1229,8 @@
               </span>
 
               <h2>${esc(product.name)}</h2>
+
+              ${window.MC.ratingHtml(product)}
 
               <div class="product-popup-price">
                 ${money(product.sellingPrice)}

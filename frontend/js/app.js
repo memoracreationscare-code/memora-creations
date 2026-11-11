@@ -197,6 +197,12 @@ function esc(value) {
 @keyframes mcDraw{to{stroke-dashoffset:0}}
 @media(max-width:600px){.mc-sheet-ov{align-items:flex-end;padding:0}.mc-sheet{border-radius:24px 24px 0 0;width:100%;padding-bottom:26px;animation:mcUp .3s ease}@keyframes mcUp{from{transform:translateY(100%)}to{transform:none}}}
 
+.mc-rate{display:inline-flex;align-items:center;gap:5px;font:700 12.5px/1 system-ui,sans-serif;color:#3b2a1d;margin:4px 0}
+.mc-rate-stars{position:relative;display:inline-block;font-size:14px;letter-spacing:1px;color:#e2d6c6;line-height:1}
+.mc-rate-stars::before{content:"★★★★★"}
+.mc-rate-stars i{position:absolute;left:0;top:0;overflow:hidden;white-space:nowrap;color:#f0a020}
+.mc-rate-stars i::before{content:"★★★★★"}
+.mc-rate small{font-weight:600;color:#8a7a68;font-size:12px}
 .mc-gal{position:relative;width:100%;user-select:none}
 .mc-gal-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;border-radius:16px;background:#f5f0eb;scroll-behavior:smooth}
 .mc-gal-track::-webkit-scrollbar{display:none}
@@ -317,6 +323,15 @@ function showCartPopup() {
    SWIPEABLE PHOTO GALLERY
    MC.galleryHtml(images, alt, {thumbs}) + MC.initGallery(root)
 ===================================== */
+
+/* Small "★★★★☆ 4.5 (12)" line. Empty until the product has an approved review. */
+function ratingHtml(product) {
+  const count = Number(product && product.ratingCount) || 0;
+  const avg = Number(product && product.ratingAverage) || 0;
+  if (count < 1 || avg <= 0) return '';
+  const pct = Math.max(0, Math.min(100, (avg / 5) * 100));
+  return `<span class="mc-rate" title="${avg.toFixed(1)} out of 5"><span class="mc-rate-stars" aria-hidden="true"><i style="width:${pct}%"></i></span>${avg.toFixed(1)} <small>(${count})</small></span>`;
+}
 
 function galleryHtml(images, alt, opts = {}) {
   const list = (Array.isArray(images) ? images : [])
@@ -992,6 +1007,7 @@ window.MC = {
   toast,
   showCartPopup,
   galleryHtml,
+  ratingHtml,
   initGallery,
   currentUser,
   requireLogin,

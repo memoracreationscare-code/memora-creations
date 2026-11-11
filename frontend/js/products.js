@@ -176,6 +176,7 @@
         <div class="product-popup-info">
           <span class="pill">${esc(product.category?.name || 'Collection')}</span>
           <h2>${esc(product.name)}</h2>
+          ${MC.ratingHtml(product)}
           <div class="product-popup-price">${priceMarkup(product)}</div>
           <p class="muted">${esc(product.description || '')}</p>
           <p>${stock ? `✅ In Stock (${stock})` : '❌ Out of Stock'}</p>
@@ -228,6 +229,7 @@
           <div class="premium-card-content">
             <div class="premium-category">${esc(product.category?.name || 'Collection')}</div>
             <h3 class="premium-product-title">${esc(product.name)}</h3>
+            ${MC.ratingHtml(product)}
             <div class="premium-price-row">${priceMarkup(product, 'premium')}</div>
             <div class="stock-text ${stock ? '' : 'out'}">${stock ? `In stock (${stock})` : 'Out of stock'}</div>
           </div>
@@ -347,6 +349,13 @@
           image: images.map(image => image.url),
           url: pageUrl,
           brand: { '@type': 'Brand', name: 'Memora Creations' },
+          ...(Number(product.ratingCount) > 0 && Number(product.ratingAverage) > 0 ? {
+            aggregateRating: {
+              '@type': 'AggregateRating',
+              ratingValue: Number(product.ratingAverage).toFixed(1),
+              reviewCount: Number(product.ratingCount)
+            }
+          } : {}),
           offers: {
             '@type': 'Offer',
             url: pageUrl,
@@ -466,6 +475,7 @@
           <div>
             <span class="pill">${esc(product.category?.name || 'Category')}</span>
             <h1>${esc(product.name)}</h1>
+            ${MC.ratingHtml(product)}
             <p>${esc(product.description || '')}</p>
             <div class="price">${priceMarkup(product)}</div>
             <p>${stock ? (stock <= 5 ? `🔥 Only ${stock} left - order soon` : `✅ In Stock (${stock})`) : '❌ OUT OF STOCK'}</p>

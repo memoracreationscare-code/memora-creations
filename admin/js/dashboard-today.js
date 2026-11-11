@@ -53,6 +53,7 @@
       { label: 'Cancellation requests', value: c.cancellations || 0, hot: c.cancellations > 0, sub: 'Customer ne cancel manga', href: '/memora-creations/admin/cancellation-requests.html' },
       { label: 'Return requests', value: c.returns || 0, hot: c.returns > 0, sub: 'Return / replacement', href: '/memora-creations/admin/return-requests.html' },
       { label: 'Refund processing', value: t.refundsProcessing, sub: 'Cashfree me chal raha hai', href: '/memora-creations/admin/payments.html' },
+      { label: 'Reviews approve karo', value: c.reviews || 0, hot: c.reviews > 0, sub: 'Customer ke naye reviews', href: '/memora-creations/admin/reviews.html' },
       { label: 'Stock kam', value: c.lowStock || 0, hot: c.lowStock > 0, sub: 'Products (3 ya kam bache)', href: '/memora-creations/admin/products.html' }
     ];
 
