@@ -48,6 +48,7 @@ const schema = new mongoose.Schema({
   emailNotificationsEnabled: Boolean,
   emailNotificationsSince: Date,
   abandonedReminderEnabled: Boolean,
+  lowStockEmailEnabled: Boolean,
   abandonedReminderSince: Date,
   abandonedReminderHours: { type: Number, min: 1, max: 168 },
 

@@ -205,6 +205,12 @@ const productSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
     index: true
+  },
+
+  // set when the owner was emailed that this product is nearly out of stock
+  lowStockAlertedAt: {
+    type: Date,
+    default: undefined
   }
 
 }, {
