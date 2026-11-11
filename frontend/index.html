@@ -1012,7 +1012,7 @@
 
   <!-- COMMON APP -->
 
-  <script src="/memora-creations/frontend/js/app.js?v=13"></script>
+  <script src="/memora-creations/frontend/js/app.js?v=14"></script>
 
   <!-- HOME PAGE LOGIC -->
 
@@ -1217,11 +1217,7 @@
             >×</button>
 
             <div class="product-popup-imagebox">
-              <img
-                src="${esc(image)}"
-                alt="${esc(product.name)}"
-                decoding="async"
-              >
+              ${window.MC.galleryHtml(product.images, product.name)}
             </div>
 
             <div class="product-popup-info">
@@ -1288,6 +1284,7 @@
         `;
 
         document.body.appendChild(overlay);
+        window.MC.initGallery(overlay);
         document.body.style.overflow = 'hidden';
 
         const close = () => {

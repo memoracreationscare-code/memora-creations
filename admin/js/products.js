@@ -608,6 +608,9 @@ function editProduct(id, asCopy = false) {
   $('#keywords').value =
     (product.keywords || []).join(',');
 
+  // Copy starts without photos (own photos); edit keeps the existing ones.
+  setPhotoItems(asCopy ? [] : (product.images || []));
+
   $('#isFeatured').checked =
     Boolean(product.isFeatured);
 
@@ -667,6 +670,84 @@ async function uploadProductImage(file) {
 
 
 /* ==========================================
+   PRODUCT PHOTOS (multiple, reorder, remove)
+========================================== */
+
+const MAX_PRODUCT_PHOTOS = 6;
+let photoItems = [];   // { url, publicId, alt, file?, preview? }
+
+function renderPhotoManager() {
+  const box = document.getElementById('preview');
+  if (!box) return;
+
+  const cards = photoItems.map((item, i) => `
+    <div class="photo-tile" data-i="${i}">
+      <img src="${window.MC.esc(item.preview || item.url)}" alt="Photo ${i + 1}">
+      ${i === 0 ? '<span class="photo-main">Main</span>' : ''}
+      ${item.file ? '<span class="photo-new">New</span>' : ''}
+      <div class="photo-tools">
+        <button type="button" data-act="left" ${i === 0 ? 'disabled' : ''} title="Pehle karo">←</button>
+        <button type="button" data-act="right" ${i === photoItems.length - 1 ? 'disabled' : ''} title="Baad me karo">→</button>
+        <button type="button" data-act="del" title="Hatao">✕</button>
+      </div>
+    </div>`).join('');
+
+  box.innerHTML =
+    `<div class="photo-grid">${cards}</div>` +
+    `<p class="photo-hint">${photoItems.length}/${MAX_PRODUCT_PHOTOS} photos · pehli photo "Main" hoti hai · ` +
+    `customer slide karke sab dekhega.</p>`;
+}
+
+function setPhotoItems(images) {
+  photoItems.forEach(x => x.preview && URL.revokeObjectURL(x.preview));
+  photoItems = (images || []).map(({ url, publicId, alt }) => ({ url, publicId, alt }));
+  renderPhotoManager();
+}
+
+function addPhotoFiles(fileList) {
+  const files = [...fileList].filter(f => f.type.startsWith('image/'));
+  for (const file of files) {
+    if (photoItems.length >= MAX_PRODUCT_PHOTOS) {
+      window.MC.toast(`Maximum ${MAX_PRODUCT_PHOTOS} photos allowed.`, 'error');
+      break;
+    }
+    photoItems.push({ file, preview: URL.createObjectURL(file), alt: file.name });
+  }
+  renderPhotoManager();
+}
+
+document.getElementById('images').addEventListener('change', event => {
+  addPhotoFiles(event.target.files);
+  event.target.value = '';   // so the same photo can be picked again
+});
+
+document.getElementById('preview').addEventListener('click', event => {
+  const btn = event.target.closest('button[data-act]');
+  const tile = event.target.closest('.photo-tile');
+  if (!btn || !tile) return;
+  const i = Number(tile.dataset.i);
+  const act = btn.dataset.act;
+  if (act === 'del') {
+    const [gone] = photoItems.splice(i, 1);
+    if (gone.preview) URL.revokeObjectURL(gone.preview);
+  } else {
+    const j = act === 'left' ? i - 1 : i + 1;
+    if (j < 0 || j >= photoItems.length) return;
+    [photoItems[i], photoItems[j]] = [photoItems[j], photoItems[i]];
+  }
+  renderPhotoManager();
+});
+
+async function uploadAllPhotos() {
+  // Upload only the new files, keep the chosen order.
+  return Promise.all(photoItems.map(item =>
+    item.file ? uploadProductImage(item.file)
+      : Promise.resolve({ url: item.url, publicId: item.publicId, alt: item.alt })
+  ));
+}
+
+
+/* ==========================================
    SAVE PRODUCT
 ========================================== */
 
@@ -680,11 +761,7 @@ window.MC.$('#productForm').addEventListener(
 
     try {
 
-      const files = [...$('#images').files];
-
-      const uploadedImages = await Promise.all(
-        files.map(uploadProductImage)
-      );
+      const uploadedImages = await uploadAllPhotos();
 
       const current = productState.products.find(
         p => p._id === $('#editId').value
@@ -731,9 +808,7 @@ window.MC.$('#productForm').addEventListener(
           .map(x => x.trim())
           .filter(Boolean),
 
-        images: uploadedImages.length
-          ? uploadedImages
-          : (current?.images || []),
+        images: uploadedImages,
 
         isFeatured:
           $('#isFeatured').checked,
@@ -926,6 +1001,7 @@ function clearProductForm() {
   window.MC.$('#editId').value = '';
 
   setVariantRows([]);
+  setPhotoItems([]);
 
 }
 
