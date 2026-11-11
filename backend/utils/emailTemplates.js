@@ -114,4 +114,20 @@ function cartReminderEmail(cart) {
   };
 }
 
-module.exports = { orderEmail, cartReminderEmail, ORDER_EVENTS };
+function backInStockEmail(product) {
+  const body =
+    '<p style="margin:0 0 10px">Aapne jis product ke liye alert maanga tha, wo ab wapas stock me hai:</p>' +
+    `<p style="margin:0 0 6px;font-size:16px"><b>${esc(product.name)}</b></p>` +
+    `<p style="margin:0;font-size:14px">${rupees(product.sellingPrice)}</p>` +
+    '<p style="margin:12px 0 0;font-size:13px;color:#8a7a68">Stock limited hota hai, jaldi order karein.</p>';
+
+  return {
+    subject: `Back in stock: ${product.name}`,
+    html: shell('Wapas aa gaya! 🎉', body, {
+      text: 'Abhi kharidein',
+      url: `${SITE}/product.html?id=${encodeURIComponent(product._id)}`
+    })
+  };
+}
+
+module.exports = { orderEmail, cartReminderEmail, backInStockEmail, ORDER_EVENTS };

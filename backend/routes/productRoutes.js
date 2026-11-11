@@ -204,6 +204,18 @@ router.get(
   require('../controllers/shareController').share
 );
 
+router.post(
+  '/:id/notify-me',
+  require('express-rate-limit')({
+    windowMs: 15 * 60 * 1000,
+    limit: 10,
+    standardHeaders: 'draft-7',
+    legacyHeaders: false,
+    message: { success: false, message: 'Bahut zyada koshish. Thodi der baad try karein.' }
+  }),
+  (req, res, next) => require('../controllers/stockAlertController').notifyMe(req, res).catch(next)
+);
+
 router.get(
   '/:id/also-bought',
   publicCache(60 * 1000),
