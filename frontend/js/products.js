@@ -502,6 +502,7 @@
       applyProductSeo(product, images, stock);
       void showTrustBadges(box);
       void showRelatedProducts(product, box);
+      window.MCPinCheck?.mount(box, product._id);
       refreshWishlist();
       // FIX: querySelectorAll returns a list; querySelector does not.
       MC.initGallery(box);

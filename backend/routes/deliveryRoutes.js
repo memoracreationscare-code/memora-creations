@@ -57,6 +57,110 @@ const deliveryCheckLimiter = rateLimit({
 
 });
 
+
+/* ==========================================
+   PUBLIC PRODUCT-PAGE PIN CHECK (no login)
+
+   POST /api/delivery/product-check
+   { "pincode": "274305", "productId": "<mongo id>" }
+
+   Read-only. Answers "delivery here? COD? how many days?"
+   Results are kept for 10 minutes so many visitors do not
+   hammer Shiprocket. Same strict weight rules as above.
+========================================== */
+
+const productCheckCache = new Map();
+const PRODUCT_CHECK_TTL = 10 * 60 * 1000;
+
+const productCheckLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 40,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: {
+    success: false,
+    available: null,
+    reason: 'RATE_LIMIT',
+    message: 'Too many checks. Please try again in a few minutes.'
+  }
+});
+
+function summarise(prepaid, cod) {
+  return {
+    success: true,
+    pincode: prepaid.pincode,
+    available: prepaid.available === true,
+    codAvailable: cod && cod.success ? cod.available === true : null,
+    estimatedDeliveryDays: prepaid.estimatedDeliveryDays ?? null,
+    estimatedDeliveryDate: prepaid.estimatedDeliveryDate || null,
+    message: prepaid.available
+      ? 'Delivery is available for this PIN code.'
+      : 'Sorry, we do not deliver to this PIN code yet.'
+  };
+}
+
+async function productCheck(req, res, check = checkDeliveryPincode, cache = productCheckCache, now = Date.now()) {
+  const body = req.body || {};
+  const pincode = typeof body.pincode === 'string' ? body.pincode.trim() : '';
+  const productId = typeof body.productId === 'string' ? body.productId.trim() : '';
+
+  if (!/^[1-9][0-9]{5}$/.test(pincode)) {
+    return res.status(400).json({
+      success: false, available: null, reason: 'INVALID_PINCODE',
+      message: 'Enter a valid 6-digit PIN code.'
+    });
+  }
+
+  if (!/^[a-f0-9]{24}$/i.test(productId)) {
+    return res.status(400).json({
+      success: false, available: null, reason: 'INVALID_ITEMS',
+      message: 'Product not found.'
+    });
+  }
+
+  const key = pincode + ':' + productId;
+  const hit = cache.get(key);
+
+  if (hit && now - hit.at < PRODUCT_CHECK_TTL) return res.status(200).json(hit.value);
+
+  const items = [{ productId, quantity: 1 }];
+  const [prepaid, cod] = await Promise.all([
+    check({ pincode, paymentMethod: 'PREPAID', items }),
+    check({ pincode, paymentMethod: 'COD', items })
+  ]);
+
+  if (!prepaid.success) {
+    const status = prepaid.reason === 'INVALID_PINCODE' ? 400
+      : prepaid.reason === 'PRODUCT_UNAVAILABLE' ? 409
+      : (prepaid.reason === 'SHIPPING_DETAILS_MISSING' || prepaid.reason === 'INVALID_PACKAGE_WEIGHT') ? 422
+      : 503;
+
+    return res.status(status).json({
+      success: false, available: null, reason: prepaid.reason,
+      message: status === 503
+        ? 'Delivery check abhi available nahi hai. Checkout par PIN code check ho jayega.'
+        : prepaid.message
+    });
+  }
+
+  const value = summarise(prepaid, cod);
+
+  if (cache.size > 500) cache.clear();
+  cache.set(key, { at: now, value });
+
+  return res.status(200).json(value);
+}
+
+router.post('/product-check', productCheckLimiter, (req, res) =>
+  productCheck(req, res).catch(err => {
+    console.error('[Delivery API] product-check failed:', err.message);
+    res.status(503).json({
+      success: false, available: null, reason: 'DELIVERY_CHECK_FAILED',
+      message: 'Delivery check abhi available nahi hai.'
+    });
+  })
+);
+
 router.use(deliveryCheckLimiter);
 
 
@@ -239,3 +343,4 @@ router.post(
 ========================================== */
 
 module.exports = router;
+module.exports.productCheck = productCheck;
