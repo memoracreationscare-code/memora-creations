@@ -355,6 +355,11 @@ router.post(
   adminController.refreshPaymentDetails
 );
 
+router.patch(
+  '/products/:id/visibility',
+  require('../controllers/adminNoteController').setProductVisibility
+);
+
 router.put(
   '/orders/:id/note',
   require('../controllers/adminNoteController').saveNote

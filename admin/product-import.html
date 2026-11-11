@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Import Products | Memora Admin</title>
+  <style>
+    body{margin:0;background:#f8f5f0;color:#302117;font-family:Arial,sans-serif}
+    .wrap{max-width:1000px;margin:0 auto;padding:28px 18px 60px}
+    h1{margin:0 0 6px}.muted{color:#81776f}
+    .panel{background:#fff;border:1px solid #e9dfd4;border-radius:16px;padding:20px;margin-top:16px}
+    .note{background:#fff4df;border-radius:10px;padding:12px 14px;line-height:1.55;margin-top:14px}
+    button,.btn{display:inline-block;padding:11px 18px;border:0;border-radius:9px;background:#805137;color:#fff;font-weight:700;cursor:pointer;font-size:14px;text-decoration:none}
+    button.alt{background:#f1e8df;color:#302117}button:disabled{opacity:.5;cursor:not-allowed}
+    table{border-collapse:collapse;width:100%;font-size:13px;margin-top:12px}
+    th,td{text-align:left;padding:8px;border-bottom:1px solid #eaded6;vertical-align:top}th{background:#f5eee8}
+    .ok{color:#1b6e2d;font-weight:700}.bad{color:#b42318;font-weight:700}.scroll{overflow-x:auto}
+    code{background:#f5eee8;padding:2px 6px;border-radius:6px}
+  </style>
+</head>
+<body>
+<main class="wrap">
+  <h1>Products CSV se jodo</h1>
+  <p class="muted">Excel ya Google Sheet me products likhkar CSV me save karein aur yahan daalein. Bahut saare products ek saath ban jate hain.</p>
+
+  <div class="note">
+    <b>Columns (pehli line me ye naam hone chahiye):</b><br>
+    <code>name</code> <code>description</code> <code>category</code> <code>originalPrice</code> <code>sellingPrice</code> <code>stock</code> <code>keywords</code> (optional, comma se alag)<br>
+    <b>category</b> ka naam wahi likhein jo Products page par hai.<br>
+    Products <b>chhupe hue (draft)</b> bante hain, kyunki photo CSV se nahi aati. Products page par har product me photo lagakar <b>"Website par dikhao"</b> dabayein.
+  </div>
+
+  <section class="panel">
+    <p><button id="sample" class="alt" type="button">Sample CSV download karo</button></p>
+    <input id="file" type="file" accept=".csv,text/csv">
+    <p id="msg" class="muted" aria-live="polite"></p>
+    <div id="preview" hidden>
+      <div class="scroll"><table><thead><tr><th>#</th><th>Naam</th><th>Category</th><th>MRP</th><th>Price</th><th>Stock</th><th>Check</th></tr></thead><tbody id="rows"></tbody></table></div>
+      <p><button id="go" type="button" disabled>Import karo</button></p>
+    </div>
+  </section>
+</main>
+
+<script src="/memora-creations/frontend/js/app.js?v=20"></script>
+<script src="/memora-creations/admin/js/auth.js?v=13"></script>
+<script src="/memora-creations/admin/js/csv-parse.js?v=1"></script>
+<script src="/memora-creations/admin/js/product-import.js?v=1"></script>
+</body>
+</html>

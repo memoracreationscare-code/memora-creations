@@ -158,6 +158,7 @@
     ] },
     { title: 'Catalog & Marketing', items: [
       ['products.html', '◈', 'Products'],
+      ['product-import.html', '⇪', 'Import Products (CSV)'],
       ['banners.html', '🖼', 'Homepage Banners'],
       ['coupons.html', '%', 'Coupons'],
       ['announcement.html', '📢', 'Announcement']

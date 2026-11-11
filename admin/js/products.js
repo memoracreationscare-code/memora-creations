@@ -470,6 +470,25 @@ async function loadProducts() {
 
             <button
               type="button"
+              class="btn secondary product-visibility"
+              data-id="${product._id}"
+              data-active="${product.isActive !== false}"
+              title="Website par dikhana ya chhupana"
+            >
+              ${product.isActive === false ? 'Website par dikhao' : 'Chhupao'}
+            </button>
+
+            <button
+              type="button"
+              class="btn secondary product-copy"
+              data-id="${product._id}"
+              title="Isi jaisa naya product banao"
+            >
+              Copy
+            </button>
+
+            <button
+              type="button"
               class="btn danger product-delete"
               data-id="${product._id}"
             >
@@ -494,6 +513,39 @@ async function loadProducts() {
   });
 
 
+  $$('.product-visibility').forEach(button => {
+
+    button.onclick = async () => {
+      const show = button.dataset.active !== 'true';
+
+      button.disabled = true;
+
+      try {
+        const r = await window.MC.api(
+          '/admin/products/' + encodeURIComponent(button.dataset.id) + '/visibility',
+          { method: 'PATCH', body: JSON.stringify({ isActive: show }) }
+        );
+
+        window.MC.toast(r.message, 'success');
+        loadProducts();
+      } catch (e) {
+        window.MC.toast(e.message || 'Badal nahi paya.', 'error');
+        button.disabled = false;
+      }
+    };
+
+  });
+
+
+  $$('.product-copy').forEach(button => {
+
+    button.onclick = () => {
+      editProduct(button.dataset.id, true);
+    };
+
+  });
+
+
   $$('.product-delete').forEach(button => {
 
     button.onclick = () => {
@@ -509,7 +561,7 @@ async function loadProducts() {
    EDIT PRODUCT
 ========================================== */
 
-function editProduct(id) {
+function editProduct(id, asCopy = false) {
 
   const product = productState.products.find(
     p => p._id === id
@@ -533,6 +585,14 @@ function editProduct(id) {
 
   $('#stock').value = product.stock;
   setVariantRows(product.variants || []);
+
+  // Copy: same details, but saved as a NEW product (new name, own photos).
+  if (asCopy) {
+    $('#editId').value = '';
+    $('#name').value = product.name + ' (Copy)';
+    setVariantRows((product.variants || []).map(({ _id, ...rest }) => rest));
+    window.MC.toast('Copy tayyar hai: naam badlo, photo chuno aur Save karo.', 'message');
+  }
 
   // Optional saved shipping fields for editing
   for (const key of [
