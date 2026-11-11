@@ -112,8 +112,7 @@
     } else {
       message =
         'SAFE MODE ON — Real shipment ' +
-        'and AWB creation are disabled. ' +
-        'Use Test Shipment (Dry Run).';
+        'and AWB creation are disabled.';
     }
 
     setTextIfChanged(panel, message);
