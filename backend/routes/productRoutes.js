@@ -200,6 +200,11 @@ router.get(
 ===================================== */
 
 router.get(
+  '/:id/share',
+  require('../controllers/shareController').share
+);
+
+router.get(
   '/:id',
   controller.getProduct
 );
