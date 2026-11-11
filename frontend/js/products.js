@@ -420,18 +420,30 @@
   // "You may also like": other products from the same category.
   async function showRelatedProducts(product, box) {
     try {
-      const categoryId = product.category?._id || product.category;
-      if (!categoryId || typeof categoryId !== 'string') return;
-      const data = await MC.api('/products?category=' + encodeURIComponent(categoryId) + '&limit=9');
-      const others = (data.products || [])
-        .filter(item => String(item._id) !== String(product._id))
-        .slice(0, 4);
+      // 1) what other customers really bought together with this product
+      let others = [];
+      let heading = 'You may also like';
+      try {
+        const bought = await MC.api('/products/' + encodeURIComponent(product._id) + '/also-bought');
+        others = (bought.products || []).slice(0, 4);
+        if (others.length) heading = 'Customers also bought';
+      } catch (_) { /* fall back to the same category */ }
+
+      // 2) not enough order history yet: same category
+      if (!others.length) {
+        const categoryId = product.category?._id || product.category;
+        if (!categoryId || typeof categoryId !== 'string') return;
+        const data = await MC.api('/products?category=' + encodeURIComponent(categoryId) + '&limit=9');
+        others = (data.products || [])
+          .filter(item => String(item._id) !== String(product._id))
+          .slice(0, 4);
+      }
       if (!others.length) return;
       const section = document.createElement('section');
       section.className = 'mc-related';
       section.style.cssText = 'margin-top:34px';
       section.innerHTML = `
-        <h2 style="margin:0 0 14px">You may also like</h2>
+        <h2 style="margin:0 0 14px">${esc(heading)}</h2>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px">
           ${others.map(item => `
             <a href="product.html?id=${encodeURIComponent(item._id)}"
