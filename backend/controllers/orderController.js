@@ -43,8 +43,8 @@ const {
 
 const {
   prepareGiftWrapping,
-  GIFT_WRAPPING_ENABLED,
-  GIFT_WRAPPING_PRICES,
+  isGiftWrappingEnabled,
+  giftWrappingPrices,
   MAX_GIFT_MESSAGE_LENGTH
 } = require('../services/giftWrappingService');
 
@@ -151,18 +151,10 @@ const preview = asyncHandler(
       giftWrappingConfig: {
 
         enabled:
-          GIFT_WRAPPING_ENABLED,
+          isGiftWrappingEnabled(),
 
-        prices: {
-          NONE:
-            GIFT_WRAPPING_PRICES.NONE,
-
-          STANDARD:
-            GIFT_WRAPPING_PRICES.STANDARD,
-
-          PREMIUM:
-            GIFT_WRAPPING_PRICES.PREMIUM
-        },
+        prices:
+          giftWrappingPrices(),
 
         maxMessageLength:
           MAX_GIFT_MESSAGE_LENGTH

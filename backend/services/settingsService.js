@@ -75,7 +75,11 @@ function defaults() {
     referralEnabled: false,
     referralFriendAmount: 50,
     referralRewardAmount: 50,
-    referralMinOrder: 299
+    referralMinOrder: 299,
+
+    giftWrapEnabled: envBool('GIFT_WRAPPING_LIVE_ENABLED'),
+    giftWrapStandardFee: envNum('GIFT_WRAP_STANDARD_FEE', 29),
+    giftWrapPremiumFee: envNum('GIFT_WRAP_PREMIUM_FEE', 59)
   };
 }
 

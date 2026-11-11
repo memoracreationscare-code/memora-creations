@@ -60,7 +60,11 @@ const schema = new mongoose.Schema({
   referralEnabled: Boolean,
   referralFriendAmount: { type: Number, min: 1, max: 5000 },
   referralRewardAmount: { type: Number, min: 1, max: 5000 },
-  referralMinOrder: { type: Number, min: 0, max: 100000 }
+  referralMinOrder: { type: Number, min: 0, max: 100000 },
+
+  giftWrapEnabled: Boolean,
+  giftWrapStandardFee: { type: Number, min: 0, max: 2000 },
+  giftWrapPremiumFee: { type: Number, min: 0, max: 2000 }
 }, { timestamps: true });
 
 module.exports = mongoose.model('SiteSettings', schema);
