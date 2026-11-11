@@ -232,6 +232,7 @@
           </div>
         </button>
         <button type="button" class="mc-wish-toggle mc-wish-card" data-wish-id="${id}" aria-label="Add to wishlist" aria-pressed="false" title="Save to wishlist">♡</button>
+        <button type="button" class="mc-share-card" data-share-id="${id}" data-share-name="${esc(product.name)}" aria-label="Share this product" title="Share">⤴</button>
         <div class="premium-card-actions">
           <button class="btn add" type="button" data-id="${id}" ${stock ? '' : 'disabled'}>Add to Cart</button>
           <button class="btn secondary buy" type="button" data-id="${id}" ${stock ? '' : 'disabled'}>Order Now</button>
@@ -484,7 +485,7 @@
             </div>
             <div class="actions">
               <button type="button" class="mc-wish-toggle mc-wish-single" data-wish-id="${esc(product._id)}" aria-label="Add to wishlist" aria-pressed="false">♡ Save to Wishlist</button>
-              <button class="btn secondary" id="shareBtn" type="button">Share on WhatsApp</button>
+              <button class="btn secondary" id="shareBtn" type="button" data-share-id="${esc(product._id)}" data-share-name="${esc(product.name)}">Share</button>
               <button class="btn" id="addBtn" type="button" ${stock ? '' : 'disabled'}>Add to Cart</button>
               <button class="btn secondary" id="buyBtn" type="button" ${stock ? '' : 'disabled'}>Order Now</button>
             </div>
@@ -501,11 +502,7 @@
           if (mainImage) mainImage.src = image.dataset.url;
         });
       });
-      $('#shareBtn')?.addEventListener('click', () => {
-        const link = 'https://memoracreationscare-code.github.io/memora-creations/frontend/product.html?id=' + encodeURIComponent(product._id);
-        const text = `${product.name} - Memora Creations\n${link}`;
-        window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank', 'noopener');
-      });
+      // the Share button (data-share-id) is handled by js/share.js
       let chosen = null;
       const stockNow = () => chosen ? Number(chosen.stock) || 0 : stock;
       const quantity = () => safeQuantity($('#qty')?.value, stockNow());

@@ -426,6 +426,9 @@
       font-size: 13px;
     }
 
+    .home-product-card { position: relative; }
+    .home-product-card .mc-share-card { top: 46px; right: 12px; width: 38px; height: 38px; font-size: 19px; }
+
     .home-product-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -1154,6 +1157,8 @@
               </div>
             </button>
 
+            <button type="button" class="mc-share-card" data-share-id="${id}" data-share-name="${esc(product.name)}" aria-label="Share this product" title="Share">⤴</button>
+
             <div class="home-product-actions">
 
               <button
@@ -1495,6 +1500,7 @@
   <script src="/memora-creations/frontend/js/announcement-popup.js?v=2"></script>
 
   <script src="js/extras.js?v=4" defer></script>
+  <script src="js/share.js?v=1" defer></script>
   <script src="js/banners.js?v=1" defer></script>
   <script src="js/animations.js?v=1" defer></script>
 </body>
