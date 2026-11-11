@@ -671,6 +671,11 @@ router.post(
 );
 
 router.get(
+  '/reports',
+  require('../controllers/adminReportsController').report
+);
+
+router.get(
   '/today',
   require('../controllers/adminTodayController').today
 );

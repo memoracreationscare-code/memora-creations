@@ -63,6 +63,7 @@ function defaults() {
     emailNotificationsEnabled: false,
     emailNotificationsSince: null,
     abandonedReminderEnabled: false,
+    lowStockEmailEnabled: false,
     abandonedReminderSince: null,
     abandonedReminderHours: 24,
 

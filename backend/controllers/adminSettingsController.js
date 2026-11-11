@@ -18,7 +18,7 @@ const TEXT = {
 const BOOL = [
   'storeOpen', 'codEnabled', 'codAdvanceEnabled', 'returnsEnabled',
   'autoRefundEnabled', 'freeDeliveryBar', 'emailNotificationsEnabled',
-  'abandonedReminderEnabled', 'welcomeEnabled', 'referralEnabled'
+  'abandonedReminderEnabled', 'lowStockEmailEnabled', 'welcomeEnabled', 'referralEnabled'
 ];
 
 const NUMBER = {

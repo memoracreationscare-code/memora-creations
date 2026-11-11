@@ -18,7 +18,7 @@
   const BOOL = [
     'storeOpen', 'freeDeliveryBar', 'codEnabled', 'codAdvanceEnabled',
     'returnsEnabled', 'autoRefundEnabled', 'emailNotificationsEnabled',
-    'abandonedReminderEnabled', 'welcomeEnabled', 'referralEnabled'
+    'abandonedReminderEnabled', 'lowStockEmailEnabled', 'welcomeEnabled', 'referralEnabled'
   ];
 
   function showMail(configured) {

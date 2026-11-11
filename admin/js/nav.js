@@ -154,6 +154,7 @@
       ['return-requests.html', '↩', 'Return Requests'],
       ['return-parcels.html', '📦', 'Return Parcels'],
       ['payments.html', '₹', 'Online Payments & Refunds'],
+      ['reports.html', '📊', 'Reports'],
       ['cod-remittance.html', '💵', 'COD Remittance']
     ] },
     { title: 'Catalog & Marketing', items: [
