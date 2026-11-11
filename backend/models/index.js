@@ -30,6 +30,9 @@ module.exports = {
   // PRODUCT REVIEWS & RATINGS
   Review: require('./Review'),
 
+  // BACK-IN-STOCK REQUESTS
+  StockAlert: require('./StockAlert'),
+
   Wishlist: require('./Wishlist'),
 
   WishlistSettings: require('./WishlistSettings'),

@@ -491,6 +491,15 @@
             <p>${esc(product.description || '')}</p>
             <div class="price">${priceMarkup(product)}</div>
             <p>${stock ? (stock <= 5 ? `🔥 Only ${stock} left - order soon` : `✅ In Stock (${stock})`) : '❌ OUT OF STOCK'}</p>
+            ${stock ? '' : `
+            <form id="notifyForm" novalidate style="margin:12px 0;padding:14px;border:1px solid #eadfce;border-radius:14px;background:#fffaf3">
+              <b style="display:block;margin-bottom:8px">🔔 Stock aane par email chahiye?</b>
+              <div style="display:flex;gap:8px">
+                <input id="notifyEmail" type="email" class="input" placeholder="Aapka email" autocomplete="email" style="flex:1;min-width:0">
+                <button class="btn" type="submit">Notify me</button>
+              </div>
+              <div id="notifyMsg" style="margin-top:8px;font-size:13px" aria-live="polite"></div>
+            </form>`}
             ${hasVariants(product) ? `
             <div class="field">
               <label for="variantPick">Option (size / colour)</label>
@@ -518,6 +527,24 @@
       refreshWishlist();
       // FIX: querySelectorAll returns a list; querySelector does not.
       MC.initGallery(box);
+      $('#notifyForm')?.addEventListener('submit', async event => {
+        event.preventDefault();
+        const msg = $('#notifyMsg');
+        const email = $('#notifyEmail').value.trim();
+        msg.style.color = '#7a6a58';
+        msg.textContent = 'Ruko…';
+        try {
+          const result = await MC.api('/products/' + encodeURIComponent(product._id) + '/notify-me', {
+            method: 'POST',
+            body: JSON.stringify({ email })
+          });
+          msg.style.color = '#1f7a4a';
+          msg.textContent = result.message || 'Done!';
+        } catch (error) {
+          msg.style.color = '#b3261e';
+          msg.textContent = error?.message || 'Abhi save nahi ho paya. Dobara try karein.';
+        }
+      });
       // the Share button (data-share-id) is handled by js/share.js
       let chosen = null;
       const stockNow = () => chosen ? Number(chosen.stock) || 0 : stock;
