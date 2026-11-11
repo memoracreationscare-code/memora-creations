@@ -671,6 +671,11 @@ router.post(
 );
 
 router.get(
+  '/launch-check',
+  require('../controllers/adminLaunchCheckController').check
+);
+
+router.get(
   '/reports',
   require('../controllers/adminReportsController').report
 );
