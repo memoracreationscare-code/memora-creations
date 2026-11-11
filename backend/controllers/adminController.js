@@ -168,7 +168,7 @@ const login = asyncHandler(async (req, res) => {
 
   const admin = await Admin.findOne({
     email
-  }).select('+passwordHash');
+  }).select('+passwordHash +twoFactor.enabled +twoFactor.secretEnc +twoFactor.recoveryHashes +twoFactor.lastStep');
 
   if (
     !admin ||
@@ -184,9 +184,39 @@ const login = asyncHandler(async (req, res) => {
     );
   }
 
+  // 2-step login: password was right, now ask for the authenticator code.
+  // Set ADMIN_2FA_DISABLE=true on Render to get back in if the phone is lost.
+  if (
+    admin.twoFactor?.enabled &&
+    process.env.ADMIN_2FA_DISABLE !== 'true'
+  ) {
+
+    const otp = String(req.body.otp || '').trim();
+
+    if (!otp) {
+      return ok(res, {
+        requiresOtp: true,
+        message: 'Authenticator app ka 6 digit code daalein.'
+      });
+    }
+
+    const twoFactor = require('../services/adminTwoFactor');
+
+    if (!(await twoFactor.verifyLogin(Admin, admin, otp))) {
+      throw error(
+        401,
+        'Code galat hai. Dobara try karein (ya recovery code daalein).'
+      );
+    }
+
+  }
+
   admin.lastLoginAt = new Date();
 
-  await admin.save();
+  await Admin.updateOne(
+    { _id: admin._id },
+    { $set: { lastLoginAt: admin.lastLoginAt } }
+  );
 
   setAuthCookie(res, {
     sub: String(admin._id),

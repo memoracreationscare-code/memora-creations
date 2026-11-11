@@ -428,6 +428,31 @@
     </form>
 
 
+    <section class="ac-head" style="margin-top:22px" id="twoFactorBox">
+      <h2>🔐 Admin security: 2-step login</h2>
+      <p id="tfState">Dekh raha hu...</p>
+      <p style="color:#6b5d52;font-size:14px;line-height:1.5">Chalu karne par admin login me password ke baad aapke phone ke Authenticator app (Google / Microsoft Authenticator) ka 6 digit code bhi lagega. Koi aapka password jaan bhi le to bina phone ke andar nahi aa sakta.</p>
+      <div id="tfSetup" hidden>
+        <ol style="line-height:1.7">
+          <li>Phone me <b>Google Authenticator</b> (ya Microsoft Authenticator) kholein, <b>+</b> dabayein.</li>
+          <li>Ye QR scan karein (ya "key" khud type karein).</li>
+          <li>App me dikh raha 6 digit code neeche daalein.</li>
+        </ol>
+        <div id="tfQr" style="margin:10px 0"></div>
+        <p>Key: <code id="tfKey" style="user-select:all;background:#f5eee8;padding:4px 8px;border-radius:6px"></code></p>
+        <input id="tfCode" class="input" inputmode="numeric" maxlength="6" placeholder="6 digit code" style="max-width:200px">
+        <button id="tfEnable" type="button" class="btn">Verify karke chalu karo</button>
+      </div>
+      <div id="tfCodes" hidden style="background:#fff4df;border-radius:12px;padding:14px;margin-top:12px">
+        <b>Recovery codes: abhi kahin likh ya screenshot kar lein. Ye dobara nahi dikhenge.</b>
+        <p style="margin:6px 0">Phone kho jaye to inme se ek code OTP ki jagah chalta hai (har code sirf ek baar).</p>
+        <pre id="tfCodeList" style="font-size:16px;line-height:1.8;user-select:all"></pre>
+        <button id="tfCopy" type="button" class="btn secondary">Copy karo</button>
+      </div>
+      <p><button id="tfStart" type="button" class="btn" hidden>2-step login chalu karo</button>
+      <button id="tfStop" type="button" class="btn danger" hidden>2-step login band karo</button></p>
+    </section>
+
     <section class="ac-head" style="margin-top:22px">
       <h2>🚚 Shiprocket connection check</h2>
       <p>Dekhne ke liye ki website aur Shiprocket ka connection theek hai ya nahi.</p>
@@ -437,8 +462,8 @@
   </main>
 
   <script src="/memora-creations/frontend/js/app.js?v=20"></script>
-  <script src="/memora-creations/admin/js/auth.js?v=12"></script>
-  <script src="/memora-creations/admin/js/settings.js?v=5"></script>
+  <script src="/memora-creations/admin/js/auth.js?v=16"></script>
+  <script src="/memora-creations/admin/js/settings.js?v=6"></script>
 
 </body>
 </html>

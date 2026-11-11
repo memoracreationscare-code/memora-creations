@@ -107,4 +107,107 @@
     }
   });
 
+
+  /* =========================
+     2-STEP LOGIN
+  ========================= */
+
+  const tf = {
+    state: $('#tfState'), start: $('#tfStart'), stop: $('#tfStop'),
+    setup: $('#tfSetup'), codes: $('#tfCodes')
+  };
+
+  async function loadTwoFactor() {
+    if (!tf.state) return;
+
+    try {
+      const s = await api('/admin/2fa/status');
+
+      tf.state.innerHTML = s.enabled
+        ? `✅ <b>Chalu hai.</b> Recovery codes bache: ${s.recoveryLeft}` + (s.emergencyOff ? '<br>⚠️ Render me ADMIN_2FA_DISABLE=true laga hai, isliye abhi code nahi maanga ja raha.' : '')
+        : '⚠️ <b>Band hai.</b> Sirf password se login hota hai.';
+      tf.start.hidden = s.enabled;
+      tf.stop.hidden = !s.enabled;
+    } catch (e) {
+      tf.state.textContent = e.message || 'Status nahi mila.';
+    }
+  }
+
+  function loadQrLibrary() {
+    return new Promise(resolve => {
+      if (window.QRCode) return resolve(true);
+
+      const script = document.createElement('script');
+
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.head.appendChild(script);
+    });
+  }
+
+  tf.start?.addEventListener('click', async () => {
+    tf.start.disabled = true;
+
+    try {
+      const d = await api('/admin/2fa/setup', { method: 'POST', body: '{}' });
+
+      $('#tfKey').textContent = d.secret;
+      $('#tfQr').innerHTML = '';
+      tf.setup.hidden = false;
+
+      if (await loadQrLibrary()) new window.QRCode($('#tfQr'), { text: d.otpauth, width: 180, height: 180 });
+      else $('#tfQr').textContent = 'QR nahi bana: upar ki key app me khud type karein.';
+    } catch (e) {
+      toast(e.message || 'Shuru nahi hua.', 'error');
+    } finally {
+      tf.start.disabled = false;
+    }
+  });
+
+  $('#tfEnable')?.addEventListener('click', async () => {
+    try {
+      const d = await api('/admin/2fa/enable', { method: 'POST', body: JSON.stringify({ code: $('#tfCode').value }) });
+
+      tf.setup.hidden = true;
+      $('#tfCodeList').textContent = d.recoveryCodes.join('\n');
+      tf.codes.hidden = false;
+      toast(d.message, 'success');
+      loadTwoFactor();
+    } catch (e) {
+      toast(e.message || 'Code galat.', 'error');
+    }
+  });
+
+  $('#tfCopy')?.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText($('#tfCodeList').textContent);
+      toast('Recovery codes copy ho gaye.', 'success');
+    } catch (_) {
+      toast('Copy nahi hua: codes ko select karke copy karein.', 'warning');
+    }
+  });
+
+  tf.stop?.addEventListener('click', async () => {
+    const password = await window.mcPrompt('Apna admin password daalein.', { title: '2-step login band karna hai?', okText: 'Aage badho' });
+
+    if (password === null) return;
+
+    const code = await window.mcPrompt('Authenticator ka 6 digit code (ya recovery code) daalein.', { title: 'Code daalein', okText: 'Band karo' });
+
+    if (code === null) return;
+
+    try {
+      const d = await api('/admin/2fa/disable', { method: 'POST', body: JSON.stringify({ password, code }) });
+
+      toast(d.message, 'success');
+      tf.codes.hidden = true;
+      loadTwoFactor();
+    } catch (e) {
+      toast(e.message || 'Band nahi hua.', 'error');
+    }
+  });
+
+  loadTwoFactor();
+
 })();

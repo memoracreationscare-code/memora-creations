@@ -18,6 +18,8 @@ const LABELS = [
   ['POST', /^\/orders\/[^/]+\/refresh-payment$/, 'Payment details refresh kiye'],
   ['PUT', /^\/orders\/[^/]+\/note$/, 'Order par note likha'],
   ['PUT', /^\/orders\/[^/]+$/, 'Order status / details badle'],
+  ['POST', /^\/2fa\/enable$/, '2-step login chalu kiya'],
+  ['POST', /^\/2fa\/disable$/, '2-step login band kiya'],
   ['POST', /^\/products$/, 'Naya product jodaa'],
   ['PUT', /^\/products\/[^/]+$/, 'Product badla'],
   ['DELETE', /^\/products\/[^/]+$/, 'Product hataya'],
