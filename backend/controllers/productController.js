@@ -290,5 +290,6 @@ module.exports = {
   listProducts,
   getProduct,
   listCategories,
-  slugify
+  slugify,
+  serialize
 };

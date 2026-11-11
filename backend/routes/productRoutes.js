@@ -205,6 +205,12 @@ router.get(
 );
 
 router.get(
+  '/:id/also-bought',
+  publicCache(60 * 1000),
+  require('../controllers/alsoBoughtController').alsoBought
+);
+
+router.get(
   '/:id',
   controller.getProduct
 );
