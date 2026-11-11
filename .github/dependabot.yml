@@ -1,0 +1,14 @@
+# Weekly check for known security problems in the packages the shop uses.
+# Dependabot opens a pull request when an update is needed; nothing is
+# changed on the live site until the owner merges it.
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
