@@ -419,6 +419,34 @@ function confirmShiprocketShipment() {
 
 
 /* =====================================
+   GIFT WRAPPING (what to pack)
+===================================== */
+
+function giftOf(order) {
+  const g = order && order.giftWrapping;
+
+  if (!g || g.selected !== true) return null;
+
+  return {
+    label: g.type === 'PREMIUM' ? 'Premium gift wrap' : 'Standard gift wrap',
+    message: typeof g.message === 'string' ? g.message : ''
+  };
+}
+
+function giftBoxHtml(order) {
+  const g = giftOf(order);
+
+  if (!g) return '';
+
+  return `
+    <p style="background:#fff4e0;border:1px solid #f0c987;border-radius:10px;padding:10px 12px;margin:10px 0">
+      <b>🎁 ${mcEscape(g.label)}</b>
+      ${g.message ? `<br>Message card: <i>"${mcEscape(g.message)}"</i>` : '<br><small>Koi message nahi likha.</small>'}
+    </p>`;
+}
+
+
+/* =====================================
    PRINT PACKAGING LABEL
 ===================================== */
 
@@ -513,6 +541,7 @@ function printShippingLabel(order) {
         <p><b>Payment:</b>
           ${mcEscape(paymentText)}
         </p>
+        ${giftOf(order) ? `<p><b>🎁 ${mcEscape(giftOf(order).label)}</b>${giftOf(order).message ? `<br>Message card: "${mcEscape(giftOf(order).message)}"` : ''}</p>` : ''}
       </div>
 
       <table>
@@ -1102,6 +1131,8 @@ function orderDetailsHtml(order) {
         ${mcEscape(order.orderId)}
       </p>
 
+      ${giftBoxHtml(order)}
+
       <p>
         <b>Customer:</b>
         ${mcEscape(
@@ -1544,6 +1575,7 @@ async function loadAdminOrders() {
               <b>
                 ${mcEscape(order.orderId)}
               </b>
+              ${giftOf(order) ? '<span title="Gift wrap + message" style="margin-left:4px">🎁</span>' : ''}
 
               <br>
 

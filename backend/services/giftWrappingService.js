@@ -37,12 +37,12 @@
    Gift Wrapping remains disabled.
 ===================================== */
 
-const GIFT_WRAPPING_ENABLED =
-  String(
-    process.env.GIFT_WRAPPING_LIVE_ENABLED ||
-    'false'
-  ).trim().toLowerCase() === 'true';
+const settingsService = require('./settingsService');
 
+/* Owner switches this in Admin -> Store Settings (Render env is only the first default). */
+function isGiftWrappingEnabled() {
+  return settingsService.peek().giftWrapEnabled === true;
+}
 
 /* =====================================
    PRICES AND MESSAGE LIMIT
@@ -50,12 +50,17 @@ const GIFT_WRAPPING_ENABLED =
 
 const MAX_GIFT_MESSAGE_LENGTH = 180;
 
-const GIFT_WRAPPING_PRICES =
-  Object.freeze({
+const GIFT_TYPES = Object.freeze(['NONE', 'STANDARD', 'PREMIUM']);
+
+function giftWrappingPrices() {
+  const st = settingsService.peek();
+
+  return {
     NONE: 0,
-    STANDARD: 29,
-    PREMIUM: 59
-  });
+    STANDARD: Number(st.giftWrapStandardFee),
+    PREMIUM: Number(st.giftWrapPremiumFee)
+  };
+}
 
 
 /* =====================================
@@ -117,10 +122,7 @@ function normalizeGiftType(value) {
   ).trim().toUpperCase();
 
   if (
-    !Object.prototype.hasOwnProperty.call(
-      GIFT_WRAPPING_PRICES,
-      type
-    )
+    !GIFT_TYPES.includes(type)
   ) {
     throw new Error(
       'Invalid gift wrapping option.'
@@ -146,7 +148,7 @@ function calculateGiftWrappingFee(type) {
     only normal packaging is allowed.
   */
 
-  if (!GIFT_WRAPPING_ENABLED) {
+  if (!isGiftWrappingEnabled()) {
     if (normalizedType !== 'NONE') {
       throw new Error(
         'Gift wrapping is not available yet.'
@@ -157,7 +159,7 @@ function calculateGiftWrappingFee(type) {
   }
 
   const fee =
-    GIFT_WRAPPING_PRICES[
+    giftWrappingPrices()[
       normalizedType
     ];
 
@@ -227,7 +229,7 @@ function prepareGiftWrapping(input = null) {
      FEATURE DISABLED
   ================================= */
 
-  if (!GIFT_WRAPPING_ENABLED) {
+  if (!isGiftWrappingEnabled()) {
     if (
       selected ||
       type !== 'NONE' ||
@@ -332,8 +334,8 @@ function addGiftWrappingToTotal(
 ===================================== */
 
 module.exports = {
-  GIFT_WRAPPING_ENABLED,
-  GIFT_WRAPPING_PRICES,
+  isGiftWrappingEnabled,
+  giftWrappingPrices,
   MAX_GIFT_MESSAGE_LENGTH,
 
   defaultGiftWrapping,

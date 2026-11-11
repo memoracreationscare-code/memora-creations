@@ -12,13 +12,14 @@
     'deliveryCharge', 'freeDeliveryAbove', 'codAdvancePercent',
     'returnWindowDays', 'codAutoReceiveDays', 'abandonedReminderHours',
     'welcomePercent', 'welcomeMaxDiscount', 'welcomeMinOrder',
-    'referralFriendAmount', 'referralRewardAmount', 'referralMinOrder'
+    'referralFriendAmount', 'referralRewardAmount', 'referralMinOrder',
+    'giftWrapStandardFee', 'giftWrapPremiumFee'
   ];
 
   const BOOL = [
     'storeOpen', 'freeDeliveryBar', 'codEnabled', 'codAdvanceEnabled',
     'returnsEnabled', 'autoRefundEnabled', 'emailNotificationsEnabled',
-    'abandonedReminderEnabled', 'lowStockEmailEnabled', 'welcomeEnabled', 'referralEnabled'
+    'abandonedReminderEnabled', 'lowStockEmailEnabled', 'welcomeEnabled', 'referralEnabled', 'giftWrapEnabled'
   ];
 
   function showMail(configured) {

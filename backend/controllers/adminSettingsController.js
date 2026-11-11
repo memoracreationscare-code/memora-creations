@@ -18,7 +18,7 @@ const TEXT = {
 const BOOL = [
   'storeOpen', 'codEnabled', 'codAdvanceEnabled', 'returnsEnabled',
   'autoRefundEnabled', 'freeDeliveryBar', 'emailNotificationsEnabled',
-  'abandonedReminderEnabled', 'lowStockEmailEnabled', 'welcomeEnabled', 'referralEnabled'
+  'abandonedReminderEnabled', 'lowStockEmailEnabled', 'welcomeEnabled', 'referralEnabled', 'giftWrapEnabled'
 ];
 
 const NUMBER = {
@@ -33,7 +33,9 @@ const NUMBER = {
   welcomeMinOrder: [0, 100000],
   referralFriendAmount: [1, 5000],
   referralRewardAmount: [1, 5000],
-  referralMinOrder: [0, 100000]
+  referralMinOrder: [0, 100000],
+  giftWrapStandardFee: [0, 2000],
+  giftWrapPremiumFee: [0, 2000]
 };
 
 const NUMBER_LABEL = {
@@ -48,7 +50,9 @@ const NUMBER_LABEL = {
   welcomeMinOrder: 'Welcome minimum order',
   referralFriendAmount: 'Friend reward',
   referralRewardAmount: 'Referrer reward',
-  referralMinOrder: 'Referral minimum order'
+  referralMinOrder: 'Referral minimum order',
+  giftWrapStandardFee: 'Standard gift wrap price',
+  giftWrapPremiumFee: 'Premium gift wrap price'
 };
 
 const isUrl = v => !v || /^https?:\/\/[^\s]+$/i.test(v);
