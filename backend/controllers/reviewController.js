@@ -463,6 +463,25 @@ const listPendingReviews = asyncHandler(
 ==========================================
 */
 
+/* Keep the star average on the product so cards and Google can show it. */
+async function refreshProductRating(productId, models = { Product, Review }) {
+  const [row] = await models.Review.aggregate([
+    { $match: { product: productId, status: 'APPROVED' } },
+    { $group: { _id: null, avg: { $avg: '$rating' }, count: { $sum: 1 } } }
+  ]);
+
+  const ratingCount = row ? row.count : 0;
+  const ratingAverage = row ? Math.round(row.avg * 10) / 10 : 0;
+
+  await models.Product.updateOne(
+    { _id: productId },
+    { $set: { ratingAverage, ratingCount } },
+    { timestamps: false }
+  );
+
+  return { ratingAverage, ratingCount };
+}
+
 const updateReviewStatus = asyncHandler(
   async (req, res) => {
     validId(req.params.id);
@@ -505,6 +524,10 @@ const updateReviewStatus = asyncHandler(
       );
     }
 
+    await refreshProductRating(review.product).catch(err =>
+      console.warn('[Review rating]', err.message)
+    );
+
     return ok(res, {
       message:
         'Review status updated successfully.',
@@ -525,5 +548,6 @@ module.exports = {
   checkEligibility,
   createReview,
   listPendingReviews,
-  updateReviewStatus
+  updateReviewStatus,
+  refreshProductRating
 };

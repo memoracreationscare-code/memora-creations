@@ -207,6 +207,10 @@ const productSchema = new mongoose.Schema({
     index: true
   },
 
+  // average of APPROVED customer reviews (kept up to date when a review is approved)
+  ratingAverage: { type: Number, default: 0, min: 0, max: 5 },
+  ratingCount: { type: Number, default: 0, min: 0 },
+
   // set when the owner was emailed that this product is nearly out of stock
   lowStockAlertedAt: {
     type: Date,

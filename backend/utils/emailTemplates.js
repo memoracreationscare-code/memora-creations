@@ -53,6 +53,11 @@ const ORDER_EVENTS = {
     title: 'Delivered - we hope you love it!',
     text: 'Your order has been delivered. If anything is wrong, you can ask for a return or replacement from My Orders.'
   }),
+  REVIEW_REQUEST: o => ({
+    subject: `How did you like your order ${o.orderId}? ⭐`,
+    title: 'Aapko hamara product kaisa laga?',
+    text: 'Aapka ek chhota sa review dusre customers ki bahut madad karta hai. Photo ke saath review de sakte hain, sirf 1 minute lagega.'
+  }),
   CANCELLED: o => ({
     subject: `Your order ${o.orderId} was cancelled`,
     title: 'Order cancelled',
@@ -84,8 +89,10 @@ function orderEmail(event, order) {
   return {
     subject: m.subject,
     html: shell(m.title, body, {
-      text: 'View / Track Order',
-      url: `${SITE}/order-details.html?id=${encodeURIComponent(order._id)}`
+      text: event === 'REVIEW_REQUEST' ? 'Review likhein ⭐' : 'View / Track Order',
+      url: event === 'REVIEW_REQUEST'
+        ? `${SITE}/orders.html`
+        : `${SITE}/order-details.html?id=${encodeURIComponent(order._id)}`
     })
   };
 }

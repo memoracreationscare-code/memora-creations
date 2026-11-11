@@ -24,9 +24,9 @@ const followUpFilter = () => ({
 });
 
 const pendingCounts = asyncHandler(async (_req, res) => {
-  const { Product } = require('../models');
+  const { Product, Review } = require('../models');
 
-  const [cancellations, returns, cancelFollowUps, lowStock] = await Promise.all([
+  const [cancellations, returns, cancelFollowUps, lowStock, reviews] = await Promise.all([
     Order.countDocuments({
       orderStatus: { $ne: 'Cancelled' },
       statusHistory: {
@@ -35,10 +35,11 @@ const pendingCounts = asyncHandler(async (_req, res) => {
     }),
     Order.countDocuments({ 'returnRequest.status': 'REQUESTED' }),
     Order.countDocuments(followUpFilter()),
-    Product.countDocuments({ isActive: true, stock: { $lte: 3 } })
+    Product.countDocuments({ isActive: true, stock: { $lte: 3 } }),
+    Review.countDocuments({ status: 'PENDING' })
   ]);
 
-  return ok(res, { cancellations, returns, cancelFollowUps, lowStock });
+  return ok(res, { cancellations, returns, cancelFollowUps, lowStock, reviews });
 });
 
 /* Orders cancelled automatically where a refund or Shiprocket step failed. */

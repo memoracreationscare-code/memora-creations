@@ -36,7 +36,16 @@ function defaultDeps() {
 }
 
 // Which email an order needs right now (never an old one it has passed).
-function wantedEvents(order) {
+const REVIEW_AFTER_DAYS = 4;
+
+function deliveredAt(order) {
+  const hist = (order.statusHistory || []).filter(h => h.status === 'Delivered' && h.changedAt);
+  const last = hist.length ? hist[hist.length - 1].changedAt : order.updatedAt;
+
+  return last ? new Date(last) : null;
+}
+
+function wantedEvents(order, now = new Date()) {
   const events = [];
   const paid = order.paymentStatus === 'SUCCESS' || order.paymentStatus === 'COD_PENDING';
 
@@ -51,6 +60,17 @@ function wantedEvents(order) {
 
   if (order.refund && order.refund.status === 'REFUNDED') events.push('REFUNDED');
 
+  // A few days after delivery, once, and only if the delivered email already went out.
+  if (
+    order.orderStatus === 'Delivered' &&
+    (order.notificationsSent || []).includes('DELIVERED') &&
+    !(order.returnRequest && order.returnRequest.status === 'REQUESTED')
+  ) {
+    const at = deliveredAt(order);
+
+    if (at && now.getTime() - at.getTime() >= REVIEW_AFTER_DAYS * 86400000) events.push('REVIEW_REQUEST');
+  }
+
   return events.filter(e => !(order.notificationsSent || []).includes(e));
 }
 
@@ -64,7 +84,7 @@ async function sweepOrderEmails(deps, now) {
 
   const orders = await Order.find({
     createdAt: { $gte: since },
-    updatedAt: { $gte: new Date(now.getTime() - 3 * 86400000) }
+    updatedAt: { $gte: new Date(now.getTime() - 10 * 86400000) }
   })
     .sort({ updatedAt: -1 })
     .limit(60)
@@ -75,7 +95,7 @@ async function sweepOrderEmails(deps, now) {
 
     if (!email) continue;
 
-    for (const event of wantedEvents(order)) {
+    for (const event of wantedEvents(order, now)) {
       if (result.sent + result.failed >= BATCH) return result;
 
       // Claim the email first so a restart can never send it twice.
