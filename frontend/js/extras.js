@@ -49,6 +49,11 @@
 
   box.append(top, wa);
 
+  // Login / signup forms: keep the floating buttons out of the way of the text.
+  if (/\/(login|signup|forgot-password|reset-password)\.html/.test(location.pathname)) {
+    box.style.display = 'none';
+  }
+
   // Show the shop address in the footer of every page.
   function addAddress() {
     const footer = document.querySelector('footer');

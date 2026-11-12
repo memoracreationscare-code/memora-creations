@@ -548,13 +548,15 @@
             </div>` : ''}
             <div class="field">
               <label for="qty">Quantity</label>
-              <input id="qty" class="input" type="number" min="1" max="${Math.max(1, stock)}" value="1" ${stock ? '' : 'disabled'}>
+              ${MC.qtyHtml('qty', '', stock, !stock)}
             </div>
             <div class="actions">
-              <button type="button" class="mc-wish-toggle mc-wish-single" data-wish-id="${esc(product._id)}" aria-label="Add to wishlist" aria-pressed="false">♡ Save to Wishlist</button>
-              <button class="btn secondary" id="shareBtn" type="button" data-share-id="${esc(product._id)}" data-share-name="${esc(product.name)}">Share</button>
               <button class="btn" id="addBtn" type="button" ${stock ? '' : 'disabled'}>Add to Cart</button>
               <button class="btn secondary" id="buyBtn" type="button" ${stock ? '' : 'disabled'}>Order Now</button>
+              <div class="mc-sub-actions">
+                <button type="button" class="mc-wish-toggle mc-wish-single" data-wish-id="${esc(product._id)}" aria-label="Add to wishlist" aria-pressed="false">♡ Save to Wishlist</button>
+                <button class="btn secondary" id="shareBtn" type="button" data-share-id="${esc(product._id)}" data-share-name="${esc(product.name)}">Share</button>
+              </div>
             </div>
           </div>
         </div>`;
