@@ -15,7 +15,7 @@ test('create-order request carries the COD advance flag', () => {
 
 test('every use of advanceMode is inside the function that defines it', () => {
   const def = src.indexOf('const advanceMode');
-  const firstUse = src.indexOf('advanceMode');
+  const firstUse = src.indexOf('advanceMode') - 6; // 'const ' prefix
   assert.strictEqual(def, firstUse, 'advanceMode used before/outside its definition');
   const codFn = src.indexOf('async function placeCodOrder');
   const cfFn = src.indexOf('async function placeCashfreeOrder');
