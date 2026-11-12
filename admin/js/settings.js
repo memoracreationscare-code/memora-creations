@@ -5,7 +5,8 @@
   const TEXT = [
     'storeClosedMessage', 'whatsapp', 'phone', 'email', 'address', 'instagram',
     'facebook', 'youtube', 'heroKicker', 'heroLine1', 'heroHighlight',
-    'heroDescription', 'heroButtonText'
+    'heroDescription', 'heroButtonText',
+    'gstLegalName', 'gstin', 'gstState'
   ];
 
   const NUMBER = [
@@ -13,13 +14,13 @@
     'returnWindowDays', 'codAutoReceiveDays', 'abandonedReminderHours',
     'welcomePercent', 'welcomeMaxDiscount', 'welcomeMinOrder',
     'referralFriendAmount', 'referralRewardAmount', 'referralMinOrder',
-    'giftWrapStandardFee', 'giftWrapPremiumFee'
+    'giftWrapStandardFee', 'giftWrapPremiumFee', 'gstRate'
   ];
 
   const BOOL = [
     'storeOpen', 'freeDeliveryBar', 'codEnabled', 'codAdvanceEnabled',
     'returnsEnabled', 'autoRefundEnabled', 'emailNotificationsEnabled',
-    'abandonedReminderEnabled', 'lowStockEmailEnabled', 'welcomeEnabled', 'referralEnabled', 'giftWrapEnabled'
+    'abandonedReminderEnabled', 'lowStockEmailEnabled', 'welcomeEnabled', 'referralEnabled', 'giftWrapEnabled', 'gstEnabled'
   ];
 
   function showMail(configured) {

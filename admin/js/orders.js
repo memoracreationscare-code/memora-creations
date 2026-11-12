@@ -1270,6 +1270,12 @@ function orderDetailsHtml(order) {
         </button>
 
         <button
+          class="btn secondary print-invoice"
+          type="button">
+          🧾 Invoice / GST Bill
+        </button>
+
+        <button
           class="btn secondary close-details"
           type="button">
           Close Details
@@ -1335,6 +1341,14 @@ function openOrderDetails(id) {
       } finally {
         button.disabled = false;
       }
+    });
+
+  detailsRow
+    .querySelector('.print-invoice')
+    ?.addEventListener('click', () => {
+      window.MCInvoice
+        ? window.MCInvoice.open(order._id, '/admin/orders/')
+        : window.MC.toast('Invoice script load nahi hui, page refresh karein.', 'error');
     });
 
   detailsRow

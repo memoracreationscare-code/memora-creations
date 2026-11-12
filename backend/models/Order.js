@@ -350,6 +350,10 @@ const orderSchema = new mongoose.Schema({
     paidAt: Date
   },
 
+  /* BILL NUMBER (given once, the first time the invoice is opened) */
+  invoiceNo: { type: String, default: undefined, index: true, sparse: true },
+  invoiceDate: { type: Date, default: undefined },
+
   /* emails already sent for this order (see services/notificationSweeper.js) */
   notificationsSent: { type: [String], default: undefined },
 

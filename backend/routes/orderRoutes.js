@@ -133,6 +133,12 @@ router.get(
 );
 
 
+router.get(
+  '/:id/invoice',
+  require('../controllers/invoiceController').customerInvoice
+);
+
+
 /* =====================================
    GET SINGLE ORDER DETAILS
 

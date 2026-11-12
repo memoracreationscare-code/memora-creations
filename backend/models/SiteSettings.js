@@ -64,7 +64,16 @@ const schema = new mongoose.Schema({
 
   giftWrapEnabled: Boolean,
   giftWrapStandardFee: { type: Number, min: 0, max: 2000 },
-  giftWrapPremiumFee: { type: Number, min: 0, max: 2000 }
+  giftWrapPremiumFee: { type: Number, min: 0, max: 2000 },
+
+  gstEnabled: Boolean,
+  gstLegalName: str(100),
+  gstin: str(20),
+  gstState: str(40),
+  gstRate: { type: Number, min: 0, max: 28 },
+
+  // running bill number, only ever increased by the invoice service (not editable in admin)
+  invoiceCounter: { type: Number, default: 0 }
 }, { timestamps: true });
 
 module.exports = mongoose.model('SiteSettings', schema);

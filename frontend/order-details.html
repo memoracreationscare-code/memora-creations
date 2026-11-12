@@ -218,14 +218,26 @@
           orderScript
         );
 
-        const invoiceScript =
+        const renderScript =
           document.createElement('script');
 
-        invoiceScript.src =
-          '/memora-creations/frontend/js/invoice.js?v=2';
+        renderScript.src =
+          '/memora-creations/frontend/js/invoice-render.js?v=1';
+
+        renderScript.onload = () => {
+          const invoiceScript =
+            document.createElement('script');
+
+          invoiceScript.src =
+            '/memora-creations/frontend/js/invoice.js?v=3';
+
+          document.body.appendChild(
+            invoiceScript
+          );
+        };
 
         document.body.appendChild(
-          invoiceScript
+          renderScript
         );
 
 

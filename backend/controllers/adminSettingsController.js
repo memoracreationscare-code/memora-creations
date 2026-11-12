@@ -12,13 +12,14 @@ const { asyncHandler, error, ok } = require('../utils/http');
 const TEXT = {
   storeClosedMessage: 300, address: 300, instagram: 200, facebook: 200,
   youtube: 200, email: 120, phone: 20, heroKicker: 60, heroLine1: 60,
-  heroHighlight: 60, heroDescription: 300, heroButtonText: 40
+  heroHighlight: 60, heroDescription: 300, heroButtonText: 40,
+  gstLegalName: 100, gstin: 20, gstState: 40
 };
 
 const BOOL = [
   'storeOpen', 'codEnabled', 'codAdvanceEnabled', 'returnsEnabled',
   'autoRefundEnabled', 'freeDeliveryBar', 'emailNotificationsEnabled',
-  'abandonedReminderEnabled', 'lowStockEmailEnabled', 'welcomeEnabled', 'referralEnabled', 'giftWrapEnabled'
+  'abandonedReminderEnabled', 'lowStockEmailEnabled', 'welcomeEnabled', 'referralEnabled', 'giftWrapEnabled', 'gstEnabled'
 ];
 
 const NUMBER = {
@@ -35,7 +36,8 @@ const NUMBER = {
   referralRewardAmount: [1, 5000],
   referralMinOrder: [0, 100000],
   giftWrapStandardFee: [0, 2000],
-  giftWrapPremiumFee: [0, 2000]
+  giftWrapPremiumFee: [0, 2000],
+  gstRate: [0, 28]
 };
 
 const NUMBER_LABEL = {
@@ -52,7 +54,8 @@ const NUMBER_LABEL = {
   referralRewardAmount: 'Referrer reward',
   referralMinOrder: 'Referral minimum order',
   giftWrapStandardFee: 'Standard gift wrap price',
-  giftWrapPremiumFee: 'Premium gift wrap price'
+  giftWrapPremiumFee: 'Premium gift wrap price',
+  gstRate: 'GST rate'
 };
 
 const isUrl = v => !v || /^https?:\/\/[^\s]+$/i.test(v);
@@ -67,6 +70,17 @@ function clean(body) {
 
     if (['instagram', 'facebook', 'youtube'].includes(key) && !isUrl(value)) {
       throw error(400, `${key} link must start with https://`);
+    }
+
+    if (key === 'gstin') {
+      const g = value.toUpperCase();
+
+      if (g && !/^\d{2}[A-Z]{5}\d{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/.test(g)) {
+        throw error(400, 'GSTIN 15 akshar ka hona chahiye (jaise 09ABCDE1234F1Z5).');
+      }
+
+      out[key] = g;
+      continue;
     }
 
     if (key === 'email' && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
