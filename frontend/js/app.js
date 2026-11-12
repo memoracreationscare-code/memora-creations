@@ -221,19 +221,48 @@ function esc(value) {
 @media(max-width:600px){.mc-gal-nav{display:none}.mc-gal-thumbs{display:none}}
 
 html body #product .gallery{display:block!important}
-html body .product-popup-overlay{background:rgba(25,18,12,.6)!important;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);animation:mcFade .2s ease}
-html body .product-popup{border-radius:24px!important;box-shadow:0 30px 90px rgba(0,0,0,.35)!important;animation:mcPop .3s cubic-bezier(.2,.9,.3,1.2)}
-html body .product-popup-close{top:12px!important;right:12px!important;width:36px!important;height:36px!important;background:rgba(255,255,255,.95)!important;box-shadow:0 2px 10px rgba(0,0,0,.18);transition:transform .15s}
-html body .product-popup-close:hover{transform:scale(1.08)}
-html body .product-popup-imagebox{background:transparent!important;padding:0!important;display:block!important;min-height:0!important;height:auto!important;max-height:none!important}
-html body .product-popup-info .pill{font-size:12px}
-html body .product-popup-price{color:#241c16}
-html body .product-popup-actions .btn{border-radius:12px}
-@media(max-width:700px){
-html body .product-popup-overlay{align-items:flex-end!important;padding:0!important}
-html body .product-popup{max-width:none!important;width:100%!important;max-height:92dvh!important;border-radius:24px 24px 0 0!important;padding:14px!important;animation:mcUp .3s ease}
-html body .product-popup-imagebox{height:auto!important;min-height:0!important;max-height:none!important}
-html body .product-popup-imagebox .mc-gal-slide{aspect-ratio:1/1;max-height:42vh}
+
+/* ---------- Product quick-view popup ---------- */
+.product-popup-overlay{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;background:rgba(25,18,12,.6);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);animation:mcFade .2s ease}
+.product-popup{position:relative;width:min(900px,100%);max-height:90vh;max-height:90dvh;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);background:#fff;border-radius:24px;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.35);animation:mcPop .3s cubic-bezier(.2,.9,.3,1.2)}
+.product-popup-close{position:absolute;top:12px;right:12px;z-index:5;width:38px;height:38px;border:0;border-radius:50%;background:rgba(255,255,255,.95);color:#241c16;font-size:24px;line-height:1;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.2);display:grid;place-items:center;padding:0;transition:transform .15s}
+.product-popup-close:hover{transform:scale(1.08)}
+.product-popup-imagebox{background:#f5f0eb;min-width:0;display:block;padding:0;margin:0}
+.product-popup-imagebox .mc-gal{height:100%}
+.product-popup-imagebox .mc-gal-track{border-radius:0;height:100%}
+.product-popup-imagebox .mc-gal-slide{aspect-ratio:1/1;height:100%}
+.product-popup-imagebox .mc-gal-slide img{object-fit:cover}
+.product-popup-imagebox .mc-gal-dots{position:absolute;left:0;right:0;bottom:10px;margin:0}
+.product-popup-imagebox .mc-gal-dots i{background:rgba(255,255,255,.7)}
+.product-popup-imagebox .mc-gal-dots i.on{background:#fff}
+.product-popup-info{display:flex;flex-direction:column;gap:10px;padding:26px 26px 22px;overflow-y:auto;min-width:0}
+.product-popup-info .pill{align-self:flex-start;font-size:11.5px;letter-spacing:.6px;text-transform:uppercase}
+.product-popup-info h2{margin:0;font-size:clamp(20px,2.6vw,27px);line-height:1.25;color:#241c16}
+.product-popup-price{display:flex;align-items:baseline;flex-wrap:wrap;gap:10px;font-size:26px;font-weight:900;color:#241c16;margin:0}
+.product-popup-price .old{font-size:15px;font-weight:600;color:#9a8d80;text-decoration:line-through}
+.product-popup-price .mc-off{font-size:12px;font-weight:800;color:#1f7a4a;background:#e8f6ee;padding:3px 8px;border-radius:999px;align-self:center}
+.product-popup-info>p.muted{margin:0;font-size:14px;line-height:1.6;color:#6b5d50;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;line-clamp:3;overflow:hidden}
+.product-popup-info>p.mc-stock{margin:0;font-size:13px;font-weight:700;color:#1f7a4a;display:flex;align-items:center;gap:6px}
+.product-popup-info>p.mc-stock.out{color:#b3261e}
+.product-popup-info>p.mc-stock::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.mc-buy{display:grid;gap:10px;margin-top:auto;padding-top:6px}
+.mc-buy-row{display:grid;grid-template-columns:auto 1fr;gap:10px}
+.mc-buy .btn{width:100%;min-height:48px;padding:12px 14px;border-radius:12px;font-size:15px;font-weight:800;white-space:normal;text-align:center;justify-content:center}
+.mc-qty{display:inline-grid;grid-template-columns:42px 52px 42px;align-items:stretch;border:1.5px solid #e2d5c6;border-radius:12px;overflow:hidden;background:#fff;min-height:48px}
+.mc-qty button{border:0;background:#faf6f0;font-size:20px;font-weight:700;color:#241c16;cursor:pointer}
+.mc-qty button:active{background:#f0e6d6}
+.mc-qty input{width:100%;min-height:0!important;height:auto!important;border:0!important;border-radius:0!important;text-align:center;font-size:16px!important;font-weight:800;padding:0!important;background:#fff!important;-moz-appearance:textfield;appearance:textfield}
+.mc-qty input::-webkit-outer-spin-button,.mc-qty input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+@media(max-width:760px){
+.product-popup-overlay{align-items:flex-end;padding:0}
+.product-popup{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr);width:100%;max-height:92vh;max-height:92dvh;border-radius:24px 24px 0 0;animation:mcUp .3s ease}
+.product-popup-imagebox .mc-gal-track,.product-popup-imagebox .mc-gal{height:auto}
+.product-popup-imagebox .mc-gal-slide{aspect-ratio:1/1;height:auto;max-height:44vh;max-height:44dvh;width:100%}
+.product-popup-imagebox .mc-gal-slide img{object-fit:cover}
+.product-popup-info{padding:16px 18px 18px;gap:8px;overflow-y:auto}
+.product-popup-info h2{font-size:19px}
+.product-popup-price{font-size:23px}
+.mc-buy{position:sticky;bottom:-18px;background:#fff;margin:0 -18px -18px;padding:12px 18px 18px;border-top:1px solid #f0e8dc}
 }
 `;
   const el = document.createElement('style');
@@ -332,6 +361,23 @@ function ratingHtml(product) {
   const pct = Math.max(0, Math.min(100, (avg / 5) * 100));
   return `<span class="mc-rate" title="${avg.toFixed(1)} out of 5"><span class="mc-rate-stars" aria-hidden="true"><i style="width:${pct}%"></i></span>${avg.toFixed(1)} <small>(${count})</small></span>`;
 }
+
+/* [ - 1 + ] quantity stepper. Keeps a normal <input type=number> inside so existing code can read it. */
+function qtyHtml(id, cls, max, disabled) {
+  return `<div class="mc-qty"><button type="button" data-qty="-1" aria-label="Kam karo"${disabled ? ' disabled' : ''}>−</button>` +
+    `<input id="${id}" class="input ${cls}" type="number" inputmode="numeric" min="1" max="${Math.max(1, max)}" value="1" aria-label="Quantity"${disabled ? ' disabled' : ''}>` +
+    `<button type="button" data-qty="1" aria-label="Badhao"${disabled ? ' disabled' : ''}>+</button></div>`;
+}
+
+document.addEventListener('click', event => {
+  const btn = event.target.closest('.mc-qty button[data-qty]');
+  if (!btn) return;
+  const input = btn.parentElement.querySelector('input');
+  const max = Number(input.max) || 1;
+  const next = Math.max(1, Math.min(max, (Number(input.value) || 1) + Number(btn.dataset.qty)));
+  input.value = next;
+  input.dispatchEvent(new Event('input', { bubbles: true }));
+});
 
 function galleryHtml(images, alt, opts = {}) {
   const list = (Array.isArray(images) ? images : [])
@@ -1007,6 +1053,7 @@ window.MC = {
   toast,
   showCartPopup,
   galleryHtml,
+  qtyHtml,
   API_BASE: API,
   ratingHtml,
   initGallery,

@@ -151,6 +151,11 @@
     });
   }, 60000);
 
+  function offBadge(product) {
+    const sell = Number(product.sellingPrice), old = Number(product.originalPrice);
+    return old > sell && sell > 0 ? `<span class="mc-off">${Math.round((1 - sell / old) * 100)}% OFF</span>` : '';
+  }
+
   function closePopup() {
     $('#productQuickView')?.remove();
     document.body.style.overflow = '';
@@ -201,19 +206,18 @@
           <span class="pill">${esc(product.category?.name || 'Collection')}</span>
           <h2>${esc(product.name)}</h2>
           ${MC.ratingHtml(product)}
-          <div class="product-popup-price">${priceMarkup(product)}</div>
+          <div class="product-popup-price">${priceMarkup(product)}${offBadge(product)}</div>
           <p class="muted">${esc(product.description || '')}</p>
-          <p>${stock ? `✅ In Stock (${stock})` : '❌ Out of Stock'}</p>
-          <div class="field">
-            <label for="mcPopupQty">Quantity</label>
-            <input id="mcPopupQty" class="input popup-qty" type="number" min="1" max="${Math.max(1, stock)}" value="1" ${stock ? '' : 'disabled'}>
-          </div>
+          <p class="mc-stock ${stock ? '' : 'out'}">${stock ? (stock <= 5 ? `Sirf ${stock} bache hain` : 'In Stock') : 'Out of Stock'}</p>
           ${hasVariants(product) ? `
-          <div class="product-popup-actions">
+          <div class="mc-buy">
             <a class="btn" href="${esc(productPageUrl(product))}">Size / Colour chuno</a>
           </div>` : `
-          <div class="product-popup-actions">
-            <button class="btn popup-add-cart" type="button" ${stock ? '' : 'disabled'}>Add to Cart</button>
+          <div class="mc-buy">
+            <div class="mc-buy-row">
+              ${MC.qtyHtml('mcPopupQty', 'popup-qty', stock, !stock)}
+              <button class="btn popup-add-cart" type="button" ${stock ? '' : 'disabled'}>Add to Cart</button>
+            </div>
             <button class="btn secondary popup-order-now" type="button" ${stock ? '' : 'disabled'}>Order Now</button>
           </div>`}
         </div>
