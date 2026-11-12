@@ -62,6 +62,9 @@ const schema = new mongoose.Schema({
   referralRewardAmount: { type: Number, min: 1, max: 5000 },
   referralMinOrder: { type: Number, min: 0, max: 100000 },
 
+  backupEmailEnabled: Boolean,
+  lastBackupEmailAt: Date,   // set only by the backup job
+
   giftWrapEnabled: Boolean,
   giftWrapStandardFee: { type: Number, min: 0, max: 2000 },
   giftWrapPremiumFee: { type: Number, min: 0, max: 2000 },

@@ -64,7 +64,9 @@
         return;
       }
 
-      location.href = '/memora-creations/admin/dashboard.html';
+      location.href = result?.admin?.role === 'staff'
+        ? '/memora-creations/admin/orders.html'
+        : '/memora-creations/admin/dashboard.html';
     } catch (x) {
       toast(x.message, 'error');
     }
@@ -106,6 +108,6 @@
 // One shared side menu on every admin page.
 (() => {
   const script = document.createElement('script');
-  script.src = '/memora-creations/admin/js/nav.js?v=5';
+  script.src = '/memora-creations/admin/js/nav.js?v=7';
   document.head.appendChild(script);
 })();

@@ -24,7 +24,7 @@ function mailConfigured() {
   return provider() !== null;
 }
 
-async function sendMail({ to, subject, html }) {
+async function sendMail({ to, subject, html, attachments }) {
   const which = provider();
 
   if (!which || !to) return false;
@@ -47,7 +47,8 @@ async function sendMail({ to, subject, html }) {
         },
         to: [{ email: to }],
         subject,
-        htmlContent: html
+        htmlContent: html,
+        ...(attachments && attachments.length ? { attachment: attachments.map(a => ({ name: a.name, content: a.contentBase64 })) } : {})
       }),
       signal: timeout
     });
@@ -58,7 +59,10 @@ async function sendMail({ to, subject, html }) {
         Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ from: process.env.MAIL_FROM, to: [to], subject, html }),
+      body: JSON.stringify({
+        from: process.env.MAIL_FROM, to: [to], subject, html,
+        ...(attachments && attachments.length ? { attachments: attachments.map(a => ({ filename: a.name, content: a.contentBase64 })) } : {})
+      }),
       signal: timeout
     });
   }

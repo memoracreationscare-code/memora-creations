@@ -450,7 +450,8 @@ function giftBoxHtml(order) {
    PRINT PACKAGING LABEL
 ===================================== */
 
-function printShippingLabel(order) {
+/* One label (address box + items table). Used for a single print and for bulk print. */
+function labelSection(order) {
 
   const address = order.shippingAddress || {};
 
@@ -482,39 +483,8 @@ function printShippingLabel(order) {
       ? `COD: ${mcMoney(order.grandTotal)}`
       : 'PREPAID';
 
-  const label = `
-    <!doctype html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <title>Packaging Label</title>
-      <style>
-        body {
-          font-family:Arial,sans-serif;
-          padding:22px;
-          color:#111;
-        }
-        h2 {text-align:center}
-        .box {
-          border:2px solid #222;
-          padding:15px;
-          margin:15px 0;
-        }
-        table {
-          width:100%;
-          border-collapse:collapse;
-        }
-        td,th {
-          border:1px solid #555;
-          padding:9px;
-          text-align:left;
-        }
-        @media print {
-          button {display:none}
-        }
-      </style>
-    </head>
-    <body>
+  return `
+    <section class="label-page">
       <h2>MEMORA CREATIONS</h2>
       <h3>Shipping / Packaging Label</h3>
 
@@ -554,6 +524,48 @@ function printShippingLabel(order) {
         </thead>
         <tbody>${products}</tbody>
       </table>
+    </section>
+  `;
+}
+
+function printLabels(orders) {
+
+  const label = `
+    <!doctype html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>Packaging Labels</title>
+      <style>
+        body {
+          font-family:Arial,sans-serif;
+          padding:22px;
+          color:#111;
+        }
+        h2 {text-align:center}
+        .box {
+          border:2px solid #222;
+          padding:15px;
+          margin:15px 0;
+        }
+        table {
+          width:100%;
+          border-collapse:collapse;
+        }
+        td,th {
+          border:1px solid #555;
+          padding:9px;
+          text-align:left;
+        }
+        .label-page {page-break-after:always}
+        .label-page:last-child {page-break-after:auto}
+        @media print {
+          button {display:none}
+        }
+      </style>
+    </head>
+    <body>
+      ${orders.map(labelSection).join('')}
     </body>
     </html>
   `;
@@ -585,6 +597,10 @@ function printShippingLabel(order) {
     },
     { once: true }
   );
+}
+
+function printShippingLabel(order) {
+  printLabels([order]);
 }
 
 
@@ -1133,6 +1149,8 @@ function orderDetailsHtml(order) {
 
       ${giftBoxHtml(order)}
 
+      <div class="risk-box" data-risk-for="${mcEscape(order._id)}"></div>
+
       <p>
         <b>Customer:</b>
         ${mcEscape(
@@ -1342,6 +1360,21 @@ function openOrderDetails(id) {
         button.disabled = false;
       }
     });
+
+  // Warning box: earlier cancels / returns, big COD, short address.
+  (async () => {
+    const box = detailsRow.querySelector('.risk-box');
+    if (!box) return;
+    try {
+      const { risk } = await window.MC.api('/admin/orders/' + encodeURIComponent(order._id) + '/risk');
+      const color = risk.level === 'HIGH' ? ['#fdeceb', '#b3261e'] : risk.level === 'MEDIUM' ? ['#fff4e0', '#a15c00'] : ['#e8f6ee', '#1f7a4a'];
+      const title = risk.trusted ? '✅ Bharosemand customer'
+        : risk.level === 'HIGH' ? '⚠️ Risk zyada: shipping se pehle customer ko call karein'
+        : risk.level === 'MEDIUM' ? '⚠️ Thoda dhyan rakhein' : '✅ Koi risk nahi dikha';
+      box.innerHTML = `<div style="background:${color[0]};color:${color[1]};border-radius:10px;padding:10px 12px;margin:10px 0;font-size:14px">
+        <b>${title}</b>${risk.reasons.length ? '<ul style="margin:6px 0 0;padding-left:18px">' + risk.reasons.map(r => `<li>${mcEscape(r)}</li>`).join('') + '</ul>' : ''}</div>`;
+    } catch (_) { /* the warning is optional */ }
+  })();
 
   detailsRow
     .querySelector('.print-invoice')
@@ -1586,6 +1619,7 @@ async function loadAdminOrders() {
 
             <td>
 
+              <input type="checkbox" class="bulk-pick" data-id="${mcEscape(order._id)}" aria-label="Select order" style="margin-right:6px;transform:scale(1.2)">
               <b>
                 ${mcEscape(order.orderId)}
               </b>
@@ -1776,3 +1810,57 @@ document.querySelector('#statusFilter')
     loadAdminOrders();
 
   });
+
+
+/* =====================================
+   BULK: print many packaging labels at once
+   Tick orders in the list, then press the button.
+===================================== */
+
+(() => {
+  const box = document.querySelector('#orders');
+
+  if (!box) return;
+
+  const bar = document.createElement('div');
+
+  bar.hidden = true;
+  bar.style.cssText = 'position:sticky;top:0;z-index:50;background:#2a1d15;color:#fff;padding:10px 14px;border-radius:12px;margin:0 0 10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap';
+  bar.innerHTML = `<b id="bulkCount"></b>
+    <button type="button" id="bulkLabels" class="btn">🖨 Labels print karo</button>
+    <button type="button" id="bulkClear" class="btn secondary">Clear</button>`;
+
+  const wrap = box.closest('.orders-table-wrap') || box.parentElement;
+
+  wrap.parentNode.insertBefore(bar, wrap);
+
+  const picked = () => [...box.querySelectorAll('.bulk-pick:checked')].map(i => i.dataset.id);
+
+  function refresh() {
+    const ids = picked();
+
+    bar.hidden = ids.length === 0;
+    bar.querySelector('#bulkCount').textContent = ids.length + ' order chune';
+  }
+
+  box.addEventListener('change', event => {
+    if (event.target.classList.contains('bulk-pick')) refresh();
+  });
+
+  bar.querySelector('#bulkClear').addEventListener('click', () => {
+    box.querySelectorAll('.bulk-pick').forEach(i => { i.checked = false; });
+    refresh();
+  });
+
+  bar.querySelector('#bulkLabels').addEventListener('click', () => {
+    const ids = new Set(picked());
+    const orders = adminOrders.filter(o => ids.has(String(o._id)));
+
+    if (!orders.length) return;
+
+    printLabels(orders);
+  });
+
+  // the list is redrawn after a status change or filter: selection is cleared
+  new MutationObserver(refresh).observe(box, { childList: true });
+})();

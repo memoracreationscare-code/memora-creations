@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Staff Logins | Memora Admin</title>
+  <style>
+    body{margin:0;background:#f8f5f0;color:#302117;font-family:Arial,sans-serif}
+    .wrap{max-width:900px;margin:0 auto;padding:28px 18px 60px}
+    h1{margin:0 0 6px}.muted{color:#81776f;line-height:1.6}
+    .panel{background:#fff;border:1px solid #e9dfd4;border-radius:16px;padding:18px;margin-top:16px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:10px}
+    label{font-weight:700;font-size:13px;display:block;margin-bottom:5px}
+    input{padding:11px;border:1px solid #d9c9bd;border-radius:9px;width:100%;font-size:15px;box-sizing:border-box}
+    button{border:0;border-radius:10px;padding:11px 16px;font-weight:700;cursor:pointer;background:#805137;color:#fff}
+    button.sec{background:#f1e8df;color:#302117}
+    table{border-collapse:collapse;width:100%;font-size:14px;margin-top:6px}
+    th,td{text-align:left;padding:10px;border-bottom:1px solid #eaded6}th{background:#f5eee8}
+    .on{color:#1b6e2d;font-weight:700}.off{color:#b42318;font-weight:700}
+    .can{line-height:1.8;margin:8px 0 0;padding-left:18px}
+    .scroll{overflow-x:auto}
+  </style>
+</head>
+<body>
+<main class="wrap">
+  <h1>👥 Staff Logins</h1>
+  <p class="muted">Apne helper (packing / order dekhne wale) ko alag login do, apna password share mat karo. Kisi ko hatana ho to "Band karo" dabao, turant login band ho jaata hai.</p>
+
+  <section class="panel">
+    <b>Staff kya kar sakta hai</b>
+    <ul class="can">
+      <li>✅ Orders dekhna, status badalna, note likhna</li>
+      <li>✅ Courier chunna, shipment banana, label aur invoice print karna</li>
+      <li>✅ Return requests aur return parcels sambhalna</li>
+      <li>❌ Sales ke numbers, customers, payments aur refunds, coupons, reports</li>
+      <li>❌ Store Settings, products badalna, backup, staff manage karna</li>
+    </ul>
+  </section>
+
+  <section class="panel">
+    <b>Naya staff login</b>
+    <form id="f" novalidate>
+      <div class="grid">
+        <div><label for="n">Naam</label><input id="n" autocomplete="off"></div>
+        <div><label for="e">Email (login ke liye)</label><input id="e" type="email" autocomplete="off"></div>
+        <div><label for="p">Password (8+ akshar)</label><input id="p" type="text" autocomplete="off"></div>
+      </div>
+      <p><button type="submit">Staff banao</button></p>
+    </form>
+  </section>
+
+  <section class="panel">
+    <b>Abhi ke staff</b>
+    <div class="scroll"><table>
+      <thead><tr><th>Naam</th><th>Email</th><th>Last login</th><th>Status</th><th></th></tr></thead>
+      <tbody id="rows"><tr><td colspan="5">Loading...</td></tr></tbody>
+    </table></div>
+  </section>
+</main>
+
+<script src="/memora-creations/frontend/js/app.js?v=15"></script>
+<script src="/memora-creations/admin/js/auth.js?v=17"></script>
+<script src="/memora-creations/admin/js/staff.js?v=1"></script>
+</body>
+</html>

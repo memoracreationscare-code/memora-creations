@@ -126,6 +126,22 @@ const productSchema = new mongoose.Schema({
      total of all options.
   ========================= */
 
+  /* =========================
+     FESTIVAL SALE (Admin -> Festival Sale)
+     The sale job lowers the price at startsAt and puts the
+     saved original prices back at endsAt. Orders and payments
+     always read the normal price fields, so nothing else changes.
+  ========================= */
+
+  sale: {
+    name: { type: String, trim: true, maxlength: 60 },
+    percent: { type: Number, min: 1, max: 90 },
+    startsAt: Date,
+    endsAt: Date,
+    applied: { type: Boolean, default: false },
+    saved: { type: Object, select: false }
+  },
+
   variants: {
     type: [{
       label: { type: String, required: true, trim: true, maxlength: 60 },

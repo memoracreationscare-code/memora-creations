@@ -20,7 +20,7 @@
   const BOOL = [
     'storeOpen', 'freeDeliveryBar', 'codEnabled', 'codAdvanceEnabled',
     'returnsEnabled', 'autoRefundEnabled', 'emailNotificationsEnabled',
-    'abandonedReminderEnabled', 'lowStockEmailEnabled', 'welcomeEnabled', 'referralEnabled', 'giftWrapEnabled', 'gstEnabled'
+    'abandonedReminderEnabled', 'lowStockEmailEnabled', 'welcomeEnabled', 'referralEnabled', 'giftWrapEnabled', 'gstEnabled', 'backupEmailEnabled'
   ];
 
   function showMail(configured) {
@@ -46,6 +46,31 @@
     box.textContent = text;
     box.style.color = ok ? '#1b6e2d' : '#b42318';
   }
+
+  $('#backupNow')?.addEventListener('click', async () => {
+    const btn = $('#backupNow');
+
+    btn.disabled = true;
+    btn.textContent = 'Ban raha hai…';
+
+    try {
+      const r = await fetch('https://memora-creations.onrender.com/api/admin/backup/download', { credentials: 'include' });
+
+      if (!r.ok) throw new Error('Backup download nahi hua.');
+
+      const url = URL.createObjectURL(await r.blob());
+      const a = Object.assign(document.createElement('a'), { href: url, download: 'memora-backup-' + new Date().toISOString().slice(0, 10) + '.json' });
+
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 3000);
+      message('Backup download ho gaya.', true);
+    } catch (e) {
+      message(e.message, false);
+    }
+
+    btn.disabled = false;
+    btn.textContent = '⬇ Backup abhi download karo';
+  });
 
   async function load() {
     try {

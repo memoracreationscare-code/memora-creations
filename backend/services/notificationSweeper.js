@@ -209,6 +209,8 @@ function startNotificationSweeper() {
 
   const run = async () => {
     try {
+      await require('./saleService').sweepSales().catch(err => console.warn('[Sale]', err.message));
+      await require('./backupService').sweepBackup().catch(err => console.warn('[Backup]', err.message));
       await require('./stockAlertSweeper').sweepStockAlerts().catch(err => console.warn('[Stock alert]', err.message));
       await require('./lowStockAlert').sweepLowStock().catch(err => console.warn('[Low stock]', err.message));
 

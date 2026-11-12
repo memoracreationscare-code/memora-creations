@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Festival Sale | Memora Admin</title>
+  <style>
+    body{margin:0;background:#f8f5f0;color:#302117;font-family:Arial,sans-serif}
+    .wrap{max-width:820px;margin:0 auto;padding:28px 18px 60px}
+    h1{margin:0 0 6px}.muted{color:#81776f;line-height:1.6}
+    .panel{background:#fff;border:1px solid #e9dfd4;border-radius:16px;padding:18px;margin-top:16px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:10px}
+    label{font-weight:700;font-size:13px;display:block;margin-bottom:5px}
+    input,select{padding:11px;border:1px solid #d9c9bd;border-radius:9px;width:100%;font-size:15px;box-sizing:border-box;background:#fff}
+    button{border:0;border-radius:10px;padding:11px 16px;font-weight:700;cursor:pointer;background:#805137;color:#fff}
+    button.danger{background:#c0362c}
+    .live{background:#fff4e0;border:1px solid #f0c987;border-radius:12px;padding:14px;line-height:1.7}
+    ul{line-height:1.8;padding-left:18px;margin:8px 0 0}
+  </style>
+</head>
+<body>
+<main class="wrap">
+  <h1>🎉 Festival Sale</h1>
+  <p class="muted">Sale ka start aur end time set karo. Time aate hi prices apne aap kam ho jaate hain, aur end par apne aap wapas normal. Customer ko puraana price kata hua aur naya price dikhta hai, saath me "sale kab tak" ki ginti.</p>
+
+  <section class="panel" id="current"><span class="muted">Loading…</span></section>
+
+  <section class="panel" id="newBox">
+    <b>Nayi sale lagao</b>
+    <form id="f" novalidate>
+      <div class="grid">
+        <div><label for="name">Sale ka naam</label><input id="name" maxlength="60" placeholder="Diwali Sale"></div>
+        <div><label for="pct">Discount (%)</label><input id="pct" type="number" min="1" max="90" placeholder="20"></div>
+        <div><label for="cat">Kin products par</label><select id="cat"><option value="">Saare products</option></select></div>
+        <div><label for="s">Start</label><input id="s" type="datetime-local"></div>
+        <div><label for="e">End</label><input id="e" type="datetime-local"></div>
+      </div>
+      <p><button type="submit">Sale set karo</button></p>
+    </form>
+    <ul class="muted">
+      <li>Sirf active products par lagti hai. Ek samay me ek hi sale.</li>
+      <li>Sale chalte waqt kisi product ka price Products page se mat badlo, warna sale khatam hone par purana price wapas aa jayega.</li>
+      <li>Variants wale products ke har option ka price bhi kam hota hai.</li>
+    </ul>
+  </section>
+</main>
+
+<script src="/memora-creations/frontend/js/app.js?v=15"></script>
+<script src="/memora-creations/admin/js/auth.js?v=17"></script>
+<script src="/memora-creations/admin/js/sale.js?v=1"></script>
+</body>
+</html>
