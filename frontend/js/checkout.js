@@ -1199,10 +1199,7 @@
         '/orders/cod',
         {
           method: 'POST',
-          body: JSON.stringify({
-              ...payload(),
-              ...(advanceMode ? { codAdvance: true } : {})
-            })
+          body: JSON.stringify(payload())
         }
       );
 
@@ -1256,9 +1253,11 @@
         '/cashfree/create-order',
         {
           method: 'POST',
-          body: JSON.stringify(
-            payload()
-          )
+          body: JSON.stringify({
+            ...payload(),
+            // COD + advance: ask the server to charge only the advance share.
+            ...(advanceMode ? { codAdvance: true } : {})
+          })
         }
       );
 
