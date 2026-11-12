@@ -222,6 +222,15 @@ function esc(value) {
 
 html body #product .gallery{display:block!important}
 
+/* ---------- Product page actions ---------- */
+html body #product .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+html body #product .actions>.btn{min-height:50px;border-radius:12px;font-weight:800}
+html body #product .actions>#addBtn{grid-column:1/-1}
+html body #product .actions>#buyBtn{grid-column:1/-1}
+html body #product .mc-sub-actions{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+html body #product .mc-sub-actions>*{min-height:44px;border-radius:12px;font-size:14px;margin:0;width:100%}
+html body #product .field .mc-qty{display:inline-grid}
+
 /* ---------- Product quick-view popup ---------- */
 .product-popup-overlay{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;background:rgba(25,18,12,.6);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);animation:mcFade .2s ease}
 .product-popup{position:relative;width:min(900px,100%);max-height:90vh;max-height:90dvh;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);background:#fff;border-radius:24px;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.35);animation:mcPop .3s cubic-bezier(.2,.9,.3,1.2)}

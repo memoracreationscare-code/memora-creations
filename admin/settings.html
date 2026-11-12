@@ -329,8 +329,10 @@
       .st-f{display:grid;gap:4px;font-weight:600;font-size:14px}
       .st-f small,.st-c small{display:block;font-weight:400;color:#7a6652;font-size:12px}
       .st-c{display:flex;gap:10px;align-items:flex-start;padding:10px;border:1px solid #eadfd3;border-radius:12px}
-      .st-c input{margin-top:4px;width:18px;height:18px}
-      #stSave{position:sticky;bottom:14px}
+      .st-c{cursor:pointer;background:#fffdfa}.st-c:has(input:checked){border-color:#c9a47f;background:#fbf3ea}
+      .st-c input{margin-top:3px;width:20px;height:20px;flex:none;accent-color:#805137;cursor:pointer}
+      #stSave{position:sticky;bottom:14px;min-height:48px;padding:0 28px;border-radius:12px;box-shadow:0 8px 24px rgba(60,35,20,.28)}
+      @media(max-width:700px){#stSave{display:block;width:100%;bottom:10px}}
       #stMsg{margin:10px 0;font-weight:700}
     </style>
 
@@ -489,7 +491,7 @@
     </section>
   </main>
 
-  <script src="/memora-creations/frontend/js/app.js?v=16"></script>
+  <script src="/memora-creations/frontend/js/app.js?v=17"></script>
   <script src="/memora-creations/admin/js/auth.js?v=17"></script>
   <script src="/memora-creations/admin/js/settings.js?v=9"></script>
 
