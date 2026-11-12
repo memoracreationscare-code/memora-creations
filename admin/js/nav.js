@@ -162,6 +162,7 @@
       ['product-import.html', '⇪', 'Import Products (CSV)'],
       ['banners.html', '🖼', 'Homepage Banners'],
       ['coupons.html', '%', 'Coupons'],
+      ['sale.html', '🎉', 'Festival Sale'],
       ['announcement.html', '📢', 'Announcement']
     ] },
     { title: 'Customers', items: [
@@ -171,6 +172,7 @@
       ['wishlist.html', '♡', 'Wishlist']
     ] },
     { title: 'Website', items: [['settings.html', '⚙', 'Store Settings'],
+      ['staff.html', '👥', 'Staff Logins'],
       ['activity-log.html', '🕘', 'Activity Log'],
       ['test-cleanup.html', '🧹', 'Test Orders Cleanup']] }
   ];
@@ -240,6 +242,20 @@
     } catch (_) {}
     location.href = B + 'index.html';
   };
+
+  // Staff (helper) logins only see the packing-work pages.
+  fetch('https://memora-creations.onrender.com/api/admin/me', { credentials: 'include' })
+    .then(r => (r.ok ? r.json() : null))
+    .then(d => {
+      if (!d || !d.admin || d.admin.role !== 'staff') return;
+      const keep = ['orders.html', 'return-requests.html', 'return-parcels.html'];
+      nav.querySelectorAll('.nv-title').forEach(t => t.remove());
+      nav.querySelectorAll('a[href^="' + B + '"]').forEach(a => {
+        if (!keep.some(k => a.getAttribute('href') === B + k)) a.remove();
+      });
+      if (!keep.includes(here)) location.href = B + 'orders.html';
+    })
+    .catch(() => {});
 
   // Let alerts.js put its red numbers on the new links.
   window.dispatchEvent(new Event('mc-nav-ready'));

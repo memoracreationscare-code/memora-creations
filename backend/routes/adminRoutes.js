@@ -94,8 +94,19 @@ router.post(
 
 router.use(requireAdmin);
 
+// Helpers (role 'staff') can only reach the packing-work routes.
+router.use(require('../middleware/staffGuard').staffGuard);
+
 // Every change made from the admin panel is written to the activity log.
 router.use(require('../middleware/auditLog').auditLog);
+
+const staffController = require('../controllers/adminStaffController');
+
+router.get('/me', staffController.me);
+router.get('/staff', staffController.list);
+router.post('/staff', staffController.create);
+router.patch('/staff/:id/toggle', staffController.toggle);
+router.patch('/staff/:id/password', staffController.resetPassword);
 
 router.get(
   '/activity',
@@ -719,6 +730,32 @@ router.get(
 /* =====================================
    USERS
 ===================================== */
+
+router.get('/orders/:id/risk', require('../utils/http').asyncHandler(async (req, res) => {
+  if (!require('mongoose').isValidObjectId(req.params.id)) return res.status(400).json({ success: false, message: 'Invalid order ID.' });
+  const risk = await require('../services/codRisk').riskForOrder(req.params.id, require('../models'));
+  if (!risk) return res.status(404).json({ success: false, message: 'Order not found.' });
+  return res.json({ success: true, risk });
+}));
+
+router.get('/backup/download', require('../utils/http').asyncHandler(async (req, res) => {
+  const backup = await require('../services/backupService').buildBackup();
+  res.set({
+    'Content-Type': 'application/json; charset=utf-8',
+    'Content-Disposition': `attachment; filename="memora-backup-${backup.generatedAt.slice(0, 10)}.json"`,
+    'Cache-Control': 'private, no-store'
+  });
+  return res.send(backup.json);
+}));
+
+const saleController = require('../controllers/adminSaleController');
+
+router.get('/sale', saleController.summary);
+router.post('/sale', saleController.create);
+router.delete('/sale', saleController.stop);
+
+router.get('/customers/summary', require('../controllers/adminCustomersController').summary);
+router.get('/customers/export', require('../controllers/adminCustomersController').exportCsv);
 
 router.get(
   '/users',

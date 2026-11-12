@@ -127,6 +127,30 @@
         : '');
   }
 
+  /* "🔥 Diwali Sale · 20% off · ends in 2d 5h" while a festival sale is running */
+  function saleLeft(endsAt) {
+    const ms = new Date(endsAt) - Date.now();
+    if (!(ms > 0)) return '';
+    const d = Math.floor(ms / 864e5);
+    const h = Math.floor((ms % 864e5) / 36e5);
+    const m = Math.floor((ms % 36e5) / 6e4);
+    return d > 0 ? `${d}d ${h}h` : h > 0 ? `${h}h ${m}m` : `${Math.max(1, m)}m`;
+  }
+
+  function saleBanner(product) {
+    const s = product.sale;
+    if (!s || !s.applied || !s.endsAt || !saleLeft(s.endsAt)) return '';
+    return `<div class="mc-sale-banner" data-ends="${esc(s.endsAt)}" style="margin:8px 0;padding:9px 12px;border-radius:10px;background:#fff1e0;border:1px solid #f0c987;color:#8a3d00;font-weight:700;font-size:14px">🔥 ${esc(s.name || 'Sale')} · ${esc(s.percent)}% off · <span class="mc-sale-left">${esc(saleLeft(s.endsAt))}</span> baaki</div>`;
+  }
+
+  setInterval(() => {
+    document.querySelectorAll('.mc-sale-banner').forEach(el => {
+      const left = saleLeft(el.dataset.ends);
+      if (left) el.querySelector('.mc-sale-left').textContent = left;
+      else el.remove();
+    });
+  }, 60000);
+
   function closePopup() {
     $('#productQuickView')?.remove();
     document.body.style.overflow = '';
@@ -499,6 +523,7 @@
             ${MC.ratingHtml(product)}
             <p>${esc(product.description || '')}</p>
             <div class="price">${priceMarkup(product)}</div>
+            ${saleBanner(product)}
             <p>${stock ? (stock <= 5 ? `🔥 Only ${stock} left - order soon` : `✅ In Stock (${stock})`) : '❌ OUT OF STOCK'}</p>
             ${stock ? '' : `
             <form id="notifyForm" novalidate style="margin:12px 0;padding:14px;border:1px solid #eadfce;border-radius:14px;background:#fffaf3">
