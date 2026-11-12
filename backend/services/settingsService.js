@@ -79,7 +79,13 @@ function defaults() {
 
     giftWrapEnabled: envBool('GIFT_WRAPPING_LIVE_ENABLED'),
     giftWrapStandardFee: envNum('GIFT_WRAP_STANDARD_FEE', 29),
-    giftWrapPremiumFee: envNum('GIFT_WRAP_PREMIUM_FEE', 59)
+    giftWrapPremiumFee: envNum('GIFT_WRAP_PREMIUM_FEE', 59),
+
+    gstEnabled: false,
+    gstLegalName: '',
+    gstin: '',
+    gstState: 'Uttar Pradesh',
+    gstRate: 18
   };
 }
 
@@ -93,7 +99,7 @@ function merge(saved) {
   }
 
   // Empty text is a valid choice for the optional contact fields.
-  for (const key of ['phone', 'email', 'instagram', 'facebook', 'youtube', 'heroKicker', 'heroLine1', 'heroHighlight', 'heroDescription', 'heroButtonText']) {
+  for (const key of ['phone', 'email', 'instagram', 'facebook', 'youtube', 'heroKicker', 'heroLine1', 'heroHighlight', 'heroDescription', 'heroButtonText', 'gstLegalName', 'gstin']) {
     if (saved && typeof saved[key] === 'string') out[key] = saved[key];
   }
 

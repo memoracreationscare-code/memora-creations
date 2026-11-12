@@ -350,6 +350,11 @@ router.get(
   adminController.listOrders
 );
 
+router.get(
+  '/orders/:id/invoice',
+  require('../controllers/invoiceController').adminInvoice
+);
+
 router.post(
   '/orders/:id/refresh-payment',
   adminController.refreshPaymentDetails

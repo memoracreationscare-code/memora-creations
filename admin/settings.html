@@ -413,6 +413,18 @@
       </div>
 
       <div class="st-box">
+        <h2>🧾 Invoice / GST bill</h2>
+        <label class="st-c"><input id="gstEnabled" type="checkbox"><span><b>Bill par GST (Tax Invoice) dikhao</b><small>OFF ho to simple bill banta hai, bina tax ke. Bill number (MC/2026-27/00001) dono me aata hai. Prices GST-inclusive maane jaate hain: tax total ke andar se nikalta hai, customer ko extra nahi dena padta. GST registration aur rate apne CA se confirm kar lena.</small></span></label>
+        <div class="st-grid" style="margin-top:10px">
+          <label class="st-f"><span>Business ka legal naam</span><input id="gstLegalName" class="input" type="text" placeholder="Memora Creations"></label>
+          <label class="st-f"><span>GSTIN (15 akshar)</span><input id="gstin" class="input" type="text" maxlength="15" placeholder="09ABCDE1234F1Z5" style="text-transform:uppercase"></label>
+          <label class="st-f"><span>Aapka state</span><input id="gstState" class="input" type="text" placeholder="Uttar Pradesh"></label>
+          <label class="st-f"><span>GST rate (%)</span><input id="gstRate" class="input" type="number" placeholder="18"></label>
+        </div>
+        <small style="display:block;margin-top:8px;color:#7a6a58">Apne state ke customer ko CGST + SGST, doosre state ko IGST dikhta hai. Bill order ke andar "Invoice / GST Bill" button se khulta hai, wahan se PDF save kar sakte ho.</small>
+      </div>
+
+      <div class="st-box">
         <h2>🎀 Gift wrapping</h2>
         <label class="st-c"><input id="giftWrapEnabled" type="checkbox"><span><b>Checkout par gift wrapping + gift message ka option dikhao</b><small>Customer Standard ya Premium wrapping aur apna message (180 akshar) chun sakta hai. Price order me judta hai aur packing ke liye admin order page par dikhta hai.</small></span></label>
         <div class="st-grid" style="margin-top:10px">
@@ -472,7 +484,7 @@
 
   <script src="/memora-creations/frontend/js/app.js?v=15"></script>
   <script src="/memora-creations/admin/js/auth.js?v=16"></script>
-  <script src="/memora-creations/admin/js/settings.js?v=7"></script>
+  <script src="/memora-creations/admin/js/settings.js?v=8"></script>
 
 </body>
 </html>
