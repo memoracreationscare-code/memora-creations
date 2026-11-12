@@ -1005,23 +1005,6 @@
 }
 
 
-/* =========================
-   QUICK VIEW PRICE
-========================= */
-
-.product-popup-price{
-  display:flex;
-
-  align-items:center;
-
-  flex-wrap:wrap;
-
-  gap:7px;
-
-  color:#291c14;
-
-  font-weight:900;
-}
 
 
 /* =========================
