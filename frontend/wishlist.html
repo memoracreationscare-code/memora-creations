@@ -23,6 +23,12 @@
     .wishlist-card-body{padding:18px}
     .wishlist-name{color:#302117;font-weight:700;text-decoration:none;line-height:1.45;display:block;min-height:42px}
     .wishlist-price{font-size:20px;font-weight:800;color:#754229;margin:12px 0 8px}
+    @media(max-width:600px){
+      .wishlist-grid{grid-template-columns:1fr 1fr;gap:12px}
+      .wishlist-card-body{padding:11px}
+      .wishlist-name{font-size:13.5px;min-height:38px}
+      .wishlist-price{font-size:17px;margin:8px 0 6px}
+    }
     .wishlist-old{color:#9a918b;text-decoration:line-through;font-size:13px;font-weight:400;margin-left:8px}
     .wishlist-stock{color:#3d7954;font-size:13px;margin-bottom:16px}
     .wishlist-stock.out{color:#b44141}
@@ -47,7 +53,7 @@
     <section id="wishlistContent" aria-live="polite"><div class="wishlist-message">Loading your favorites...</div></section>
   </main>
   <nav id="bottomNav" class="bottomnav"></nav>
-  <script src="/memora-creations/frontend/js/app.js?v=16"></script>
+  <script src="/memora-creations/frontend/js/app.js?v=17"></script>
   <script>
     (() => {
       'use strict';
@@ -100,7 +106,7 @@
       loadWishlist();
     })();
   </script>
-  <script src="js/extras.js?v=4" defer></script>
+  <script src="js/extras.js?v=5" defer></script>
   <script src="js/animations.js?v=1" defer></script>
 </body>
 </html>
