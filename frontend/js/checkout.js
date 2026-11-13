@@ -22,7 +22,7 @@
 (() => {
   'use strict';
 
-  const BASE = '/memora-creations';
+  const BASE = '';
   const MC = window.MC;
 
   if (!MC) {

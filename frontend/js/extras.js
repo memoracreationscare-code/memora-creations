@@ -259,7 +259,7 @@
         if (settings.chatEnabled === true && !/\/(checkout|login|signup)\.html/.test(location.pathname)) {
           window.__mcChatWhatsapp = settings.whatsapp || '';
           const c = document.createElement('script');
-          c.src = '/memora-creations/frontend/js/chat-widget.js?v=1';
+          c.src = '/frontend/js/chat-widget.js?v=1';
           c.async = true;
           document.head.appendChild(c);
         }
@@ -274,7 +274,7 @@
     prefillReferral();
     loadSettings();
     const wv = document.createElement('script');
-    wv.src = '/memora-creations/frontend/js/welcome-voice.js?v=2';
+    wv.src = '/frontend/js/welcome-voice.js?v=2';
     wv.async = true;
     document.head.appendChild(wv);
     const toggle = () => top.classList.toggle('show', window.scrollY > 500);

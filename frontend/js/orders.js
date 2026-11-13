@@ -23,7 +23,7 @@
 =========================================
 */
 
-const ORDERS_BASE = '/memora-creations';
+const ORDERS_BASE = '';
 
 const ORDERS_API =
   'https://memora-creations.onrender.com/api';

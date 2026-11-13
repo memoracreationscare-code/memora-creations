@@ -15,7 +15,7 @@ const { asyncHandler, error, ok } = require('../utils/http');
 
 const isImage = v => /^https:\/\/[^\s]+$/i.test(v || '');
 // Links may point inside the shop or to an https page.
-const isLink = v => !v || /^(https:\/\/[^\s]+|\/memora-creations\/[^\s]*|products\.html[^\s]*|[a-z-]+\.html[^\s]*)$/i.test(v);
+const isLink = v => !v || /^(https:\/\/[^\s]+|\/(?:memora-creations\/)?(?:frontend|admin)\/[^\s]*|products\.html[^\s]*|[a-z-]+\.html[^\s]*)$/i.test(v);
 
 function clean(body, partial = false) {
   const out = {};

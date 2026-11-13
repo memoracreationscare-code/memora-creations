@@ -145,7 +145,7 @@
   if (document.getElementById('mcAdminNav')) return;
   if (/\/admin\/(index\.html)?$/.test(location.pathname)) return; // login page
 
-  const B = '/memora-creations/admin/';
+  const B = '/admin/';
   const GROUPS = [
     { title: '', items: [['dashboard.html', '▦', 'Dashboard']] },
     { title: 'Orders & Payments', items: [
@@ -221,7 +221,7 @@
         `<a href="${B}${file}" class="${file === current ? 'on' : ''}" ${file === current ? 'aria-current="page"' : ''}><span class="nv-ic">${ic}</span>${esc(label)}</a>`
       ).join('')).join('') +
     `<div class="nv-foot">
-       <a href="/memora-creations/frontend/index.html" target="_blank" rel="noopener"><span class="nv-ic">↗</span>View Store</a>
+       <a href="/frontend/index.html" target="_blank" rel="noopener"><span class="nv-ic">↗</span>View Store</a>
        <button type="button" id="mcNavLogout"><span class="nv-ic">⎋</span>Logout</button>
      </div>`;
 

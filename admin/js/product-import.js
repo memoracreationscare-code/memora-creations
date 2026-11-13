@@ -108,7 +108,7 @@
     }
 
     $('#msg').innerHTML = `${done} product bane${failed ? `, ${failed} fail hue` : ''}. ` +
-      '<a href="/memora-creations/admin/products.html">Products page par jakar photo lagayein aur "Website par dikhao" dabayein →</a>';
+      '<a href="/admin/products.html">Products page par jakar photo lagayein aur "Website par dikhao" dabayein →</a>';
     toast(`${done} product import hue.`, failed ? 'warning' : 'success');
   };
 })();

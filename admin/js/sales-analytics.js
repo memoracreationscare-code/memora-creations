@@ -1256,7 +1256,7 @@
       );
 
       link.href =
-        '/memora-creations/admin/orders.html';
+        '/admin/orders.html';
 
       idCell.appendChild(link);
       row.appendChild(idCell);

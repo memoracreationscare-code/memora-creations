@@ -1643,7 +1643,7 @@ async function refreshProfile() {
   if (!profileUser) {
 
     location.href =
-      '/memora-creations/frontend/login.html';
+      '/frontend/login.html';
 
     return;
 

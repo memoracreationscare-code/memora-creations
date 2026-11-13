@@ -16,7 +16,7 @@ const API =
   'https://memora-creations.onrender.com/api';
 
 const BASE =
-  '/memora-creations';
+  '';
 
 const $ = (selector, root = document) =>
   root.querySelector(selector);

@@ -30,8 +30,8 @@
     return (
       path === '/' ||
       path === '/frontend/index.html' ||
-      path === '/memora-creations/' ||
-      path === '/memora-creations/frontend/index.html'
+      path === '/' ||
+      path === '/frontend/index.html'
     );
   }
 

@@ -15,7 +15,7 @@
     if (/^https:\/\//i.test(link)) return link;
     if (link.startsWith('/')) return link;
 
-    return '/memora-creations/frontend/' + link.replace(/^\/+/, '');
+    return '/frontend/' + link.replace(/^\/+/, '');
   }
 
   function build(banners) {

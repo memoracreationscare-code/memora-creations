@@ -9,7 +9,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const SITE = 'https://memoracreationscare-code.github.io/memora-creations/frontend';
+const SITE = 'https://memoracreationscare.in/frontend';
 const API = process.env.API_BASE || 'https://memora-creations.onrender.com/api';
 
 const PAGES = [

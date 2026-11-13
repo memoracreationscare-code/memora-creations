@@ -13,7 +13,7 @@
 (function () {
   'use strict';
 
-  const FILE = '/memora-creations/frontend/audio/welcome.mp3?v=1';
+  const FILE = '/frontend/audio/welcome.mp3?v=1';
   const TEXT = 'Welcome to Memora Creations';
   let busy = false;
 
