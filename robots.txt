@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /backend/
+
+Sitemap: https://memoracreationscare.in/sitemap.xml
