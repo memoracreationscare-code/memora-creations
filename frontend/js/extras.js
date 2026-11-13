@@ -264,6 +264,10 @@
     addAddress();
     prefillReferral();
     loadSettings();
+    const wv = document.createElement('script');
+    wv.src = '/memora-creations/frontend/js/welcome-voice.js?v=1';
+    wv.async = true;
+    document.head.appendChild(wv);
     const toggle = () => top.classList.toggle('show', window.scrollY > 500);
     window.addEventListener('scroll', toggle, { passive: true });
     toggle();
