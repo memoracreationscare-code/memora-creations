@@ -65,6 +65,20 @@ async function checkBeforeCancel(order) {
     throw error(400, 'This order can no longer be cancelled.');
   }
 
+  /*
+    Courier already assigned (AWB exists): the parcel may be picked up
+    any minute, before our 30-minute tracking sync marks it Shipped.
+    So the customer can no longer cancel; the owner decides.
+  */
+  const tracking = await ShipmentTracking.findOne({ order: order._id }).lean();
+
+  if (tracking && tracking.awbCode) {
+    throw error(
+      409,
+      'Your order is already handed to the courier, so it can no longer be cancelled. Please contact customer care.'
+    );
+  }
+
   if (order.paymentMethod === 'COD') {
 
     if (order.paymentStatus !== 'COD_PENDING') {
