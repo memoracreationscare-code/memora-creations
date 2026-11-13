@@ -320,7 +320,7 @@ async function replyClaude(messages, settings, deps) {
 
 /* ---------- Gemini (Google, has a free tier) ---------- */
 
-const GEMINI_FALLBACKS = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-flash-lite-latest'];
+const GEMINI_FALLBACKS = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/';
 
 async function replyGemini(messages, settings, deps) {
@@ -350,6 +350,7 @@ async function replyGemini(messages, settings, deps) {
     */
     const models = [deps.model, ...GEMINI_FALLBACKS.filter(m => m !== deps.model)];
     let res;
+    let firstFail = null;
 
     for (let i = 0; i < models.length; i++) {
       res = await deps.fetch(`${GEMINI_URL}${encodeURIComponent(models[i])}:generateContent`, {
@@ -358,10 +359,17 @@ async function replyGemini(messages, settings, deps) {
         body
       });
 
-      if (res.ok || !(res.status === 429 || res.status >= 500)) break;
+      if (res.ok) break;
+
+      // Remember why the chosen model failed; that is the useful reason.
+      if (!firstFail) firstFail = await upstreamError(res);
+
+      const retryable = res.status === 429 || res.status >= 500;
+      // A missing fallback name (404) is skipped, not fatal.
+      if (!retryable && !(i > 0 && res.status === 404)) break;
     }
 
-    if (!res.ok) throw await upstreamError(res);
+    if (!res.ok) throw firstFail;
 
     const data = await res.json();
     const content = data && data.candidates && data.candidates[0] && data.candidates[0].content;
