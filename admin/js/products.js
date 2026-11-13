@@ -632,7 +632,8 @@ async function uploadProductImage(file) {
     {
       method: 'POST',
       body: JSON.stringify({
-        folder: 'memora-creations/products'
+        folder: 'memora-creations/products',
+        fit: true
       })
     }
   );
@@ -643,6 +644,7 @@ async function uploadProductImage(file) {
   fd.append('api_key', signature.apiKey);
   fd.append('timestamp', signature.timestamp);
   fd.append('folder', signature.folder);
+  if (signature.transformation) fd.append('transformation', signature.transformation);
   fd.append('signature', signature.signature);
 
   const response = await fetch(
