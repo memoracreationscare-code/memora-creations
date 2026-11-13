@@ -320,6 +320,7 @@ async function replyClaude(messages, settings, deps) {
 
 /* ---------- Gemini (Google, has a free tier) ---------- */
 
+const GEMINI_FALLBACKS = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-flash-lite-latest'];
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/';
 
 async function replyGemini(messages, settings, deps) {
@@ -336,16 +337,29 @@ async function replyGemini(messages, settings, deps) {
   }));
 
   for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
-    const res = await deps.fetch(`${GEMINI_URL}${encodeURIComponent(deps.model)}:generateContent`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', 'x-goog-api-key': deps.apiKey },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: system }] },
-        contents,
-        tools: round < MAX_TOOL_ROUNDS ? [{ functionDeclarations: declarations }] : undefined,
-        generationConfig: { maxOutputTokens: 600, temperature: 0.4 }
-      })
+    const body = JSON.stringify({
+      systemInstruction: { parts: [{ text: system }] },
+      contents,
+      tools: round < MAX_TOOL_ROUNDS ? [{ functionDeclarations: declarations }] : undefined,
+      generationConfig: { maxOutputTokens: 600, temperature: 0.4 }
     });
+
+    /*
+      Gemini's free models are often "overloaded" (503) for a while.
+      Try the chosen model, then other free models, before giving up.
+    */
+    const models = [deps.model, ...GEMINI_FALLBACKS.filter(m => m !== deps.model)];
+    let res;
+
+    for (let i = 0; i < models.length; i++) {
+      res = await deps.fetch(`${GEMINI_URL}${encodeURIComponent(models[i])}:generateContent`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'x-goog-api-key': deps.apiKey },
+        body
+      });
+
+      if (res.ok || !(res.status === 429 || res.status >= 500)) break;
+    }
 
     if (!res.ok) throw await upstreamError(res);
 
