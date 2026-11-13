@@ -254,6 +254,15 @@
         applyContact(settings);
         applyHero(settings);
         applyStoreState(settings);
+
+        // AI chat ("Ask Memora") appears only when the owner switched it on.
+        if (settings.chatEnabled === true && !/\/(checkout|login|signup)\.html/.test(location.pathname)) {
+          window.__mcChatWhatsapp = settings.whatsapp || '';
+          const c = document.createElement('script');
+          c.src = '/memora-creations/frontend/js/chat-widget.js?v=1';
+          c.async = true;
+          document.head.appendChild(c);
+        }
         window.mcApplyFreeShip();
       })
       .catch(() => { /* the built-in text stays: never break the page */ });

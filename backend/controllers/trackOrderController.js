@@ -27,28 +27,27 @@ const NOT_FOUND = {
   message: 'Order nahi mila. Order number aur checkout wala mobile number dubara check karein.'
 };
 
-async function trackOrder(req, res, deps = {}) {
-  res.set('Cache-Control', 'no-store');
-
+/*
+  Shared, verified lookup (also used by the AI chat assistant).
+  Returns the safe summary, or null when the order number + mobile do not match.
+*/
+async function lookupOrder(orderIdRaw, mobileRaw, deps = {}) {
   const models = deps.models || require('../models');
   const refresh = deps.refresh ||
     require('./shipmentTrackingController').refreshShipmentTracking;
 
-  const orderId = clean((req.body || {}).orderId, 60);
-  const mobile = clean((req.body || {}).mobile, 20).replace(/\D/g, '').slice(-10);
+  const orderId = clean(orderIdRaw, 60);
+  const mobile = clean(mobileRaw, 20).replace(/\D/g, '').slice(-10);
 
   if (!/^[A-Za-z0-9_-]{4,60}$/.test(orderId) || !/^[6-9]\d{9}$/.test(mobile)) {
-    return res.status(400).json({
-      success: false,
-      message: 'Sahi order number aur 10 ankon ka mobile number daalein.'
-    });
+    return { invalid: true };
   }
 
   const order = await models.Order.findOne({ orderId, 'shippingAddress.mobile': mobile })
     .select('_id orderId orderStatus createdAt statusHistory items.name items.quantity')
     .lean();
 
-  if (!order) return res.status(404).json(NOT_FOUND);
+  if (!order) return null;
 
   let shipment = await models.ShipmentTracking.findOne({ order: order._id }).lean();
 
@@ -56,8 +55,7 @@ async function trackOrder(req, res, deps = {}) {
     try { shipment = await refresh(shipment); } catch (_) { /* keep cached data */ }
   }
 
-  return res.json({
-    success: true,
+  return {
     orderId: order.orderId,
     orderStatus: order.orderStatus,
     placedAt: order.createdAt,
@@ -73,7 +71,24 @@ async function trackOrder(req, res, deps = {}) {
       estimatedDeliveryDate: shipment.estimatedDeliveryDate || null,
       deliveredAt: shipment.deliveredAt || null
     } : null
-  });
+  };
 }
 
-module.exports = { trackOrder };
+async function trackOrder(req, res, deps = {}) {
+  res.set('Cache-Control', 'no-store');
+
+  const found = await lookupOrder((req.body || {}).orderId, (req.body || {}).mobile, deps);
+
+  if (found && found.invalid) {
+    return res.status(400).json({
+      success: false,
+      message: 'Sahi order number aur 10 ankon ka mobile number daalein.'
+    });
+  }
+
+  if (!found) return res.status(404).json(NOT_FOUND);
+
+  return res.json({ success: true, ...found });
+}
+
+module.exports = { trackOrder, lookupOrder };

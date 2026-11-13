@@ -13,13 +13,13 @@ const TEXT = {
   storeClosedMessage: 300, address: 300, instagram: 200, facebook: 200,
   youtube: 200, email: 120, phone: 20, heroKicker: 60, heroLine1: 60,
   heroHighlight: 60, heroDescription: 300, heroButtonText: 40,
-  gstLegalName: 100, gstin: 20, gstState: 40
+  chatFaq: 2500, gstLegalName: 100, gstin: 20, gstState: 40
 };
 
 const BOOL = [
   'storeOpen', 'codEnabled', 'codAdvanceEnabled', 'returnsEnabled',
   'autoRefundEnabled', 'freeDeliveryBar', 'emailNotificationsEnabled',
-  'abandonedReminderEnabled', 'lowStockEmailEnabled', 'welcomeEnabled', 'referralEnabled', 'giftWrapEnabled', 'gstEnabled', 'backupEmailEnabled'
+  'abandonedReminderEnabled', 'lowStockEmailEnabled', 'welcomeEnabled', 'referralEnabled', 'giftWrapEnabled', 'chatEnabled', 'gstEnabled', 'backupEmailEnabled'
 ];
 
 const NUMBER = {
@@ -120,7 +120,8 @@ function clean(body) {
 const getSettings = asyncHandler(async (_req, res) => {
   return ok(res, {
     settings: await settings.load(true),
-    mailConfigured: require('../services/mailService').mailConfigured()
+    mailConfigured: require('../services/mailService').mailConfigured(),
+    chatConfigured: Boolean(process.env.ANTHROPIC_API_KEY || process.env.GEMINI_API_KEY)
   });
 });
 

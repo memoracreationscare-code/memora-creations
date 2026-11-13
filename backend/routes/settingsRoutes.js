@@ -32,6 +32,7 @@ function publicView(s) {
     referralEnabled: s.referralEnabled,
     referralFriendAmount: s.referralFriendAmount,
     referralRewardAmount: s.referralRewardAmount,
+    chatEnabled: s.chatEnabled === true,
     heroKicker: s.heroKicker,
     heroLine1: s.heroLine1,
     heroHighlight: s.heroHighlight,

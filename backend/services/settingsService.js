@@ -83,6 +83,9 @@ function defaults() {
     giftWrapStandardFee: envNum('GIFT_WRAP_STANDARD_FEE', 29),
     giftWrapPremiumFee: envNum('GIFT_WRAP_PREMIUM_FEE', 59),
 
+    chatEnabled: false,
+    chatFaq: '',
+
     gstEnabled: false,
     gstLegalName: '',
     gstin: '',
