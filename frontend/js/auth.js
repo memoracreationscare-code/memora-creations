@@ -217,6 +217,7 @@
       successMessage,
       successButton = 'Continue',
       successRedirect = null,
+      onSuccess = null,
       errorTitle
     }
   ) {
@@ -257,6 +258,10 @@
           method: 'POST',
           body: JSON.stringify(body)
         });
+
+        if (typeof onSuccess === 'function') {
+          try { onSuccess(result); } catch (e) { /* never block login */ }
+        }
 
         showStatusPopup({
           type: 'success',
@@ -312,6 +317,9 @@
       'Welcome back to Memora Creations. You have logged in successfully.',
 
     successRedirect: safeDestination,
+
+    // Greets the customer with the welcome voice (see welcome-voice.js)
+    onSuccess: () => window.dispatchEvent(new Event('mc:login-success')),
 
     errorTitle: 'Login Failed'
   });

@@ -265,7 +265,7 @@
     prefillReferral();
     loadSettings();
     const wv = document.createElement('script');
-    wv.src = '/memora-creations/frontend/js/welcome-voice.js?v=1';
+    wv.src = '/memora-creations/frontend/js/welcome-voice.js?v=2';
     wv.async = true;
     document.head.appendChild(wv);
     const toggle = () => top.classList.toggle('show', window.scrollY > 500);
