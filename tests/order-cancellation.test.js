@@ -147,3 +147,18 @@ test('shipped or already cancelled orders are refused', async () => {
   currentOrder = makeOrder({ orderStatus: 'Cancelled' });
   await assert.rejects(autoCancelOrder(currentOrder), /already cancelled/);
 });
+
+test('courier already assigned (AWB) or shipped: no cancel, no refund', async () => {
+  reset(); process.env.AUTO_REFUND_ENABLED = 'true';
+  shipment = { shiprocketOrderId: '123', awbCode: 'AWB1' };
+  currentOrder = makeOrder();
+  await assert.rejects(autoCancelOrder(currentOrder), /handed to the courier/);
+  assert.ok(!calls.includes('stock') && !calls.includes('refund'));
+
+  for (const st of ['Packed', 'Shipped', 'Out for Delivery', 'Delivered']) {
+    reset(); process.env.AUTO_REFUND_ENABLED = 'true';
+    currentOrder = makeOrder({ orderStatus: st });
+    await assert.rejects(autoCancelOrder(currentOrder), /can no longer be cancelled/);
+    assert.ok(!calls.includes('refund'));
+  }
+});
