@@ -238,13 +238,13 @@
   document.getElementById('mcNavLogout').onclick = async () => {
     try {
       if (window.MC && window.MC.api) await window.MC.api('/admin/logout', { method: 'POST' });
-      else await fetch('https://memora-creations.onrender.com/api/admin/logout', { method: 'POST', credentials: 'include' });
+      else await fetch('https://api.memoracreationscare.in/api/admin/logout', { method: 'POST', credentials: 'include' });
     } catch (_) {}
     location.href = B + 'index.html';
   };
 
   // Staff (helper) logins only see the packing-work pages.
-  fetch('https://memora-creations.onrender.com/api/admin/me', { credentials: 'include' })
+  fetch('https://api.memoracreationscare.in/api/admin/me', { credentials: 'include' })
     .then(r => (r.ok ? r.json() : null))
     .then(d => {
       if (!d || !d.admin || d.admin.role !== 'staff') return;
@@ -263,7 +263,7 @@
   // Standalone pages (coupons, wishlist) have no login check of their own:
   // send visitors without an admin session to the login page.
   if (!window.requireAdmin) {
-    fetch('https://memora-creations.onrender.com/api/admin/dashboard', { credentials: 'include' })
+    fetch('https://api.memoracreationscare.in/api/admin/dashboard', { credentials: 'include' })
       .then(r => { if (r.status === 401 || r.status === 403) location.href = B + 'index.html'; })
       .catch(() => {});
   }

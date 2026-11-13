@@ -5,7 +5,7 @@
   The shared link opens a page with the product photo, name and price preview.
 */
 (() => {
-  const API_ROOT = 'https://memora-creations.onrender.com/api';
+  const API_ROOT = 'https://api.memoracreationscare.in/api';
 
   const style = document.createElement('style');
 

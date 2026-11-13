@@ -29,7 +29,7 @@
 
     document.getElementById('cxCsv').addEventListener('click', async () => {
       try {
-        const r = await fetch('https://memora-creations.onrender.com/api/admin/customers/export', { credentials: 'include' });
+        const r = await fetch('https://api.memoracreationscare.in/api/admin/customers/export', { credentials: 'include' });
         if (!r.ok) throw new Error('Download nahi hua.');
         const url = URL.createObjectURL(await r.blob());
         const a = Object.assign(document.createElement('a'), { href: url, download: 'memora-customers.csv' });

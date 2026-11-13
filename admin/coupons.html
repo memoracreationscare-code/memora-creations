@@ -68,7 +68,7 @@
 </div>
 <script>
 'use strict';
-const API='https://memora-creations.onrender.com/api/admin/coupons';
+const API='https://api.memoracreationscare.in/api/admin/coupons';
 const $=id=>document.getElementById(id);
 let coupons=[],editingId=null,busy=false;
 function alertMsg(text,problem=false){const el=$('notice');el.classList.remove('hidden');el.classList.toggle('error',problem);el.textContent=text;}
@@ -86,5 +86,5 @@ $('couponForm').addEventListener('submit',async e=>{e.preventDefault();if(busy)r
 $('couponRows').addEventListener('click',async e=>{const b=e.target.closest('button[data-action]');if(!b||busy)return;const c=coupons.find(x=>x._id===b.dataset.id);if(!c)return;if(b.dataset.action==='edit'){edit(c);return;}if(b.dataset.action==='toggle'){const target=!c.isActive;if(!(await window.mcConfirm(`${target?'Enable':'Disable'} coupon ${c.code}?`,{title:'Coupon '+(target?'chalu':'band')+' karna hai?'})))return;busy=true;b.disabled=true;try{await api('/'+encodeURIComponent(c._id)+'/status',{method:'PATCH',body:JSON.stringify({isActive:target})});await load();alertMsg(`${c.code} ${target?'enabled':'disabled'} successfully.`);}catch(err){alertMsg(err.message,true);}finally{busy=false;b.disabled=false;}}});
 $('cancelEdit').addEventListener('click',reset);$('search').addEventListener('input',render);$('filter').addEventListener('change',render);$('refreshBtn').addEventListener('click',load);reset();load();
 </script>
-<script src="/admin/js/nav.js?v=5"></script>
+<script src="/admin/js/nav.js?v=6"></script>
 </body></html>

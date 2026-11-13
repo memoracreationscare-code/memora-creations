@@ -31,7 +31,7 @@
 </main></div></div>
 <script>
 'use strict';
-const API='https://memora-creations.onrender.com/api';
+const API='https://api.memoracreationscare.in/api';
 const $=id=>document.getElementById(id);
 let enabled=true,loaded=false,busy=false;
 function escapeHTML(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
@@ -43,5 +43,5 @@ async function loadReport(){if(busy)return;busy=true;$('refreshBtn').disabled=tr
 async function toggleWishlist(){if(!loaded||busy)return;const next=!enabled;if(!(await window.mcConfirm(next?'Enable customer wishlist?':'Disable customer wishlist? Existing saves will be retained.',{title:'Wishlist setting badalni hai?'})))return;busy=true;renderSettings();try{const data=await request('/wishlist/admin/settings',{method:'PUT',body:JSON.stringify({enabled:next})});enabled=data.settings?.enabled===true;message(data.message||'Wishlist setting updated.');}catch(err){message(err.message,true);}finally{busy=false;renderSettings();}}
 $('refreshBtn').addEventListener('click',loadReport);$('toggleBtn').addEventListener('click',toggleWishlist);loadReport();
 </script>
-<script src="/admin/js/nav.js?v=5"></script>
+<script src="/admin/js/nav.js?v=6"></script>
 </body></html>
