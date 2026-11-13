@@ -2,7 +2,7 @@
 
 /* Customer emails: order updates and cart reminders. Plain, mobile friendly. */
 
-const SITE = 'https://memoracreationscare-code.github.io/memora-creations/frontend';
+const SITE = 'https://memoracreationscare.in/frontend';
 
 const esc = v => String(v ?? '').replace(/[&<>"']/g, c => (
   { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]

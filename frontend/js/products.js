@@ -7,7 +7,7 @@
     console.error('Memora common app.js must load before products.js');
     return;
   }
-  const BASE = '/memora-creations';
+  const BASE = '';
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
   const esc = value => MC.esc(String(value ?? ''));
@@ -343,7 +343,7 @@
       const name = String(product.name || 'Product');
       const text = String(product.description || '').replace(/\s+/g, ' ').trim();
       const description = (text || `Buy ${name} online from Memora Creations.`).slice(0, 155);
-      const pageUrl = 'https://memoracreationscare-code.github.io/memora-creations/frontend/product.html?id=' + encodeURIComponent(product._id);
+      const pageUrl = 'https://memoracreationscare.in/frontend/product.html?id=' + encodeURIComponent(product._id);
 
       document.title = `${name} | Memora Creations`;
 

@@ -101,6 +101,8 @@ const configuredOrigins = (
 const allowedOrigins = new Set([
   ...configuredOrigins,
   'https://memoracreationscare-code.github.io',
+  'https://memoracreationscare.in',
+  'https://www.memoracreationscare.in',
   'https://memora-creations.pages.dev'
 ]);
 

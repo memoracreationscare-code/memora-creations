@@ -24,7 +24,7 @@
   'use strict';
 
   const ORDERS_URL =
-    '/memora-creations/admin/orders.html';
+    '/admin/orders.html';
 
   const STORAGE_KEY =
     'mc_admin_orders_seen_v1';

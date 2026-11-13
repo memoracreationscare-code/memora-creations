@@ -1,5 +1,5 @@
 const CART_BASE =
-  '/memora-creations';
+  '';
 
 
 let cartUpdating =

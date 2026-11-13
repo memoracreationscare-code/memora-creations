@@ -13,7 +13,7 @@
 const mongoose = require('mongoose');
 const { Product } = require('../models');
 
-const SITE = (process.env.FRONTEND_URL || 'https://memoracreationscare-code.github.io/memora-creations/frontend').replace(/\/+$/, '');
+const SITE = (process.env.FRONTEND_URL || 'https://memoracreationscare.in/frontend').replace(/\/+$/, '');
 
 const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 

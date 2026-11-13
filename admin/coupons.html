@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
   <meta name="robots" content="noindex, nofollow">
-  <link rel="icon" type="image/png" sizes="48x48" href="/memora-creations/frontend/images/favicon-48.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="/memora-creations/frontend/images/favicon-192.png">
-  <link rel="apple-touch-icon" href="/memora-creations/frontend/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="/frontend/images/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/frontend/images/favicon-192.png">
+  <link rel="apple-touch-icon" href="/frontend/images/apple-touch-icon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Coupon Management | Memora Creations Admin</title>
 <style>
@@ -20,13 +20,13 @@
     <div class="brand"><strong>MEMORA</strong><small>CREATIONS ADMIN</small></div>
     <div class="menu-title">STORE MANAGEMENT</div>
     <nav class="menu" aria-label="Admin navigation">
-      <a href="/memora-creations/admin/dashboard.html"><span class="symbol">▦</span>Dashboard</a>
-      <a href="/memora-creations/admin/products.html"><span class="symbol">◈</span>Products</a>
-      <a href="/memora-creations/admin/orders.html"><span class="symbol">▣</span>Orders</a>
-      <a href="/memora-creations/admin/users.html"><span class="symbol">♙</span>Customers</a>
-      <a href="/memora-creations/admin/abandoned-carts.html"><span class="symbol">🛒</span>Abandoned Carts</a>
-      <a href="/memora-creations/admin/wishlist.html"><span class="symbol">♡</span>Wishlist</a>
-      <a class="active" href="/memora-creations/admin/coupons.html" aria-current="page"><span class="symbol">%</span>Coupons</a>
+      <a href="/admin/dashboard.html"><span class="symbol">▦</span>Dashboard</a>
+      <a href="/admin/products.html"><span class="symbol">◈</span>Products</a>
+      <a href="/admin/orders.html"><span class="symbol">▣</span>Orders</a>
+      <a href="/admin/users.html"><span class="symbol">♙</span>Customers</a>
+      <a href="/admin/abandoned-carts.html"><span class="symbol">🛒</span>Abandoned Carts</a>
+      <a href="/admin/wishlist.html"><span class="symbol">♡</span>Wishlist</a>
+      <a class="active" href="/admin/coupons.html" aria-current="page"><span class="symbol">%</span>Coupons</a>
     </nav>
     <div class="sidefoot">MEMORA CREATIONS · Admin Control Center</div>
   </aside>
@@ -86,5 +86,5 @@ $('couponForm').addEventListener('submit',async e=>{e.preventDefault();if(busy)r
 $('couponRows').addEventListener('click',async e=>{const b=e.target.closest('button[data-action]');if(!b||busy)return;const c=coupons.find(x=>x._id===b.dataset.id);if(!c)return;if(b.dataset.action==='edit'){edit(c);return;}if(b.dataset.action==='toggle'){const target=!c.isActive;if(!(await window.mcConfirm(`${target?'Enable':'Disable'} coupon ${c.code}?`,{title:'Coupon '+(target?'chalu':'band')+' karna hai?'})))return;busy=true;b.disabled=true;try{await api('/'+encodeURIComponent(c._id)+'/status',{method:'PATCH',body:JSON.stringify({isActive:target})});await load();alertMsg(`${c.code} ${target?'enabled':'disabled'} successfully.`);}catch(err){alertMsg(err.message,true);}finally{busy=false;b.disabled=false;}}});
 $('cancelEdit').addEventListener('click',reset);$('search').addEventListener('input',render);$('filter').addEventListener('change',render);$('refreshBtn').addEventListener('click',load);reset();load();
 </script>
-<script src="/memora-creations/admin/js/nav.js?v=5"></script>
+<script src="/admin/js/nav.js?v=5"></script>
 </body></html>

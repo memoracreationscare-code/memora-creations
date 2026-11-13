@@ -24,7 +24,7 @@
     return;
   }
 
-  const BASE = '/memora-creations';
+  const BASE = '';
   const HOME = BASE + '/frontend/index.html';
   const LOGIN = BASE + '/frontend/login.html';
 

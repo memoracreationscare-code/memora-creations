@@ -70,7 +70,7 @@ async function chat(req, res, deps = {}) {
       lookupOrder: deps.lookupOrder || require('./trackOrderController').lookupOrder,
       siteUrl: process.env.FRONTEND_URL
         ? process.env.FRONTEND_URL.replace(/\/$/, '')
-        : 'https://memoracreationscare-code.github.io/memora-creations'
+        : 'https://memoracreationscare.in'
     });
 
     return res.json({ success: true, reply: text });

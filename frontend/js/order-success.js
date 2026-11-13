@@ -1,5 +1,5 @@
 const SUCCESS_BASE =
-  '/memora-creations';
+  '';
 
 
 function formatSuccessDate(

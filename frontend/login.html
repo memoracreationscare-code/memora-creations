@@ -5,9 +5,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="robots" content="noindex, nofollow">
-  <link rel="icon" type="image/png" sizes="48x48" href="/memora-creations/frontend/images/favicon-48.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="/memora-creations/frontend/images/favicon-192.png">
-  <link rel="apple-touch-icon" href="/memora-creations/frontend/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="/frontend/images/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/frontend/images/favicon-192.png">
+  <link rel="apple-touch-icon" href="/frontend/images/apple-touch-icon.png">
 
   <meta
     name="viewport"
@@ -24,7 +24,7 @@
   <!-- COMMON STYLE -->
   <link
     rel="stylesheet"
-    href="/memora-creations/frontend/css/style.css?v=14"
+    href="/frontend/css/style.css?v=14"
   >
 
   <link
@@ -405,7 +405,7 @@
       <section class="login-brand-panel">
 
         <a
-          href="/memora-creations/frontend/index.html"
+          href="/frontend/index.html"
           style="color:white;text-decoration:none"
         >
           <div class="login-brand">
@@ -458,7 +458,7 @@
 
         <a
           class="login-back"
-          href="/memora-creations/frontend/index.html"
+          href="/frontend/index.html"
         >
           ← Back to Home
         </a>
@@ -549,7 +549,7 @@
           <div class="login-forgot">
 
             <a
-              href="/memora-creations/frontend/forgot-password.html"
+              href="/frontend/forgot-password.html"
             >
               Forgot Password?
             </a>
@@ -574,7 +574,7 @@
         <p class="login-register">
           Don't have an account?
 
-          <a href="/memora-creations/frontend/signup.html">
+          <a href="/frontend/signup.html">
             Create Account
           </a>
         </p>
@@ -632,14 +632,14 @@
   <!-- UPDATED COMMON APP -->
 
   <script
-    src="/memora-creations/frontend/js/app.js?v=17"
+    src="/frontend/js/app.js?v=17"
   ></script>
 
 
   <!-- UPDATED AUTH SCRIPT -->
 
   <script
-    src="/memora-creations/frontend/js/auth.js?v=13"
+    src="/frontend/js/auth.js?v=13"
   ></script>
 
 
@@ -690,7 +690,7 @@
       function safeDestination() {
 
         const fallback =
-          '/memora-creations/frontend/index.html';
+          '/frontend/index.html';
 
         const raw =
           new URLSearchParams(location.search)
@@ -713,7 +713,7 @@
           if (
             url.origin === location.origin &&
             url.pathname.startsWith(
-              '/memora-creations/frontend/'
+              '/frontend/'
             )
           ) {
             return url.pathname +

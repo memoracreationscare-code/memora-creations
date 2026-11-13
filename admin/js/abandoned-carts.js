@@ -3,7 +3,7 @@
   const { api, $, esc, money, toast } = window.MC;
 
   const SITE_CART_LINK =
-    'https://memoracreationscare-code.github.io/memora-creations/frontend/cart.html';
+    'https://memoracreationscare.in/frontend/cart.html';
 
   const DEFAULT_TEMPLATE =
     'Namaste {name} ji 🙏\n' +

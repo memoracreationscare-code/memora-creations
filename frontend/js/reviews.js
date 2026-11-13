@@ -17,7 +17,7 @@
   const API =
     'https://memora-creations.onrender.com/api';
 
-  const BASE = '/memora-creations';
+  const BASE = '';
 
   const params = new URLSearchParams(
     window.location.search
