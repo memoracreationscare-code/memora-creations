@@ -79,9 +79,52 @@ async function chat(req, res, deps = {}) {
       return res.status(400).json({ success: false, message: 'Kuch likhiye.' });
     }
 
-    console.error('[Chat]', err.message);
+    console.error('[Chat]', `${provider}:`, err.message);
     return res.status(502).json({ success: false, message: FALLBACK });
   }
 }
 
-module.exports = { chat, resetDailyCount, pickProvider };
+/* Plain-language reason for the owner (Admin -> Store Settings -> "AI test karo"). */
+function explain(err, provider) {
+  const s = err && err.status;
+  const name = provider === 'gemini' ? 'Gemini' : 'Claude';
+
+  if (s === 400 || s === 401 || s === 403) return `${name} ne key accept nahi ki. Key dobara copy karke Render me daalein (aage-peeche space na ho), phir redeploy karein.`;
+  if (s === 404) return `Model ka naam ${name} ko nahi mila. Render me CHAT_MODEL hata dein ya sahi naam daalein.`;
+  if (s === 429) return `${name} ki free limit abhi poori hai. Thodi der baad try karein.`;
+  if (s >= 500) return `${name} ka server abhi problem me hai. Thodi der baad try karein.`;
+
+  return 'AI tak pahunch nahi paye: ' + String((err && err.message) || 'unknown').slice(0, 160);
+}
+
+async function test(req, res, deps = {}) {
+  res.set('Cache-Control', 'no-store');
+
+  const picked = deps.picked || pickProvider(process.env);
+
+  if (!picked.apiKey) {
+    return res.json({
+      success: true, ok: false, provider: picked.provider,
+      message: 'Render me GEMINI_API_KEY (free) ya ANTHROPIC_API_KEY nahi mili. Key daal kar redeploy karein.'
+    });
+  }
+
+  try {
+    const text = await (deps.agent || require('../services/chatAgent')).reply(
+      [{ role: 'user', content: 'Say hi in 3 words.' }],
+      { ...require('../services/settingsService').peek(), chatEnabled: true },
+      {
+        apiKey: picked.apiKey, provider: picked.provider, model: picked.model,
+        fetch: deps.fetch || fetch, models: deps.models || require('../models'),
+        lookupOrder: async () => null, siteUrl: ''
+      }
+    );
+
+    return res.json({ success: true, ok: true, provider: picked.provider, model: picked.model, message: 'AI chal raha hai ✔ Jawab: ' + text.slice(0, 80) });
+  } catch (err) {
+    console.error('[Chat test]', err.message);
+    return res.json({ success: true, ok: false, provider: picked.provider, model: picked.model, message: explain(err, picked.provider) });
+  }
+}
+
+module.exports = { chat, test, explain, resetDailyCount, pickProvider };

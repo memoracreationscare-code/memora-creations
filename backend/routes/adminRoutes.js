@@ -651,6 +651,11 @@ router.put(
   require('../controllers/adminSettingsController').updateSettings
 );
 
+router.post(
+  '/chat-test',
+  (req, res, next) => require('../controllers/chatController').test(req, res).catch(next)
+);
+
 router.get(
   '/payments',
   require('../controllers/adminPaymentController').listPayments
