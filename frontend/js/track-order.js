@@ -1,7 +1,7 @@
 'use strict';
 
 (() => {
-  const API = 'https://memora-creations.onrender.com/api';
+  const API = 'https://api.memoracreationscare.in/api';
   const $ = id => document.getElementById(id);
   const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const fmt = d => {

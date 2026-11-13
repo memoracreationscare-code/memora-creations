@@ -13,7 +13,7 @@
 */
 
 const API =
-  'https://memora-creations.onrender.com/api';
+  'https://api.memoracreationscare.in/api';
 
 const BASE =
   '';

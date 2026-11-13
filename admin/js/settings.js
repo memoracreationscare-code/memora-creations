@@ -86,7 +86,7 @@
     btn.textContent = 'Ban raha hai…';
 
     try {
-      const r = await fetch('https://memora-creations.onrender.com/api/admin/backup/download', { credentials: 'include' });
+      const r = await fetch('https://api.memoracreationscare.in/api/admin/backup/download', { credentials: 'include' });
 
       if (!r.ok) throw new Error('Backup download nahi hua.');
 

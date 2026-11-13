@@ -26,7 +26,7 @@
 const ORDERS_BASE = '';
 
 const ORDERS_API =
-  'https://memora-creations.onrender.com/api';
+  'https://api.memoracreationscare.in/api';
 
 const orderUI = window.MC;
 
