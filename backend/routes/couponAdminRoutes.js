@@ -144,6 +144,10 @@ function validateInput(body, current = null) {
     throw error(400, 'Expiry date is required.');
   }
 
+  if (body.showInChat !== undefined) {
+    data.showInChat = body.showInChat === true;
+  }
+
   if (body.isActive !== undefined) {
     if (typeof body.isActive !== 'boolean') {
       throw error(400, 'isActive must be boolean.');

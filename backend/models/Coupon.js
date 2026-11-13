@@ -99,6 +99,12 @@ const couponSchema = new mongoose.Schema(
       index: true
     },
 
+    // Owner ticks this to let the AI chat tell customers about this code.
+    showInChat: {
+      type: Boolean,
+      default: false
+    },
+
     // Only for a customer who has never placed an order.
     firstOrderOnly: {
       type: Boolean,

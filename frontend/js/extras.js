@@ -259,7 +259,7 @@
         if (settings.chatEnabled === true && !/\/(checkout|login|signup)\.html/.test(location.pathname)) {
           window.__mcChatWhatsapp = settings.whatsapp || '';
           const c = document.createElement('script');
-          c.src = '/memora-creations/frontend/js/chat-widget.js?v=1';
+          c.src = '/memora-creations/frontend/js/chat-widget.js?v=2';
           c.async = true;
           document.head.appendChild(c);
         }
