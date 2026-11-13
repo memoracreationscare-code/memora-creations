@@ -121,7 +121,7 @@ const getSettings = asyncHandler(async (_req, res) => {
   return ok(res, {
     settings: await settings.load(true),
     mailConfigured: require('../services/mailService').mailConfigured(),
-    chatConfigured: Boolean(process.env.ANTHROPIC_API_KEY)
+    chatConfigured: Boolean(process.env.ANTHROPIC_API_KEY || process.env.GEMINI_API_KEY)
   });
 });
 

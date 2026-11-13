@@ -141,3 +141,32 @@ test('controller: model failure gives a friendly WhatsApp fallback, not an error
   assert.ok(!JSON.stringify(r.body).includes('boom'));
   resetDailyCount();
 });
+
+test('Gemini (free) path: tool call, thought-signature turn echoed back, final text', async () => {
+  const bodies = [];
+  const modelParts = [{ functionCall: { name: 'track_order', args: { orderId: 'MC9', mobile: '9876543210' } }, thoughtSignature: 'sig' }];
+  const fetch = async (url, opts) => {
+    bodies.push({ url, headers: opts.headers, body: JSON.parse(opts.body) });
+    if (bodies.length === 1) return { ok: true, json: async () => ({ candidates: [{ content: { role: 'model', parts: modelParts } }] }) };
+    return { ok: true, json: async () => ({ candidates: [{ content: { role: 'model', parts: [{ text: 'Order Delivered hai.' }] } }] }) };
+  };
+  const out = await agent.reply([{ role: 'user', content: 'MC9 9876543210' }], settings, {
+    provider: 'gemini', apiKey: 'gk', model: 'gemini-flash-latest', fetch, siteUrl: 's', models: {},
+    lookupOrder: async () => ({ orderId: 'MC9', orderStatus: 'Delivered' })
+  });
+  assert.strictEqual(out, 'Order Delivered hai.');
+  assert.match(bodies[0].url, /gemini-flash-latest:generateContent$/);
+  assert.strictEqual(bodies[0].headers['x-goog-api-key'], 'gk');
+  assert.deepStrictEqual(bodies[0].body.tools[0].functionDeclarations.map(f => f.name).sort(), ['search_products', 'track_order']);
+  const second = bodies[1].body.contents;
+  assert.strictEqual(second[1].parts[0].thoughtSignature, 'sig');
+  assert.match(JSON.stringify(second[2].parts[0].functionResponse), /Delivered/);
+});
+
+test('provider choice: Gemini key alone => free Gemini; Claude key wins unless told otherwise', () => {
+  const { pickProvider } = require('../backend/controllers/chatController');
+  assert.strictEqual(pickProvider({ GEMINI_API_KEY: 'g' }).provider, 'gemini');
+  assert.strictEqual(pickProvider({ ANTHROPIC_API_KEY: 'a', GEMINI_API_KEY: 'g' }).provider, 'anthropic');
+  assert.strictEqual(pickProvider({ ANTHROPIC_API_KEY: 'a', GEMINI_API_KEY: 'g', CHAT_PROVIDER: 'gemini' }).provider, 'gemini');
+  assert.strictEqual(pickProvider({}).provider, 'anthropic');
+});

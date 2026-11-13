@@ -7,6 +7,22 @@
 
 const FALLBACK = 'Abhi chat available nahi hai. Kripya WhatsApp par Memora team se baat karein.';
 
+/*
+  Which AI to use. GEMINI_API_KEY = Google's free tier. ANTHROPIC_API_KEY = Claude (paid).
+  If both exist, CHAT_PROVIDER ('gemini' or 'anthropic') decides, else Claude.
+*/
+function pickProvider(env) {
+  const claude = env.ANTHROPIC_API_KEY;
+  const gemini = env.GEMINI_API_KEY;
+  const use = env.CHAT_PROVIDER === 'gemini' || (!claude && gemini) ? 'gemini' : 'anthropic';
+
+  if (use === 'gemini') {
+    return { provider: 'gemini', apiKey: gemini, model: env.CHAT_MODEL || 'gemini-flash-latest' };
+  }
+
+  return { provider: 'anthropic', apiKey: claude, model: env.CHAT_MODEL || 'claude-haiku-5-5' };
+}
+
 // Global safety valve so a bot/spam wave can never run up a big AI bill.
 let day = '';
 let used = 0;
@@ -28,7 +44,9 @@ async function chat(req, res, deps = {}) {
   res.set('Cache-Control', 'no-store');
 
   const settings = deps.settings || require('../services/settingsService').peek();
-  const apiKey = deps.apiKey !== undefined ? deps.apiKey : process.env.ANTHROPIC_API_KEY;
+  const { apiKey, provider, model } = deps.apiKey !== undefined
+    ? { apiKey: deps.apiKey, provider: deps.provider || 'anthropic', model: deps.model || 'm' }
+    : pickProvider(process.env);
 
   if (settings.chatEnabled !== true || !apiKey) {
     return res.status(503).json({ success: false, message: FALLBACK });
@@ -45,7 +63,8 @@ async function chat(req, res, deps = {}) {
   try {
     const text = await agent.reply((req.body || {}).messages, settings, {
       apiKey,
-      model: process.env.CHAT_MODEL || 'claude-haiku-5-5',
+      provider,
+      model,
       fetch: deps.fetch || fetch,
       models: deps.models || require('../models'),
       lookupOrder: deps.lookupOrder || require('./trackOrderController').lookupOrder,
@@ -65,4 +84,4 @@ async function chat(req, res, deps = {}) {
   }
 }
 
-module.exports = { chat, resetDailyCount };
+module.exports = { chat, resetDailyCount, pickProvider };

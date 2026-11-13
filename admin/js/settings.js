@@ -31,7 +31,7 @@
     box.style.color = configured ? '#1b6e2d' : '#b42318';
     box.textContent = configured
       ? '✔ AI key Render me laga hai.'
-      : '✖ AI key abhi nahi laga. Render → Environment me ANTHROPIC_API_KEY daalein, tab chat chalega.';
+      : '✖ AI key abhi nahi laga. Free ke liye Render → Environment me GEMINI_API_KEY daalein (ya paid Claude ke liye ANTHROPIC_API_KEY), tab chat chalega.';
   }
 
   function showMail(configured) {

@@ -173,7 +173,9 @@ async function callModel(body, deps) {
   return res.json();
 }
 
-async function reply(messages, settings, deps) {
+const GIVE_UP = 'Maaf kijiye, abhi jawab nahi de paa raha. Kripya WhatsApp par Memora team se baat karein.';
+
+function checkHistory(messages) {
   const history = cleanHistory(messages);
 
   if (!history.length || history[history.length - 1].role !== 'user') {
@@ -182,7 +184,13 @@ async function reply(messages, settings, deps) {
     throw e;
   }
 
-  const convo = history.map(m => ({ ...m }));
+  return history;
+}
+
+/* ---------- Claude (Anthropic) ---------- */
+
+async function replyClaude(messages, settings, deps) {
+  const convo = checkHistory(messages).map(m => ({ ...m }));
   const system = systemPrompt(settings);
 
   for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
@@ -199,7 +207,7 @@ async function reply(messages, settings, deps) {
 
     if (data.stop_reason !== 'tool_use' || !uses.length) {
       const text = blocks.filter(b => b.type === 'text').map(b => b.text).join('\n').trim();
-      return text || 'Maaf kijiye, abhi jawab nahi de paa raha. Kripya WhatsApp par Memora team se baat karein.';
+      return text || GIVE_UP;
     }
 
     convo.push({ role: 'assistant', content: blocks });
@@ -217,7 +225,74 @@ async function reply(messages, settings, deps) {
     convo.push({ role: 'user', content: results });
   }
 
-  return 'Maaf kijiye, abhi poora jawab nahi mil paya. Kripya WhatsApp par Memora team se baat karein.';
+  return GIVE_UP;
+}
+
+/* ---------- Gemini (Google, has a free tier) ---------- */
+
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/';
+
+async function replyGemini(messages, settings, deps) {
+  const history = checkHistory(messages);
+  const contents = history.map(m => ({
+    role: m.role === 'assistant' ? 'model' : 'user',
+    parts: [{ text: m.content }]
+  }));
+  const system = systemPrompt(settings);
+  const declarations = TOOLS.map(t => ({
+    name: t.name,
+    description: t.description,
+    parameters: t.input_schema
+  }));
+
+  for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
+    const res = await deps.fetch(`${GEMINI_URL}${encodeURIComponent(deps.model)}:generateContent`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-goog-api-key': deps.apiKey },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: system }] },
+        contents,
+        tools: round < MAX_TOOL_ROUNDS ? [{ functionDeclarations: declarations }] : undefined,
+        generationConfig: { maxOutputTokens: 600, temperature: 0.4 }
+      })
+    });
+
+    if (!res.ok) {
+      const err = new Error(`Model request failed (${res.status})`);
+      err.status = res.status;
+      throw err;
+    }
+
+    const data = await res.json();
+    const content = data && data.candidates && data.candidates[0] && data.candidates[0].content;
+    const parts = content && Array.isArray(content.parts) ? content.parts : [];
+    const calls = parts.filter(p => p.functionCall);
+
+    if (!calls.length) {
+      const text = parts.filter(p => p.text && !p.thought).map(p => p.text).join('\n').trim();
+      return text || GIVE_UP;
+    }
+
+    // send the model's turn back exactly as received (keeps its thought signatures)
+    contents.push({ role: 'model', parts });
+
+    const answers = [];
+
+    for (const c of calls) {
+      const out = await runTool(c.functionCall.name, c.functionCall.args || {}, deps);
+      answers.push({ functionResponse: { name: c.functionCall.name, response: { result: out } } });
+    }
+
+    contents.push({ role: 'user', parts: answers });
+  }
+
+  return GIVE_UP;
+}
+
+function reply(messages, settings, deps) {
+  return deps.provider === 'gemini'
+    ? replyGemini(messages, settings, deps)
+    : replyClaude(messages, settings, deps);
 }
 
 module.exports = { reply, systemPrompt, cleanHistory, TOOLS, MAX_MESSAGE_CHARS };
