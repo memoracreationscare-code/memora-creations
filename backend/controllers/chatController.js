@@ -90,7 +90,7 @@ function explain(err, provider) {
   const name = provider === 'gemini' ? 'Gemini' : 'Claude';
 
   if (s === 400 || s === 401 || s === 403) return `${name} ne key accept nahi ki. Key dobara copy karke Render me daalein (aage-peeche space na ho), phir redeploy karein.`;
-  if (s === 404) return `Model ka naam ${name} ko nahi mila. Render me CHAT_MODEL hata dein ya sahi naam daalein.`;
+  if (s === 404) return `Model ka naam ${name} ko nahi mila. Render me CHAT_MODEL hata dein ya sahi naam daalein.` + (err.detail ? ' [' + String(err.detail).slice(0, 140) + ']' : '');
   if (s === 429) return `${name} ki free limit abhi poori hai. Thodi der baad try karein.`;
   if (s >= 500) return `${name} ka server abhi busy/problem me hai (sab free models try kiye). 1-2 minute baad "AI test karo" dobara dabayein.` + (err.detail ? ' [' + String(err.detail).slice(0, 120) + ']' : '');
 
