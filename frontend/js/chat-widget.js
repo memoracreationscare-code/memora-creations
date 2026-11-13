@@ -130,7 +130,7 @@
   function greet() {
     add('bot', 'Namaste! 🌸 Main Memora hu. Product, delivery, return ya apne order ke bare me kuch bhi poochiye.');
     const chips = el('div', 'mcc-chips');
-    ['Mere order ka status', 'Delivery charge kitna hai?', 'Gift ke liye kya sahi rahega?', 'Return kaise hota hai?'].forEach(t => {
+    ['Abhi kaun sa offer chal raha hai?', 'Mere order ka status', 'Delivery charge kitna hai?', 'Gift ke liye kya sahi rahega?', 'Return kaise hota hai?'].slice(0, 4).forEach(t => {
       const b = el('button', '', t);
       b.type = 'button';
       b.addEventListener('click', () => { chips.remove(); ask(t); });

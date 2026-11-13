@@ -32,7 +32,7 @@ test('system prompt carries live shop facts, owner FAQ and the safety rules', ()
 });
 
 test('the agent only has read-only tools', () => {
-  assert.deepStrictEqual(agent.TOOLS.map(t => t.name).sort(), ['search_products', 'track_order']);
+  assert.deepStrictEqual(agent.TOOLS.map(t => t.name).sort(), ['get_offers', 'search_products', 'track_order']);
 });
 
 test('history is cleaned: roles, alternation, length, must end on a user turn', () => {
@@ -157,7 +157,7 @@ test('Gemini (free) path: tool call, thought-signature turn echoed back, final t
   assert.strictEqual(out, 'Order Delivered hai.');
   assert.match(bodies[0].url, /gemini-flash-latest:generateContent$/);
   assert.strictEqual(bodies[0].headers['x-goog-api-key'], 'gk');
-  assert.deepStrictEqual(bodies[0].body.tools[0].functionDeclarations.map(f => f.name).sort(), ['search_products', 'track_order']);
+  assert.deepStrictEqual(bodies[0].body.tools[0].functionDeclarations.map(f => f.name).sort(), ['get_offers', 'search_products', 'track_order']);
   const second = bodies[1].body.contents;
   assert.strictEqual(second[1].parts[0].thoughtSignature, 'sig');
   assert.match(JSON.stringify(second[2].parts[0].functionResponse), /Delivered/);
@@ -196,4 +196,35 @@ test('successful owner test reports ok', async () => {
   const r = res();
   await runTest({}, r, { picked: { provider: 'gemini', apiKey: 'k', model: 'm' }, models: {}, agent: { reply: async () => 'Hi there friend' } });
   assert.strictEqual(r.body.ok, true);
+});
+
+test('get_offers: sale + opted-in coupons + welcome + referral + free delivery; private coupons never asked for', async () => {
+  let couponFilter;
+  const future = new Date(Date.now() + 86400000);
+  const Product = { find: () => ({ select: () => ({ limit: () => ({ lean: async () => [
+    { sale: { name: 'Diwali Sale', percent: 20, endsAt: future } },
+    { sale: { name: 'Diwali Sale', percent: 20, endsAt: future } }
+  ] }) }) }) };
+  const Coupon = { find: f => { couponFilter = f; return { select: () => ({ limit: () => ({ lean: async () => [
+    { code: 'FESTIVE50', discountType: 'FIXED', discountValue: 50, minOrderAmount: 499, expiresAt: future, usageLimit: 10, usedCount: 1 },
+    { code: 'USEDUP', discountType: 'PERCENTAGE', discountValue: 10, usageLimit: 5, usedCount: 5, expiresAt: future }
+  ] }) }) }; } };
+
+  let sent;
+  const fetch = async (_u, opts) => {
+    const body = JSON.parse(opts.body);
+    if (body.messages.length === 1) return modelReply([{ type: 'tool_use', id: 'o', name: 'get_offers', input: {} }], 'tool_use');
+    sent = body; return modelReply([{ type: 'text', text: 'ok' }]);
+  };
+  await agent.reply([{ role: 'user', content: 'koi offer?' }], { ...settings, welcomeEnabled: true, welcomePercent: 10, welcomeMaxDiscount: 100, welcomeMinOrder: 299, referralEnabled: true, referralFriendAmount: 50, referralRewardAmount: 50, referralMinOrder: 299 },
+    { apiKey: 'k', model: 'm', fetch, siteUrl: 's', models: { Product, Coupon }, lookupOrder: async () => null });
+
+  assert.strictEqual(couponFilter.showInChat, true);
+  assert.strictEqual(couponFilter.allowedUser, null);
+  assert.strictEqual(couponFilter.source, 'ADMIN');
+  const offers = JSON.parse(sent.messages[sent.messages.length - 1].content[0].content).offers;
+  const types = offers.map(o => o.type);
+  assert.deepStrictEqual(types, ['festival_sale', 'coupon', 'first_order_discount', 'refer_and_earn', 'free_delivery']);
+  assert.strictEqual(offers[0].productsOnSale, 2);
+  assert.ok(!offers.some(o => o.code === 'USEDUP'));
 });
