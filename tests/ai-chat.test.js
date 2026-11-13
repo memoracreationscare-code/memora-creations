@@ -254,11 +254,10 @@ test('Gemini 401 does not try other models', async () => {
 });
 
 test('Gemini: unknown fallback name is skipped and the real first error is reported', async () => {
-  const seq = [503, 404, 404];
   let n = 0;
-  const fetch = async () => ({ ok: false, status: seq[n++], json: async () => ({ error: { message: n === 1 ? 'overloaded' : 'not found' } }) });
+  const fetch = async () => ({ ok: false, status: n++ === 0 ? 503 : 404, json: async () => ({ error: { message: n === 1 ? 'overloaded' : 'not found' } }) });
   await assert.rejects(agent.reply([{ role: 'user', content: 'hi' }], settings, {
-    provider: 'gemini', apiKey: 'gk', model: 'gemini-flash-latest', fetch, siteUrl: 's', models: {}, lookupOrder: async () => null
+    provider: 'gemini', apiKey: 'gk', model: 'gemini-flash-latest', fetch, siteUrl: 's', models: {}, lookupOrder: async () => null, pauseMs: 0
   }), e => e.status === 503 && /overloaded/.test(e.detail));
-  assert.strictEqual(n, 3);
+  assert.strictEqual(n, 10);
 });
