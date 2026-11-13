@@ -2,52 +2,82 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://memoracreationscare-code.github.io/memora-creations/frontend/index.html</loc>
-    <lastmod>2026-11-12</lastmod>
+    <lastmod>2026-11-13</lastmod>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://memoracreationscare-code.github.io/memora-creations/frontend/products.html</loc>
-    <lastmod>2026-11-12</lastmod>
+    <lastmod>2026-11-13</lastmod>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://memoracreationscare-code.github.io/memora-creations/frontend/about.html</loc>
-    <lastmod>2026-11-12</lastmod>
+    <lastmod>2026-11-13</lastmod>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://memoracreationscare-code.github.io/memora-creations/frontend/contact.html</loc>
-    <lastmod>2026-11-12</lastmod>
+    <lastmod>2026-11-13</lastmod>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://memoracreationscare-code.github.io/memora-creations/frontend/shipping-policy.html</loc>
-    <lastmod>2026-11-12</lastmod>
+    <lastmod>2026-11-13</lastmod>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://memoracreationscare-code.github.io/memora-creations/frontend/return-refund-policy.html</loc>
-    <lastmod>2026-11-12</lastmod>
+    <lastmod>2026-11-13</lastmod>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://memoracreationscare-code.github.io/memora-creations/frontend/privacy-policy.html</loc>
-    <lastmod>2026-11-12</lastmod>
+    <lastmod>2026-11-13</lastmod>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://memoracreationscare-code.github.io/memora-creations/frontend/terms.html</loc>
-    <lastmod>2026-11-12</lastmod>
+    <lastmod>2026-11-13</lastmod>
     <priority>0.3</priority>
   </url>
   <url>
+    <loc>https://memoracreationscare-code.github.io/memora-creations/frontend/product.html?id=6af5a5bfae114ee3c2c3015e</loc>
+    <lastmod>2026-11-12</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://memoracreationscare-code.github.io/memora-creations/frontend/product.html?id=6af5a4aeae114ee3c2c30116</loc>
+    <lastmod>2026-11-12</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://memoracreationscare-code.github.io/memora-creations/frontend/product.html?id=6af5a42bae114ee3c2c300d6</loc>
+    <lastmod>2026-11-12</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://memoracreationscare-code.github.io/memora-creations/frontend/product.html?id=6af5a1d9ae114ee3c2c2ffd7</loc>
+    <lastmod>2026-11-12</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://memoracreationscare-code.github.io/memora-creations/frontend/product.html?id=6af59fc8ae114ee3c2c2ff35</loc>
+    <lastmod>2026-11-12</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://memoracreationscare-code.github.io/memora-creations/frontend/product.html?id=6af59debae114ee3c2c2fe56</loc>
+    <lastmod>2026-11-12</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://memoracreationscare-code.github.io/memora-creations/frontend/product.html?id=6af40fb19b9258a0aceb7310</loc>
-    <lastmod>2026-11-11</lastmod>
+    <lastmod>2026-11-12</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://memoracreationscare-code.github.io/memora-creations/frontend/product.html?id=6af40e059b9258a0aceb726c</loc>
-    <lastmod>2026-11-11</lastmod>
+    <lastmod>2026-11-12</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
