@@ -170,3 +170,30 @@ test('provider choice: Gemini key alone => free Gemini; Claude key wins unless t
   assert.strictEqual(pickProvider({ ANTHROPIC_API_KEY: 'a', GEMINI_API_KEY: 'g', CHAT_PROVIDER: 'gemini' }).provider, 'gemini');
   assert.strictEqual(pickProvider({}).provider, 'anthropic');
 });
+
+test('upstream errors carry the reason (no key) and the owner test explains it in plain words', async () => {
+  const { test: runTest, explain } = require('../backend/controllers/chatController');
+  const fetch = async () => ({ ok: false, status: 400, json: async () => ({ error: { message: 'API key not valid. Please pass a valid API key.' } }) });
+  const r = res();
+  await runTest({}, r, { picked: { provider: 'gemini', apiKey: 'SECRETKEY', model: 'm' }, fetch, models: {} });
+  assert.strictEqual(r.body.ok, false);
+  assert.match(r.body.message, /key accept nahi/);
+  assert.ok(!JSON.stringify(r.body).includes('SECRETKEY'));
+  assert.match(explain({ status: 429 }, 'gemini'), /limit/);
+  assert.match(explain({ status: 404 }, 'gemini'), /CHAT_MODEL/);
+});
+
+test('owner test with no key says which key to add', async () => {
+  const { test: runTest } = require('../backend/controllers/chatController');
+  const r = res();
+  await runTest({}, r, { picked: { provider: 'gemini', apiKey: '', model: 'm' } });
+  assert.strictEqual(r.body.ok, false);
+  assert.match(r.body.message, /GEMINI_API_KEY/);
+});
+
+test('successful owner test reports ok', async () => {
+  const { test: runTest } = require('../backend/controllers/chatController');
+  const r = res();
+  await runTest({}, r, { picked: { provider: 'gemini', apiKey: 'k', model: 'm' }, models: {}, agent: { reply: async () => 'Hi there friend' } });
+  assert.strictEqual(r.body.ok, true);
+});
