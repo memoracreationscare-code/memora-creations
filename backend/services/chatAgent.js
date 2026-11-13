@@ -164,13 +164,24 @@ async function callModel(body, deps) {
     body: JSON.stringify(body)
   });
 
-  if (!res.ok) {
-    const err = new Error(`Model request failed (${res.status})`);
-    err.status = res.status;
-    throw err;
-  }
+  if (!res.ok) throw await upstreamError(res);
 
   return res.json();
+}
+
+/* Turn a failed AI response into an Error that says WHY (never contains the key). */
+async function upstreamError(res) {
+  let detail = '';
+
+  try {
+    const j = await res.json();
+    detail = String((j && j.error && (j.error.message || j.error.status)) || '').slice(0, 300);
+  } catch (_) { /* body was not JSON */ }
+
+  const err = new Error(`Model request failed (${res.status})${detail ? ': ' + detail : ''}`);
+  err.status = res.status;
+  err.detail = detail;
+  return err;
 }
 
 const GIVE_UP = 'Maaf kijiye, abhi jawab nahi de paa raha. Kripya WhatsApp par Memora team se baat karein.';
@@ -257,11 +268,7 @@ async function replyGemini(messages, settings, deps) {
       })
     });
 
-    if (!res.ok) {
-      const err = new Error(`Model request failed (${res.status})`);
-      err.status = res.status;
-      throw err;
-    }
+    if (!res.ok) throw await upstreamError(res);
 
     const data = await res.json();
     const content = data && data.candidates && data.candidates[0] && data.candidates[0].content;
@@ -295,4 +302,4 @@ function reply(messages, settings, deps) {
     : replyClaude(messages, settings, deps);
 }
 
-module.exports = { reply, systemPrompt, cleanHistory, TOOLS, MAX_MESSAGE_CHARS };
+module.exports = { upstreamError, reply, systemPrompt, cleanHistory, TOOLS, MAX_MESSAGE_CHARS };

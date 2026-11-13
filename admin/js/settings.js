@@ -58,6 +58,27 @@
     box.style.color = ok ? '#1b6e2d' : '#b42318';
   }
 
+  $('#chatTest')?.addEventListener('click', async () => {
+    const btn = $('#chatTest');
+    const out = $('#chatTestMsg');
+
+    btn.disabled = true;
+    out.style.color = '#7a6a58';
+    out.textContent = 'Test ho raha hai… (10 second tak lag sakte hain)';
+
+    try {
+      const data = await api('/admin/chat-test', { method: 'POST', body: '{}' });
+
+      out.style.color = data.ok ? '#1b6e2d' : '#b42318';
+      out.textContent = (data.ok ? '' : '✖ ') + data.message;
+    } catch (err) {
+      out.style.color = '#b42318';
+      out.textContent = '✖ ' + (err.message || 'Test nahi ho paya.');
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
   $('#backupNow')?.addEventListener('click', async () => {
     const btn = $('#backupNow');
 

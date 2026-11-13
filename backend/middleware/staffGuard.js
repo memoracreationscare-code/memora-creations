@@ -12,6 +12,7 @@
 */
 
 const ALLOWED = [
+  // (chat-test is owner-only: not listed here)
   ['GET',   /^\/me$/],
   ['GET',   /^\/dashboard$/],                        // answered with an empty one, see below
   ['GET',   /^\/today$/],
