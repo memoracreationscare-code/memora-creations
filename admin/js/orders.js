@@ -451,6 +451,63 @@ function giftBoxHtml(order) {
 ===================================== */
 
 /* One label (address box + items table). Used for a single print and for bulk print. */
+
+/* ============================================
+   PAYMENT BADGE: COD / COD + advance / prepaid
+   Shows clearly how much came online and how
+   much the courier must collect in cash.
+============================================ */
+
+function mcPayBadge(order, full) {
+  const box = (bg, fg, title, lines) => `
+    <div style="margin-top:4px;padding:6px 8px;border-radius:8px;background:${bg};color:${fg};font-size:12px;line-height:1.5;font-weight:700;text-align:left">
+      <div style="font-weight:900;letter-spacing:.3px">${title}</div>
+      ${lines.map(l => `<div style="font-weight:600">${l}</div>`).join('')}
+    </div>`;
+
+  const cod = order.codAdvance;
+
+  if (cod && cod.enabled) {
+    const adv = Number(cod.advanceAmount || 0);
+    const bal = Number(cod.balanceAmount || 0);
+    const advPaid = order.paymentStatus === 'SUCCESS';
+    const received = cod.balanceStatus === 'RECEIVED';
+
+    return box(
+      '#fff4d6', '#7a4b00',
+      'COD + ADVANCE',
+      [
+        `Advance ${advPaid ? 'mila' : 'NAHI mila'}: ${mcMoney(adv)}`,
+        received
+          ? `Baaki COD mil gaya: ${mcMoney(bal)} ✔`
+          : `Baaki COD (courier se lena): <b>${mcMoney(bal)}</b>`,
+        ...(full ? [`Total: ${mcMoney(order.grandTotal)}`] : [])
+      ]
+    );
+  }
+
+  if (order.paymentMethod === 'COD') {
+    const got = order.paymentStatus === 'COD_RECEIVED' || order.paymentStatus === 'SUCCESS';
+
+    return box(
+      '#fde8e8', '#8a1c1c',
+      'CASH ON DELIVERY',
+      [
+        'Advance: ₹0',
+        got
+          ? `COD mil gaya: ${mcMoney(order.grandTotal)} ✔`
+          : `COD (courier se lena): <b>${mcMoney(order.grandTotal)}</b>`
+      ]
+    );
+  }
+
+  return box(
+    '#e6f4ea', '#14532d',
+    'PREPAID (Online)',
+    [order.paymentStatus === 'SUCCESS' ? `Paid: ${mcMoney(order.grandTotal)} ✔` : 'Payment abhi pending']
+  );
+}
+
 function labelSection(order) {
 
   const address = order.shippingAddress || {};
@@ -1222,6 +1279,8 @@ function orderDetailsHtml(order) {
         ${mcEscape(order.paymentStatus)}
       </p>
 
+      ${mcPayBadge(order, true)}
+
       <p>
         <b>Order Status:</b>
         ${mcEscape(order.orderStatus)}
@@ -1680,6 +1739,8 @@ async function loadAdminOrders() {
               <span class="mini">
                 ${mcEscape(order.paymentStatus)}
               </span>
+
+              ${mcPayBadge(order, false)}
 
               ${order.refund && order.refund.status
                 ? `<br><span class="mini" style="color:#b45309;font-weight:800">
