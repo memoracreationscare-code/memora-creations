@@ -65,8 +65,8 @@
       }
 
       location.href = result?.admin?.role === 'staff'
-        ? '/memora-creations/admin/orders.html'
-        : '/memora-creations/admin/dashboard.html';
+        ? '/admin/orders.html'
+        : '/admin/dashboard.html';
     } catch (x) {
       toast(x.message, 'error');
     }
@@ -83,7 +83,7 @@
     try {
       return (await api('/admin/dashboard')).dashboard;
     } catch (e) {
-      location.href = '/memora-creations/admin/index.html';
+      location.href = '/admin/index.html';
       return null;
     } finally {
       clearTimeout(slowHint);
@@ -92,7 +92,7 @@
 
   $('#logout')?.addEventListener('click', async () => {
     await api('/admin/logout', { method: 'POST' });
-    location.href = '/memora-creations/admin/index.html';
+    location.href = '/admin/index.html';
   });
 
   window.requireAdmin = requireAdmin;
@@ -101,13 +101,13 @@
 // Load the request alerts (red badges + banner) on every admin page.
 (() => {
   const script = document.createElement('script');
-  script.src = '/memora-creations/admin/js/alerts.js?v=3';
+  script.src = '/admin/js/alerts.js?v=3';
   document.head.appendChild(script);
 })();
 
 // One shared side menu on every admin page.
 (() => {
   const script = document.createElement('script');
-  script.src = '/memora-creations/admin/js/nav.js?v=7';
+  script.src = '/admin/js/nav.js?v=7';
   document.head.appendChild(script);
 })();

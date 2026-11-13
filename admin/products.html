@@ -5,9 +5,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="robots" content="noindex, nofollow">
-  <link rel="icon" type="image/png" sizes="48x48" href="/memora-creations/frontend/images/favicon-48.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="/memora-creations/frontend/images/favicon-192.png">
-  <link rel="apple-touch-icon" href="/memora-creations/frontend/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="/frontend/images/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/frontend/images/favicon-192.png">
+  <link rel="apple-touch-icon" href="/frontend/images/apple-touch-icon.png">
 
   <meta
     name="viewport"
@@ -22,7 +22,7 @@
 
   <link
     rel="stylesheet"
-    href="/memora-creations/admin/css/style.css?v=5"
+    href="/admin/css/style.css?v=5"
   >
 
   <style>
@@ -604,7 +604,7 @@
       display: block;
       width: 100%;
       aspect-ratio: 1 / 1;
-      object-fit: cover;
+      object-fit: contain;
       background: #f3eee9;
     }
 
@@ -857,7 +857,7 @@
     }
       .photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-top:14px;width:100%}
     .photo-tile{position:relative;border:1px solid #e5dccf;border-radius:12px;overflow:hidden;background:#fff}
-    .photo-tile img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
+    .photo-tile img{width:100%;aspect-ratio:1;object-fit: contain;display:block}
     .photo-main,.photo-new{position:absolute;top:6px;left:6px;background:#2f6f4f;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px}
     .photo-new{left:auto;right:6px;background:#b8860b}
     .photo-tools{display:flex;border-top:1px solid #eee}
@@ -887,7 +887,7 @@
       </div>
 
       <a
-        href="/memora-creations/admin/dashboard.html"
+        href="/admin/dashboard.html"
       >
         Dashboard
       </a>
@@ -895,24 +895,24 @@
       <a
         class="active"
         aria-current="page"
-        href="/memora-creations/admin/products.html"
+        href="/admin/products.html"
       >
         Products
       </a>
 
       <a
-        href="/memora-creations/admin/orders.html"
+        href="/admin/orders.html"
       >
         Orders
       </a>
 
       <a
-        href="/memora-creations/admin/users.html"
+        href="/admin/users.html"
       >
         Customers
       </a>
 
-      <a href="/memora-creations/admin/abandoned-carts.html">Abandoned Carts</a>
+      <a href="/admin/abandoned-carts.html">Abandoned Carts</a>
 
       <button
         id="logout"
@@ -1406,19 +1406,19 @@
   <!-- COMMON API -->
 
   <script
-    src="/memora-creations/frontend/js/app.js?v=17"
+    src="/frontend/js/app.js?v=19"
   ></script>
 
   <!-- ADMIN AUTH -->
 
   <script
-    src="/memora-creations/admin/js/auth.js?v=17"
+    src="/admin/js/auth.js?v=17"
   ></script>
 
   <!-- PRODUCT MANAGEMENT -->
 
   <script
-    src="/memora-creations/admin/js/products.js?v=10"
+    src="/admin/js/products.js?v=11"
   ></script>
 
   <!-- =====================================
@@ -1426,10 +1426,10 @@
   ===================================== -->
 
   <script
-    src="/memora-creations/admin/js/order-notifications.js?v=3"
+    src="/admin/js/order-notifications.js?v=3"
   ></script>
 
-  <script src="/memora-creations/admin/js/products-search.js?v=1" defer></script>
+  <script src="/admin/js/products-search.js?v=1" defer></script>
 </body>
 
 </html>

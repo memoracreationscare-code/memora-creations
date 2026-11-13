@@ -13,10 +13,10 @@
 */
 
 const API =
-  'https://memora-creations.onrender.com/api';
+  'https://api.memoracreationscare.in/api';
 
 const BASE =
-  '/memora-creations';
+  '';
 
 const $ = (selector, root = document) =>
   root.querySelector(selector);
@@ -216,7 +216,7 @@ function esc(value) {
 .mc-gal-dots i{width:7px;height:7px;border-radius:50%;background:#d8cdbf;transition:.2s}
 .mc-gal-dots i.on{background:#8a6d4b;width:20px;border-radius:99px}
 .mc-gal-thumbs{display:flex;gap:8px;margin-top:10px;overflow-x:auto;scrollbar-width:thin}
-.mc-gal-thumbs img{flex:none;width:62px;height:62px;object-fit:cover;border-radius:10px;border:2px solid transparent;cursor:pointer;opacity:.7}
+.mc-gal-thumbs img{flex:none;width:62px;height:62px;object-fit: contain;border-radius:10px;border:2px solid transparent;cursor:pointer;opacity:.7}
 .mc-gal-thumbs img.on{border-color:#8a6d4b;opacity:1}
 @media(max-width:600px){.mc-gal-nav{display:none}.mc-gal-thumbs{display:none}}
 
@@ -240,7 +240,7 @@ html body #product .field .mc-qty{display:inline-grid}
 .product-popup-imagebox .mc-gal{height:100%}
 .product-popup-imagebox .mc-gal-track{border-radius:0;height:100%}
 .product-popup-imagebox .mc-gal-slide{aspect-ratio:1/1;height:100%}
-.product-popup-imagebox .mc-gal-slide img{object-fit:cover}
+.product-popup-imagebox .mc-gal-slide img{object-fit:contain}
 .product-popup-imagebox .mc-gal-dots{position:absolute;left:0;right:0;bottom:10px;margin:0}
 .product-popup-imagebox .mc-gal-dots i{background:rgba(255,255,255,.7)}
 .product-popup-imagebox .mc-gal-dots i.on{background:#fff}
@@ -267,7 +267,7 @@ html body #product .field .mc-qty{display:inline-grid}
 .product-popup{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr);width:100%;max-height:92vh;max-height:92dvh;border-radius:24px 24px 0 0;animation:mcUp .3s ease}
 .product-popup-imagebox .mc-gal-track,.product-popup-imagebox .mc-gal{height:auto}
 .product-popup-imagebox .mc-gal-slide{aspect-ratio:1/1;height:auto;max-height:44vh;max-height:44dvh;width:100%}
-.product-popup-imagebox .mc-gal-slide img{object-fit:cover}
+.product-popup-imagebox .mc-gal-slide img{object-fit:contain}
 .product-popup-info{padding:16px 18px 18px;gap:8px;overflow-y:auto}
 .product-popup-info h2{font-size:19px}
 .product-popup-price{font-size:23px}

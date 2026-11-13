@@ -68,9 +68,9 @@ async function chat(req, res, deps = {}) {
       fetch: deps.fetch || fetch,
       models: deps.models || require('../models'),
       lookupOrder: deps.lookupOrder || require('./trackOrderController').lookupOrder,
-      siteUrl: process.env.FRONTEND_URL
-        ? process.env.FRONTEND_URL.replace(/\/$/, '')
-        : 'https://memoracreationscare-code.github.io/memora-creations'
+      siteUrl: (process.env.FRONTEND_URL || 'https://memoracreationscare.in')
+        .replace(/\/+$/, '')
+        .replace(/\/frontend$/, '')
     });
 
     return res.json({ success: true, reply: text });

@@ -145,7 +145,7 @@
   if (document.getElementById('mcAdminNav')) return;
   if (/\/admin\/(index\.html)?$/.test(location.pathname)) return; // login page
 
-  const B = '/memora-creations/admin/';
+  const B = '/admin/';
   const GROUPS = [
     { title: '', items: [['dashboard.html', '▦', 'Dashboard']] },
     { title: 'Orders & Payments', items: [
@@ -221,7 +221,7 @@
         `<a href="${B}${file}" class="${file === current ? 'on' : ''}" ${file === current ? 'aria-current="page"' : ''}><span class="nv-ic">${ic}</span>${esc(label)}</a>`
       ).join('')).join('') +
     `<div class="nv-foot">
-       <a href="/memora-creations/frontend/index.html" target="_blank" rel="noopener"><span class="nv-ic">↗</span>View Store</a>
+       <a href="/frontend/index.html" target="_blank" rel="noopener"><span class="nv-ic">↗</span>View Store</a>
        <button type="button" id="mcNavLogout"><span class="nv-ic">⎋</span>Logout</button>
      </div>`;
 
@@ -238,13 +238,13 @@
   document.getElementById('mcNavLogout').onclick = async () => {
     try {
       if (window.MC && window.MC.api) await window.MC.api('/admin/logout', { method: 'POST' });
-      else await fetch('https://memora-creations.onrender.com/api/admin/logout', { method: 'POST', credentials: 'include' });
+      else await fetch('https://api.memoracreationscare.in/api/admin/logout', { method: 'POST', credentials: 'include' });
     } catch (_) {}
     location.href = B + 'index.html';
   };
 
   // Staff (helper) logins only see the packing-work pages.
-  fetch('https://memora-creations.onrender.com/api/admin/me', { credentials: 'include' })
+  fetch('https://api.memoracreationscare.in/api/admin/me', { credentials: 'include' })
     .then(r => (r.ok ? r.json() : null))
     .then(d => {
       if (!d || !d.admin || d.admin.role !== 'staff') return;
@@ -263,7 +263,7 @@
   // Standalone pages (coupons, wishlist) have no login check of their own:
   // send visitors without an admin session to the login page.
   if (!window.requireAdmin) {
-    fetch('https://memora-creations.onrender.com/api/admin/dashboard', { credentials: 'include' })
+    fetch('https://api.memoracreationscare.in/api/admin/dashboard', { credentials: 'include' })
       .then(r => { if (r.status === 401 || r.status === 403) location.href = B + 'index.html'; })
       .catch(() => {});
   }

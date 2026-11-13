@@ -7,7 +7,7 @@
   if (!window.MC || typeof window.MC.api !== 'function') return;
 
   const { api, esc, money, toast } = window.MC;
-  const SITE = 'https://memoracreationscare-code.github.io/memora-creations/frontend';
+  const SITE = 'https://memoracreationscare.in/frontend';
 
   const copy = async text => {
     try {

@@ -14,7 +14,7 @@
   'use strict';
 
   const API_URL =
-    'https://memora-creations.onrender.com/api/announcement';
+    'https://api.memoracreationscare.in/api/announcement';
 
   const STORAGE_KEY = 'memora_seen_announcement_v2';
 
@@ -30,8 +30,8 @@
     return (
       path === '/' ||
       path === '/frontend/index.html' ||
-      path === '/memora-creations/' ||
-      path === '/memora-creations/frontend/index.html'
+      path === '/' ||
+      path === '/frontend/index.html'
     );
   }
 

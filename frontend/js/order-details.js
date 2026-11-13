@@ -14,7 +14,7 @@
 
 'use strict';
 
-const ORDER_BASE = '/memora-creations';
+const ORDER_BASE = '';
 
 let currentOrderDetails = null;
 let retryPaymentRunning = false;

@@ -5,7 +5,7 @@
 */
 (() => {
 
-  const BASE = '/memora-creations/admin/';
+  const BASE = '/admin/';
   const ITEMS = [
     { key: 'returns', page: 'return-requests.html', label: 'return/replacement request' },
     { key: 'lowStock', page: 'products.html', label: 'product low on stock (3 or less)' },

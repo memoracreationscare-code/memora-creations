@@ -12,7 +12,7 @@
     const d = await api('/admin/launch-check');
     const wrap = document.createElement('section');
     const problems = d.checks.filter(c => c.level !== 'ok');
-    const base = '/memora-creations/admin/';
+    const base = '/admin/';
     const style = document.createElement('style');
 
     style.textContent = `

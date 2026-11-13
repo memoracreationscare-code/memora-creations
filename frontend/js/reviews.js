@@ -15,9 +15,9 @@
   'use strict';
 
   const API =
-    'https://memora-creations.onrender.com/api';
+    'https://api.memoracreationscare.in/api';
 
-  const BASE = '/memora-creations';
+  const BASE = '';
 
   const params = new URLSearchParams(
     window.location.search
