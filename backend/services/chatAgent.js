@@ -320,7 +320,7 @@ async function replyClaude(messages, settings, deps) {
 
 /* ---------- Gemini (Google, has a free tier) ---------- */
 
-const GEMINI_FALLBACKS = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
+const GEMINI_FALLBACKS = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.0-flash', 'gemini-2.0-flash-lite'];
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/';
 
 async function replyGemini(messages, settings, deps) {
@@ -348,7 +348,9 @@ async function replyGemini(messages, settings, deps) {
       Gemini's free models are often "overloaded" (503) for a while.
       Try the chosen model, then other free models, before giving up.
     */
-    const models = [deps.model, ...GEMINI_FALLBACKS.filter(m => m !== deps.model)];
+    const list = [deps.model, ...GEMINI_FALLBACKS.filter(m => m !== deps.model)];
+    // High demand is usually over in seconds: go through the list twice.
+    const models = list.concat(list);
     let res;
     let firstFail = null;
 
@@ -360,6 +362,9 @@ async function replyGemini(messages, settings, deps) {
       });
 
       if (res.ok) break;
+
+      // Pause before the second pass (not in tests: deps.pauseMs = 0).
+      if (i === list.length - 1) await new Promise(r => setTimeout(r, deps.pauseMs === undefined ? 1500 : deps.pauseMs));
 
       // Remember why the chosen model failed; that is the useful reason.
       if (!firstFail) firstFail = await upstreamError(res);
