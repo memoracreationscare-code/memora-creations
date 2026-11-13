@@ -6,7 +6,7 @@
     'storeClosedMessage', 'whatsapp', 'phone', 'email', 'address', 'instagram',
     'facebook', 'youtube', 'heroKicker', 'heroLine1', 'heroHighlight',
     'heroDescription', 'heroButtonText',
-    'gstLegalName', 'gstin', 'gstState'
+    'gstLegalName', 'gstin', 'gstState', 'chatFaq'
   ];
 
   const NUMBER = [
@@ -20,8 +20,19 @@
   const BOOL = [
     'storeOpen', 'freeDeliveryBar', 'codEnabled', 'codAdvanceEnabled',
     'returnsEnabled', 'autoRefundEnabled', 'emailNotificationsEnabled',
-    'abandonedReminderEnabled', 'lowStockEmailEnabled', 'welcomeEnabled', 'referralEnabled', 'giftWrapEnabled', 'gstEnabled', 'backupEmailEnabled'
+    'abandonedReminderEnabled', 'lowStockEmailEnabled', 'welcomeEnabled', 'referralEnabled', 'giftWrapEnabled', 'chatEnabled', 'gstEnabled', 'backupEmailEnabled'
   ];
+
+  function showChat(configured) {
+    const box = $('#chatKeyState');
+
+    if (!box || configured === undefined) return;
+
+    box.style.color = configured ? '#1b6e2d' : '#b42318';
+    box.textContent = configured
+      ? '✔ AI key Render me laga hai.'
+      : '✖ AI key abhi nahi laga. Render → Environment me ANTHROPIC_API_KEY daalein, tab chat chalega.';
+  }
 
   function showMail(configured) {
     const box = $('#mailState');
@@ -78,6 +89,7 @@
 
       fill(data.settings || {});
       showMail(data.mailConfigured);
+      showChat(data.chatConfigured);
 
     } catch (e) {
       message('Could not load settings. If the server was asleep, wait a minute and reload.', false);
@@ -106,6 +118,7 @@
 
       fill(data.settings || {});
       showMail(data.mailConfigured);
+      showChat(data.chatConfigured);
       message('✔ ' + (data.message || 'Saved.'), true);
       toast('Settings saved.', 'success');
 

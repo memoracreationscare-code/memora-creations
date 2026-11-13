@@ -69,6 +69,9 @@ const schema = new mongoose.Schema({
   giftWrapStandardFee: { type: Number, min: 0, max: 2000 },
   giftWrapPremiumFee: { type: Number, min: 0, max: 2000 },
 
+  chatEnabled: Boolean,
+  chatFaq: str(2500),
+
   gstEnabled: Boolean,
   gstLegalName: str(100),
   gstin: str(20),

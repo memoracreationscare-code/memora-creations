@@ -328,6 +328,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/track-order', require('./routes/trackOrderRoutes'));
+app.use('/api/chat', require('./routes/chatRoutes'));
 app.use('/api/orders', orderRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/cashfree', cashfreeRoutes);
