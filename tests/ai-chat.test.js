@@ -228,3 +228,27 @@ test('get_offers: sale + opted-in coupons + welcome + referral + free delivery; 
   assert.strictEqual(offers[0].productsOnSale, 2);
   assert.ok(!offers.some(o => o.code === 'USEDUP'));
 });
+
+test('Gemini overloaded (503): falls back to another free model and still answers', async () => {
+  const urls = [];
+  const fetch = async (url) => {
+    urls.push(url);
+    if (urls.length < 3) return { ok: false, status: 503, json: async () => ({ error: { message: 'overloaded' } }) };
+    return { ok: true, json: async () => ({ candidates: [{ content: { role: 'model', parts: [{ text: 'Namaste!' }] } }] }) };
+  };
+  const out = await agent.reply([{ role: 'user', content: 'hi' }], settings, {
+    provider: 'gemini', apiKey: 'gk', model: 'gemini-flash-latest', fetch, siteUrl: 's', models: {}, lookupOrder: async () => null
+  });
+  assert.strictEqual(out, 'Namaste!');
+  assert.match(urls[0], /gemini-flash-latest:/);
+  assert.match(urls[2], /gemini-2.5-flash-lite:/);
+});
+
+test('Gemini 401 does not try other models', async () => {
+  let n = 0;
+  const fetch = async () => { n++; return { ok: false, status: 401, json: async () => ({}) }; };
+  await assert.rejects(agent.reply([{ role: 'user', content: 'hi' }], settings, {
+    provider: 'gemini', apiKey: 'gk', model: 'm', fetch, siteUrl: 's', models: {}, lookupOrder: async () => null
+  }));
+  assert.strictEqual(n, 1);
+});
