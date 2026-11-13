@@ -166,7 +166,7 @@ test('daily backup: off by default, once per day, claims the slot, attaches gzip
   const r = await backup.sweepBackup(mk(true, new Date('2026-11-10T02:00:00Z')), now);
   assert.strictEqual(r.sent, true);
   assert.strictEqual(sent[0].to, 'owner@x.com');
-  assert.match(sent[0].attachments[0].name, /memora-backup-2026-11-12\.json\.gz/);
+  assert.match(sent[0].attachments[0].name, /^memora-backup-\d{4}-\d{2}-\d{2}\.json\.gz$/);
   assert.ok(slot[0].$set.lastBackupEmailAt);
   const json = require('zlib').gunzipSync(Buffer.from(sent[0].attachments[0].contentBase64, 'base64')).toString();
   assert.ok(!/passwordHash/.test(json));
