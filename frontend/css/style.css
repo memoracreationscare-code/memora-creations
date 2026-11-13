@@ -161,7 +161,7 @@ box-shadow:0 5px 20px rgba(46,31,20,.04)
 }
 .cardbody{padding:14px}
 .productimg{
-width:100%;aspect-ratio:1/1;object-fit:cover;background:#eee
+width:100%;aspect-ratio:1/1;object-fit: contain;background:#eee
 }
 .price{font-weight:900;font-size:18px}
 .old{
