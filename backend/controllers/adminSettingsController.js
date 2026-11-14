@@ -25,6 +25,7 @@ const BOOL = [
 const NUMBER = {
   deliveryCharge: [0, 5000],
   freeDeliveryAbove: [0, 1000000],
+  customPhotoKeepDays: [3, 365],
   codAdvancePercent: [5, 90],
   returnWindowDays: [1, 60],
   codAutoReceiveDays: [0, 60],
@@ -43,6 +44,7 @@ const NUMBER = {
 const NUMBER_LABEL = {
   deliveryCharge: 'Delivery charge',
   freeDeliveryAbove: 'Free delivery above',
+  customPhotoKeepDays: 'Customer photo keep days',
   codAdvancePercent: 'COD advance percent',
   returnWindowDays: 'Return days',
   codAutoReceiveDays: 'COD auto-receive days',

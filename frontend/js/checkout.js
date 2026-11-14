@@ -1030,6 +1030,16 @@
           : 1
       }];
 
+      // photo frame bought with "Order Now": photos wait in this tab's session storage
+      try {
+        const saved = JSON.parse(sessionStorage.getItem('mc_buynow_custom') || 'null');
+
+        if (saved && saved.productId === buyNowId && Array.isArray(saved.customPhotos) && saved.customPhotos.length) {
+          items[0].customPhotos = saved.customPhotos;
+          if (saved.customNote) items[0].customNote = saved.customNote;
+        }
+      } catch (_) { /* ignore */ }
+
     } else {
       fromCart = true;
 
@@ -1041,6 +1051,9 @@
         .map(x => ({
           productId: x.product._id,
           ...(x.variantId ? { variantId: x.variantId } : {}),
+          ...(x.customPhotos && x.customPhotos.length
+            ? { customPhotos: x.customPhotos, ...(x.customNote ? { customNote: x.customNote } : {}) }
+            : {}),
           quantity: Number(x.quantity) || 1
         }));
     }

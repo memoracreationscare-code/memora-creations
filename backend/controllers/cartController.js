@@ -2,9 +2,10 @@ const { Cart, Product } = require('../models');
 const { asyncHandler, error, ok } = require('../utils/http');
 const { positiveInt } = require('../utils/validation');
 const { findVariant, hasVariants, virtualProduct } = require('../utils/variants');
+const photos = require('../services/customPhotoService');
 
 async function hydrate(cart) {
-  await cart.populate({ path: 'items.product', select: 'productId name images sellingPrice originalPrice stock isActive category variants' });
+  await cart.populate({ path: 'items.product', select: 'productId name images sellingPrice originalPrice stock isActive category variants personalization' });
   const items = [];
   for (const i of cart.items) {
     if (!i.product || !i.product.isActive) continue;
@@ -15,7 +16,7 @@ async function hydrate(cart) {
       if (!variant) continue;
       product = virtualProduct(i.product, variant);
     }
-    items.push({ id: i._id, product, variantId: i.variant ? String(i.variant) : undefined, quantity: i.quantity, lineTotal: Math.round(product.sellingPrice * i.quantity * 100) / 100 });
+    items.push({ id: i._id, product, variantId: i.variant ? String(i.variant) : undefined, customPhotos: i.customPhotos && i.customPhotos.length ? i.customPhotos.map(x => ({ url: x.url, publicId: x.publicId })) : undefined, customNote: i.customNote || undefined, quantity: i.quantity, lineTotal: Math.round(product.sellingPrice * i.quantity * 100) / 100 });
   }
   const subtotal = Math.round(items.reduce((s, i) => s + i.lineTotal, 0) * 100) / 100;
   const settings = require('../services/settingsService').peek();
@@ -40,7 +41,24 @@ const addItem = asyncHandler(async (req, res) => {
   const available = variant ? variant.stock : product.stock;
   if (!positiveInt(quantity) || quantity > available) throw error(409, 'Requested quantity is unavailable.');
   const cart = await Cart.findOneAndUpdate({ user: req.user._id }, { $setOnInsert: { user: req.user._id, items: [] } }, { upsert: true, new: true });
-  const existing = cart.items.find(i => String(i.product) === String(product._id) && String(i.variant || '') === String(variant ? variant._id : ''));
+
+  // Personalised product (photo frame): the customer's photos are required and
+  // every add is its own cart line, so two frames can carry two different photos.
+  let custom;
+  try {
+    custom = photos.checkCustomization(product, req.body.customPhotos, req.body.customNote, req.user._id);
+  } catch (e) {
+    throw error(e.status || 400, e.message);
+  }
+
+  if (custom.photos.length) {
+    if (cart.items.length >= 50) throw error(409, 'Cart is full.');
+    cart.items.push({ product: product._id, quantity, ...(variant ? { variant: variant._id } : {}), customPhotos: custom.photos, ...(custom.note ? { customNote: custom.note } : {}) });
+    await cart.save();
+    return ok(res, { message: 'Added to cart.', cart: await hydrate(cart) }, 201);
+  }
+
+  const existing = cart.items.find(i => !(i.customPhotos && i.customPhotos.length) && String(i.product) === String(product._id) && String(i.variant || '') === String(variant ? variant._id : ''));
   const nextQty = (existing?.quantity || 0) + quantity;
   if (nextQty > available) throw error(409, 'Quantity exceeds available stock.');
   if (existing) existing.quantity = nextQty; else cart.items.push({ product: product._id, quantity, ...(variant ? { variant: variant._id } : {}) });

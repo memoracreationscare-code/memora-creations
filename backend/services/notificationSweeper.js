@@ -213,6 +213,7 @@ function startNotificationSweeper() {
       await require('./backupService').sweepBackup().catch(err => console.warn('[Backup]', err.message));
       await require('./stockAlertSweeper').sweepStockAlerts().catch(err => console.warn('[Stock alert]', err.message));
       await require('./lowStockAlert').sweepLowStock().catch(err => console.warn('[Low stock]', err.message));
+      await require('./customPhotoService').maybeSweep().catch(err => console.warn('[Customer photos]', err.message));
 
       const r = await sweepNotifications();
 

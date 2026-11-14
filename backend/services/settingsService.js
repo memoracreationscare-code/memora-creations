@@ -86,6 +86,7 @@ function defaults() {
     chatEnabled: false,
     chatFaq: '',
 
+    customPhotoKeepDays: 30,
     shareEnabled: true,
     waOrderEnabled: true,
     waOrderText: '',

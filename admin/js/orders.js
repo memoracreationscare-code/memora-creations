@@ -433,6 +433,76 @@ function giftOf(order) {
   };
 }
 
+
+/* =====================================
+   CUSTOMER PHOTOS (photo frames etc.)
+===================================== */
+
+function hasCustomPhotos(order) {
+  return (order.items || []).some(i => (i.customPhotos || []).length);
+}
+
+// Cloudinary link that downloads the original file when opened
+function photoDownloadUrl(url) {
+  return String(url || '').replace('/upload/', '/upload/fl_attachment/');
+}
+
+function itemPhotosHtml(item, order) {
+  const photos = item.customPhotos || [];
+
+  if (!photos.length && !item.customNote) return '';
+
+  if (order.customPhotosDeletedAt) {
+    return `<p class="mini" style="margin:8px 0;color:#8a5a3b">📷 Customer ki photos ${formatDate(order.customPhotosDeletedAt)} ko delete ho chuki hain.</p>`
+      + (item.customNote ? `<p style="margin:6px 0">📝 <b>Note:</b> ${mcEscape(item.customNote)}</p>` : '');
+  }
+
+  return `
+    <div style="margin-top:10px;padding:12px;border:1.5px dashed #d9b99f;border-radius:12px;background:#fff9f3;width:100%;box-sizing:border-box">
+      <b>📷 Customer ki photo${photos.length > 1 ? 's' : ''} (${photos.length})</b>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px">
+        ${photos.map((p, i) => `
+          <div style="width:120px">
+            <a href="${mcEscape(p.url)}" target="_blank" rel="noopener">
+              <img src="${mcEscape(p.url)}" alt="Customer photo ${i + 1}" loading="lazy" style="width:120px;height:120px;object-fit:cover;border-radius:10px;display:block;background:#f2e6db">
+            </a>
+            <a href="${mcEscape(photoDownloadUrl(p.url))}" download style="display:block;margin-top:5px;text-align:center;font-weight:800;font-size:12px;color:#7a4b2a;text-decoration:none;background:#f1e2d6;border-radius:8px;padding:6px 0">⬇ Download</a>
+          </div>`).join('')}
+      </div>
+      ${item.customNote ? `<p style="margin:10px 0 0"><b>📝 Customer ka note:</b> ${mcEscape(item.customNote)}</p>` : ''}
+    </div>`;
+}
+
+function photoToolsHtml(order) {
+  if (!hasCustomPhotos(order) || order.customPhotosDeletedAt) return '';
+
+  return `
+    <p style="background:#fff9f3;border:1px solid #ead2bc;border-radius:10px;padding:10px 12px;margin:10px 0;display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between">
+      <span>📷 Is order me customer ki photo hai. Delivery ke kuch din baad ye apne aap delete ho jaati hain.</span>
+      <button type="button" class="btn secondary" data-delete-photos="${mcEscape(order._id)}" style="padding:8px 12px">Photos abhi delete karo</button>
+    </p>`;
+}
+
+document.addEventListener('click', async event => {
+  const button = event.target.closest('[data-delete-photos]');
+
+  if (!button) return;
+
+  if (!confirm('Is order ki customer photos Cloudinary se hamesha ke liye delete ho jayengi. Pehle download kar li hain?')) return;
+
+  button.disabled = true;
+
+  try {
+    const data = await window.MC.api('/admin/orders/' + encodeURIComponent(button.dataset.deletePhotos) + '/custom-photos', { method: 'DELETE' });
+
+    window.MC.toast(data.message || 'Photos delete ho gayi.', 'success');
+    location.reload();
+  } catch (err) {
+    button.disabled = false;
+    window.MC.toast(err.message || 'Photos delete nahi ho payi.', 'error');
+  }
+});
+
 function giftBoxHtml(order) {
   const g = giftOf(order);
 
@@ -527,7 +597,7 @@ function labelSection(order) {
     .map((item, index) => `
       <tr>
         <td>${index + 1}</td>
-        <td>${mcEscape(item.name)}</td>
+        <td>${mcEscape(item.name)}${(item.customPhotos || []).length ? ' 📷 (photo order me hai)' : ''}${item.customNote ? '<br><small>Note: ' + mcEscape(item.customNote) + '</small>' : ''}</td>
         <td>${Number(item.quantity || 0)}</td>
       </tr>
     `)
@@ -1171,6 +1241,8 @@ function orderDetailsHtml(order) {
 
         </div>
 
+        ${itemPhotosHtml(item, order)}
+
       </div>
     `)
     .join('');
@@ -1205,6 +1277,8 @@ function orderDetailsHtml(order) {
       </p>
 
       ${giftBoxHtml(order)}
+
+      ${photoToolsHtml(order)}
 
       <div class="risk-box" data-risk-for="${mcEscape(order._id)}"></div>
 
@@ -1683,6 +1757,7 @@ async function loadAdminOrders() {
                 ${mcEscape(order.orderId)}
               </b>
               ${giftOf(order) ? '<span title="Gift wrap + message" style="margin-left:4px">🎁</span>' : ''}
+              ${hasCustomPhotos(order) ? `<span title="${order.customPhotosDeletedAt ? 'Customer photos delete ho chuki' : 'Customer ne photo upload ki hai'}" style="margin-left:4px">${order.customPhotosDeletedAt ? '🗑️' : '📷'}</span>` : ''}
 
               <br>
 

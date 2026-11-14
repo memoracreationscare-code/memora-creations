@@ -1254,13 +1254,17 @@
               </div>
               <a class="mc-pop-detail" href="/frontend/product.html?id=${encodeURIComponent(product._id)}">Poori details dekho →</a>
 
+              ${product.personalization?.enabled || (Array.isArray(product.variants) && product.variants.length) ? `
+              <div class="mc-buy">
+                <a class="btn" href="/frontend/product.html?id=${encodeURIComponent(product._id)}">${product.personalization?.enabled ? '📷 Photo upload karke order karein' : 'Size / Colour chuno'}</a>
+              </div>` : `
               <div class="mc-buy">
                 <div class="mc-buy-row">
                   ${window.MC.qtyHtml('homePopupQty', 'home-popup-qty', stock, !(stock > 0))}
                   <button class="btn home-popup-add" type="button" ${stock > 0 ? '' : 'disabled'}>Add to Cart</button>
                 </div>
                 <button class="btn secondary home-popup-order" type="button" ${stock > 0 ? '' : 'disabled'}>Order Now</button>
-              </div>
+              </div>`}
 
 
             </div>
@@ -1351,6 +1355,18 @@
           `${HOME_BASE}/frontend/checkout.html?buyNow=${encodeURIComponent(id)}&qty=${encodeURIComponent(quantity)}`;
       }
 
+      // photo frames and size/colour products are ordered on their own page
+      function openOwnPage(id) {
+        const item = homeProducts.find(p => String(p._id) === String(id));
+
+        if (item && (item.personalization?.enabled || (Array.isArray(item.variants) && item.variants.length))) {
+          location.href = HOME_BASE + '/frontend/product.html?id=' + encodeURIComponent(item._id);
+          return true;
+        }
+
+        return false;
+      }
+
       function bindHomeButtons() {
         document.querySelectorAll('.home-product-open')
           .forEach(button => {
@@ -1365,14 +1381,18 @@
 
         document.querySelectorAll('.home-add-cart')
           .forEach(button => {
-            button.onclick = () =>
+            button.onclick = () => {
+              if (openOwnPage(button.dataset.id)) return;
               addHomeProductToCart(button.dataset.id,1);
+            };
           });
 
         document.querySelectorAll('.home-buy-now')
           .forEach(button => {
-            button.onclick = () =>
+            button.onclick = () => {
+              if (openOwnPage(button.dataset.id)) return;
               buyHomeProductNow(button.dataset.id,1);
+            };
           });
       }
 

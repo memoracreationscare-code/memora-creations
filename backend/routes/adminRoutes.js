@@ -716,6 +716,11 @@ router.get(
   require('../controllers/adminAlertsController').pendingCounts
 );
 
+router.delete(
+  '/orders/:id/custom-photos',
+  require('../controllers/adminCustomPhotoController').deleteNow
+);
+
 router.post(
   '/seen',
   require('../controllers/adminAlertsController').markSeen

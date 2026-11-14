@@ -57,6 +57,18 @@ const orderItemSchema = new mongoose.Schema({
     type: Number,
     required: true,
     min: 0
+  },
+
+  // personalised products: customer's photos (kept in Cloudinary) + note
+  customPhotos: {
+    type: [{ _id: false, url: String, publicId: String }],
+    default: undefined
+  },
+
+  customNote: {
+    type: String,
+    maxlength: 300,
+    default: undefined
   }
 }, {
   _id: false
@@ -466,6 +478,12 @@ const orderSchema = new mongoose.Schema({
     requestedAt: Date,
     adminNote: { type: String, trim: true, maxlength: 500 },
     resolvedAt: Date
+  },
+
+  // set when the customer photos were deleted from Cloudinary
+  customPhotosDeletedAt: {
+    type: Date,
+    default: null
   },
 
   statusHistory: [{

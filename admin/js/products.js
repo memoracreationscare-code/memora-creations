@@ -586,6 +586,13 @@ function editProduct(id, asCopy = false) {
   $('#stock').value = product.stock;
   setVariantRows(product.variants || []);
 
+  const pz = product.personalization || {};
+
+  $('#photoNeeded').checked = pz.enabled === true;
+  $('#photoMax').value = pz.maxPhotos || 1;
+  $('#photoLabel').value = pz.label || '';
+  showPhotoSettings();
+
   // Copy: same details, but saved as a NEW product (new name, own photos).
   if (asCopy) {
     $('#editId').value = '';
@@ -787,6 +794,12 @@ window.MC.$('#productForm').addEventListener(
           Number($('#stock').value),
 
         variants: readVariantRows(),
+
+        personalization: {
+          enabled: $('#photoNeeded').checked,
+          maxPhotos: Number($('#photoMax').value) || 1,
+          label: $('#photoLabel').value.trim()
+        },
 
         // Read from the admin form. Empty means unknown.
         shippingWeightKg:
@@ -1004,8 +1017,17 @@ function clearProductForm() {
 
   setVariantRows([]);
   setPhotoItems([]);
+  showPhotoSettings();
 
 }
+
+function showPhotoSettings() {
+  const box = window.MC.$('#photoNeededMore');
+
+  if (box) box.style.display = window.MC.$('#photoNeeded').checked ? 'block' : 'none';
+}
+
+window.MC.$('#photoNeeded').addEventListener('change', showPhotoSettings);
 
 window.MC.$('#cancelEdit').onclick =
   clearProductForm;

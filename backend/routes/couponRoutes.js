@@ -70,7 +70,8 @@ router.post(
 
     // Get real prices from database.
     const trustedItems = await getTrustedItems(
-      req.body?.items
+      req.body?.items,
+      req.user && req.user._id
     );
 
     // Existing order pricing.

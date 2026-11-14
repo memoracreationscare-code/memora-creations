@@ -1215,6 +1215,42 @@
 
           </div>
 
+          <!-- CUSTOMER PHOTO UPLOAD (photo frames etc.) -->
+
+          <div class="premium-field">
+
+            <label class="premium-option">
+
+              <input
+                id="photoNeeded"
+                type="checkbox"
+              >
+
+              <span class="option-copy">
+
+                <strong>
+                  📷 Customer se photo mangwao
+                </strong>
+
+                <small>
+                  Photo frame jaise products ke liye. Customer order karte time
+                  apni photo upload karta hai aur wo order ke saath aapko
+                  dikhti hai.
+                </small>
+
+              </span>
+
+            </label>
+
+            <div id="photoNeededMore" style="display:none;margin-top:10px;gap:10px">
+              <label for="photoMax" style="font-weight:800;font-size:13px">Maximum kitni photo?</label>
+              <input id="photoMax" type="number" min="1" max="10" value="1" style="width:100%;box-sizing:border-box;padding:10px;border:1px solid #e0d3c7;border-radius:10px">
+              <label for="photoLabel" style="font-weight:800;font-size:13px;margin-top:8px;display:block">Customer ko kya likh kar dikhana hai? (optional)</label>
+              <input id="photoLabel" type="text" maxlength="120" placeholder="Jaise: Frame me lagane wali photo upload karein" style="width:100%;box-sizing:border-box;padding:10px;border:1px solid #e0d3c7;border-radius:10px">
+            </div>
+
+          </div>
+
           <!-- FEATURED PRODUCT -->
 
           <div class="premium-field">
@@ -1418,7 +1454,7 @@
   <!-- PRODUCT MANAGEMENT -->
 
   <script
-    src="/admin/js/products.js?v=11"
+    src="/admin/js/products.js?v=12"
   ></script>
 
   <!-- =====================================
