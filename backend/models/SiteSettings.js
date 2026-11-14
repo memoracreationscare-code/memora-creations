@@ -72,6 +72,7 @@ const schema = new mongoose.Schema({
   chatEnabled: Boolean,
   chatFaq: str(2500),
 
+  customPhotoKeepDays: Number,
   shareEnabled: Boolean,
   waOrderEnabled: Boolean,
   waOrderText: str(300),

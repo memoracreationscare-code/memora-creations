@@ -339,6 +339,7 @@ app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/coupons', couponRoutes);
 app.use('/api/delivery', deliveryRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/custom-photos', require('./routes/customPhotoRoutes'));
 app.use('/api/announcement', announcementRoutes);
 app.use('/api/settings', require('./routes/settingsRoutes'));
 app.use('/api/banners', require('./routes/bannerRoutes'));

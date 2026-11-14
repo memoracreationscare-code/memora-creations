@@ -165,11 +165,11 @@
     }
   }
 
-  async function addToCart(id, quantity = 1, variantId) {
+  async function addToCart(id, quantity = 1, variantId, extra) {
     try {
       await MC.api('/cart', {
         method: 'POST',
-        body: JSON.stringify({ productId: id, quantity, ...(variantId ? { variantId } : {}) })
+        body: JSON.stringify({ productId: id, quantity, ...(variantId ? { variantId } : {}), ...(extra || {}) })
       });
       await MC.updateCartCount();
       closePopup();
@@ -181,13 +181,24 @@
     }
   }
 
-  function buyNow(id, quantity = 1, variantId) {
+  function buyNow(id, quantity = 1, variantId, extra) {
+    // the customer's photos travel to checkout in this tab's session storage
+    try {
+      if (extra && extra.customPhotos && extra.customPhotos.length) {
+        sessionStorage.setItem('mc_buynow_custom', JSON.stringify({ productId: id, ...extra }));
+      } else {
+        sessionStorage.removeItem('mc_buynow_custom');
+      }
+    } catch (_) { /* private mode: checkout will ask again */ }
+
     location.href = BASE + '/frontend/checkout.html?buyNow=' +
       encodeURIComponent(id) + '&qty=' + encodeURIComponent(quantity) +
       (variantId ? '&variant=' + encodeURIComponent(variantId) : '');
   }
 
   const hasVariants = product => Array.isArray(product?.variants) && product.variants.length > 0;
+  // photo frames: photos are uploaded on the product's own page
+  const needsPhoto = product => product?.personalization?.enabled === true;
   const productPageUrl = product => BASE + '/frontend/product.html?id=' + encodeURIComponent(product._id);
 
   function openPopup(product) {
@@ -215,9 +226,9 @@
             <button type="button" class="mc-wa-order" data-wa-order data-wa-id="${esc(product._id)}" data-wa-name="${esc(product.name)}" data-wa-price="${esc(money(product.sellingPrice))}">${window.MC_ICONS?.wa || ''} WhatsApp</button>
           </div>
           <a class="mc-pop-detail" href="${esc(productPageUrl(product))}">Poori details dekho →</a>
-          ${hasVariants(product) ? `
+          ${hasVariants(product) || needsPhoto(product) ? `
           <div class="mc-buy">
-            <a class="btn" href="${esc(productPageUrl(product))}">Size / Colour chuno</a>
+            <a class="btn" href="${esc(productPageUrl(product))}">${needsPhoto(product) ? '📷 Photo upload karke order karein' : 'Size / Colour chuno'}</a>
           </div>` : `
           <div class="mc-buy">
             <div class="mc-buy-row">
@@ -552,6 +563,7 @@
                 ${product.variants.map(v => `<option value="${esc(v._id)}" ${Number(v.stock) > 0 ? '' : 'disabled'}>${esc(v.label)}${Number(v.stock) > 0 ? '' : ' (Out of stock)'}</option>`).join('')}
               </select>
             </div>` : ''}
+            ${needsPhoto(product) ? '<div id="mcPhotoBox"></div>' : ''}
             <div class="field">
               <label for="qty">Quantity</label>
               ${MC.qtyHtml('qty', '', stock, !stock)}
@@ -610,13 +622,16 @@
         const qtyInput = $('#qty');
         if (qtyInput) { qtyInput.max = Math.max(1, stockNow()); qtyInput.value = 1; }
       });
+      const photoBox = needsPhoto(product) && window.MCPhoto ? window.MCPhoto.mount($('#mcPhotoBox'), product) : null;
       $('#addBtn')?.addEventListener('click', () => {
         if (needOption()) return;
-        if (quantity()) addToCart(product._id, quantity(), chosen?._id);
+        if (photoBox && !photoBox.check()) return;
+        if (quantity()) addToCart(product._id, quantity(), chosen?._id, photoBox ? photoBox.value() : undefined);
       });
       $('#buyBtn')?.addEventListener('click', () => {
         if (needOption()) return;
-        if (quantity()) buyNow(product._id, quantity(), chosen?._id);
+        if (photoBox && !photoBox.check()) return;
+        if (quantity()) buyNow(product._id, quantity(), chosen?._id, photoBox ? photoBox.value() : undefined);
       });
     } catch (error) {
       console.error('Single product loading:', error);
@@ -638,7 +653,7 @@
     if (picked && !picked.disabled) {
       const item = productsCache.find(p => String(p._id) === picked.dataset.id);
       // Size / colour products need the option chosen on their own page.
-      if (hasVariants(item)) { location.href = productPageUrl(item); return; }
+      if (hasVariants(item) || needsPhoto(item)) { location.href = productPageUrl(item); return; }
       if (add) addToCart(add.dataset.id, 1); else buyNow(buy.dataset.id);
     }
   });

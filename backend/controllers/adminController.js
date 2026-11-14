@@ -417,6 +417,22 @@ function readVariants(body) {
   }
 }
 
+function readPersonalization(body) {
+  const p = body.personalization;
+
+  if (p === undefined) return {};
+
+  const src = p && typeof p === 'object' ? p : {};
+
+  return {
+    personalization: {
+      enabled: src.enabled === true,
+      label: String(src.label || '').trim().slice(0, 120),
+      maxPhotos: Math.min(10, Math.max(1, Math.floor(Number(src.maxPhotos) || 1)))
+    }
+  };
+}
+
 const createProduct = asyncHandler(async (req, res) => {
 
   const b = req.body;
@@ -525,6 +541,8 @@ const createProduct = asyncHandler(async (req, res) => {
 
     ...readVariants(b),
 
+    ...readPersonalization(b),
+
     ...shippingDetails,
 
     isFeatured: Boolean(
@@ -592,6 +610,10 @@ const updateProduct = asyncHandler(async (req, res) => {
 
   if (body.variants !== undefined) {
     product.variants = readVariants(body).variants;
+  }
+
+  if (body.personalization !== undefined) {
+    product.personalization = readPersonalization(body).personalization;
   }
 
   const shippingDetails =

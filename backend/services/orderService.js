@@ -25,6 +25,7 @@ const {
 } = require('../models');
 
 const { error } = require('../utils/http');
+const customPhotos = require('./customPhotoService');
 const { splitAdvance } = require('../utils/codAdvance');
 const { findVariant, hasVariants, virtualProduct } = require('../utils/variants');
 
@@ -104,7 +105,7 @@ function deliveryFor(subtotal) {
    VALIDATE PRODUCTS
 ===================================== */
 
-async function getTrustedItems(items) {
+async function getTrustedItems(items, userId) {
   if (
     !Array.isArray(items) ||
     items.length === 0 ||
@@ -117,6 +118,7 @@ async function getTrustedItems(items) {
   }
 
   const merged = new Map();
+  const customRaw = new Map();
 
   for (const item of items) {
     if (!item || typeof item !== 'object') {
@@ -158,9 +160,19 @@ async function getTrustedItems(items) {
       );
     }
 
-    const key = variantId
-      ? productId + '|' + variantId
-      : productId;
+    // A line that carries the customer's photos is never merged with another
+    // line: each keeps its own photos and note.
+    const hasCustom = Array.isArray(item.customPhotos) && item.customPhotos.length > 0;
+
+    const key = hasCustom
+      ? productId + '|' + variantId + '|c' + merged.size
+      : variantId
+        ? productId + '|' + variantId
+        : productId;
+
+    if (hasCustom) {
+      customRaw.set(key, { photos: item.customPhotos, note: item.customNote });
+    }
 
     const previous = merged.get(key) || 0;
     const total = previous + quantity;
@@ -272,7 +284,22 @@ async function getTrustedItems(items) {
       );
     }
 
-    return { product, quantity, variantId: product.variantId };
+    // Photo frames: photos are required, and must be this customer's own uploads.
+    const raw = customRaw.get(key) || {};
+    let custom;
+
+    try {
+      custom = customPhotos.checkCustomization(baseProduct, raw.photos, raw.note, userId);
+    } catch (e) {
+      throw error(e.status || 400, e.message);
+    }
+
+    return {
+      product,
+      quantity,
+      variantId: product.variantId,
+      ...(custom.photos.length ? { customPhotos: custom.photos, customNote: custom.note } : {})
+    };
   });
 }
 
@@ -426,7 +453,8 @@ async function buildOrderDocument({
   /* TRUSTED PRODUCTS */
 
   const trusted = await getTrustedItems(
-    items
+    items,
+    user._id
   );
 
   const amount = totals(trusted);
@@ -477,7 +505,7 @@ async function buildOrderDocument({
   /* ORDER ITEMS */
 
   const orderItems = trusted.map(
-    ({ product, quantity, variantId }) => ({
+    ({ product, quantity, variantId, customPhotos: photoList, customNote }) => ({
       product: product._id,
       productId: product.productId,
       ...(variantId ? { variantId } : {}),
@@ -489,7 +517,11 @@ async function buildOrderDocument({
 
       lineTotal: money(
         product.sellingPrice * quantity
-      )
+      ),
+
+      ...(photoList && photoList.length
+        ? { customPhotos: photoList, ...(customNote ? { customNote } : {}) }
+        : {})
     })
   );
 

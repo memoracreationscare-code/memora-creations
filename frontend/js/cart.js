@@ -145,6 +145,15 @@ async function loadCartPage() {
 
                       </div>
 
+                      ${(item.customPhotos && item.customPhotos.length) ? `
+                      <div class="cart-custom" style="margin:8px 0">
+                        <div style="font-size:12px;font-weight:800;color:#7a4b2a;margin-bottom:5px">📷 Aapki photo${item.customPhotos.length > 1 ? 's' : ''}</div>
+                        <div style="display:flex;gap:6px;flex-wrap:wrap">
+                          ${item.customPhotos.map(p => `<img src="${window.MC.esc(p.url)}" alt="Aapki photo" style="width:44px;height:44px;border-radius:8px;object-fit:cover">`).join('')}
+                        </div>
+                        ${item.customNote ? `<div style="font-size:12px;color:#6b5d52;margin-top:5px">📝 ${window.MC.esc(item.customNote)}</div>` : ''}
+                      </div>` : ''}
+
 
                       <div class="qty">
 

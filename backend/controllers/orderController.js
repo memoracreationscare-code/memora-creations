@@ -88,7 +88,8 @@ const preview = asyncHandler(
 
     const trustedItems =
       await getTrustedItems(
-        req.body.items
+        req.body.items,
+        req.user._id
       );
 
     const giftWrapping =

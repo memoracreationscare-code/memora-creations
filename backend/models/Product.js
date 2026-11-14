@@ -142,6 +142,13 @@ const productSchema = new mongoose.Schema({
     saved: { type: Object, select: false }
   },
 
+  /* Customer uploads photos when ordering (photo frames etc.). */
+  personalization: {
+    enabled: { type: Boolean, default: false },
+    label: { type: String, trim: true, maxlength: 120, default: '' },
+    maxPhotos: { type: Number, min: 1, max: 10, default: 1 }
+  },
+
   variants: {
     type: [{
       label: { type: String, required: true, trim: true, maxlength: 60 },

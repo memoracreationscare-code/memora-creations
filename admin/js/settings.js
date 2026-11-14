@@ -10,7 +10,7 @@
   ];
 
   const NUMBER = [
-    'deliveryCharge', 'freeDeliveryAbove', 'codAdvancePercent',
+    'deliveryCharge', 'freeDeliveryAbove', 'customPhotoKeepDays', 'codAdvancePercent',
     'returnWindowDays', 'codAutoReceiveDays', 'abandonedReminderHours',
     'welcomePercent', 'welcomeMaxDiscount', 'welcomeMinOrder',
     'referralFriendAmount', 'referralRewardAmount', 'referralMinOrder',
