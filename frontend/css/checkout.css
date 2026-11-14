@@ -1025,3 +1025,149 @@ input:checked +
   }
 
 }
+
+
+/* ===== COMPACT CHECKOUT (less scrolling) ===== */
+
+/* Unavailable "coming soon" extras take no space */
+#mcGiftWrap[data-gift-enabled="false"],
+.mc-whatsapp-consent:has(#whatsappOptIn:disabled){
+  display:none !important;
+}
+
+#mcPhotoStep{
+  margin-bottom:14px;
+}
+
+#mcPhotoStep .checkout-card-heading{
+  margin-bottom:10px;
+}
+
+#mcPhotoStep .checkout-card-heading h2{
+  font-size:20px;
+}
+
+#mcPhotoStep .checkout-card-heading p{
+  font-size:13px;
+  margin-top:3px !important;
+}
+
+@media(max-width:640px){
+
+  .checkout-page{
+    padding-top:8px;
+  }
+
+  /* hero becomes a slim title bar */
+  .checkout-hero{
+    padding:14px 16px;
+    margin-bottom:10px;
+    border-radius:16px;
+  }
+
+  .checkout-hero h1{
+    font-size:24px;
+    margin:2px 0 0;
+    line-height:1.15;
+  }
+
+  .checkout-hero p,
+  .checkout-hero .checkout-eyebrow{
+    display:none;
+  }
+
+  .checkout-card{
+    padding:14px;
+  }
+
+  .checkout-card-heading{
+    margin-bottom:12px;
+  }
+
+  .checkout-card-heading h2,
+  .checkout-summary-heading h2{
+    font-size:21px;
+  }
+
+  /* address: two columns instead of one long column */
+  .checkout-form-grid{
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+
+  .checkout-field.full{
+    grid-column:auto;
+  }
+
+  .checkout-field.full:has(textarea){
+    grid-column:1 / -1;
+  }
+
+  .checkout-field label{
+    font-size:12px;
+    margin-bottom:4px;
+  }
+
+  .checkout-input{
+    padding:0 12px;
+    font-size:15px;
+    min-height:44px;
+    border-radius:12px;
+  }
+
+  .checkout-textarea{
+    min-height:64px;
+    height:64px;
+    padding:10px 12px;
+  }
+
+  .payment-option{
+    padding:10px 12px;
+    min-height:64px;
+    border-radius:14px;
+  }
+
+  .mc-gift-wrap{
+    margin:14px 0;
+    padding:14px;
+  }
+
+  .mc-gift-wrap-option{
+    padding:10px;
+  }
+
+  .checkout-summary-card{
+    padding:14px;
+  }
+
+  /* trust tiles + big help banner are repeated info: hide on phones */
+  .checkout-trust,
+  .checkout-help{
+    display:none;
+  }
+}
+
+/* delivery estimate: slim full-width strip placed after address fields */
+.checkout-form-grid #mcDeliveryEstimate{
+  grid-column:1 / -1;
+  order:99;
+  margin:2px 0 0 !important;
+  padding:10px 12px !important;
+  border-radius:12px !important;
+}
+
+.checkout-form-grid #mcDeliveryEstimate h3{
+  margin:0 0 2px;
+  font-size:14px;
+}
+
+.checkout-form-grid #mcDeliveryEstimate p{
+  margin:0;
+  font-size:13px;
+  line-height:1.4;
+}
+
+.checkout-form-grid #mcDeliveryEstimate small{
+  font-size:11px;
+  opacity:.8;
+}
