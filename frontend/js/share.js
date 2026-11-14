@@ -30,7 +30,7 @@
   const style = document.createElement('style');
 
   style.textContent = `
-    .mc-share-card{font-size:0!important;line-height:0!important;letter-spacing:0!important;overflow:hidden;position:absolute;top:62px;right:12px;z-index:4;width:40px;height:40px;padding:0;border-radius:999px;border:1px solid #ead9cf;background:rgba(255,255,255,.96);color:#71412c;font-size:0;line-height:0;cursor:pointer;box-shadow:0 4px 14px #3a1f1226;display:inline-grid;place-items:center;transition:transform .15s,box-shadow .15s,background .15s}
+    .mc-share-card{position:absolute;top:62px;right:12px;z-index:4;width:40px;height:40px;padding:0;border-radius:999px;border:1px solid #ead9cf;background:rgba(255,255,255,.96);color:#71412c;font-size:0!important;line-height:0!important;overflow:hidden;cursor:pointer;box-shadow:0 4px 14px #3a1f1226;display:inline-grid;place-items:center;transition:transform .15s,box-shadow .15s,background .15s}
     .mc-share-card::before{content:"";width:19px;height:19px;background:currentColor;-webkit-mask:var(--mc-share-svg) center/contain no-repeat;mask:var(--mc-share-svg) center/contain no-repeat}
     .mc-share-card:hover{transform:translateY(-1px);background:#fff;box-shadow:0 7px 18px #3a1f1233}
     .mc-share-card:focus-visible{outline:3px solid #9b613c;outline-offset:3px}
