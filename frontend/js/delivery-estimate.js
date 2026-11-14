@@ -265,10 +265,16 @@
     if (!panel) {
       panel = createPanel();
 
-      pinInput.insertAdjacentElement(
-        'afterend',
-        panel
-      );
+      const grid = pinInput.closest('.checkout-form-grid');
+
+      if (grid) {
+        grid.appendChild(panel);
+      } else {
+        pinInput.insertAdjacentElement(
+          'afterend',
+          panel
+        );
+      }
     }
 
     let lastKey = '';
