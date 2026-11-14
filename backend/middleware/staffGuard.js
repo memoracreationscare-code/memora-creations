@@ -17,6 +17,7 @@ const ALLOWED = [
   ['GET',   /^\/dashboard$/],                        // answered with an empty one, see below
   ['GET',   /^\/today$/],
   ['GET',   /^\/pending-counts$/],
+  ['POST',  /^\/seen$/],
   ['GET',   /^\/orders$/],
   ['GET',   /^\/orders\/[a-f0-9]{24}$/i],
   ['PUT',   /^\/orders\/[a-f0-9]{24}$/i],

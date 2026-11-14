@@ -7,11 +7,27 @@
 
   const BASE = '/admin/';
   const ITEMS = [
+    { key: 'orders', page: 'orders.html', label: 'new order' },
+    { key: 'cancellations', page: 'cancellation-requests.html', label: 'cancellation request' },
     { key: 'returns', page: 'return-requests.html', label: 'return/replacement request' },
-    { key: 'lowStock', page: 'products.html', label: 'product low on stock (3 or less)' },
     { key: 'cancelFollowUps', page: 'cancellation-requests.html', label: 'cancelled order needs a refund/Shiprocket check' },
-    { key: 'cancellations', page: 'cancellation-requests.html', label: 'cancellation request' }
+    { key: 'passwordResets', page: 'users.html', label: 'password reset request' },
+    { key: 'reviews', page: 'reviews.html', label: 'review waiting for approval' },
+    { key: 'lowStock', page: 'products.html', label: 'product low on stock (3 or less)' }
   ];
+
+  // Opening one of these pages means "I have seen it": the red alert goes
+  // away, and comes back only when something NEW arrives.
+  const SEEN_BY_PAGE = {
+    'orders.html': 'orders',
+    'cancellation-requests.html': 'cancellations',
+    'return-requests.html': 'returns',
+    'reviews.html': 'reviews',
+    'products.html': 'lowStock',
+    'users.html': 'passwordResets'
+  };
+
+  const currentPage = location.pathname.split('/').pop() || '';
 
   const originalTitle = document.title;
 
@@ -86,6 +102,21 @@
     });
   }
 
+  async function markThisPageSeen() {
+    const section = SEEN_BY_PAGE[currentPage];
+
+    if (!section) return;
+
+    try {
+      await window.MC.api('/admin/seen', {
+        method: 'POST',
+        body: JSON.stringify({ section })
+      });
+    } catch {
+      /* not logged in or server asleep: stay silent */
+    }
+  }
+
   async function refresh() {
     try {
       const counts = await window.MC.api('/admin/pending-counts');
@@ -104,7 +135,7 @@
   if (/\/admin\/(index\.html)?$/.test(location.pathname)) return;
 
   function start() {
-    setTimeout(refresh, 600);
+    markThisPageSeen().then(() => setTimeout(refresh, 200));
     setInterval(() => { if (!document.hidden) refresh(); }, 60000);
   }
 

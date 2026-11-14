@@ -692,7 +692,7 @@
 
     bar.style.cssText = [
       'max-width:1200px',
-      'margin:18px auto',
+      'margin:12px auto',
       'padding:15px 18px',
       'background:#fff8ee',
       'border:1px solid #e8ceb2',
@@ -850,15 +850,18 @@
       controls
     );
 
-    const nav = document.querySelector(
-      '.adminnav'
-    );
+    const main = document.querySelector('main');
+    const nav = document.querySelector('.adminnav');
+    const alertBanner = document.getElementById('mcAlertBanner');
 
-    if (nav) {
-      nav.insertAdjacentElement(
-        'afterend',
-        bar
-      );
+    if (main) {
+      // same column as the page content; the red alert (if any) stays on top
+      bar.style.maxWidth = 'none';
+
+      if (alertBanner && alertBanner.parentElement === main) alertBanner.after(bar);
+      else main.prepend(bar);
+    } else if (nav) {
+      nav.insertAdjacentElement('afterend', bar);
     } else {
       document.body.prepend(bar);
     }

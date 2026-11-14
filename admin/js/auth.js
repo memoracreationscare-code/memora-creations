@@ -101,7 +101,7 @@
 // Load the request alerts (red badges + banner) on every admin page.
 (() => {
   const script = document.createElement('script');
-  script.src = '/admin/js/alerts.js?v=3';
+  script.src = '/admin/js/alerts.js?v=4';
   document.head.appendChild(script);
 })();
 

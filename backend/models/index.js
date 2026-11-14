@@ -39,6 +39,8 @@ module.exports = {
 
   Coupon: require('./Coupon'),
 
+  AdminSeen: require('./AdminSeen'),
+
   CouponUserUsage: require('./CouponUserUsage'),
 
   // WHATSAPP ORDER NOTIFICATIONS
