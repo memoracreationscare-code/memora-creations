@@ -90,6 +90,7 @@ function defaults() {
     shareEnabled: true,
     waOrderEnabled: true,
     waOrderText: '',
+    waUpdatesEnabled: false,
 
     gstEnabled: false,
     gstLegalName: '',
