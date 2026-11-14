@@ -269,7 +269,7 @@
           </div>
         </button>
         <button type="button" class="mc-wish-toggle mc-wish-card" data-wish-id="${id}" aria-label="Add to wishlist" aria-pressed="false" title="Save to wishlist">♡</button>
-        <button type="button" class="mc-share-card" data-share-id="${id}" data-share-name="${esc(product.name)}" data-share-image="${esc(pictureOf(product))}" data-share-price="${esc(money(product.sellingPrice))}" aria-label="Share this product" title="Share">Share</button>
+        <button type="button" class="mc-share-card" data-share-id="${id}" data-share-name="${esc(product.name)}" data-share-image="${esc(pictureOf(product))}" data-share-price="${esc(money(product.sellingPrice))}" aria-label="Share this product" title="Share"></button>
         <div class="premium-card-actions">
           <button class="btn add" type="button" data-id="${id}" ${stock ? '' : 'disabled'}>Add to Cart</button>
           <button class="btn secondary buy" type="button" data-id="${id}" ${stock ? '' : 'disabled'}>Order Now</button>
