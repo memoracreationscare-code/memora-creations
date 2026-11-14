@@ -1057,6 +1057,7 @@
       return;
     }
 
+    await setupWhatsAppOptIn();
     await setupPhotoStep();
 
     await refreshCouponPreview();
@@ -1150,6 +1151,29 @@
     } catch (_) { /* private mode: just no memory after reload */ }
 
     return undefined;
+  }
+
+  /*
+    Admin controls this from Settings → "Checkout WhatsApp updates".
+    Off (or settings unreachable) = the box stays hidden and the
+    checkbox stays disabled, so no consent can be recorded.
+  */
+  async function setupWhatsAppOptIn() {
+    const box = $('#whatsappOptIn');
+
+    if (!box) return;
+
+    try {
+      const data = await MC.api('/settings');
+      const s = (data && (data.settings || data.data || data)) || {};
+
+      box.disabled = s.waUpdatesEnabled !== true;
+
+      if (box.disabled) box.checked = false;
+    } catch (_) {
+      box.disabled = true;
+      box.checked = false;
+    }
   }
 
   async function setupPhotoStep() {

@@ -36,6 +36,7 @@ function publicView(s) {
     shareEnabled: s.shareEnabled !== false,
     waOrderEnabled: s.waOrderEnabled !== false,
     waOrderText: s.waOrderText || '',
+    waUpdatesEnabled: s.waUpdatesEnabled === true,
     heroKicker: s.heroKicker,
     heroLine1: s.heroLine1,
     heroHighlight: s.heroHighlight,
