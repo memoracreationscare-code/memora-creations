@@ -76,6 +76,7 @@ const schema = new mongoose.Schema({
   shareEnabled: Boolean,
   waOrderEnabled: Boolean,
   waOrderText: str(300),
+  waUpdatesEnabled: Boolean,
 
   gstEnabled: Boolean,
   gstLegalName: str(100),

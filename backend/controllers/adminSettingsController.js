@@ -19,7 +19,7 @@ const TEXT = {
 const BOOL = [
   'storeOpen', 'codEnabled', 'codAdvanceEnabled', 'returnsEnabled',
   'autoRefundEnabled', 'freeDeliveryBar', 'emailNotificationsEnabled',
-  'abandonedReminderEnabled', 'lowStockEmailEnabled', 'welcomeEnabled', 'referralEnabled', 'giftWrapEnabled', 'chatEnabled', 'shareEnabled', 'waOrderEnabled', 'gstEnabled', 'backupEmailEnabled'
+  'abandonedReminderEnabled', 'lowStockEmailEnabled', 'welcomeEnabled', 'referralEnabled', 'giftWrapEnabled', 'chatEnabled', 'shareEnabled', 'waOrderEnabled', 'gstEnabled', 'backupEmailEnabled', 'waUpdatesEnabled'
 ];
 
 const NUMBER = {
