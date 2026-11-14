@@ -72,6 +72,10 @@ const schema = new mongoose.Schema({
   chatEnabled: Boolean,
   chatFaq: str(2500),
 
+  shareEnabled: Boolean,
+  waOrderEnabled: Boolean,
+  waOrderText: str(300),
+
   gstEnabled: Boolean,
   gstLegalName: str(100),
   gstin: str(20),

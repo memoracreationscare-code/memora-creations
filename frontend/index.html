@@ -1013,7 +1013,7 @@
 
   <!-- COMMON APP -->
 
-  <script src="/frontend/js/app.js?v=19"></script>
+  <script src="/frontend/js/app.js?v=31"></script>
 
   <!-- HOME PAGE LOGIC -->
 
@@ -1161,7 +1161,7 @@
               </div>
             </button>
 
-            <button type="button" class="mc-share-card" data-share-id="${id}" data-share-name="${esc(product.name)}" aria-label="Share this product" title="Share">⤴</button>
+            <button type="button" class="mc-share-card" data-share-id="${id}" data-share-name="${esc(product.name)}" data-share-image="${esc(product.images?.[0]?.url || '')}" data-share-price="${esc(money(product.sellingPrice))}" aria-label="Share this product" title="Share">Share</button>
 
             <div class="home-product-actions">
 
@@ -1248,6 +1248,12 @@
 
               <p class="mc-stock ${stock > 0 ? '' : 'out'}">${stock > 0 ? (stock <= 5 ? `Sirf ${stock} bache hain` : 'In Stock') : 'Out of Stock'}</p>
 
+              <div class="mc-pop-extra">
+                <button type="button" class="mc-pop-share" data-share-id="${esc(product._id)}" data-share-name="${esc(product.name)}" data-share-image="${esc(product.images?.[0]?.url || '')}" data-share-price="${esc(money(product.sellingPrice))}">${window.MC_ICONS?.share || ''} Share</button>
+                <button type="button" class="mc-wa-order" data-wa-order data-wa-id="${esc(product._id)}" data-wa-name="${esc(product.name)}" data-wa-price="${esc(money(product.sellingPrice))}">${window.MC_ICONS?.wa || ''} WhatsApp</button>
+              </div>
+              <a class="mc-pop-detail" href="/frontend/product.html?id=${encodeURIComponent(product._id)}">Poori details dekho →</a>
+
               <div class="mc-buy">
                 <div class="mc-buy-row">
                   ${window.MC.qtyHtml('homePopupQty', 'home-popup-qty', stock, !(stock > 0))}
@@ -1255,6 +1261,7 @@
                 </div>
                 <button class="btn secondary home-popup-order" type="button" ${stock > 0 ? '' : 'disabled'}>Order Now</button>
               </div>
+
 
             </div>
           </div>
@@ -1475,7 +1482,7 @@
   <script src="/frontend/js/announcement-popup.js?v=3"></script>
 
   <script src="js/extras.js?v=9" defer></script>
-  <script src="js/share.js?v=1" defer></script>
+  <script src="/frontend/js/share.js?v=31" defer></script>
   <script src="js/banners.js?v=1" defer></script>
   <script src="js/animations.js?v=1" defer></script>
 </body>

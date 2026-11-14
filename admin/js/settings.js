@@ -6,7 +6,7 @@
     'storeClosedMessage', 'whatsapp', 'phone', 'email', 'address', 'instagram',
     'facebook', 'youtube', 'heroKicker', 'heroLine1', 'heroHighlight',
     'heroDescription', 'heroButtonText',
-    'gstLegalName', 'gstin', 'gstState', 'chatFaq'
+    'gstLegalName', 'gstin', 'gstState', 'chatFaq', 'waOrderText'
   ];
 
   const NUMBER = [
@@ -20,7 +20,7 @@
   const BOOL = [
     'storeOpen', 'freeDeliveryBar', 'codEnabled', 'codAdvanceEnabled',
     'returnsEnabled', 'autoRefundEnabled', 'emailNotificationsEnabled',
-    'abandonedReminderEnabled', 'lowStockEmailEnabled', 'welcomeEnabled', 'referralEnabled', 'giftWrapEnabled', 'chatEnabled', 'gstEnabled', 'backupEmailEnabled'
+    'abandonedReminderEnabled', 'lowStockEmailEnabled', 'welcomeEnabled', 'referralEnabled', 'giftWrapEnabled', 'chatEnabled', 'shareEnabled', 'waOrderEnabled', 'gstEnabled', 'backupEmailEnabled'
   ];
 
   function showChat(configured) {

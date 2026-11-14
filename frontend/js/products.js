@@ -209,6 +209,12 @@
           <div class="product-popup-price">${priceMarkup(product)}${offBadge(product)}</div>
           <p class="muted">${esc(product.description || '')}</p>
           <p class="mc-stock ${stock ? '' : 'out'}">${stock ? (stock <= 5 ? `Sirf ${stock} bache hain` : 'In Stock') : 'Out of Stock'}</p>
+
+          <div class="mc-pop-extra">
+            <button type="button" class="mc-pop-share" data-share-id="${esc(product._id)}" data-share-name="${esc(product.name)}" data-share-image="${esc(pictureOf(product))}" data-share-price="${esc(money(product.sellingPrice))}">${window.MC_ICONS?.share || ''} Share</button>
+            <button type="button" class="mc-wa-order" data-wa-order data-wa-id="${esc(product._id)}" data-wa-name="${esc(product.name)}" data-wa-price="${esc(money(product.sellingPrice))}">${window.MC_ICONS?.wa || ''} WhatsApp</button>
+          </div>
+          <a class="mc-pop-detail" href="${esc(productPageUrl(product))}">Poori details dekho →</a>
           ${hasVariants(product) ? `
           <div class="mc-buy">
             <a class="btn" href="${esc(productPageUrl(product))}">Size / Colour chuno</a>
@@ -263,7 +269,7 @@
           </div>
         </button>
         <button type="button" class="mc-wish-toggle mc-wish-card" data-wish-id="${id}" aria-label="Add to wishlist" aria-pressed="false" title="Save to wishlist">♡</button>
-        <button type="button" class="mc-share-card" data-share-id="${id}" data-share-name="${esc(product.name)}" aria-label="Share this product" title="Share">⤴</button>
+        <button type="button" class="mc-share-card" data-share-id="${id}" data-share-name="${esc(product.name)}" data-share-image="${esc(pictureOf(product))}" data-share-price="${esc(money(product.sellingPrice))}" aria-label="Share this product" title="Share">Share</button>
         <div class="premium-card-actions">
           <button class="btn add" type="button" data-id="${id}" ${stock ? '' : 'disabled'}>Add to Cart</button>
           <button class="btn secondary buy" type="button" data-id="${id}" ${stock ? '' : 'disabled'}>Order Now</button>
@@ -555,8 +561,9 @@
               <button class="btn secondary" id="buyBtn" type="button" ${stock ? '' : 'disabled'}>Order Now</button>
               <div class="mc-sub-actions">
                 <button type="button" class="mc-wish-toggle mc-wish-single" data-wish-id="${esc(product._id)}" aria-label="Add to wishlist" aria-pressed="false">♡ Save to Wishlist</button>
-                <button class="btn secondary" id="shareBtn" type="button" data-share-id="${esc(product._id)}" data-share-name="${esc(product.name)}">Share</button>
+                <button class="btn secondary mc-share-btn" id="shareBtn" type="button" data-share-id="${esc(product._id)}" data-share-name="${esc(product.name)}" data-share-image="${esc(images[0]?.url || '')}" data-share-price="${esc(money(product.sellingPrice))}">${window.MC_ICONS?.share || ''} Share</button>
               </div>
+              <a class="btn secondary mc-wa-order" href="#" data-wa-order data-wa-id="${esc(product._id)}" data-wa-name="${esc(product.name)}" data-wa-price="${esc(money(product.sellingPrice))}">${window.MC_ICONS?.wa || ''} WhatsApp par order karo</a>
             </div>
           </div>
         </div>`;

@@ -86,6 +86,10 @@ function defaults() {
     chatEnabled: false,
     chatFaq: '',
 
+    shareEnabled: true,
+    waOrderEnabled: true,
+    waOrderText: '',
+
     gstEnabled: false,
     gstLegalName: '',
     gstin: '',
