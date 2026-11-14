@@ -45,3 +45,9 @@ test('every page loads the same app.js version (stale phone caches get refreshed
   }
   assert.strictEqual(versions.size, 1);
 });
+
+test('share icon on cards is icon-only: no page CSS may bring its text back', () => {
+  const share = read('frontend/js/share.js');
+  assert.match(share, /\.mc-share-card\{font-size:0!important/);
+  assert.ok(!/mc-share-card \{[^}]*font-size/.test(read('frontend/index.html')));
+});
