@@ -716,6 +716,11 @@ router.get(
   require('../controllers/adminAlertsController').pendingCounts
 );
 
+router.post(
+  '/seen',
+  require('../controllers/adminAlertsController').markSeen
+);
+
 router.get(
   '/return-requests',
   returnRequestController.listReturnRequests
