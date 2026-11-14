@@ -44,9 +44,10 @@ const addItem = asyncHandler(async (req, res) => {
 
   // Personalised product (photo frame): the customer's photos are required and
   // every add is its own cart line, so two frames can carry two different photos.
+  // Photos are normally uploaded later, on the checkout page; here they are optional.
   let custom;
   try {
-    custom = photos.checkCustomization(product, req.body.customPhotos, req.body.customNote, req.user._id);
+    custom = photos.checkCustomization(product, req.body.customPhotos, req.body.customNote, req.user._id, { required: false });
   } catch (e) {
     throw error(e.status || 400, e.message);
   }

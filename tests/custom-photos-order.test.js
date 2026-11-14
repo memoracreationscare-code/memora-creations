@@ -78,3 +78,11 @@ test('normal product ignores any photos sent with it', async () => {
 
   assert.strictEqual(out[0].customPhotos, undefined);
 });
+
+test('price preview works without photos; order placement does not', async () => {
+  const out = await getTrustedItems([{ productId: FRAME, quantity: 1 }], U, { requirePhotos: false });
+
+  assert.strictEqual(out.length, 1);
+  assert.strictEqual(out[0].customPhotos, undefined);
+  await assert.rejects(getTrustedItems([{ productId: FRAME, quantity: 1 }], U), /photo upload karein/);
+});

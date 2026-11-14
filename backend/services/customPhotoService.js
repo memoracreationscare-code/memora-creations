@@ -86,12 +86,16 @@ function cleanPhotos(raw, userId) {
 }
 
 /* Returns { photos, note } to store, or throws a clear message. */
-function checkCustomization(product, rawPhotos, rawNote, userId) {
+function checkCustomization(product, rawPhotos, rawNote, userId, opts = {}) {
   const cfg = personalizationOf(product);
 
   if (!cfg.enabled) return { photos: [], note: '' };
 
   const photos = cleanPhotos(rawPhotos, userId);
+
+  // At the cart / price preview the photos may still be missing (the customer
+  // uploads them on the checkout page). They are required when the order is placed.
+  if (photos.length < 1 && opts.required === false) return { photos: [], note: cleanNote(rawNote) };
 
   if (photos.length < 1) {
     throw error(400, `${product.name}: pehle apni photo upload karein (zaroori hai).`);

@@ -105,7 +105,7 @@ function deliveryFor(subtotal) {
    VALIDATE PRODUCTS
 ===================================== */
 
-async function getTrustedItems(items, userId) {
+async function getTrustedItems(items, userId, opts = {}) {
   if (
     !Array.isArray(items) ||
     items.length === 0 ||
@@ -289,7 +289,7 @@ async function getTrustedItems(items, userId) {
     let custom;
 
     try {
-      custom = customPhotos.checkCustomization(baseProduct, raw.photos, raw.note, userId);
+      custom = customPhotos.checkCustomization(baseProduct, raw.photos, raw.note, userId, { required: opts.requirePhotos !== false });
     } catch (e) {
       throw error(e.status || 400, e.message);
     }

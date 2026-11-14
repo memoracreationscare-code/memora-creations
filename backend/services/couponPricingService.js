@@ -66,7 +66,8 @@ async function calculateCouponPricing({
 
   const trustedItems = await getTrustedItems(
     items,
-    userId
+    userId,
+    { requirePhotos: false }
   );
 
   const base = totals(trustedItems);

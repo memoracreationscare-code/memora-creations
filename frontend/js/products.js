@@ -226,9 +226,9 @@
             <button type="button" class="mc-wa-order" data-wa-order data-wa-id="${esc(product._id)}" data-wa-name="${esc(product.name)}" data-wa-price="${esc(money(product.sellingPrice))}">${window.MC_ICONS?.wa || ''} WhatsApp</button>
           </div>
           <a class="mc-pop-detail" href="${esc(productPageUrl(product))}">Poori details dekho →</a>
-          ${hasVariants(product) || needsPhoto(product) ? `
+          ${hasVariants(product) ? `
           <div class="mc-buy">
-            <a class="btn" href="${esc(productPageUrl(product))}">${needsPhoto(product) ? '📷 Photo upload karke order karein' : 'Size / Colour chuno'}</a>
+            <a class="btn" href="${esc(productPageUrl(product))}">Size / Colour chuno</a>
           </div>` : `
           <div class="mc-buy">
             <div class="mc-buy-row">
@@ -563,7 +563,7 @@
                 ${product.variants.map(v => `<option value="${esc(v._id)}" ${Number(v.stock) > 0 ? '' : 'disabled'}>${esc(v.label)}${Number(v.stock) > 0 ? '' : ' (Out of stock)'}</option>`).join('')}
               </select>
             </div>` : ''}
-            ${needsPhoto(product) ? '<div id="mcPhotoBox"></div>' : ''}
+            ${needsPhoto(product) ? '<div class="mc-photo-info" style="margin:14px 0;padding:12px 14px;border-radius:14px;background:#fff9f3;border:1px dashed #d9b99f;color:#5a3b27;font-size:14px;line-height:1.55">📷 <b>Apni photo ke saath banta hai.</b> Order karne ke baad checkout page par aap apni photo aur note upload karoge, uske baad payment hoga.</div>' : ''}
             <div class="field">
               <label for="qty">Quantity</label>
               ${MC.qtyHtml('qty', '', stock, !stock)}
@@ -622,7 +622,7 @@
         const qtyInput = $('#qty');
         if (qtyInput) { qtyInput.max = Math.max(1, stockNow()); qtyInput.value = 1; }
       });
-      const photoBox = needsPhoto(product) && window.MCPhoto ? window.MCPhoto.mount($('#mcPhotoBox'), product) : null;
+      const photoBox = null; // photo + note are asked on the checkout page
       $('#addBtn')?.addEventListener('click', () => {
         if (needOption()) return;
         if (photoBox && !photoBox.check()) return;
@@ -653,7 +653,7 @@
     if (picked && !picked.disabled) {
       const item = productsCache.find(p => String(p._id) === picked.dataset.id);
       // Size / colour products need the option chosen on their own page.
-      if (hasVariants(item) || needsPhoto(item)) { location.href = productPageUrl(item); return; }
+      if (hasVariants(item)) { location.href = productPageUrl(item); return; }
       if (add) addToCart(add.dataset.id, 1); else buyNow(buy.dataset.id);
     }
   });

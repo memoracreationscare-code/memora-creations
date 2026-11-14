@@ -133,10 +133,16 @@ test('wiring: product flag, admin form, cart, checkout, orders and cleanup are a
   assert.match(read('admin/js/products.js'), /personalization: \{/);
   assert.match(read('admin/js/orders.js'), /itemPhotosHtml\(item, order\)/);
   assert.match(read('frontend/js/checkout.js'), /customPhotos: x\.customPhotos/);
-  assert.match(read('frontend/js/checkout.js'), /mc_buynow_custom/);
-  assert.match(read('frontend/product.html'), /custom-photo\.js/);
+  assert.match(read('frontend/js/checkout.js'), /setupPhotoStep/);
+  assert.match(read('frontend/js/checkout.js'), /verifyBeforePayment\(\) \{\s*collectPhotos\(\)/);
+  assert.match(read('frontend/checkout.html'), /custom-photo\.js/);
 });
 
 test('staff cannot delete customer photos (owner only)', () => {
   assert.ok(!/custom-photos/.test(read('backend/middleware/staffGuard.js')));
+});
+
+test('before checkout (cart / price preview) photos are optional; placing the order still needs them', () => {
+  assert.deepStrictEqual(svc.checkCustomization(frame, [], 'x', U, { required: false }), { photos: [], note: 'x' });
+  assert.throws(() => svc.checkCustomization(frame, [], 'x', U), /upload karein/);
 });

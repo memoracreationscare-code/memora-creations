@@ -145,6 +145,9 @@ async function loadCartPage() {
 
                       </div>
 
+                      ${(product.personalization?.enabled && !(item.customPhotos && item.customPhotos.length)) ? `
+                      <div style="margin:6px 0;font-size:12.5px;font-weight:700;color:#7a4b2a">📷 Photo checkout page par upload hogi</div>` : ''}
+
                       ${(item.customPhotos && item.customPhotos.length) ? `
                       <div class="cart-custom" style="margin:8px 0">
                         <div style="font-size:12px;font-weight:800;color:#7a4b2a;margin-bottom:5px">📷 Aapki photo${item.customPhotos.length > 1 ? 's' : ''}</div>

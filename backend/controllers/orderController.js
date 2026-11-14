@@ -89,7 +89,8 @@ const preview = asyncHandler(
     const trustedItems =
       await getTrustedItems(
         req.body.items,
-        req.user._id
+        req.user._id,
+        { requirePhotos: false }
       );
 
     const giftWrapping =
