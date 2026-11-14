@@ -377,8 +377,14 @@
 
     @media (max-width: 900px) {
       #product > .two {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
         gap: 26px;
+      }
+
+      /* 1fr alone grows to the widest child (e.g. PIN row) and pushes the
+         page wider than a small phone; minmax(0,..) lets it shrink. */
+      #product > .two > * {
+        min-width: 0;
       }
 
       #product .gallery {
@@ -415,7 +421,7 @@
       }
 
       #product .gallery {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
       }
 
       #product .thumbs {
@@ -674,15 +680,15 @@
   <!-- COMMON JS -->
 
   <script
-    src="/frontend/js/app.js?v=19"
+    src="/frontend/js/app.js?v=31"
   ></script>
 
   <!-- PRODUCT JS -->
 
   <script
-    src="/frontend/js/products.js?v=22"
+    src="/frontend/js/products.js?v=31"
   ></script>
-  <script src="/frontend/js/share.js?v=2" defer></script>
+  <script src="/frontend/js/share.js?v=31" defer></script>
 
   <!-- PRODUCT REVIEWS & RATINGS JS -->
 

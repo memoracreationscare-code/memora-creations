@@ -264,7 +264,7 @@ html body #product .field .mc-qty{display:inline-grid}
 .mc-qty input::-webkit-outer-spin-button,.mc-qty input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 @media(max-width:760px){
 .product-popup-overlay{align-items:flex-end;padding:0}
-.product-popup{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr);width:100%;max-height:92vh;max-height:92dvh;border-radius:24px 24px 0 0;animation:mcUp .3s ease}
+.product-popup{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);width:100%;max-height:92vh;max-height:92dvh;border-radius:24px 24px 0 0;animation:mcUp .3s ease}
 .product-popup-imagebox .mc-gal-track,.product-popup-imagebox .mc-gal{height:auto}
 .product-popup-imagebox .mc-gal-slide{aspect-ratio:1/1;height:auto;max-height:44vh;max-height:44dvh;width:100%}
 .product-popup-imagebox .mc-gal-slide img{object-fit:contain}
