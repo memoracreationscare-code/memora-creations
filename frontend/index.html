@@ -1254,9 +1254,9 @@
               </div>
               <a class="mc-pop-detail" href="/frontend/product.html?id=${encodeURIComponent(product._id)}">Poori details dekho →</a>
 
-              ${product.personalization?.enabled || (Array.isArray(product.variants) && product.variants.length) ? `
+              ${Array.isArray(product.variants) && product.variants.length ? `
               <div class="mc-buy">
-                <a class="btn" href="/frontend/product.html?id=${encodeURIComponent(product._id)}">${product.personalization?.enabled ? '📷 Photo upload karke order karein' : 'Size / Colour chuno'}</a>
+                <a class="btn" href="/frontend/product.html?id=${encodeURIComponent(product._id)}">Size / Colour chuno</a>
               </div>` : `
               <div class="mc-buy">
                 <div class="mc-buy-row">
@@ -1355,11 +1355,11 @@
           `${HOME_BASE}/frontend/checkout.html?buyNow=${encodeURIComponent(id)}&qty=${encodeURIComponent(quantity)}`;
       }
 
-      // photo frames and size/colour products are ordered on their own page
+      // size/colour products are ordered on their own page
       function openOwnPage(id) {
         const item = homeProducts.find(p => String(p._id) === String(id));
 
-        if (item && (item.personalization?.enabled || (Array.isArray(item.variants) && item.variants.length))) {
+        if (item && Array.isArray(item.variants) && item.variants.length) {
           location.href = HOME_BASE + '/frontend/product.html?id=' + encodeURIComponent(item._id);
           return true;
         }

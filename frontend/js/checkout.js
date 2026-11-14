@@ -1030,24 +1030,17 @@
           : 1
       }];
 
-      // photo frame bought with "Order Now": photos wait in this tab's session storage
-      try {
-        const saved = JSON.parse(sessionStorage.getItem('mc_buynow_custom') || 'null');
-
-        if (saved && saved.productId === buyNowId && Array.isArray(saved.customPhotos) && saved.customPhotos.length) {
-          items[0].customPhotos = saved.customPhotos;
-          if (saved.customNote) items[0].customNote = saved.customNote;
-        }
-      } catch (_) { /* ignore */ }
-
     } else {
       fromCart = true;
 
       const cart =
         await MC.api('/cart');
 
-      items = (cart.cart?.items || [])
-        .filter(x => x.product?._id)
+      const cartLines = (cart.cart?.items || []).filter(x => x.product?._id);
+
+      lineProducts = cartLines.map(x => x.product);
+
+      items = cartLines
         .map(x => ({
           productId: x.product._id,
           ...(x.variantId ? { variantId: x.variantId } : {}),
@@ -1063,6 +1056,8 @@
         '<div class="empty">Cart is empty.</div>';
       return;
     }
+
+    await setupPhotoStep();
 
     await refreshCouponPreview();
 
@@ -1132,7 +1127,112 @@
   ========================================
   */
 
+  /*
+  ========================================
+   PHOTO FRAME: photo + note step
+
+   Products that need the customer's own photo get an upload box here, before
+   payment. Payment is blocked until every such product has a photo.
+  ========================================
+  */
+
+  const photoBoxes = [];
+  let lineProducts = []; // product details of each cart line (same order as items)
+
+  function photoStorage(action, key, value) {
+    try {
+      const all = JSON.parse(sessionStorage.getItem('mc_cphotos') || '{}');
+
+      if (action === 'get') return all[key];
+
+      all[key] = value;
+      sessionStorage.setItem('mc_cphotos', JSON.stringify(all));
+    } catch (_) { /* private mode: just no memory after reload */ }
+
+    return undefined;
+  }
+
+  async function setupPhotoStep() {
+    photoBoxes.length = 0;
+
+    const lines = [];
+
+    for (let i = 0; i < items.length; i += 1) {
+      let product = lineProducts[i];
+
+      if (!product && !fromCart) {
+        try {
+          product = (await MC.api('/products/' + encodeURIComponent(items[i].productId))).product;
+        } catch (_) { product = null; }
+      }
+
+      if (product && product.personalization && product.personalization.enabled) {
+        lines.push({ index: i, product });
+      }
+    }
+
+    const form = $('#checkoutForm');
+
+    $('#mcPhotoStep')?.remove();
+
+    if (!lines.length || !form || !window.MCPhoto) return;
+
+    const step = document.createElement('section');
+
+    step.id = 'mcPhotoStep';
+    step.innerHTML = `
+      <div class="checkout-card-heading">
+        <span>PHOTO FRAME</span>
+        <h2>📷 Apni photo aur note do</h2>
+        <p style="margin:6px 0 0;color:#6b5d52">Pehle photo upload karein, uske baad address aur payment karein.</p>
+      </div>
+      <div id="mcPhotoLines"></div>`;
+
+    form.prepend(step);
+
+    const seen = {};
+
+    lines.forEach((line, n) => {
+      const item = items[line.index];
+      const base = item.productId + '|' + (item.variantId || '');
+
+      seen[base] = (seen[base] || 0) + 1;
+
+      const key = base + '|' + seen[base];
+      const holder = document.createElement('div');
+
+      $('#mcPhotoLines').appendChild(holder);
+
+      const box = window.MCPhoto.mount(holder, line.product, {
+        uid: String(n),
+        title: lines.length > 1 ? line.product.name + ': photo upload karein' : 'Apni photo upload karein',
+        initial: photoStorage('get', key),
+        onChange: value => photoStorage('set', key, value)
+      });
+
+      photoBoxes.push({ index: line.index, box });
+    });
+  }
+
+  // Every photo frame needs its photo before the order can be placed.
+  function collectPhotos() {
+    for (const { box } of photoBoxes) {
+      if (!box.check()) throw new Error('Pehle apni photo upload karein, phir payment karein.');
+    }
+
+    for (const { index, box } of photoBoxes) {
+      const value = box.value();
+
+      items[index].customPhotos = value.customPhotos;
+
+      if (value.customNote) items[index].customNote = value.customNote;
+      else delete items[index].customNote;
+    }
+  }
+
   async function verifyBeforePayment() {
+    collectPhotos();
+
     const currentGift =
       giftWrappingData();
 

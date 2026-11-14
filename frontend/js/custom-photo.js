@@ -90,23 +90,36 @@
     return result.photo;
   }
 
-  function mount(container, product) {
+  function mount(container, product, opts = {}) {
     const cfg = product.personalization || {};
     const max = Math.min(10, Math.max(1, Number(cfg.maxPhotos) || 1));
     const items = []; // { id, url, publicId, preview, busy }
     let n = 0;
+    const initial = opts.initial || {};
+
+    // photos uploaded earlier (page reload) come back already uploaded
+    (Array.isArray(initial.photos) ? initial.photos : []).slice(0, max).forEach(p => {
+      if (p && p.url && p.publicId) items.push({ id: ++n, url: p.url, publicId: p.publicId, preview: p.url, busy: false });
+    });
+
+    const changed = () => {
+      if (typeof opts.onChange === 'function') opts.onChange({
+        customPhotos: items.filter(it => it.url).map(it => ({ url: it.url, publicId: it.publicId })),
+        customNote: note.value.trim()
+      });
+    };
 
     const root = document.createElement('section');
 
     root.className = 'mc-photo-box';
     root.innerHTML = `
-      <h3>${CAMERA.replace('<svg', '<svg width="22" height="22"')} Apni photo upload karein <span style="color:#b3261e">*</span></h3>
+      <h3>${CAMERA.replace('<svg', '<svg width="22" height="22"')} ${esc(opts.title || 'Apni photo upload karein')} <span style="color:#b3261e">*</span></h3>
       <p class="mc-photo-hint">${esc(cfg.label || 'Jo photo frame me lagani hai wo yaha upload karein.')} (maximum ${max} photo, JPG / PNG / WebP, har photo 8 MB tak)</p>
       <div class="mc-photo-grid"></div>
       <div class="mc-photo-note">
-        <label for="mcPhotoNote">Kuch likhwana ya batana hai? (optional)</label>
-        <textarea id="mcPhotoNote" maxlength="300" placeholder="Jaise: Naam Riya, date 14-02-2027. Pehli photo bade frame me lagana."></textarea>
-        <small><span id="mcPhotoCount">0</span>/300</small>
+        <label for="mcPhotoNote${opts.uid || ''}">Kuch likhwana ya batana hai? (optional)</label>
+        <textarea id="mcPhotoNote${opts.uid || ''}" maxlength="300" placeholder="Jaise: Naam Riya, date 14-02-2027. Pehli photo bade frame me lagana."></textarea>
+        <small><span class="mc-photo-count">0</span>/300</small>
       </div>
       <div class="mc-photo-msg" role="alert" hidden></div>`;
 
@@ -122,7 +135,13 @@
       root.classList.toggle('invalid', !!text);
     };
 
-    note.addEventListener('input', () => { root.querySelector('#mcPhotoCount').textContent = note.value.length; });
+    note.value = String(initial.note || '').slice(0, 300);
+    root.querySelector('.mc-photo-count').textContent = note.value.length;
+
+    note.addEventListener('input', () => {
+      root.querySelector('.mc-photo-count').textContent = note.value.length;
+      changed();
+    });
 
     function render() {
       grid.innerHTML = items.map(it => `
@@ -176,6 +195,7 @@
         }
 
         render();
+        changed();
       }
     }
 
@@ -193,7 +213,7 @@
 
       const i = items.findIndex(it => String(it.id) === x.dataset.remove);
 
-      if (i >= 0) { URL.revokeObjectURL(items[i].preview); items.splice(i, 1); render(); }
+      if (i >= 0) { URL.revokeObjectURL(items[i].preview); items.splice(i, 1); render(); changed(); }
     });
 
     render();
