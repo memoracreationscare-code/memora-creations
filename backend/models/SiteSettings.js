@@ -76,6 +76,8 @@ const schema = new mongoose.Schema({
   shareEnabled: Boolean,
   waOrderEnabled: Boolean,
   waOrderText: str(300),
+  recentViewedEnabled: Boolean,
+  installAppEnabled: Boolean,
   waUpdatesEnabled: Boolean,
 
   gstEnabled: Boolean,

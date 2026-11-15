@@ -90,6 +90,8 @@ function defaults() {
     shareEnabled: true,
     waOrderEnabled: true,
     waOrderText: '',
+    recentViewedEnabled: true,
+    installAppEnabled: true,
     waUpdatesEnabled: false,
 
     gstEnabled: false,
