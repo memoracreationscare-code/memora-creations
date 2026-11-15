@@ -108,7 +108,7 @@ async function loadCartPage() {
 
 
                 const image =
-                  product.images?.[0]?.url ||
+                  window.MC.optImg(product.images?.[0]?.url, 240) ||
                   'https://placehold.co/120x120?text=Memora';
 
 
