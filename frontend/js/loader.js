@@ -17,9 +17,9 @@
 
   const root = document.documentElement;
 
-  const MIN_VISIBLE_FIRST = 1000;
+  const MIN_VISIBLE_FIRST = 350;
   const SHOW_AFTER_LATER = 500;
-  const MAX_WAIT = 8000;
+  const MAX_WAIT = 2500;
   const FADE_MS = 450;
 
   let firstVisit = true;
@@ -69,10 +69,10 @@
     showTimer = setTimeout(show, SHOW_AFTER_LATER);
   }
 
-  if (document.readyState === 'complete') {
+  if (document.readyState !== 'loading') {
     finish();
   } else {
-    window.addEventListener('load', finish, { once: true });
+    document.addEventListener('DOMContentLoaded', finish, { once: true });
   }
 
   setTimeout(finish, MAX_WAIT);
