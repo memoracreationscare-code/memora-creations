@@ -582,6 +582,13 @@
       applyProductSeo(product, images, stock);
       void showTrustBadges(box);
       void showRelatedProducts(product, box);
+      // recent.js is deferred too and may not have run yet: wait for it if needed
+      const trackViewed = () => {
+        window.MCRecent?.add(product);
+        window.MCRecent?.render(box, String(product._id));
+      };
+      if (window.MCRecent || document.readyState === 'complete') trackViewed();
+      else window.addEventListener('load', trackViewed, { once: true });
       window.MCPinCheck?.mount(box, product._id);
       refreshWishlist();
       // FIX: querySelectorAll returns a list; querySelector does not.

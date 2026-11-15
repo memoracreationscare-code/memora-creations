@@ -1,0 +1,14 @@
+{
+  "name": "Memora Creations",
+  "short_name": "Memora",
+  "description": "Home decor, photo frames and thoughtful gifts.",
+  "start_url": "/frontend/index.html",
+  "scope": "/frontend/",
+  "display": "standalone",
+  "background_color": "#fbf6ef",
+  "theme_color": "#8a5a3b",
+  "icons": [
+    { "src": "/frontend/images/favicon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/frontend/images/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
