@@ -434,6 +434,16 @@ document.addEventListener('click', event => {
   input.dispatchEvent(new Event('input', { bubbles: true }));
 });
 
+/* Cloudinary photos: ask for a right-sized, modern-format copy (f_auto = webp/avif, q_auto, width cap).
+   Anything that is not a plain Cloudinary upload URL is returned untouched. */
+function optImg(url, width) {
+  if (typeof url !== 'string') return url;
+  const m = url.match(/^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(.+)$/);
+  if (!m) return url;
+  if (/^(?:[a-z]{1,3}_[^/,]+,?)+\//.test(m[2])) return url; // already has a transformation
+  return `${m[1]}f_auto,q_auto,c_limit,w_${Math.max(80, Math.round(width) || 600)}/${m[2]}`;
+}
+
 function galleryHtml(images, alt, opts = {}) {
   const list = (Array.isArray(images) ? images : [])
     .map(x => (typeof x === 'string' ? x : x?.url))
@@ -446,10 +456,10 @@ function galleryHtml(images, alt, opts = {}) {
         <button class="mc-gal-nav prev" type="button" aria-label="Pichli photo" disabled>‹</button>
         <button class="mc-gal-nav next" type="button" aria-label="Agli photo">›</button>` : ''}
       <div class="mc-gal-track">
-        ${list.map((u, i) => `<div class="mc-gal-slide"><img src="${esc(u)}" alt="${esc(alt || '')}" ${i ? 'loading="lazy"' : ''} decoding="async" draggable="false"${i === 0 ? ' id="mainImage"' : ''}></div>`).join('')}
+        ${list.map((u, i) => `<div class="mc-gal-slide"><img src="${esc(optImg(u, 1000))}" alt="${esc(alt || '')}" ${i ? 'loading="lazy"' : ''} decoding="async" draggable="false"${i === 0 ? ' id="mainImage"' : ''}></div>`).join('')}
       </div>
       ${many ? `<div class="mc-gal-dots">${list.map((_, i) => `<i class="${i ? '' : 'on'}"></i>`).join('')}</div>` : ''}
-      ${many && opts.thumbs ? `<div class="mc-gal-thumbs">${list.map((u, i) => `<img src="${esc(u)}" alt="" class="${i ? '' : 'on'}" data-i="${i}" loading="lazy">`).join('')}</div>` : ''}
+      ${many && opts.thumbs ? `<div class="mc-gal-thumbs">${list.map((u, i) => `<img src="${esc(optImg(u, 160))}" alt="" class="${i ? '' : 'on'}" data-i="${i}" loading="lazy">`).join('')}</div>` : ''}
     </div>`;
 }
 
@@ -1112,6 +1122,7 @@ window.MC = {
   API_BASE: API,
   ratingHtml,
   ribbonHtml,
+  optImg,
   shuffleProducts,
   initGallery,
   currentUser,

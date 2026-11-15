@@ -117,7 +117,7 @@
   }
 
   function pictureOf(product) {
-    return product.images?.[0]?.url || placeholder;
+    return MC.optImg(product.images?.[0]?.url, 560) || placeholder;
   }
 
   function priceMarkup(product, prefix) {

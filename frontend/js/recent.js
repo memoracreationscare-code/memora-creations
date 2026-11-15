@@ -76,7 +76,7 @@
     sec.className = 'mc-recent';
     sec.innerHTML = `<h2>Recently viewed</h2><div class="mc-recent-row">` + found.map(p =>
       `<a class="mc-recent-card" href="/frontend/product.html?id=${encodeURIComponent(p._id)}">
-         <img src="${esc((p.images && p.images[0] && p.images[0].url) || '/frontend/images/logo.png')}" alt="${esc(p.name)}" loading="lazy">
+         <img src="${esc((window.MC && window.MC.optImg ? window.MC.optImg(p.images && p.images[0] && p.images[0].url, 300) : (p.images && p.images[0] && p.images[0].url)) || '/frontend/images/logo.png')}" alt="${esc(p.name)}" loading="lazy">
          <b>${esc(p.name)}</b><span>${money(p.sellingPrice)}</span></a>`).join('') + `</div>`;
     if (where === 'before') host.parentNode.insertBefore(sec, host);
     else host.appendChild(sec);
