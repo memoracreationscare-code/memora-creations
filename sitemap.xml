@@ -2,43 +2,78 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://memoracreationscare.in/frontend/index.html</loc>
-    <lastmod>2026-11-14</lastmod>
+    <lastmod>2026-11-15</lastmod>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://memoracreationscare.in/frontend/products.html</loc>
-    <lastmod>2026-11-14</lastmod>
+    <lastmod>2026-11-15</lastmod>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://memoracreationscare.in/frontend/about.html</loc>
-    <lastmod>2026-11-14</lastmod>
+    <lastmod>2026-11-15</lastmod>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://memoracreationscare.in/frontend/contact.html</loc>
-    <lastmod>2026-11-14</lastmod>
+    <lastmod>2026-11-15</lastmod>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://memoracreationscare.in/frontend/shipping-policy.html</loc>
-    <lastmod>2026-11-14</lastmod>
+    <lastmod>2026-11-15</lastmod>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://memoracreationscare.in/frontend/return-refund-policy.html</loc>
-    <lastmod>2026-11-14</lastmod>
+    <lastmod>2026-11-15</lastmod>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://memoracreationscare.in/frontend/privacy-policy.html</loc>
-    <lastmod>2026-11-14</lastmod>
+    <lastmod>2026-11-15</lastmod>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://memoracreationscare.in/frontend/terms.html</loc>
-    <lastmod>2026-11-14</lastmod>
+    <lastmod>2026-11-15</lastmod>
     <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://memoracreationscare.in/frontend/product.html?id=6af803659437450c261310ac</loc>
+    <lastmod>2026-11-14</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://memoracreationscare.in/frontend/product.html?id=6af7ef99d93fee28b5e767d9</loc>
+    <lastmod>2026-11-14</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://memoracreationscare.in/frontend/product.html?id=6af7ee6bd93fee28b5e7674c</loc>
+    <lastmod>2026-11-14</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://memoracreationscare.in/frontend/product.html?id=6af7eda1d93fee28b5e766ea</loc>
+    <lastmod>2026-11-14</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://memoracreationscare.in/frontend/product.html?id=6af7ecb3d93fee28b5e76684</loc>
+    <lastmod>2026-11-14</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://memoracreationscare.in/frontend/product.html?id=6af7eb58d93fee28b5e7660a</loc>
+    <lastmod>2026-11-14</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://memoracreationscare.in/frontend/product.html?id=6af7ea4bd93fee28b5e76586</loc>
+    <lastmod>2026-11-14</lastmod>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://memoracreationscare.in/frontend/product.html?id=6af6ea5d26db5d7ebebe4251</loc>
