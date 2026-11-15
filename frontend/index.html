@@ -1014,7 +1014,7 @@
 
   <!-- COMMON APP -->
 
-  <script src="/frontend/js/app.js?v=31"></script>
+  <script src="/frontend/js/app.js?v=32"></script>
 
   <!-- HOME PAGE LOGIC -->
 
@@ -1128,6 +1128,8 @@
                     ${discount}% OFF
                   </span>
                 ` : ''}
+
+                ${MC.ribbonHtml(product)}
 
                 <span class="stock-badge ${inStock ? '' : 'out'}"></span>
 

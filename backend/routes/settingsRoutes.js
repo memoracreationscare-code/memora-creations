@@ -37,6 +37,7 @@ function publicView(s) {
     waOrderEnabled: s.waOrderEnabled !== false,
     waOrderText: s.waOrderText || '',
     recentViewedEnabled: s.recentViewedEnabled !== false,
+    badgesEnabled: s.badgesEnabled !== false,
     installAppEnabled: s.installAppEnabled !== false,
     waUpdatesEnabled: s.waUpdatesEnabled === true,
     heroKicker: s.heroKicker,

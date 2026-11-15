@@ -77,6 +77,7 @@ const schema = new mongoose.Schema({
   waOrderEnabled: Boolean,
   waOrderText: str(300),
   recentViewedEnabled: Boolean,
+  badgesEnabled: Boolean,
   installAppEnabled: Boolean,
   waUpdatesEnabled: Boolean,
 
