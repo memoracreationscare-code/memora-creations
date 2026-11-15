@@ -716,6 +716,28 @@
         grid-template-columns: 1fr;
       }
     }
+  
+    /* Hero with photo on the right (text stays real, editable text) */
+    .home-hero { position: relative; background: #f8e8d7; min-height: 520px; }
+    .home-hero::after {
+      content: ""; position: absolute; top: 0; right: 0; bottom: 0; height: 100%;
+      aspect-ratio: 301 / 660;
+      background: url("/frontend/images/hero-decor.webp") center bottom / cover no-repeat;
+      -webkit-mask-image: linear-gradient(to right, transparent 0, #000 45%);
+      mask-image: linear-gradient(to right, transparent 0, #000 45%);
+      pointer-events: none;
+    }
+    .hero-copy { position: relative; z-index: 1; max-width: 62%; padding: clamp(28px,4vw,52px) clamp(24px,6vw,78px); }
+    @media (max-width: 640px) {
+      .home-hero { min-height: 0; }
+      .home-hero::after {
+        top: auto; right: 0; height: 380px; width: 60%; aspect-ratio: auto;
+        -webkit-mask-image: linear-gradient(to right, transparent 0, #000 40%);
+        mask-image: linear-gradient(to right, transparent 0, #000 40%);
+      }
+      .hero-copy { max-width: 100%; padding: 30px 20px 400px; }
+      .home-hero h1 { font-size: clamp(40px,11.5vw,54px); }
+    }
   </style>
   <link rel="stylesheet" href="css/loader.css?v=1">
   <script src="js/loader.js?v=1"></script>
