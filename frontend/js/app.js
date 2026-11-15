@@ -383,11 +383,30 @@ function ribbonHtml(product) {
     .mc-ribbon-new{background:#1f7a4a;color:#fff}
     html.mc-no-badges .mc-ribbon{display:none}`;
   document.head.appendChild(s);
-  fetch(API + '/settings').then(r => r.json()).then(d => {
+  window.__mcSettings = fetch(API + '/settings').then(r => r.json()).then(d => {
     const st = (d && (d.settings || d.data || d)) || {};
     if (st.badgesEnabled === false) document.documentElement.classList.add('mc-no-badges');
-  }).catch(() => {});
+    return st;
+  }).catch(() => ({}));
 })();
+
+/* Random order on every page load (admin switch: Settings -> shuffleProducts).
+   In-stock products are mixed; out-of-stock ones stay at the end. */
+async function shuffleProducts(list) {
+  const st = await (window.__mcSettings || Promise.resolve({}));
+  if (st.shuffleProducts === false || !Array.isArray(list)) return list;
+  const mix = arr => {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+  const inStock = list.filter(p => Number(p && p.stock) > 0);
+  const out = list.filter(p => !(Number(p && p.stock) > 0));
+  return mix(inStock).concat(out);
+}
 
 /* Small "★★★★☆ 4.5 (12)" line. Empty until the product has an approved review. */
 function ratingHtml(product) {
@@ -1093,6 +1112,7 @@ window.MC = {
   API_BASE: API,
   ratingHtml,
   ribbonHtml,
+  shuffleProducts,
   initGallery,
   currentUser,
   requireLogin,

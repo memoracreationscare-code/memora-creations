@@ -1014,7 +1014,7 @@
 
   <!-- COMMON APP -->
 
-  <script src="/frontend/js/app.js?v=32"></script>
+  <script src="/frontend/js/app.js?v=33"></script>
 
   <!-- HOME PAGE LOGIC -->
 
@@ -1458,7 +1458,7 @@
           const data = await window.MC.api('/products?limit=24');
 
           homeProducts = Array.isArray(data.products)
-            ? data.products
+            ? await window.MC.shuffleProducts(data.products)
             : [];
 
           box.innerHTML = homeProducts.length

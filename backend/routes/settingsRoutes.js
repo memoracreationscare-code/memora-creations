@@ -38,6 +38,7 @@ function publicView(s) {
     waOrderText: s.waOrderText || '',
     recentViewedEnabled: s.recentViewedEnabled !== false,
     badgesEnabled: s.badgesEnabled !== false,
+    shuffleProducts: s.shuffleProducts !== false,
     installAppEnabled: s.installAppEnabled !== false,
     waUpdatesEnabled: s.waUpdatesEnabled === true,
     heroKicker: s.heroKicker,

@@ -302,7 +302,7 @@
     const search = $('#filterForm [name="q"]');
     const sort = $('#filterForm [name="sort"]');
     if (search) search.value = params.get('q') || '';
-    if (sort) sort.value = params.get('sort') || 'newest';
+    if (sort) sort.value = params.get('sort') || 'mix';
     ['minPrice', 'maxPrice'].forEach(name => {
       const field = $('#filterForm [name="' + name + '"]');
       if (field) field.value = params.get(name) || '';
@@ -337,6 +337,8 @@
     try {
       const result = await MC.api('/products?' + params.toString());
       productsCache = Array.isArray(result.products) ? result.products : [];
+      // default view (no sort chosen, no search) = fresh random mix on every refresh
+      if (!params.get('sort') && !params.get('q')) productsCache = await MC.shuffleProducts(productsCache);
       const count = $('#resultCount');
       const total = Number(result.pagination?.total ?? productsCache.length);
       if (count) count.textContent = `${total} ${total === 1 ? 'product' : 'products'}`;
@@ -674,7 +676,7 @@
       const params = new URLSearchParams();
       for (const [key, value] of new FormData(filterForm).entries()) {
         const clean = String(value || '').trim();
-        if (clean && !(key === 'sort' && clean === 'newest')) params.set(key, clean);
+        if (clean && !(key === 'sort' && clean === 'mix')) params.set(key, clean);
       }
       const query = params.toString();
       location.href = location.pathname + (query ? '?' + query : '');
