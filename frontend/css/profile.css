@@ -925,3 +925,171 @@
   cursor:pointer;
   padding:0;
 }
+
+
+/* =====================================
+   PROFILE REDESIGN (v4)
+   Slim account header, compact cards, collapsible new-address form
+===================================== */
+
+.profile-page{padding-top:18px}
+
+/* the old big title block is replaced by the account header */
+.profile-hero{
+  padding:0;
+  margin-bottom:18px;
+  border:0;
+  background:none;
+  box-shadow:none;
+  border-radius:0;
+}
+.profile-hero > .profile-eyebrow,
+.profile-hero > h1,
+.profile-hero > p{display:none}
+
+.profile-summary{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  align-items:center;
+  gap:14px 18px;
+  max-width:none;
+  margin:0;
+  padding:22px;
+  border:0;
+  border-radius:24px;
+  color:#fff;
+  background:
+    radial-gradient(circle at 92% 0%,rgba(255,255,255,.14),transparent 45%),
+    linear-gradient(135deg,#8a5a3b,#573621);
+  box-shadow:0 16px 36px rgba(87,54,33,.28);
+}
+.profile-summary[hidden]{display:none}
+
+.profile-avatar-wrap{width:78px;height:78px;flex:none}
+.profile-avatar{
+  width:78px;height:78px;flex:none;
+  font-size:28px;
+  border:3px solid rgba(255,255,255,.9);
+  box-shadow:0 6px 16px rgba(0,0,0,.25);
+}
+.profile-avatar-edit{border-color:#573621;background:#d7a46c;color:#2b1d14;width:30px;height:30px}
+
+.profile-summary-text{min-width:0}
+.profile-summary-text strong{color:#fff;font-size:clamp(20px,3vw,26px);line-height:1.2}
+.profile-summary-text span{color:#f1dfcf;font-size:14px}
+
+.profile-avatar-actions{grid-column:2}
+.profile-avatar-actions button{color:#f6c9bd}
+
+.profile-quick-links{
+  grid-column:1 / -1;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+  width:auto;
+}
+.profile-quick-links a{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  padding:12px 6px;
+  border-radius:14px;
+  background:rgba(255,255,255,.13);
+  border:1px solid rgba(255,255,255,.2);
+  color:#fff;
+  font-size:13px;
+  font-weight:700;
+}
+.profile-quick-links a i{font-style:normal;font-size:20px;line-height:1}
+.profile-quick-links a:hover{background:rgba(255,255,255,.22)}
+
+/* cards */
+.profile-card{
+  padding:20px;
+  border-radius:20px;
+  box-shadow:0 8px 24px rgba(61,39,23,.06);
+}
+.profile-card-heading{margin-bottom:14px}
+.profile-card-heading h2,
+.profile-support-heading h2{font-size:21px;line-height:1.2;margin:2px 0 0}
+.profile-card-heading > span,
+.profile-support-heading > span{font-size:10px}
+
+.address-heading{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:10px;
+}
+.profile-add-toggle{
+  flex:none;
+  border:1.5px solid #8a5a3b;
+  background:#fff;
+  color:#8a5a3b;
+  border-radius:999px;
+  padding:8px 14px;
+  font:800 13px/1 inherit;
+  font-family:inherit;
+  cursor:pointer;
+}
+.profile-add-toggle:hover{background:#8a5a3b;color:#fff}
+.profile-add-toggle:focus-visible{outline:2px solid #8a5a3b;outline-offset:2px}
+
+.address-form-card.is-collapsed{display:none}
+
+/* saved addresses sit side by side when there is room */
+#addresses{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+  gap:12px;
+}
+.saved-address-card{margin:0;padding:14px 16px;border-radius:16px}
+.saved-address-card p{font-size:13px;line-height:1.55;margin:0 0 12px}
+.saved-address-title{font-size:15px}
+.default-badge{font-size:10px}
+.saved-address-actions button{min-height:36px}
+
+/* support card: compact */
+.profile-support-card{padding:18px;border-radius:20px}
+.profile-support-heading p{display:none}
+.profile-support-link{padding:12px 14px}
+.profile-support-link strong{font-size:14px}
+.profile-support-link span{font-size:12.5px}
+
+.profile-input{min-height:46px}
+
+/* phones: account, addresses, new address, then support */
+@media (max-width:900px){
+  .profile-layout{display:flex;flex-direction:column;align-items:stretch;gap:16px}
+  .profile-layout > div{display:contents}
+  #profileForm{order:1}
+  #addressesCard{order:2}
+  #addressForm{order:3}
+  .profile-support-card{order:4}
+}
+
+@media (max-width:560px){
+  .profile-summary{padding:18px 16px;border-radius:20px}
+  .profile-avatar-wrap,.profile-avatar{width:68px;height:68px}
+  .profile-card{padding:16px}
+  .address-heading{flex-wrap:wrap}
+  #addresses{grid-template-columns:minmax(0,1fr)}
+}
+
+@media (max-width:900px) and (min-width:561px){
+  .profile-summary{max-width:none}
+}
+
+/* desktop: slim header row (avatar, name, quick links) */
+@media (min-width:761px){
+  .profile-summary{
+    grid-template-columns:auto minmax(0,1fr) minmax(320px,400px);
+    padding:22px 28px;
+  }
+  .profile-quick-links{grid-column:3;grid-row:1 / span 2}
+  .profile-avatar-actions{grid-column:2}
+}
+
+.profile-support-heading{margin-bottom:12px}
+.profile-support-link + .profile-support-link{margin-top:10px}

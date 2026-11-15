@@ -28,7 +28,7 @@
 
   <link
     rel="stylesheet"
-    href="/frontend/css/profile.css?v=3"
+    href="/frontend/css/profile.css?v=4"
   >
 
   <link rel="stylesheet" href="css/loader.css?v=1">
@@ -89,9 +89,9 @@
         </div>
 
         <div class="profile-quick-links">
-          <a href="/frontend/orders.html">📦 My Orders</a>
-          <a href="/frontend/wishlist.html">♡ Wishlist</a>
-          <a href="/frontend/cart.html">🛒 Cart</a>
+          <a href="/frontend/orders.html"><i aria-hidden="true">📦</i>My Orders</a>
+          <a href="/frontend/wishlist.html"><i aria-hidden="true">♡</i>Wishlist</a>
+          <a href="/frontend/cart.html"><i aria-hidden="true">🛒</i>Cart</a>
         </div>
       </div>
 
@@ -190,83 +190,6 @@
         </form>
 
 
-        <!-- CUSTOMER CARE -->
-
-        <section class="profile-support-card">
-
-          <div class="profile-support-heading">
-
-            <span>
-              NEED HELP?
-            </span>
-
-            <h2>
-              Customer Care
-            </h2>
-
-            <p>
-              Order, payment, delivery ya account
-              se related help ke liye humse contact karein.
-            </p>
-
-          </div>
-
-
-          <a
-            class="profile-support-link"
-            href="https://wa.me/918874050204?text=Namaste%20Memora%20Creations%2C%20mujhe%20customer%20support%20chahiye."
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-
-            <div class="support-icon whatsapp">
-              💬
-            </div>
-
-            <div>
-
-              <strong>
-                WhatsApp Support
-              </strong>
-
-              <span>
-                +91 88740 50204
-              </span>
-
-            </div>
-
-            <b>›</b>
-
-          </a>
-
-
-          <a
-            class="profile-support-link"
-            href="mailto:memoracreations.care@gmail.com?subject=Memora%20Creations%20Customer%20Support"
-          >
-
-            <div class="support-icon email">
-              ✉️
-            </div>
-
-            <div>
-
-              <strong>
-                Email Support
-              </strong>
-
-              <span>
-                memoracreations.care@gmail.com
-              </span>
-
-            </div>
-
-            <b>›</b>
-
-          </a>
-
-        </section>
-
       </div>
 
 
@@ -277,7 +200,7 @@
 
         <!-- SAVED ADDRESS -->
 
-        <section class="profile-card">
+        <section class="profile-card" id="addressesCard">
 
           <div class="profile-card-heading address-heading">
 
@@ -292,6 +215,8 @@
               </h2>
 
             </div>
+
+            <button type="button" class="profile-add-toggle" id="addAddressToggle" aria-expanded="false" aria-controls="addressForm">＋ Naya address</button>
 
           </div>
 
@@ -311,7 +236,7 @@
 
         <form
           id="addressForm"
-          class="profile-card address-form-card"
+          class="profile-card address-form-card is-collapsed"
         >
 
           <div class="profile-card-heading">
@@ -471,10 +396,85 @@
 
         </form>
 
+        <!-- CUSTOMER CARE -->
+
+        <section class="profile-support-card">
+
+          <div class="profile-support-heading">
+
+            <span>
+              NEED HELP?
+            </span>
+
+            <h2>
+              Customer Care
+            </h2>
+
+            <p>
+              Order, payment, delivery ya account
+              se related help ke liye humse contact karein.
+            </p>
+
+          </div>
+
+
+          <a
+            class="profile-support-link"
+            href="https://wa.me/918874050204?text=Namaste%20Memora%20Creations%2C%20mujhe%20customer%20support%20chahiye."
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+
+            <div class="support-icon whatsapp">
+              💬
+            </div>
+
+            <div>
+
+              <strong>
+                WhatsApp Support
+              </strong>
+
+              <span>
+                +91 88740 50204
+              </span>
+
+            </div>
+
+            <b>›</b>
+
+          </a>
+
+
+          <a
+            class="profile-support-link"
+            href="mailto:memoracreations.care@gmail.com?subject=Memora%20Creations%20Customer%20Support"
+          >
+
+            <div class="support-icon email">
+              ✉️
+            </div>
+
+            <div>
+
+              <strong>
+                Email Support
+              </strong>
+
+              <span>
+                memoracreations.care@gmail.com
+              </span>
+
+            </div>
+
+            <b>›</b>
+
+          </a>
+
+        </section>
+
       </div>
-
     </section>
-
   </main>
 
 
@@ -542,6 +542,29 @@
 
   </script>
 
+  <script>
+    /* "Naya address" form opens on demand and closes after a save */
+    (function () {
+      var btn = document.getElementById('addAddressToggle');
+      var form = document.getElementById('addressForm');
+      var list = document.getElementById('addresses');
+      if (!btn || !form) return;
+      function set(open) {
+        form.classList.toggle('is-collapsed', !open);
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.textContent = open ? '✕ Band karein' : '＋ Naya address';
+        if (open) { form.scrollIntoView({ behavior: 'smooth', block: 'start' }); var f = form.querySelector('input[name="label"]'); if (f) f.focus({ preventScroll: true }); }
+      }
+      btn.addEventListener('click', function () { set(form.classList.contains('is-collapsed')); });
+      if (list && window.MutationObserver) {
+        var first = true;
+        new MutationObserver(function () {
+          if (first) { first = false; return; }
+          if (!form.classList.contains('is-collapsed')) set(false);
+        }).observe(list, { childList: true });
+      }
+    })();
+  </script>
   <script src="js/extras.js?v=9" defer></script>
   <script src="js/animations.js?v=1" defer></script>
 </body>
