@@ -48,7 +48,42 @@ async function chat(req, res, deps = {}) {
     ? { apiKey: deps.apiKey, provider: deps.provider || 'anthropic', model: deps.model || 'm' }
     : pickProvider(process.env);
 
-  if (settings.chatEnabled !== true || !apiKey) {
+  if (settings.chatEnabled !== true) {
+    return res.status(503).json({ success: false, message: FALLBACK });
+  }
+
+  const agent = deps.agent || require('../services/chatAgent');
+  const instant = deps.instant !== undefined ? deps.instant : (deps.agent ? null : require('../services/chatInstant'));
+
+  const agentDeps = {
+    apiKey,
+    provider,
+    model,
+    fetch: deps.fetch || fetch,
+    // loaded only when needed (keeps the "chat is off" path light)
+    get models() { return deps.models || require('../models'); },
+    userId: deps.userId !== undefined ? deps.userId : (req.chatUserId || null),
+    get lookupOrder() { return deps.lookupOrder || require('./trackOrderController').lookupOrder; },
+    siteUrl: (process.env.FRONTEND_URL || 'https://memoracreationscare.in')
+      .replace(/\/+$/, '')
+      .replace(/\/frontend$/, '')
+  };
+
+  const messages = (req.body || {}).messages;
+
+  // 1) Answer from the shop's own data: instant, free, never "overloaded".
+  if (instant) {
+    try {
+      const quick = await instant.tryAnswer(messages, settings, agentDeps);
+
+      if (quick) return res.json({ success: true, reply: quick, source: 'shop' });
+    } catch (err) {
+      console.error('[Chat] instant:', err.message); // fall through to the AI
+    }
+  }
+
+  // 2) Everything else goes to the AI (needs a key and stays under the daily cap).
+  if (!apiKey) {
     return res.status(503).json({ success: false, message: FALLBACK });
   }
 
@@ -58,21 +93,8 @@ async function chat(req, res, deps = {}) {
     return res.status(429).json({ success: false, message: FALLBACK });
   }
 
-  const agent = deps.agent || require('../services/chatAgent');
-
   try {
-    const text = await agent.reply((req.body || {}).messages, settings, {
-      apiKey,
-      provider,
-      model,
-      fetch: deps.fetch || fetch,
-      models: deps.models || require('../models'),
-      userId: deps.userId !== undefined ? deps.userId : (req.chatUserId || null),
-      lookupOrder: deps.lookupOrder || require('./trackOrderController').lookupOrder,
-      siteUrl: (process.env.FRONTEND_URL || 'https://memoracreationscare.in')
-        .replace(/\/+$/, '')
-        .replace(/\/frontend$/, '')
-    });
+    const text = await agent.reply(messages, settings, agentDeps);
 
     return res.json({ success: true, reply: text });
   } catch (err) {
@@ -81,6 +103,12 @@ async function chat(req, res, deps = {}) {
     }
 
     console.error('[Chat]', `${provider}:`, err.message);
+
+    // AI busy/down: still give a useful, honest answer instead of an error.
+    if (instant && instant.fallbackMenu) {
+      return res.json({ success: true, reply: instant.fallbackMenu(settings), source: 'fallback' });
+    }
+
     return res.status(502).json({ success: false, message: FALLBACK });
   }
 }
