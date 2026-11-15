@@ -362,6 +362,33 @@ function showCartPopup() {
    MC.galleryHtml(images, alt, {thumbs}) + MC.initGallery(root)
 ===================================== */
 
+/* "Bestseller" / "New" ribbon on product images (admin can switch it off in Settings). */
+const NEW_DAYS = 14;
+function ribbonHtml(product) {
+  if (!product) return '';
+  let label = '';
+  if (product.isBestSeller === true) label = 'Bestseller';
+  else {
+    const t = Date.parse(product.createdAt || '');
+    if (Number.isFinite(t) && Date.now() - t < NEW_DAYS * 864e5 && Date.now() >= t - 864e5) label = 'New';
+  }
+  return label ? `<span class="mc-ribbon mc-ribbon-${label === 'New' ? 'new' : 'best'}">${label}</span>` : '';
+}
+
+(function applyBadgeSetting() {
+  const s = document.createElement('style');
+  s.textContent = `
+    .mc-ribbon{position:absolute;left:10px;bottom:10px;z-index:2;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.02em;line-height:1.2;box-shadow:0 2px 6px rgba(0,0,0,.18);pointer-events:none}
+    .mc-ribbon-best{background:#e8b34a;color:#2b1d14}
+    .mc-ribbon-new{background:#1f7a4a;color:#fff}
+    html.mc-no-badges .mc-ribbon{display:none}`;
+  document.head.appendChild(s);
+  fetch(API + '/settings').then(r => r.json()).then(d => {
+    const st = (d && (d.settings || d.data || d)) || {};
+    if (st.badgesEnabled === false) document.documentElement.classList.add('mc-no-badges');
+  }).catch(() => {});
+})();
+
 /* Small "★★★★☆ 4.5 (12)" line. Empty until the product has an approved review. */
 function ratingHtml(product) {
   const count = Number(product && product.ratingCount) || 0;
@@ -1065,6 +1092,7 @@ window.MC = {
   qtyHtml,
   API_BASE: API,
   ratingHtml,
+  ribbonHtml,
   initGallery,
   currentUser,
   requireLogin,

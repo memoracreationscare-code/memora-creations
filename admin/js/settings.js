@@ -20,7 +20,7 @@
   const BOOL = [
     'storeOpen', 'freeDeliveryBar', 'codEnabled', 'codAdvanceEnabled',
     'returnsEnabled', 'autoRefundEnabled', 'emailNotificationsEnabled',
-    'abandonedReminderEnabled', 'lowStockEmailEnabled', 'welcomeEnabled', 'referralEnabled', 'giftWrapEnabled', 'chatEnabled', 'shareEnabled', 'waOrderEnabled', 'gstEnabled', 'backupEmailEnabled', 'recentViewedEnabled', 'installAppEnabled', 'waUpdatesEnabled'
+    'abandonedReminderEnabled', 'lowStockEmailEnabled', 'welcomeEnabled', 'referralEnabled', 'giftWrapEnabled', 'chatEnabled', 'shareEnabled', 'waOrderEnabled', 'gstEnabled', 'backupEmailEnabled', 'recentViewedEnabled', 'installAppEnabled', 'badgesEnabled', 'waUpdatesEnabled'
   ];
 
   function showChat(configured) {

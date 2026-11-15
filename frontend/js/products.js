@@ -269,6 +269,7 @@
           <div class="premium-image-wrap">
             <img class="premium-product-img" src="${esc(pictureOf(product))}" alt="${esc(product.name)}" loading="lazy" decoding="async">
             ${discount > 0 ? `<span class="discount-badge">${discount}% OFF</span>` : ''}
+            ${MC.ribbonHtml(product)}
             <span class="stock-dot ${stock ? '' : 'out'}"></span>
           </div>
           <div class="premium-card-content">
@@ -540,6 +541,7 @@
           </div>
           <div>
             <span class="pill">${esc(product.category?.name || 'Category')}</span>
+            ${product.isBestSeller === true ? '<span class="pill" style="background:#e8b34a;color:#2b1d14;margin-left:6px">Bestseller</span>' : ''}
             <h1>${esc(product.name)}</h1>
             ${MC.ratingHtml(product)}
             <p>${esc(product.description || '')}</p>

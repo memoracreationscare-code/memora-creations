@@ -91,6 +91,7 @@ function defaults() {
     waOrderEnabled: true,
     waOrderText: '',
     recentViewedEnabled: true,
+    badgesEnabled: true,
     installAppEnabled: true,
     waUpdatesEnabled: false,
 
