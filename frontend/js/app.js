@@ -50,7 +50,7 @@ class ApiError extends Error {
    API REQUEST
 ===================================== */
 
-async function api(path, options = {}) {
+async function apiNetwork(path, options = {}) {
   if (
     typeof navigator !== 'undefined' &&
     navigator.onLine === false
@@ -133,6 +133,69 @@ async function api(path, options = {}) {
   }
 
   return data;
+}
+
+
+/* =====================================
+   FAST START: remember public shop data
+   (products, categories, banners, settings).
+   - saved copy younger than 60s is used straight away
+   - older saved copy is shown if the server is slow (>1.2s)
+     while the fresh data loads in the background
+===================================== */
+
+const CACHEABLE = /^\/(products|settings|banners|announcements?)(\/|\?|$)/;
+const CACHE_FRESH_MS = 60 * 1000;
+const CACHE_MAX_MS = 24 * 60 * 60 * 1000;
+const CACHE_WAIT_MS = 1200;
+
+function cacheRead(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    const hit = JSON.parse(raw);
+    if (!hit || Date.now() - hit.t > CACHE_MAX_MS) return null;
+    return hit;
+  } catch (_) {
+    return null;
+  }
+}
+
+function cacheWrite(key, data) {
+  try {
+    localStorage.setItem(key, JSON.stringify({ t: Date.now(), d: data }));
+  } catch (_) {
+    /* storage full or blocked: just skip */
+  }
+}
+
+async function api(path, options = {}) {
+  const method = String(options.method || 'GET').toUpperCase();
+
+  if (method !== 'GET' || !CACHEABLE.test(path)) {
+    return apiNetwork(path, options);
+  }
+
+  const key = 'mc_c1:' + path;
+  const hit = cacheRead(key);
+
+  if (hit && Date.now() - hit.t < CACHE_FRESH_MS) {
+    return hit.d;
+  }
+
+  const live = apiNetwork(path, options).then(data => {
+    cacheWrite(key, data);
+    return data;
+  });
+
+  if (!hit) return live;
+
+  live.catch(() => {});
+
+  return Promise.race([
+    live.catch(() => hit.d),
+    new Promise(resolve => setTimeout(() => resolve(hit.d), CACHE_WAIT_MS))
+  ]);
 }
 
 
@@ -383,7 +446,7 @@ function ribbonHtml(product) {
     .mc-ribbon-new{background:#1f7a4a;color:#fff}
     html.mc-no-badges .mc-ribbon{display:none}`;
   document.head.appendChild(s);
-  window.__mcSettings = fetch(API + '/settings').then(r => r.json()).then(d => {
+  window.__mcSettings = api('/settings').then(d => {
     const st = (d && (d.settings || d.data || d)) || {};
     if (st.badgesEnabled === false) document.documentElement.classList.add('mc-no-badges');
     return st;
