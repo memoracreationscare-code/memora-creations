@@ -67,6 +67,7 @@ async function chat(req, res, deps = {}) {
       model,
       fetch: deps.fetch || fetch,
       models: deps.models || require('../models'),
+      userId: deps.userId !== undefined ? deps.userId : (req.chatUserId || null),
       lookupOrder: deps.lookupOrder || require('./trackOrderController').lookupOrder,
       siteUrl: (process.env.FRONTEND_URL || 'https://memoracreationscare.in')
         .replace(/\/+$/, '')

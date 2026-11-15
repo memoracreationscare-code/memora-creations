@@ -32,7 +32,7 @@ test('system prompt carries live shop facts, owner FAQ and the safety rules', ()
 });
 
 test('the agent only has read-only tools', () => {
-  assert.deepStrictEqual(agent.TOOLS.map(t => t.name).sort(), ['get_offers', 'search_products', 'track_order']);
+  assert.deepStrictEqual(agent.TOOLS.map(t => t.name).sort(), ['get_offers', 'my_orders', 'search_products', 'track_order']);
 });
 
 test('history is cleaned: roles, alternation, length, must end on a user turn', () => {
@@ -205,10 +205,10 @@ test('get_offers: sale + opted-in coupons + welcome + referral + free delivery; 
     { sale: { name: 'Diwali Sale', percent: 20, endsAt: future } },
     { sale: { name: 'Diwali Sale', percent: 20, endsAt: future } }
   ] }) }) }) };
-  const Coupon = { find: f => { couponFilter = f; return { select: () => ({ limit: () => ({ lean: async () => [
+  const Coupon = { find: f => { couponFilter = f; return { select: () => ({ sort: () => ({ limit: () => ({ lean: async () => [
     { code: 'FESTIVE50', discountType: 'FIXED', discountValue: 50, minOrderAmount: 499, expiresAt: future, usageLimit: 10, usedCount: 1 },
     { code: 'USEDUP', discountType: 'PERCENTAGE', discountValue: 10, usageLimit: 5, usedCount: 5, expiresAt: future }
-  ] }) }) }; } };
+  ] }) }) }) }; } };
 
   let sent;
   const fetch = async (_u, opts) => {
@@ -219,7 +219,7 @@ test('get_offers: sale + opted-in coupons + welcome + referral + free delivery; 
   await agent.reply([{ role: 'user', content: 'koi offer?' }], { ...settings, welcomeEnabled: true, welcomePercent: 10, welcomeMaxDiscount: 100, welcomeMinOrder: 299, referralEnabled: true, referralFriendAmount: 50, referralRewardAmount: 50, referralMinOrder: 299 },
     { apiKey: 'k', model: 'm', fetch, siteUrl: 's', models: { Product, Coupon }, lookupOrder: async () => null });
 
-  assert.strictEqual(couponFilter.showInChat, true);
+  assert.strictEqual(couponFilter.showInChat, undefined); // every active public coupon is told
   assert.strictEqual(couponFilter.allowedUser, null);
   assert.strictEqual(couponFilter.source, 'ADMIN');
   const offers = JSON.parse(sent.messages[sent.messages.length - 1].content[0].content).offers;
@@ -260,4 +260,29 @@ test('Gemini: unknown fallback name is skipped and the real first error is repor
     provider: 'gemini', apiKey: 'gk', model: 'gemini-flash-latest', fetch, siteUrl: 's', models: {}, lookupOrder: async () => null, pauseMs: 0
   }), e => e.status === 503 && /overloaded/.test(e.detail));
   assert.strictEqual(n, 10);
+});
+
+
+test('my_orders is offered only to a logged-in customer and filters by their id', async () => {
+  assert.ok(!agent.toolsFor({}).some(t => t.name === 'my_orders'));
+  assert.ok(agent.toolsFor({ userId: 'u1' }).some(t => t.name === 'my_orders'));
+
+  let filter;
+  const Order = { find: f => { filter = f; return { select: () => ({ sort: () => ({ limit: () => ({ lean: async () => [{
+    _id: 'o1', orderId: 'MC-1', orderStatus: 'Shipped', grandTotal: 599, paymentMethod: 'COD',
+    codAdvance: { enabled: true, advanceAmount: 100, balanceAmount: 499, balanceStatus: 'PENDING' },
+    items: [{ product: 'p1', name: 'Frame', quantity: 1, unitPrice: 599, lineTotal: 599 }], statusHistory: []
+  }] }) }) }) }; } };
+  const ShipmentTracking = { findOne: () => ({ lean: async () => ({ awbCode: 'AWB1', courierName: 'Delhivery', trackingUrl: 'https://t.example/1' }) }) };
+  const Product = { find: () => ({ select: () => ({ populate: () => ({ lean: async () => [{ _id: 'p1', category: { name: 'Photo Frame' }, description: 'nice' }] }) }) }) };
+
+  const out = await agent.myOrders({ orderId: 'MC-1' }, { userId: 'u1', siteUrl: 's', models: { Order, ShipmentTracking, Product } });
+
+  assert.strictEqual(filter.user, 'u1');
+  assert.strictEqual(filter.orderId, 'MC-1');
+  const o = out.orders[0];
+  assert.strictEqual(o.payment.codBalanceDueOnDelivery, 499);
+  assert.strictEqual(o.items[0].category, 'Photo Frame');
+  assert.strictEqual(o.shipment.courier, 'Delhivery');
+  assert.strictEqual((await agent.myOrders({ orderId: 'x;$ne' }, { userId: 'u1', models: { Order } })).found, false);
 });
