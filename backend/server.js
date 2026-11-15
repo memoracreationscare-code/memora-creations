@@ -306,6 +306,12 @@ app.use(
 );
 
 /* ========================================
+   KEEP AWAKE WHILE PEOPLE ARE ON THE SITE
+======================================== */
+
+app.use(require('./services/keepAwake').markActivity);
+
+/* ========================================
    API HEALTH CHECK
 ======================================== */
 
@@ -434,6 +440,9 @@ if (require.main === module) {
   connectDatabase()
     .then(() => {
       app.listen(port, () => {
+        // Stops Render from sleeping while customers are around.
+        require('./services/keepAwake').start();
+
         // Move orders to Shipped / Delivered from Shiprocket tracking.
         require('./services/shipmentSync').startShipmentSync();
 

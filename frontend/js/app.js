@@ -50,6 +50,20 @@ class ApiError extends Error {
    API REQUEST
 ===================================== */
 
+/* Wake the server the moment any page opens (once per 5 minutes),
+   so it is already starting while the customer looks around. */
+(function wakeServer() {
+  try {
+    const last = Number(sessionStorage.getItem('mc_wake') || 0);
+    if (Date.now() - last < 5 * 60 * 1000) return;
+    sessionStorage.setItem('mc_wake', String(Date.now()));
+  } catch (_) { /* storage blocked: still ping */ }
+
+  try {
+    fetch(API + '/health?visit=1', { mode: 'no-cors', keepalive: true }).catch(() => {});
+  } catch (_) { /* ignore */ }
+})();
+
 async function apiNetwork(path, options = {}) {
   if (
     typeof navigator !== 'undefined' &&
