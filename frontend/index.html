@@ -716,6 +716,31 @@
         grid-template-columns: 1fr;
       }
     }
+  
+    /* Hero with photo on the right (text stays real, editable text) */
+    .home-hero { position: relative; background: #f8e8d7; min-height: 520px; }
+    .home-hero::after {
+      content: ""; position: absolute; top: 0; right: 0; bottom: 0; height: 100%;
+      aspect-ratio: 301 / 660;
+      background: url("/frontend/images/hero-decor.webp") center bottom / cover no-repeat;
+      -webkit-mask-image: linear-gradient(to right, transparent 0, #000 45%);
+      mask-image: linear-gradient(to right, transparent 0, #000 45%);
+      pointer-events: none;
+    }
+    .hero-copy { position: relative; z-index: 1; max-width: 62%; padding: clamp(28px,4vw,52px) clamp(24px,6vw,78px); }
+    @media (max-width: 640px) {
+      .home-hero { min-height: 0; margin-bottom: 24px; }
+      .home-hero::after {
+        top: 0; right: 0; bottom: 72px; height: auto; width: 46%; aspect-ratio: auto;
+        background-position: right bottom;
+        -webkit-mask-image: linear-gradient(to right, transparent 0, #000 40%);
+        mask-image: linear-gradient(to right, transparent 0, #000 40%);
+      }
+      .hero-copy { max-width: 100%; padding: 22px 18px 18px; }
+      .home-hero h1 { font-size: clamp(34px,10vw,44px); max-width: 62%; margin-bottom: 10px; }
+      .hero-kicker { margin-bottom: 8px; }
+      .hero-description { max-width: 58%; font-size: 14px; line-height: 1.5; margin-bottom: 20px; }
+    }
   </style>
   <link rel="stylesheet" href="css/loader.css?v=1">
   <script src="js/loader.js?v=1"></script>
