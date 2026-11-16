@@ -450,6 +450,9 @@ if (require.main === module) {
         // Automatic customer emails: order updates + abandoned cart reminder.
         require('./services/notificationSweeper').startNotificationSweeper();
 
+        // Phone notifications: order updates, cart reminders, birthdays, admin alerts.
+        require('./services/pushSweeper').startPushSweeper();
+
         // Refer & Earn: reward the referrer when the friend's order is delivered.
         require('./services/referralService').startReferralSweeper();
 

@@ -55,6 +55,7 @@ table.h{width:100%;border-collapse:collapse;font-size:14px}table.h th,table.h td
 <div class="prev"><i>MEMORA CREATIONS • abhi</i><b id="pvT">Title yahan dikhega</b><span id="pvB">Message yahan dikhega</span></div>
 <p style="color:var(--muted);font-size:13px;margin-top:14px">Dhyan: iPhone par notification tabhi aata hai jab customer ne website ko Home Screen par add kiya ho.</p></section>
 </div>
+<section class="card" style="margin-top:20px"><h2 class="section-title">Mere phone par admin alerts</h2><p style="color:var(--muted)">Is phone/computer par chalu karo to <b>naya order aate hi</b> notification aayega, aur roz raat 9 baje ke baad us din ka hisaab (kitne order, kitni bikri).</p><button class="nbtn" id="adminOn" type="button">Is device par alerts chalu karo</button></section>
 <section class="card" style="margin-top:20px"><h2 class="section-title">Pichle notifications</h2><div style="overflow:auto"><table class="h"><thead><tr><th>Kab</th><th>Title</th><th>Message</th><th>Gaye</th></tr></thead><tbody id="nHist"><tr><td colspan="4">Loading…</td></tr></tbody></table></div></section>
 </main></div></div>
 <script>
@@ -73,6 +74,14 @@ $('nForm').addEventListener('submit',async e=>{e.preventDefault();const subs=$('
  const b=$('nSend');b.disabled=true;b.textContent='Bhej rahe hain…';note('');
  try{const d=await req('/push/admin/send',{method:'POST',body:JSON.stringify({title:$('nTitle').value,body:$('nBody').value,url:$('nUrl').value})});note(d.message||'Bhej diya.');$('nForm').reset();$('pvT').textContent='Title yahan dikhega';$('pvB').textContent='Message yahan dikhega';load()}
  catch(err){note(err.message,true)}finally{b.disabled=false;b.textContent='Send to everyone'}});
+$('adminOn').addEventListener('click',async()=>{
+ try{if(!('serviceWorker' in navigator)||!('PushManager' in window))throw new Error('Is browser me notification support nahi hai (iPhone par pehle Home Screen par add karein).');
+ const perm=await Notification.requestPermission();if(perm!=='granted')throw new Error('Notification ki permission nahi mili.');
+ const reg=await navigator.serviceWorker.register('/frontend/sw.js',{scope:'/frontend/'});await navigator.serviceWorker.ready;
+ const {publicKey}=await req('/push/key');const pad='='.repeat((4-publicKey.length%4)%4);const raw=atob((publicKey+pad).replace(/-/g,'+').replace(/_/g,'/'));
+ let sub=await reg.pushManager.getSubscription();if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:Uint8Array.from(raw,c=>c.charCodeAt(0))});
+ await req('/push/admin/subscribe',{method:'POST',body:JSON.stringify({subscription:sub.toJSON()})});note('Is device par admin alerts chalu ho gaye.');
+ }catch(e){note(e.message,true)}});
 load();
 </script>
 <script src="/admin/js/nav.js?v=7"></script>

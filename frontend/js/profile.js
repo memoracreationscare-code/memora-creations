@@ -94,6 +94,28 @@ function fillProfile(
   }
 
 
+  /* Birthday (day + month, stored as "MM-DD") */
+  {
+    const dayEl = document.getElementById('bdDay');
+    const monEl = document.getElementById('bdMonth');
+
+    if (dayEl && monEl) {
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+      if (!dayEl.options.length) {
+        dayEl.innerHTML = '<option value="">Day</option>' +
+          Array.from({ length: 31 }, (_, i) => `<option value="${String(i + 1).padStart(2, '0')}">${i + 1}</option>`).join('');
+        monEl.innerHTML = '<option value="">Month</option>' +
+          months.map((m, i) => `<option value="${String(i + 1).padStart(2, '0')}">${m}</option>`).join('');
+      }
+
+      const parts = String(user.birthday || '').split('-');
+      monEl.value = parts[0] || '';
+      dayEl.value = parts[1] || '';
+    }
+  }
+
+
   const addresses =
     Array.isArray(
       user.addresses
@@ -807,7 +829,12 @@ if (profileForm) {
               JSON.stringify({
 
                 fullName,
-                email
+                email,
+                birthday: (() => {
+                  const d = document.getElementById('bdDay');
+                  const m = document.getElementById('bdMonth');
+                  return d && m && d.value && m.value ? m.value + '-' + d.value : '';
+                })()
 
               })
 

@@ -179,6 +179,19 @@
 
           </div>
 
+          <div class="profile-field">
+
+            <label for="bdDay">
+              Birthday <small style="font-weight:400;opacity:.7">(optional — us din aapko wish aur gift offer milega)</small>
+            </label>
+
+            <div style="display:flex;gap:10px">
+              <select id="bdDay" class="profile-input" aria-label="Day"></select>
+              <select id="bdMonth" class="profile-input" aria-label="Month"></select>
+            </div>
+
+          </div>
+
 
           <button
             class="profile-save-btn"
@@ -531,7 +544,7 @@
 
 
       script.src =
-        '/frontend/js/profile.js?v=12';
+        '/frontend/js/profile.js?v=13';
 
       // Refer & Earn and personal coupons
       const offers =

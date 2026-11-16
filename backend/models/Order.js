@@ -369,6 +369,9 @@ const orderSchema = new mongoose.Schema({
   /* emails already sent for this order (see services/notificationSweeper.js) */
   notificationsSent: { type: [String], default: undefined },
 
+  /* phone notifications already sent for this order (services/pushSweeper.js) */
+  pushSent: { type: [String], default: undefined },
+
   cashfreeEventId: {
     type: String,
     sparse: true
