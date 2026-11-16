@@ -163,7 +163,8 @@
       ['banners.html', '🖼', 'Homepage Banners'],
       ['coupons.html', '%', 'Coupons'],
       ['sale.html', '🎉', 'Festival Sale'],
-      ['announcement.html', '📢', 'Announcement']
+      ['announcement.html', '📢', 'Announcement'],
+      ['notifications.html', '🔔', 'Phone Notifications']
     ] },
     { title: 'Customers', items: [
       ['users.html', '♙', 'Customers'],
