@@ -12,7 +12,9 @@ self.addEventListener('push', event => {
     let msg = null;
 
     try {
-      const res = await fetch(API_BASE + '/push/latest', { cache: 'no-store' });
+      const sub = await self.registration.pushManager.getSubscription();
+      const q = sub ? '?e=' + encodeURIComponent(sub.endpoint) : '';
+      const res = await fetch(API_BASE + '/push/latest' + q, { cache: 'no-store' });
       const data = await res.json();
       msg = data && data.message;
     } catch (_) { /* show the default text below */ }

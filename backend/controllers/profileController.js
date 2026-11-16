@@ -7,7 +7,13 @@ const updateProfile = asyncHandler(async (req, res) => {
   const fullName = cleanString(req.body.fullName, 100); const email = cleanString(req.body.email, 150) || undefined;
   if (fullName.length < 2 || !validEmail(email)) throw error(400, 'Invalid profile details.');
   if (email && email !== req.user.email && await User.findOne({ email, _id: { $ne: req.user._id } })) throw error(409, 'Email already in use.');
-  req.user.fullName = fullName; req.user.email = email; await req.user.save();
+  req.user.fullName = fullName; req.user.email = email;
+  if (req.body.birthday !== undefined) {
+    const b = cleanString(req.body.birthday, 5);
+    if (b && !/^(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(b)) throw error(400, 'Birthday sahi nahi hai.');
+    req.user.birthday = b || undefined;
+  }
+  await req.user.save();
   return ok(res, { user: req.user });
 });
 const AVATAR_PATTERN = /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/;

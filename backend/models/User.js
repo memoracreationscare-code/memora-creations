@@ -175,6 +175,18 @@ const userSchema =
       },
 
 
+      /* Birthday as "MM-DD" (no year). Used for one birthday notification a year. */
+      birthday: {
+        type: String,
+        match: /^(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/,
+        default: undefined
+      },
+
+      birthdayPushYear: {
+        type: Number,
+        default: undefined
+      },
+
       isActive: {
         type: Boolean,
         default: true,
