@@ -257,14 +257,29 @@ const logout = asyncHandler(async (_req, res) => {
 /* =====================================
    ADMIN DASHBOARD
 
-   Only SUCCESS payments count as sales.
+   Sales = paid online orders + COD orders (not cancelled), like Reports.
 ===================================== */
 
 const dashboard = asyncHandler(async (_req, res) => {
 
-  const start = new Date();
+  /* "Today" starts at midnight India time (the server runs in UTC). */
+  const IST = 5.5 * 60 * 60 * 1000;
+  const istNow = new Date(Date.now() + IST);
+  const start = new Date(
+    Date.UTC(
+      istNow.getUTCFullYear(),
+      istNow.getUTCMonth(),
+      istNow.getUTCDate()
+    ) - IST
+  );
 
-  start.setHours(0, 0, 0, 0);
+  /* Real orders only: a started-but-unpaid online payment or a failed one
+     is not an order the customer placed. */
+  const real = {
+    paymentStatus: {
+      $nin: ['PENDING', 'FAILED']
+    }
+  };
 
   const [
     totalOrders,
@@ -280,21 +295,27 @@ const dashboard = asyncHandler(async (_req, res) => {
     totalCustomers
   ] = await Promise.all([
 
-    Order.countDocuments(),
+    Order.countDocuments(real),
 
     Order.countDocuments({
+      ...real,
       createdAt: {
         $gte: start
       }
     }),
 
+    /* Same rule as the Reports page: paid online orders + COD orders,
+       cancelled ones left out. */
     Order.aggregate([
       {
         $match: {
-          paymentStatus: 'SUCCESS',
           orderStatus: {
             $ne: 'Cancelled'
-          }
+          },
+          $or: [
+            { paymentMethod: 'COD' },
+            { paymentStatus: 'SUCCESS' }
+          ]
         }
       },
       {
@@ -321,10 +342,12 @@ const dashboard = asyncHandler(async (_req, res) => {
     }),
 
     Order.countDocuments({
+      ...real,
       paymentMethod: 'COD'
     }),
 
     Order.countDocuments({
+      ...real,
       orderStatus: {
         $nin: [
           'Delivered',
@@ -338,6 +361,7 @@ const dashboard = asyncHandler(async (_req, res) => {
     }),
 
     Order.countDocuments({
+      ...real,
       orderStatus: 'Cancelled'
     }),
 

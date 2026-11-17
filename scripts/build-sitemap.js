@@ -13,7 +13,7 @@ const SITE = 'https://memoracreationscare.in/frontend';
 const API = process.env.API_BASE || 'https://memora-creations.onrender.com/api';
 
 const PAGES = [
-  ['index.html', '1.0'], ['products.html', '0.9'], ['about.html', '0.5'], ['contact.html', '0.5'],
+  ['index.html', '1.0'], ['products.html', '0.9'], ['gift-guide.html', '0.7'], ['about.html', '0.5'], ['contact.html', '0.5'],
   ['shipping-policy.html', '0.3'], ['return-refund-policy.html', '0.3'], ['privacy-policy.html', '0.3'], ['terms.html', '0.3']
 ];
 
