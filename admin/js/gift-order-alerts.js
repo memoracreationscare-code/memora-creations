@@ -554,7 +554,7 @@
       align-items: center;
       justify-content: center;
       border-radius: 13px;
-      background: var(--dark);
+      background: #f8e8d7;
       color: white;
       font-family: Georgia, serif;
       font-size: 25px;
@@ -922,7 +922,7 @@
 
     <header class="header">
       <div class="brand-group">
-        <div class="logo">MC</div>
+        <div class="logo"><img src="https://memoracreationscare.in/frontend/images/logo.png" alt="Memora Creations" width="48" height="48"></div>
 
         <div>
           <div class="brand">
