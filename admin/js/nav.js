@@ -189,7 +189,8 @@
   style.textContent = `
     #mcAdminNav{position:fixed;inset:0 auto 0 0;width:248px;background:#2a1d15;color:#fff;z-index:900;
       display:flex;flex-direction:column;padding:18px 12px;overflow-y:auto;font-family:inherit;box-sizing:border-box}
-    #mcAdminNav .nv-brand{padding:6px 10px 14px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:6px}
+    #mcAdminNav .nv-brand{display:flex;align-items:center;gap:10px;padding:6px 10px 14px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:6px}
+    #mcAdminNav .nv-brand img{width:42px;height:42px;border-radius:10px;background:#f8e8d7;padding:4px;box-sizing:border-box;flex-shrink:0}
     #mcAdminNav .nv-brand b{display:block;font-size:20px;letter-spacing:2px}
     #mcAdminNav .nv-brand small{font-size:10px;letter-spacing:2px;color:#d9b48f}
     #mcAdminNav .nv-title{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:#b99c84;margin:14px 10px 4px}
@@ -216,7 +217,7 @@
   const nav = document.createElement('aside');
   nav.id = 'mcAdminNav';
   nav.setAttribute('aria-label', 'Admin menu');
-  nav.innerHTML = `<div class="nv-brand"><b>MEMORA</b><small>CREATIONS ADMIN</small></div>` +
+  nav.innerHTML = `<div class="nv-brand"><img src="/frontend/images/logo.png" alt="" width="42" height="42"><div><b>MEMORA</b><small>CREATIONS ADMIN</small></div></div>` +
     GROUPS.map(g => (g.title ? `<div class="nv-title">${esc(g.title)}</div>` : '') +
       g.items.map(([file, ic, label]) =>
         `<a href="${B}${file}" class="${file === current ? 'on' : ''}" ${file === current ? 'aria-current="page"' : ''}><span class="nv-ic">${ic}</span>${esc(label)}</a>`
