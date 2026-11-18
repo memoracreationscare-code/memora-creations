@@ -400,7 +400,25 @@ app.use('/api', (_req, res) => {
    GLOBAL ERROR HANDLER
 ======================================== */
 
+/* A forgotten error inside a timer or background job must not crash the
+   whole server (Render would restart it and customers wait again). */
+process.on('unhandledRejection', reason => {
+  console.error('[Unhandled rejection]', reason);
+});
+
 app.use((err, _req, res, _next) => {
+  /* A bad id in the address (e.g. /api/products/abc) or bad field values
+     are the caller's mistake (400), not a server crash (500). */
+  if (err && (err.name === 'CastError' || err.name === 'ValidationError')) {
+    return res.status(400).json({
+      success: false,
+      message:
+        err.name === 'CastError'
+          ? 'Invalid request. Please check the link or id and try again.'
+          : 'Some of the details are not valid. Please check and try again.'
+    });
+  }
+
   console.error(err);
 
   const status =

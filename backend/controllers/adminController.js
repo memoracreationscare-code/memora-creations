@@ -1040,6 +1040,22 @@ const updateOrder = asyncHandler(async (req, res) => {
         );
       }
 
+      /* A delivered order does not go back to an earlier step. */
+      if (
+        order.orderStatus === 'Delivered' &&
+        status !== 'Delivered'
+      ) {
+        throw error(
+          400,
+          'Delivered order ka status wapas nahi badla ja sakta.'
+        );
+      }
+
+      /* Same status again: nothing to change (no duplicate history). */
+      if (status === order.orderStatus) {
+        return;
+      }
+
       /*
        Online orders require separate
        payment reconciliation/refund flow.
