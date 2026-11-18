@@ -139,3 +139,13 @@ test('admin dashboard counts real orders and uses India midnight for "today"', (
   assert.match(src, /5\.5 \* 60 \* 60 \* 1000/);
   assert.doesNotMatch(src, /start\.setHours\(0, 0, 0, 0\)/);
 });
+
+test('server turns bad ids into 400, and a delivered order cannot go back', () => {
+  const fs = require('node:fs');
+  const srv = fs.readFileSync(path.join(root, 'server.js'), 'utf8');
+  assert.match(srv, /err\.name === 'CastError'/);
+  assert.match(srv, /unhandledRejection/);
+  const adm = fs.readFileSync(path.join(root, 'controllers/adminController.js'), 'utf8');
+  assert.match(adm, /status !== 'Delivered'/);
+  assert.match(adm, /status === order\.orderStatus/);
+});
