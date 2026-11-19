@@ -67,7 +67,8 @@ const getOffers = asyncHandler(async (req, res) => {
       enabled: settings.referralEnabled === true,
       code,
       friendAmount: settings.referralFriendAmount,
-      rewardAmount: settings.referralRewardAmount
+      rewardAmount: settings.referralRewardAmount,
+      minOrder: settings.referralMinOrder
     },
     welcome: {
       available: settings.welcomeEnabled === true && !earlier,
