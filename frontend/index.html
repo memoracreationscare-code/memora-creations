@@ -14,8 +14,8 @@
 <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Memora Creations | Home Decor, Photo Frames & Personalized Gifts Online</title>
-  <meta name="description" content="Shop home decor, personalized photo frames, wall decor and thoughtful gifts at Memora Creations. COD and online payment, delivery across India, WhatsApp support.">
+  <title>Memora Creations | Home Decor &amp; Gifts Online Store India</title>
+  <meta name="description" content="Memora Creations is an online home decor and gifts store: lamps, vases, photo frames, wall decor and personalized gifts. COD and online payment, delivery across India.">
   <meta name="keywords" content="home decor, photo frames, personalized gifts, wall decor, resin art, gifts online India, Memora Creations">
   <meta name="theme-color" content="#8a5a3b">
 
@@ -27,39 +27,60 @@
 
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Memora Creations">
-  <meta property="og:title" content="Memora Creations | Home Decor, Photo Frames & Personalized Gifts Online">
+  <meta property="og:title" content="Memora Creations | Home Decor &amp; Gifts Online Store India">
   <meta property="og:description" content="Beautiful home decor, photo frames and thoughtful gifts to make every corner feel personal.">
   <meta property="og:url" content="https://memoracreationscare.in/frontend/index.html">
   <meta property="og:image" content="https://memoracreationscare.in/frontend/images/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Memora Creations | Home Decor, Photo Frames & Personalized Gifts Online">
+  <meta name="twitter:title" content="Memora Creations | Home Decor &amp; Gifts Online Store India">
   <meta name="twitter:description" content="Beautiful home decor, photo frames and thoughtful gifts to make every corner feel personal.">
   <meta name="twitter:image" content="https://memoracreationscare.in/frontend/images/og-image.png">
 
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "Store",
-    "name": "Memora Creations",
-    "description": "Home decor, personalized photo frames and thoughtful gifts, delivered across India.",
-    "priceRange": "₹₹",
-    "paymentAccepted": "Cash on Delivery, UPI, Credit Card, Debit Card, Net Banking",
-    "url": "https://memoracreationscare.in/frontend/index.html",
-    "image": "https://memoracreationscare.in/frontend/images/og-image.png",
-    "logo": "https://memoracreationscare.in/frontend/images/logo.png",
-    "email": "memoracreations.care@gmail.com",
-    "telephone": "+918874050204",
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "Kotwa Kalan, Post Kotwa Bazar",
-      "addressLocality": "Kushinagar",
-      "addressRegion": "Uttar Pradesh",
-      "postalCode": "274305",
-      "addressCountry": "IN"
-    },
-    "areaServed": "IN"
+    "@graph": [
+      {
+        "@type": "Store",
+        "@id": "https://memoracreationscare.in/#store",
+        "name": "Memora Creations",
+        "alternateName": ["Memora Creations Care", "Memora Creations Home Decor & Gifts"],
+        "description": "Online home decor and gifts store: lamps, vases, photo frames, wall decor and personalized gifts, delivered across India. Not an event planning company.",
+        "slogan": "Beautiful Decor, Thoughtful Gifts, Memorable Spaces",
+        "knowsAbout": ["Home decor", "Wall decor", "Photo frames", "Gift items", "Personalized gifts"],
+        "priceRange": "₹₹",
+        "paymentAccepted": "Cash on Delivery, UPI, Credit Card, Debit Card, Net Banking",
+        "url": "https://memoracreationscare.in/frontend/index.html",
+        "image": "https://memoracreationscare.in/frontend/images/og-image.png",
+        "logo": "https://memoracreationscare.in/frontend/images/logo.png",
+        "email": "memoracreations.care@gmail.com",
+        "telephone": "+918874050204",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Kotwa Kalan, Post Kotwa Bazar",
+          "addressLocality": "Kushinagar",
+          "addressRegion": "Uttar Pradesh",
+          "postalCode": "274305",
+          "addressCountry": "IN"
+        },
+        "areaServed": "IN"
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://memoracreationscare.in/#website",
+        "url": "https://memoracreationscare.in/",
+        "name": "Memora Creations",
+        "alternateName": "Memora Creations Home Decor & Gifts",
+        "publisher": { "@id": "https://memoracreationscare.in/#store" },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://memoracreationscare.in/frontend/products.html?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    ]
   }
   </script>
 
