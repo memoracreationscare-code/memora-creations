@@ -349,6 +349,7 @@ app.use('/api/custom-photos', require('./routes/customPhotoRoutes'));
 app.use('/api/announcement', announcementRoutes);
 app.use('/api/push', require('./routes/pushRoutes'));
 app.use('/api/settings', require('./routes/settingsRoutes'));
+app.use('/api/feed', require('./routes/feedRoutes'));
 app.use('/api/banners', require('./routes/bannerRoutes'));
 
 /* ========================================
