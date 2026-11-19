@@ -164,7 +164,8 @@
       ['coupons.html', '%', 'Coupons'],
       ['sale.html', '🎉', 'Festival Sale'],
       ['announcement.html', '📢', 'Announcement'],
-      ['notifications.html', '🔔', 'Phone Notifications']
+      ['notifications.html', '🔔', 'Phone Notifications'],
+      ['referrals.html', '🤝', 'Referrals']
     ] },
     { title: 'Customers', items: [
       ['users.html', '♙', 'Customers'],

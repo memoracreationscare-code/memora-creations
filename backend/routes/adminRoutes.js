@@ -707,6 +707,16 @@ router.get(
 );
 
 router.get(
+  '/referrals',
+  require('../controllers/adminReferralsController').list
+);
+
+router.post(
+  '/referrals/run',
+  require('../controllers/adminReferralsController').run
+);
+
+router.get(
   '/today',
   require('../controllers/adminTodayController').today
 );

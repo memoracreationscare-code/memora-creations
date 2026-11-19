@@ -803,7 +803,7 @@
   <!-- UPDATED AUTH -->
 
   <script
-    src="/frontend/js/auth.js?v=13"
+    src="/frontend/js/auth.js?v=14"
   ></script>
 
 
@@ -895,6 +895,27 @@
 
   </script>
 
+  <script>
+    /* Friend's referral link (signup.html?ref=CODE): fill the code in for them. */
+    (function () {
+      try {
+        var q = new URLSearchParams(location.search).get('ref');
+        if (q && /^[A-Za-z0-9]{4,12}$/.test(q)) localStorage.setItem('mc_ref', q.toUpperCase());
+      } catch (e) {}
+      document.addEventListener('DOMContentLoaded', function () {
+        var input = document.getElementById('signupReferral');
+        var code = '';
+        try { code = localStorage.getItem('mc_ref') || ''; } catch (e) {}
+        if (input && code && !input.value) {
+          input.value = code;
+          var note = document.createElement('small');
+          note.style.cssText = 'display:block;margin-top:6px;color:#24734c;font-weight:700';
+          note.textContent = 'Friend ka referral code laga diya gaya hai. Sign up par welcome gift milega.';
+          input.parentNode.appendChild(note);
+        }
+      });
+    })();
+  </script>
   <script src="js/extras.js?v=9" defer></script>
   <script src="js/animations.js?v=1" defer></script>
 </body>

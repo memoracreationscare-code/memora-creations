@@ -1145,6 +1145,11 @@ const updateOrder = asyncHandler(async (req, res) => {
 
   }
 
+  // Delivered: give the customer's referrer their reward right away.
+  if (status === 'Delivered' && order && order.user) {
+    void require('../services/referralService').rewardAfterDelivery(order.user);
+  }
+
   return ok(res, {
     order
   });

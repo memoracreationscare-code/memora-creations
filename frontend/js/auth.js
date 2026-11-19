@@ -355,6 +355,8 @@
 
     successRedirect: HOME,
 
+    onSuccess: () => { try { localStorage.removeItem('mc_ref'); } catch (_) {} },
+
     errorTitle: 'Account Creation Failed'
   });
 
