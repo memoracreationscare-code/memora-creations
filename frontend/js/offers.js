@@ -82,6 +82,17 @@
     const layout = document.querySelector('.profile-layout');
 
     if (layout && layout.parentNode) layout.parentNode.insertBefore(card, layout);
-  }).catch(() => { /* offers are optional */ });
+  }).catch(err => {
+    // Do not stay silent: show why the Refer & Earn card is missing.
+    const layout = document.querySelector('.profile-layout');
+    if (!layout || !layout.parentNode) return;
+    const note = document.createElement('section');
+    note.className = 'profile-card';
+    note.style.cssText = 'max-width:1100px;margin:18px auto;padding:14px 18px;font-size:14px';
+    note.innerHTML = '<b>Refer &amp; Earn</b> abhi load nahi ho paya (' + esc((err && err.message) || 'server error') +
+      '). <button type="button" id="mcOffersRetry" style="margin-left:6px;padding:4px 12px;border-radius:8px;border:1px solid #b98a2c;background:#fff;font-weight:700;cursor:pointer">Retry</button>';
+    note.querySelector('#mcOffersRetry').addEventListener('click', () => location.reload());
+    layout.parentNode.insertBefore(note, layout);
+  });
 
 })();
