@@ -63,6 +63,8 @@ const schema = new mongoose.Schema({
   referralMinOrder: { type: Number, min: 0, max: 100000 },
 
   backupEmailEnabled: Boolean,
+  weeklySummaryEnabled: Boolean,
+  lastWeeklySummaryAt: Date,   // set only by the weekly summary job
   lastBackupEmailAt: Date,   // set only by the backup job
 
   giftWrapEnabled: Boolean,

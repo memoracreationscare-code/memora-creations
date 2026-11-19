@@ -78,6 +78,7 @@ function defaults() {
     referralMinOrder: 299,
 
     backupEmailEnabled: false,
+    weeklySummaryEnabled: false,
 
     giftWrapEnabled: envBool('GIFT_WRAPPING_LIVE_ENABLED'),
     giftWrapStandardFee: envNum('GIFT_WRAP_STANDARD_FEE', 29),
