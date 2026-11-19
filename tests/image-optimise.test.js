@@ -22,6 +22,6 @@ test('already-transformed, foreign and empty URLs are left alone', () => {
 
 test('home page title/description are keyword-rich', () => {
   const h = fs.readFileSync('frontend/index.html', 'utf8');
-  assert.match(h, /<title>Memora Creations \| Home Decor, Photo Frames & Personalized Gifts Online<\/title>/);
-  assert.match(h, /name="description" content="Shop home decor, personalized photo frames/);
+  assert.match(h, /<title>Memora Creations \| Home Decor &amp; Gifts Online Store India<\/title>/);
+  assert.match(h, /name="description" content="Memora Creations is an online home decor and gifts store/);
 });
