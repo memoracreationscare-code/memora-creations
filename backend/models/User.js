@@ -20,26 +20,6 @@ const addressSchema =
         default: 'Home'
       },
 
-      // Refer & Earn
-      referralCode: {
-        type: String,
-        unique: true,
-        sparse: true,
-        uppercase: true,
-        trim: true
-      },
-
-      referredBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        default: undefined
-      },
-
-      referralRewarded: {
-        type: Boolean,
-        default: undefined
-      },
-
       fullName: {
         type: String,
         required: true,
@@ -174,6 +154,26 @@ const userSchema =
         default: []
       },
 
+
+      // Refer & Earn
+      referralCode: {
+        type: String,
+        unique: true,
+        sparse: true,
+        uppercase: true,
+        trim: true
+      },
+
+      referredBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        default: undefined
+      },
+
+      referralRewarded: {
+        type: Boolean,
+        default: undefined
+      },
 
       /* Birthday as "MM-DD" (no year). Used for one birthday notification a year. */
       birthday: {
