@@ -518,10 +518,7 @@ const createProduct = asyncHandler(async (req, res) => {
   const productId =
     `MC-P-${Date.now()
       .toString(36)
-      .toUpperCase()}-${Math.random()
-      .toString(36)
-      .slice(2, 7)
-      .toUpperCase()}`;
+      .toUpperCase()}-${require('crypto').randomBytes(4).toString('hex').slice(0, 5).toUpperCase()}`;
 
   const product = await Product.create({
 
