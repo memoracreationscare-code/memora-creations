@@ -86,4 +86,10 @@ const getOffers = asyncHandler(async (req, res) => {
   });
 });
 
-module.exports = { getOffers, getProfile, updateProfile, updateAvatar, addAddress, updateAddress, deleteAddress };
+const getReferrals = asyncHandler(async (req, res) => {
+  const data = await require('../services/referralService').overviewFor(req.user._id);
+
+  return ok(res, data || { referredBy: null, stats: { joined: 0, ordered: 0, rewarded: 0, earned: 0 }, friends: [] });
+});
+
+module.exports = { getReferrals, getOffers, getProfile, updateProfile, updateAvatar, addAddress, updateAddress, deleteAddress };

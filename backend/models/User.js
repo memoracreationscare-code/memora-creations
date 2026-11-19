@@ -170,6 +170,27 @@ const userSchema =
         default: undefined
       },
 
+      referredAt: {
+        type: Date,
+        default: undefined
+      },
+
+      // Coupon codes given because of this referral (for the history view).
+      referralFriendCode: {
+        type: String,
+        default: undefined
+      },
+
+      referralRewardCode: {
+        type: String,
+        default: undefined
+      },
+
+      referralRewardedAt: {
+        type: Date,
+        default: undefined
+      },
+
       referralRewarded: {
         type: Boolean,
         default: undefined
