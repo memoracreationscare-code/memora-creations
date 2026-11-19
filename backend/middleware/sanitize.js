@@ -21,7 +21,7 @@ function clean(value, depth = 0) {
   }
 
   Object.keys(value).forEach(key => {
-    if (key.startsWith('$') || key.includes('.')) {
+    if (key.startsWith('$') || key.includes('.') || key === '__proto__' || key === 'constructor' || key === 'prototype') {
       delete value[key];
       return;
     }

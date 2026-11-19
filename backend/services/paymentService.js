@@ -21,7 +21,9 @@ function verifyWebhook(rawBody, signature) {
   const expected = crypto.createHmac('sha256', process.env.RAZORPAY_WEBHOOK_SECRET || '')
     .update(rawBody)
     .digest('hex');
-  return expected === signature;
+  const provided = String(signature || '');
+  if (provided.length !== expected.length) return false;
+  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(provided));
 }
 
 module.exports = { getRazorpay, verifySignature, verifyWebhook };

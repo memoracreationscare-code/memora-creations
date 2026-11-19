@@ -35,6 +35,7 @@ function signToken(payload) {
     payload,
     process.env.JWT_SECRET,
     {
+      algorithm: 'HS256',
       expiresIn:
         process.env.JWT_EXPIRES_IN || '7d'
     }
@@ -164,7 +165,8 @@ async function requireUser(req, res, next) {
 
     const payload = jwt.verify(
       token,
-      process.env.JWT_SECRET
+      process.env.JWT_SECRET,
+      { algorithms: ['HS256'] }
     );
 
     if (payload.type !== 'user') {
@@ -243,7 +245,8 @@ async function requireAdmin(req, res, next) {
 
     const payload = jwt.verify(
       token,
-      process.env.JWT_SECRET
+      process.env.JWT_SECRET,
+      { algorithms: ['HS256'] }
     );
 
     if (payload.type !== 'admin') {
