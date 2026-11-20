@@ -78,4 +78,4 @@ if (require.main === module) {
   main().catch(err => { console.error(err.message); process.exit(1); });
 }
 
-module.exports = { buildSitemap, fetchAllProducts };
+module.exports = { buildSitemap, fetchAllProducts, PAGES };

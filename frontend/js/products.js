@@ -594,6 +594,7 @@
       if (window.MCRecent || document.readyState === 'complete') trackViewed();
       else window.addEventListener('load', trackViewed, { once: true });
       window.MCPinCheck?.mount(box, product._id);
+      window.MCBundleBox?.mount(box, product._id);
       refreshWishlist();
       // FIX: querySelectorAll returns a list; querySelector does not.
       MC.initGallery(box);
