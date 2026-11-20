@@ -9,7 +9,9 @@ test('sitemap lists fixed pages and every product, escaped', () => {
   assert.match(xml, /product\.html\?id=abc123<\/loc>\s*<lastmod>2026-11-10/);
   assert.match(xml, /id=x%26y/);
   assert.match(xml, /frontend\/index\.html/);
-  assert.strictEqual((xml.match(/<url>/g) || []).length, 9 + 2);
+  const { PAGES } = require('../scripts/build-sitemap');
+  assert.strictEqual((xml.match(/<url>/g) || []).length, PAGES.length + 2);
+  assert.match(xml, /frontend\/blog\.html/);
 });
 
 test('all pages of products are read', async () => {
