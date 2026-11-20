@@ -71,6 +71,11 @@
     .bl-card h2{margin:0;font-size:19px;color:#2d2119;line-height:1.3}
     .bl-card p{margin:0;color:#5b4a3e;line-height:1.65;font-size:15px;flex:1}
     .bl-card span{color:#8a5a3b;font-weight:700;font-size:14px}
+    .bl-products h3{font-family:Georgia,serif;margin:30px 0 12px;color:#2d2119}
+    .bl-pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+    .bl-pcard{display:flex;flex-direction:column;gap:6px;text-decoration:none;color:#2d2119;font-size:14px;background:#fff;border:1px solid #e9dfd5;border-radius:14px;padding:10px}
+    .bl-pcard img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;background:#f6efe6}
+    .bl-pcard b{color:#8a5a3b}
     .bl-footer{text-align:center;padding:26px 16px 110px;color:#766c63}
   </style>
   <link rel="stylesheet" href="css/loader.css?v=2">
@@ -96,6 +101,7 @@
         <h2>5. Something for the festive corner</h2>
         <p>Diyas, a decorative tray or a small idol stand are thoughtful for grih pravesh. Keep the choice respectful of the family&#x27;s traditions.</p>
         <div class="bl-tip"><b>Quick tip:</b> Presentation matters. Add a handwritten message card and neat gift wrapping; it costs little and makes the gift feel carefully chosen.</div>
+        <div class="bl-products" data-q="gift" hidden></div>
         <p><a class="bl-cta" href="/frontend/products.html?q=gift">Browse gifts →</a></p>
       </div>
     </article>
@@ -114,6 +120,7 @@
 
   <nav id="bottomNav" class="bottomnav"></nav>
   <script src="/frontend/js/app.js?v=37"></script>
+  <script src="js/blog-products.js?v=1" defer></script>
   <script src="js/extras.js?v=9" defer></script>
   <script src="js/animations.js?v=1" defer></script>
 </body>
