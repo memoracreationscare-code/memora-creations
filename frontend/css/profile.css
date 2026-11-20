@@ -1093,3 +1093,11 @@
 
 .profile-support-heading{margin-bottom:12px}
 .profile-support-link + .profile-support-link{margin-top:10px}
+
+/* Customer Policies shortcut */
+.profile-policies-link{display:flex;align-items:center;gap:14px;max-width:1100px;margin:18px auto;padding:16px 18px;border-radius:18px;text-decoration:none;color:#3a2618;background:#fff;border:1px solid #e9dfd5;box-shadow:0 6px 20px #6b45201a}
+.profile-policies-ic{font-size:28px}
+.profile-policies-text{flex:1;min-width:0}
+.profile-policies-text b{display:block;font-size:17px}
+.profile-policies-text small{color:#7a6048;font-size:13.5px}
+.profile-policies-go{font-weight:800;color:#7a4a30;white-space:nowrap}
