@@ -501,12 +501,31 @@ function couponSummaryHtml(order) {
   const discount =
     Number(order.couponDiscount || 0);
 
+  const bundle =
+    Number(order.bundleDiscount || 0);
+
+  const bundleLine =
+    Number.isFinite(bundle) && bundle > 0
+      ? `
+    <div class="order-summary-line">
+      <span>Bundle Offer${
+        Array.isArray(order.bundleNames) && order.bundleNames.length
+          ? ` (${order.bundleNames.map(orderEsc).join(', ')})`
+          : ''
+      }</span>
+
+      <strong>
+        -${orderMoney(bundle)}
+      </strong>
+    </div>`
+      : '';
+
   if (!Number.isFinite(discount) ||
       discount <= 0) {
-    return '';
+    return bundleLine;
   }
 
-  return `
+  return bundleLine + `
     <div class="order-summary-line">
       <span>
         Coupon Discount

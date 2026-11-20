@@ -163,6 +163,7 @@
       ['banners.html', '🖼', 'Homepage Banners'],
       ['coupons.html', '%', 'Coupons'],
       ['sale.html', '🎉', 'Festival Sale'],
+      ['bundles.html', '🎁', 'Bundle Offers'],
       ['announcement.html', '📢', 'Announcement'],
       ['notifications.html', '🔔', 'Phone Notifications'],
       ['referrals.html', '🤝', 'Referrals']

@@ -265,6 +265,26 @@ async function loadCartPage() {
       </div>
 
 
+      ${Number(cart.bundleDiscount) > 0 ? `
+      <div class="summaryline">
+
+        <span>
+          Bundle Offer${
+            Array.isArray(cart.bundleNames) && cart.bundleNames.length
+              ? ' (' + cart.bundleNames.map(window.MC.esc).join(', ') + ')'
+              : ''
+          }
+        </span>
+
+        <b>
+          -${window.MC.money(
+            cart.bundleDiscount
+          )}
+        </b>
+
+      </div>
+      ` : ''}
+
       <div class="summaryline">
 
         <span>

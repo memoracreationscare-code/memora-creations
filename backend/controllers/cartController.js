@@ -21,7 +21,8 @@ async function hydrate(cart) {
   const subtotal = Math.round(items.reduce((s, i) => s + i.lineTotal, 0) * 100) / 100;
   const settings = require('../services/settingsService').peek();
   const delivery = subtotal >= settings.freeDeliveryAbove ? 0 : (items.length ? settings.deliveryCharge : 0);
-  return { items, subtotal, deliveryCharge: delivery, grandTotal: Math.round((subtotal + delivery) * 100) / 100 };
+  const bundle = await require('../services/bundleService').bundleFor(items, subtotal);
+  return { items, subtotal, deliveryCharge: delivery, bundleDiscount: bundle.discount, bundleNames: bundle.names, grandTotal: Math.round((subtotal - bundle.discount + delivery) * 100) / 100 };
 }
 
 const getCart = asyncHandler(async (req, res) => {

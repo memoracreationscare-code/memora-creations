@@ -97,7 +97,7 @@ function build(order, settings, invoiceNo, invoiceDate) {
     })),
     subtotal: round2(order.subtotal),
     deliveryCharge: round2(order.deliveryCharge),
-    discount: round2(order.couponDiscount || order.discount || 0),
+    discount: round2((order.couponDiscount || order.discount || 0) + (order.bundleDiscount || 0)),
     giftFee: order.giftWrapping && order.giftWrapping.selected ? round2(order.giftWrapping.fee) : 0,
     grandTotal: total,
     tax: gstOn ? { ...taxBreakup(total, settings.gstRate, settings.gstState, address.state), intraState: sameState(settings.gstState, address.state) } : null

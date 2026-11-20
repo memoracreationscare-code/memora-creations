@@ -527,6 +527,15 @@
     );
 
     if (
+      Number(preview.bundleDiscount || 0) > 0
+    ) {
+      line(
+        'Bundle Offer',
+        -Number(preview.bundleDiscount)
+      );
+    }
+
+    if (
       Number(preview.couponDiscount || 0) > 0
     ) {
       line(

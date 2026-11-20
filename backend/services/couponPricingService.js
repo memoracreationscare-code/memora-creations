@@ -43,6 +43,10 @@ const {
   error
 } = require('../utils/http');
 
+const {
+  bundleFor
+} = require('./bundleService');
+
 
 /* =====================================
    CALCULATE COUPON PRICING
@@ -71,6 +75,12 @@ async function calculateCouponPricing({
   );
 
   const base = totals(trustedItems);
+
+  // Bundle offer (automatic). Coupon still uses the normal subtotal.
+  const bundle = await bundleFor(
+    trustedItems,
+    base.subtotal
+  );
 
 
   /*
@@ -152,7 +162,8 @@ async function calculateCouponPricing({
     base.subtotal +
     base.deliveryCharge +
     giftWrappingFee -
-    couponDiscount
+    couponDiscount -
+    bundle.discount
   );
 
 
@@ -198,6 +209,10 @@ async function calculateCouponPricing({
       : null,
 
     couponDiscount,
+
+    bundleDiscount: bundle.discount,
+
+    bundleNames: bundle.names,
 
     giftWrapping: gift,
 
