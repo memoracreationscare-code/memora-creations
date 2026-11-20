@@ -284,4 +284,57 @@
 
   if (document.body) mount();
   else document.addEventListener('DOMContentLoaded', mount);
+
+  /* ---------- WhatsApp "help" messages ----------
+     Every WhatsApp link to our own number gets a clear, polite message that says
+     what the customer needs and from which page. It is built when the link is
+     tapped, so product names and order numbers are always the current ones. */
+  (() => {
+    const clean = t => String(t || '').replace(/\s+/g, ' ').trim();
+    const pageName = () => clean(document.title.split('|')[0]);
+
+    function topic() {
+      const path = location.pathname;
+      const q = new URLSearchParams(location.search);
+      const h1 = clean((document.querySelector('h1') || {}).textContent);
+
+      if (/product\.html/.test(path)) return { line: 'Mujhe is product ke baare me jaankari chahiye:', item: h1 || pageName(), link: true };
+      if (/products\.html/.test(path)) return { line: 'Mujhe products chunne me madad chahiye.' };
+      if (/cart\.html/.test(path)) return { line: 'Mujhe cart me madad chahiye.' };
+      if (/checkout\.html/.test(path)) return { line: 'Mujhe checkout / payment me madad chahiye.' };
+      if (/order-details\.html/.test(path)) return { line: 'Mujhe apne order ke baare me madad chahiye.', item: q.get('id') ? 'Order ref: ' + q.get('id') : '', link: false };
+      if (/orders\.html|track-order\.html/.test(path)) return { line: 'Mujhe apne order ki jaankari / tracking chahiye.' };
+      if (/login\.html|signup\.html|forgot-password\.html|reset-password\.html/.test(path)) return { line: 'Mujhe login / account me madad chahiye.' };
+      if (/refer\.html|profile\.html/.test(path)) return { line: 'Mujhe apne account ke baare me madad chahiye.' };
+      if (/policy|terms|policies/.test(path)) return { line: 'Mujhe ' + pageName() + ' ke baare me poochna hai.' };
+      return { line: 'Mujhe ek sawal poochna hai.' };
+    }
+
+    function message() {
+      const t = topic();
+      const rows = ['🙏 *Namaste Memora Creations!*', '', t.line];
+      if (t.item) rows.push('', '🛍️ ' + t.item);
+      if (t.link) rows.push('🔗 ' + location.origin + location.pathname + location.search);
+      rows.push('', 'Kripya meri madad karein. Dhanyavaad! 😊');
+      return rows.join('\n');
+    }
+
+    document.addEventListener('click', e => {
+      const a = e.target.closest && e.target.closest('a[href*="wa.me/"]');
+      if (!a || a.dataset.waCustom) return;
+
+      let url;
+      try { url = new URL(a.href); } catch (_) { return; }
+      if (url.hostname !== 'wa.me') return;
+
+      const text = url.searchParams.get('text');
+      // leave share links (no number) and messages written elsewhere
+      // (product order message, referral share) alone
+      if (!/^\/\d{10,15}$/.test(url.pathname)) return;
+      if (text && !/^Namaste Memora Creations, mujhe/i.test(text)) return;
+
+      a.href = 'https://wa.me' + url.pathname + '?text=' + encodeURIComponent(message());
+    }, true);
+  })();
+
 })();
