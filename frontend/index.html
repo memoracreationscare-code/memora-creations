@@ -585,6 +585,25 @@
       text-decoration: none;
     }
 
+    /* Quick Links: two compact columns so the footer stays short */
+    .footer-links.is-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 16px;
+    }
+
+    .footer-links.is-grid a {
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    @media (max-width: 640px) {
+      .premium-footer { padding: 32px 0 110px; }
+      .footer-grid { gap: 22px; }
+      .footer-title { margin-bottom: 10px; }
+      .footer-links { gap: 8px; }
+    }
+
     .footer-bottom {
       border-top: 1px solid rgba(255,255,255,.1);
       margin-top: 35px;
@@ -1005,7 +1024,7 @@
 
         <div>
           <div class="footer-title">Quick Links</div>
-          <div class="footer-links">
+          <div class="footer-links is-grid">
             <a href="/frontend/index.html">Home</a>
             <a href="/frontend/products.html">Shop Products</a>
             <a href="/frontend/gift-guide.html">Gift Guide</a>
