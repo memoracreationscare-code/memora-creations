@@ -39,6 +39,8 @@ module.exports = {
 
   Coupon: require('./Coupon'),
 
+  Bundle: require('./Bundle'),
+
   AdminSeen: require('./AdminSeen'),
 
   CouponUserUsage: require('./CouponUserUsage'),

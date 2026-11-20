@@ -244,6 +244,19 @@ const orderSchema = new mongoose.Schema({
     default: 0
   },
 
+  /* BUNDLE OFFER (automatic, fixed rupees off per complete set) */
+
+  bundleDiscount: {
+    type: Number,
+    min: 0,
+    default: 0
+  },
+
+  bundleNames: {
+    type: [String],
+    default: []
+  },
+
   /* GIFT WRAPPING */
 
   giftWrapping: {

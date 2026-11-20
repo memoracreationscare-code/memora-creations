@@ -29,6 +29,10 @@ const {
   validateCoupon
 } = require('../services/couponService');
 
+const {
+  bundleFor
+} = require('../services/bundleService');
+
 /*
 ========================================
  POST /api/coupons/validate
@@ -89,11 +93,17 @@ router.post(
       coupon.discount
     );
 
+    const bundle = await bundleFor(
+      trustedItems,
+      amount.subtotal
+    );
+
     const grandTotal = money(
       Math.max(
         0,
         amount.subtotal -
-          couponDiscount +
+          couponDiscount -
+          bundle.discount +
           amount.deliveryCharge
       )
     );
@@ -117,6 +127,10 @@ router.post(
         deliveryCharge: amount.deliveryCharge,
 
         couponDiscount,
+
+        bundleDiscount: bundle.discount,
+
+        bundleNames: bundle.names,
 
         grandTotal
       },

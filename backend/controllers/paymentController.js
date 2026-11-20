@@ -7,6 +7,8 @@ const { getRazorpay, verifySignature } = require('../services/paymentService');
 const createOrder = asyncHandler(async (req, res) => {
   const address = req.body.address; const msg = validateAddress(address); if (msg) throw error(400, msg);
   const trusted = await getTrustedItems(req.body.items, req.user && req.user._id); const t = totals(trusted);
+  const bundle = await require('../services/bundleService').bundleFor(trusted, t.subtotal);
+  t.grandTotal = Math.max(0, Math.round((t.grandTotal - bundle.discount) * 100) / 100);
   if (t.grandTotal <= 0) throw error(400, 'Invalid order total.');
   const razorpay = getRazorpay();
   const receipt = `MC${Date.now()}`;

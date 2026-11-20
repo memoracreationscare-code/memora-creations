@@ -459,6 +459,13 @@ async function buildOrderDocument({
 
   const amount = totals(trusted);
 
+  /* BUNDLE OFFER (automatic) */
+
+  const bundle = await require('./bundleService').bundleFor(
+    trusted,
+    amount.subtotal
+  );
+
 
   /* TRUSTED GIFT WRAPPING */
 
@@ -497,7 +504,8 @@ async function buildOrderDocument({
       0,
       amount.grandTotal +
       giftWrappingFee -
-      appliedCouponDiscount
+      appliedCouponDiscount -
+      bundle.discount
     )
   );
 
@@ -586,6 +594,10 @@ async function buildOrderDocument({
 
     couponUsageReserved:
       Boolean(couponReservation),
+
+    bundleDiscount: bundle.discount,
+
+    bundleNames: bundle.names,
 
     giftWrapping: {
       selected: gift.selected,

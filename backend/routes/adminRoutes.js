@@ -125,6 +125,16 @@ router.use(
 
 
 /* =====================================
+   BUNDLE OFFERS
+===================================== */
+
+router.get('/bundles', require('../controllers/adminBundlesController').list);
+router.post('/bundles', require('../controllers/adminBundlesController').create);
+router.put('/bundles/:id', require('../controllers/adminBundlesController').update);
+router.delete('/bundles/:id', require('../controllers/adminBundlesController').remove);
+
+
+/* =====================================
    CASHFREE SANDBOX REFUND STATUS
 ===================================== */
 
