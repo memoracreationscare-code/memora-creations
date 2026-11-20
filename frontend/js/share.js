@@ -188,8 +188,12 @@
 
     if (!settings.waOrderEnabled) return;
 
-    const intro = settings.waOrderText || 'Namaste Memora Creations, mujhe ye product order karna hai:';
-    const message = `${intro}\n\n${name}${price ? '\nPrice: ' + price : ''}\n${pageUrl(id)}`;
+    const custom = String(settings.waOrderText || '').trim();
+    const message = custom
+      ? `${custom}\n\n${name}${price ? '\nPrice: ' + price : ''}\n${pageUrl(id)}`
+      : ['🙏 *Namaste Memora Creations!*', '', 'Mujhe ye product order karna hai:', '',
+         '🛍️ *' + name + '*', price ? '💰 Price: ' + price : '', '🔗 ' + pageUrl(id), '',
+         'Kya ye available hai? Order kaise karun? 😊'].filter((x, i, arr) => x !== '' || arr[i - 1] !== '').join('\n');
 
     window.open('https://wa.me/' + settings.whatsapp + '?text=' + encodeURIComponent(message), '_blank', 'noopener');
   }
