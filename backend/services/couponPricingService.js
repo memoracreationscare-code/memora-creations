@@ -158,12 +158,20 @@ async function calculateCouponPricing({
   =====================================
   */
 
+  // coupon + bundle together can never take more than the items cost
+  const bundleDiscount = money(
+    Math.min(
+      bundle.discount,
+      Math.max(0, base.subtotal - couponDiscount)
+    )
+  );
+
   const grandTotal = money(
     base.subtotal +
     base.deliveryCharge +
     giftWrappingFee -
     couponDiscount -
-    bundle.discount
+    bundleDiscount
   );
 
 
@@ -210,7 +218,7 @@ async function calculateCouponPricing({
 
     couponDiscount,
 
-    bundleDiscount: bundle.discount,
+    bundleDiscount,
 
     bundleNames: bundle.names,
 
