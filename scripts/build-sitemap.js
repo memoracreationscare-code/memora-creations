@@ -15,7 +15,7 @@ const API = process.env.API_BASE || 'https://memora-creations.onrender.com/api';
 const PAGES = [
   ['index.html', '1.0'], ['products.html', '0.9'], ['gift-guide.html', '0.7'], ['blog.html', '0.6'], ['blog-living-room-wall-decor-ideas.html', '0.5'], ['blog-housewarming-gift-ideas.html', '0.5'], ['blog-photo-frame-gallery-wall.html', '0.5'], ['blog-diwali-home-decor-ideas.html', '0.5'],
   ['about.html', '0.5'], ['contact.html', '0.5'],
-  ['shipping-policy.html', '0.3'], ['return-refund-policy.html', '0.3'], ['privacy-policy.html', '0.3'], ['terms.html', '0.3']
+  ['policies.html', '0.4'], ['shipping-policy.html', '0.3'], ['return-refund-policy.html', '0.3'], ['privacy-policy.html', '0.3'], ['terms.html', '0.3']
 ];
 
 const esc = v => String(v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[c]));
