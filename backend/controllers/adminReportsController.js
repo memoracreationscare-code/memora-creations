@@ -45,7 +45,7 @@ async function buildReport(from, to, model = Order) {
     $or: [{ paymentMethod: 'COD' }, { paymentStatus: 'SUCCESS' }]
   };
 
-  const [totals, products, states, payments, days, cancelled] = await Promise.all([
+  const [totals, products, states, payments, days, cancelled, discountRows, profitRows] = await Promise.all([
     model.aggregate([{ $match: match }, { $group: { _id: null, orders: { $sum: 1 }, revenue: { $sum: '$grandTotal' } } }]),
     model.aggregate([
       { $match: match }, { $unwind: '$items' },
@@ -67,7 +67,30 @@ async function buildReport(from, to, model = Order) {
       { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt', timezone: '+05:30' } }, orders: { $sum: 1 }, revenue: { $sum: '$grandTotal' } } },
       { $sort: { _id: 1 } }
     ]),
-    model.countDocuments({ createdAt: { $gte: from, $lt: to }, orderStatus: 'Cancelled' })
+    model.countDocuments({ createdAt: { $gte: from, $lt: to }, orderStatus: 'Cancelled' }),
+    // coupon + bundle money given away, and how many orders used a bundle
+    model.aggregate([
+      { $match: match },
+      { $group: {
+        _id: null,
+        coupon: { $sum: '$couponDiscount' },
+        bundle: { $sum: { $ifNull: ['$bundleDiscount', 0] } },
+        bundleOrders: { $sum: { $cond: [{ $gt: [{ $ifNull: ['$bundleDiscount', 0] }, 0] }, 1, 0] } }
+      } }
+    ]),
+    // estimated profit: only items whose product has a cost price
+    model.aggregate([
+      { $match: match }, { $unwind: '$items' },
+      { $lookup: { from: 'products', localField: 'items.product', foreignField: '_id', as: 'p' } },
+      { $unwind: '$p' },
+      { $match: { 'p.costPrice': { $gt: 0 } } },
+      { $group: {
+        _id: null,
+        units: { $sum: '$items.quantity' },
+        sales: { $sum: '$items.lineTotal' },
+        cost: { $sum: { $multiply: ['$p.costPrice', '$items.quantity'] } }
+      } }
+    ])
   ]);
 
   const orders = totals[0]?.orders || 0;
@@ -76,6 +99,19 @@ async function buildReport(from, to, model = Order) {
   return {
     from, to,
     summary: { orders, revenue, average: orders ? money(revenue / orders) : 0, cancelled },
+    discounts: {
+      coupon: money(discountRows?.[0]?.coupon),
+      bundle: money(discountRows?.[0]?.bundle),
+      bundleOrders: discountRows?.[0]?.bundleOrders || 0
+    },
+    profit: profitRows?.[0]
+      ? {
+          units: profitRows[0].units,
+          sales: money(profitRows[0].sales),
+          cost: money(profitRows[0].cost),
+          profit: money(profitRows[0].sales - profitRows[0].cost)
+        }
+      : null,
     products: products.map(p => ({ name: p._id, quantity: p.quantity, revenue: money(p.revenue) })),
     states: states.map(s => ({ state: s._id, orders: s.orders, revenue: money(s.revenue) })),
     payments: payments.map(p => ({ method: p._id, orders: p.orders, revenue: money(p.revenue) })),

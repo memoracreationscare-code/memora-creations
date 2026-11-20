@@ -94,6 +94,15 @@ const productSchema = new mongoose.Schema({
     min: 0
   },
 
+  /* Owner-only purchase cost (for the profit report).
+     select:false => never returned by normal queries, so it cannot leak
+     into any public API. Admin list asks for it explicitly. */
+  costPrice: {
+    type: Number,
+    min: 0,
+    select: false
+  },
+
   sellingPrice: {
     type: Number,
     required: true,

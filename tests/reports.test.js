@@ -32,7 +32,9 @@ test('report is shaped and rounded', async () => {
     [{ _id: 'Lamp', quantity: 3, revenue: 900 }],
     [{ _id: 'Delhi', orders: 2, revenue: 1000.456 }],
     [{ _id: 'COD', orders: 2, revenue: 1000.456 }],
-    [{ _id: '2026-11-12', orders: 2, revenue: 1000.456 }]
+    [{ _id: '2026-11-12', orders: 2, revenue: 1000.456 }],
+    [{ coupon: 50, bundle: 100.005, bundleOrders: 1 }],
+    [{ units: 3, sales: 900, cost: 450.5 }]
   ];
   let i = 0;
   const model = { aggregate: async () => answers[i++], countDocuments: async () => 1 };
@@ -40,4 +42,6 @@ test('report is shaped and rounded', async () => {
   assert.deepStrictEqual(r.summary, { orders: 2, revenue: 1000.46, average: 500.23, cancelled: 1 });
   assert.deepStrictEqual(r.products, [{ name: 'Lamp', quantity: 3, revenue: 900 }]);
   assert.strictEqual(r.states[0].state, 'Delhi');
+  assert.deepStrictEqual(r.discounts, { coupon: 50, bundle: 100.01, bundleOrders: 1 });
+  assert.deepStrictEqual(r.profit, { units: 3, sales: 900, cost: 450.5, profit: 449.5 });
 });
