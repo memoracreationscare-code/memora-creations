@@ -1,0 +1,58 @@
+name: Backup website and admin code
+
+# Every Sunday (and whenever started by hand from the Actions tab) this saves
+# the whole project (website + admin panel + backend) as a dated Release:
+#   tag  backup-YYYY-MM-DD   +   a downloadable zip.
+# The newest 12 backups are kept, older ones are removed.
+# It only copies code. Shop data (orders, customers) is backed up by
+# MongoDB Atlas and by Admin > Settings > Backup.
+
+on:
+  schedule:
+    - cron: "30 21 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: backup-code
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Create dated release with zip
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          DAY=$(TZ=Asia/Kolkata date +%F)
+          TAG="backup-$DAY"
+          SHA=$(git rev-parse HEAD)
+          ZIP="memora-creations-$DAY.zip"
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Backup $TAG already exists."
+            exit 0
+          fi
+
+          git archive --format=zip --output "$ZIP" HEAD
+          gh release create "$TAG" "$ZIP" \
+            --target "$SHA" \
+            --title "Backup $DAY" \
+            --notes "Automatic backup of the website, admin panel and backend. Commit $SHA. Download the zip to restore."
+
+      - name: Keep only the newest 12 backups
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release list --limit 100 --json tagName,createdAt \
+            --jq '[.[] | select(.tagName | startswith("backup-"))] | sort_by(.createdAt) | reverse | .[12:] | .[].tagName' |
+          while read -r old; do
+            [ -n "$old" ] && gh release delete "$old" --cleanup-tag --yes
+          done
