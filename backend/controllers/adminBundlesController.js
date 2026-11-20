@@ -49,16 +49,20 @@ const list = asyncHandler(async (_req, res) => {
   return ok(res, { bundles: rows });
 });
 
-async function assertProducts(ids) {
+async function assertProducts(ids, discountAmount) {
   const { Product } = require('../models');
-  const found = await Product.countDocuments({ _id: { $in: ids } });
-  if (found !== ids.length) throw error(400, 'Kuch product mila nahi.');
+  const found = await Product.find({ _id: { $in: ids } }).select('sellingPrice').lean();
+  if (found.length !== ids.length) throw error(400, 'Kuch product mila nahi.');
+  const total = found.reduce((s, p) => s + (Number(p.sellingPrice) || 0), 0);
+  if (discountAmount !== undefined && discountAmount >= total) {
+    throw error(400, 'Chhoot in products ke total daam se kam honi chahiye (total ' + total + ').');
+  }
 }
 
 const create = asyncHandler(async (req, res) => {
   const { Bundle } = require('../models');
   const data = clean(req.body || {});
-  await assertProducts(data.products);
+  await assertProducts(data.products, data.discountAmount);
   const row = await Bundle.create({ ...data, isActive: data.isActive !== false });
   return ok(res, { bundle: row, message: 'Bundle ban gaya.' });
 });
@@ -69,7 +73,12 @@ const update = asyncHandler(async (req, res) => {
   const current = await Bundle.findById(req.params.id);
   if (!current) throw error(404, 'Bundle nahi mila.');
   const data = clean(req.body || {}, current);
-  if (data.products) await assertProducts(data.products);
+  if (data.products || data.discountAmount !== undefined) {
+    await assertProducts(
+      data.products || current.products.map(String),
+      data.discountAmount !== undefined ? data.discountAmount : current.discountAmount
+    );
+  }
   Object.assign(current, data);
   await current.save();
   return ok(res, { bundle: current, message: 'Bundle update ho gaya.' });

@@ -86,10 +86,10 @@ test('admin input is validated', () => {
 
 test('every price path subtracts the bundle discount', () => {
   const read = f => fs.readFileSync(path.join(__dirname, '..', f), 'utf8');
-  assert.match(read('backend/services/orderService.js'), /appliedCouponDiscount -\s+bundle\.discount/);
-  assert.match(read('backend/services/orderService.js'), /bundleDiscount: bundle\.discount/);
-  assert.match(read('backend/services/couponPricingService.js'), /couponDiscount -\s+bundle\.discount/);
-  assert.match(read('backend/routes/couponRoutes.js'), /couponDiscount -\s+bundle\.discount/);
+  assert.match(read('backend/services/orderService.js'), /appliedCouponDiscount -\s+bundleDiscount/);
+  assert.match(read('backend/services/orderService.js'), /^\s+bundleDiscount,$/m);
+  assert.match(read('backend/services/couponPricingService.js'), /couponDiscount -\s+bundleDiscount/);
+  assert.match(read('backend/routes/couponRoutes.js'), /couponDiscount -\s+bundleDiscount/);
   assert.match(read('backend/controllers/cartController.js'), /subtotal - bundle\.discount \+ delivery/);
   assert.match(read('backend/controllers/paymentController.js'), /t\.grandTotal - bundle\.discount/);
   assert.match(read('backend/models/Order.js'), /bundleDiscount:/);

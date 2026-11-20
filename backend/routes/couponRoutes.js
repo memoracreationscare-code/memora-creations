@@ -98,12 +98,19 @@ router.post(
       amount.subtotal
     );
 
+    const bundleDiscount = money(
+      Math.min(
+        bundle.discount,
+        Math.max(0, amount.subtotal - couponDiscount)
+      )
+    );
+
     const grandTotal = money(
       Math.max(
         0,
         amount.subtotal -
           couponDiscount -
-          bundle.discount +
+          bundleDiscount +
           amount.deliveryCharge
       )
     );
@@ -128,7 +135,7 @@ router.post(
 
         couponDiscount,
 
-        bundleDiscount: bundle.discount,
+        bundleDiscount,
 
         bundleNames: bundle.names,
 

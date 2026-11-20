@@ -499,13 +499,21 @@ async function buildOrderDocument({
 
   /* SERVER-CALCULATED TOTAL */
 
+  // coupon + bundle together can never take more than the items cost
+  const bundleDiscount = money(
+    Math.min(
+      bundle.discount,
+      Math.max(0, amount.subtotal - appliedCouponDiscount)
+    )
+  );
+
   const payableTotal = money(
     Math.max(
       0,
       amount.grandTotal +
       giftWrappingFee -
       appliedCouponDiscount -
-      bundle.discount
+      bundleDiscount
     )
   );
 
@@ -595,7 +603,7 @@ async function buildOrderDocument({
     couponUsageReserved:
       Boolean(couponReservation),
 
-    bundleDiscount: bundle.discount,
+    bundleDiscount,
 
     bundleNames: bundle.names,
 
