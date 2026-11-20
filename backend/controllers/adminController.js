@@ -405,9 +405,20 @@ const dashboard = asyncHandler(async (_req, res) => {
    LIST PRODUCTS
 ===================================== */
 
+/* Purchase cost: blank/missing = not set (undefined); otherwise a number >= 0. */
+function cleanCost(value) {
+  if (value === undefined || value === null || value === '') return undefined;
+  const n = Number(value);
+  if (!Number.isFinite(n) || n < 0 || n > 10000000) {
+    throw error(400, 'Kharid keemat (cost price) sahi number honi chahiye.');
+  }
+  return Math.round(n * 100) / 100;
+}
+
 const listProducts = asyncHandler(async (_req, res) => {
 
   const products = await Product.find()
+    .select('+costPrice')
     .populate('category', 'name')
     .sort({
       createdAt: -1
@@ -558,6 +569,10 @@ const createProduct = asyncHandler(async (req, res) => {
       b.sellingPrice
     ),
 
+    ...(cleanCost(b.costPrice) !== undefined
+      ? { costPrice: cleanCost(b.costPrice) }
+      : {}),
+
     stock: Number(b.stock),
 
     ...readVariants(b),
@@ -628,6 +643,11 @@ const updateProduct = asyncHandler(async (req, res) => {
     }
 
   });
+
+  if (body.costPrice !== undefined) {
+    const cost = cleanCost(body.costPrice);
+    product.costPrice = cost === undefined ? undefined : cost;
+  }
 
   if (body.variants !== undefined) {
     product.variants = readVariants(body).variants;

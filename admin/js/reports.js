@@ -30,13 +30,19 @@
       $('#cards').innerHTML = [
         ['Total sale', inr(s.revenue)], ['Orders', s.orders],
         ['Ek order ka average', inr(s.average)], ['Cancel hue', s.cancelled]
-      ].map(([a, b]) => `<div class="card"><span class="muted">${a}</span><b>${esc(b)}</b></div>`).join('');
+      ].concat(
+        data.profit ? [['Anuman munafa (cost daale products)', inr(data.profit.profit)]] : [],
+        [['Coupon chhoot di', inr(data.discounts && data.discounts.coupon)],
+         ['Bundle chhoot di', inr(data.discounts && data.discounts.bundle) + ' (' + ((data.discounts && data.discounts.bundleOrders) || 0) + ' orders)']]
+      ).map(([a, b]) => `<div class="card"><span class="muted">${a}</span><b>${esc(b)}</b></div>`).join('');
+      $('#msg').textContent = data.profit
+        ? `Munafa = bikri − kharid keemat, sirf un ${data.profit.units} items par jinki cost daali gayi hai (delivery, coupon aur bundle chhoot ke bina).`
+        : 'Munafa dekhne ke liye Products me "Kharid keemat" bharo.';
 
       fill('#products', data.products, r => [esc(r.name), r.quantity, inr(r.revenue)]);
       fill('#states', data.states, r => [esc(r.state), r.orders, inr(r.revenue)]);
       fill('#payments', data.payments, r => [esc(r.method), r.orders, inr(r.revenue)]);
       fill('#days', data.days, r => [esc(r.date), r.orders, inr(r.revenue)]);
-      $('#msg').textContent = '';
     } catch (e) {
       $('#msg').textContent = e.message || 'Report nahi aayi.';
     }

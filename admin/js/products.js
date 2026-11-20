@@ -583,6 +583,9 @@ function editProduct(id, asCopy = false) {
   $('#sellingPrice').value =
     product.sellingPrice;
 
+  $('#costPrice').value =
+    product.costPrice ?? '';
+
   $('#stock').value = product.stock;
   setVariantRows(product.variants || []);
 
@@ -789,6 +792,9 @@ window.MC.$('#productForm').addEventListener(
 
         sellingPrice:
           Number($('#sellingPrice').value),
+
+        costPrice:
+          $('#costPrice').value,
 
         stock:
           Number($('#stock').value),
