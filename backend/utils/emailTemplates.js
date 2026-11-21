@@ -114,6 +114,23 @@ function cartReminderEmail(cart) {
   };
 }
 
+function birthdayEmail(user) {
+  const name = String((user && user.fullName) || '').split(' ')[0] || 'Dost';
+  const body =
+    `<p style="margin:0 0 10px">Dear ${esc(name)},</p>` +
+    '<p style="margin:0 0 10px;font-size:16px"><b>Happy Birthday! 🎂🎉</b></p>' +
+    '<p style="margin:0 0 10px">Memora Creations ki taraf se aapko janamdin ki dher saari shubhkamnayein. Aapka saal khushiyon, sehat aur sundar palon se bhara rahe.</p>' +
+    '<p style="margin:0">Aaj ke din apne liye ya kisi khaas ke liye koi sundar decor ya gift chun lijiye. 💝</p>';
+
+  return {
+    subject: `Happy Birthday ${name}! 🎂 - Memora Creations`,
+    html: shell('Happy Birthday! 🎉', body, {
+      text: 'Gifts dekhein',
+      url: `${SITE}/products.html`
+    })
+  };
+}
+
 function backInStockEmail(product) {
   const body =
     '<p style="margin:0 0 10px">Aapne jis product ke liye alert maanga tha, wo ab wapas stock me hai:</p>' +
@@ -130,4 +147,4 @@ function backInStockEmail(product) {
   };
 }
 
-module.exports = { orderEmail, cartReminderEmail, backInStockEmail, ORDER_EVENTS };
+module.exports = { orderEmail, cartReminderEmail, backInStockEmail, birthdayEmail, ORDER_EVENTS };

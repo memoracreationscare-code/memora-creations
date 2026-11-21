@@ -208,6 +208,12 @@ const userSchema =
         default: undefined
       },
 
+      /* Year the birthday email was last sent (one per year). */
+      birthdayEmailYear: {
+        type: Number,
+        default: undefined
+      },
+
       isActive: {
         type: Boolean,
         default: true,

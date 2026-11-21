@@ -61,6 +61,7 @@ function defaults() {
     freeDeliveryBar: true,
 
     emailNotificationsEnabled: false,
+    birthdayEmailEnabled: true,
     emailNotificationsSince: null,
     abandonedReminderEnabled: false,
     lowStockEmailEnabled: false,
