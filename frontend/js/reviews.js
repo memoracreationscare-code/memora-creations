@@ -355,7 +355,16 @@
         data.summary?.totalRatings || 0
       );
 
-      summary.innerHTML = `
+      summary.innerHTML = total === 0 ? `
+        <div>
+          <div class="mc-stars">
+            ${starText(0)}
+          </div>
+          <div class="mc-muted">
+            Abhi tak koi rating nahi. Delivery ke baad aap pehle reviewer ban sakte hain.
+          </div>
+        </div>
+      ` : `
         <div class="mc-average">
           ${average.toFixed(1)}
         </div>
