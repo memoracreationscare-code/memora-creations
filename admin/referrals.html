@@ -24,7 +24,7 @@
 table.h{width:100%;border-collapse:collapse;font-size:14px}table.h th,table.h td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
 .msg{padding:12px 16px;border-radius:10px;margin-bottom:14px;display:none;font-weight:600}
 .msg.ok{background:#eaf4ec;color:var(--green)}.msg.err{background:#fbeceb;color:var(--red)}
-.two{display:grid;grid-template-columns:1.1fr .9fr;gap:20px}@media(max-width:900px){.two{grid-template-columns:1fr}}
+.two{display:grid;grid-template-columns:1.1fr .9fr;gap:20px}.two>*{min-width:0}@media(max-width:680px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}}@media(max-width:900px){.two{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
