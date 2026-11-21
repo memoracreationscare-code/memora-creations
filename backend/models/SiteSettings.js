@@ -46,6 +46,7 @@ const schema = new mongoose.Schema({
   freeDeliveryBar: Boolean,
 
   emailNotificationsEnabled: Boolean,
+  birthdayEmailEnabled: Boolean,
   emailNotificationsSince: Date,
   abandonedReminderEnabled: Boolean,
   lowStockEmailEnabled: Boolean,

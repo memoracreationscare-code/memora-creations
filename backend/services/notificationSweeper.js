@@ -28,6 +28,7 @@ function defaultDeps() {
   return {
     Order: models.Order,
     Cart: models.Cart,
+    User: models.User,
     settings: require('./settingsService'),
     mail: require('./mailService'),
     templates: require('../utils/emailTemplates'),
@@ -195,10 +196,70 @@ async function sweepCartReminders(deps, now) {
   return result;
 }
 
+// India date parts (the shop and its customers are in IST).
+function istDate(now) {
+  const ist = new Date(now.getTime() + 5.5 * 3600000);
+  return {
+    year: ist.getUTCFullYear(),
+    md: String(ist.getUTCMonth() + 1).padStart(2, '0') + '-' + String(ist.getUTCDate()).padStart(2, '0'),
+    hour: ist.getUTCHours()
+  };
+}
+
+/*
+  Happy Birthday email: once a year, after 9 AM IST, to customers whose saved
+  birthday (MM-DD) is today and who have an email. The year is written BEFORE
+  sending so a slow or repeated run can never send two; on a failed send the
+  mark is removed so the next run (same day) tries again.
+*/
+async function sweepBirthdayEmails(deps, now) {
+  const { User, settings, mail, templates } = deps;
+  const s = settings.peek();
+  const result = { sent: 0, failed: 0 };
+
+  if (!User || !s.emailNotificationsEnabled || s.birthdayEmailEnabled === false || !mail.mailConfigured()) return result;
+
+  const t = istDate(now);
+
+  if (t.hour < 9) return result;
+
+  const users = await User.find({
+    birthday: t.md,
+    isActive: true,
+    email: { $exists: true, $ne: '' },
+    birthdayEmailYear: { $ne: t.year }
+  }).select('_id fullName email').limit(30).lean();
+
+  for (const u of users) {
+    if (!u.email) continue;
+
+    const claimed = await User.updateOne(
+      { _id: u._id, birthdayEmailYear: { $ne: t.year } },
+      { $set: { birthdayEmailYear: t.year } }
+    );
+
+    if (!claimed.modifiedCount) continue;
+
+    try {
+      const message = templates.birthdayEmail(u);
+
+      await mail.sendMail({ to: u.email, subject: message.subject, html: message.html });
+      result.sent += 1;
+    } catch (err) {
+      result.failed += 1;
+      await User.updateOne({ _id: u._id }, { $unset: { birthdayEmailYear: 1 } });
+      console.warn('[Birthday email]', err.message);
+    }
+  }
+
+  return result;
+}
+
 async function sweepNotifications(deps = defaultDeps(), now = new Date()) {
   return {
     orders: await sweepOrderEmails(deps, now),
-    carts: await sweepCartReminders(deps, now)
+    carts: await sweepCartReminders(deps, now),
+    birthdays: await sweepBirthdayEmails(deps, now)
   };
 }
 
@@ -218,7 +279,7 @@ function startNotificationSweeper() {
 
       const r = await sweepNotifications();
 
-      if (r.orders.sent || r.carts.sent || r.orders.failed || r.carts.failed) {
+      if (r.orders.sent || r.carts.sent || r.orders.failed || r.carts.failed || r.birthdays.sent || r.birthdays.failed) {
         console.log('[Notifications]', JSON.stringify(r));
       }
     } catch (err) {
@@ -231,4 +292,4 @@ function startNotificationSweeper() {
   timer.unref();
 }
 
-module.exports = { sweepNotifications, wantedEvents, startNotificationSweeper };
+module.exports = { sweepNotifications, sweepBirthdayEmails, wantedEvents, startNotificationSweeper };
