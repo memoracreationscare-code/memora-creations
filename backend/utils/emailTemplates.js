@@ -147,4 +147,22 @@ function backInStockEmail(product) {
   };
 }
 
-module.exports = { orderEmail, cartReminderEmail, backInStockEmail, birthdayEmail, ORDER_EVENTS };
+function priceDropEmail(user, drops) {
+  const name = String((user && user.fullName) || '').split(' ')[0] || 'Dost';
+  const rows = drops.map(d =>
+    `<p style="margin:0 0 10px;font-size:15px"><b>${esc(d.name)}</b><br>` +
+    `<span style="text-decoration:line-through;color:#8a7a68">${rupees(d.oldPrice)}</span> ` +
+    `<b style="color:#1f7a3d">${rupees(d.newPrice)}</b></p>`).join('');
+  const body =
+    `<p style="margin:0 0 10px">Dear ${esc(name)},</p>` +
+    '<p style="margin:0 0 10px">Aapki Wishlist ke product ka daam kam ho gaya hai:</p>' +
+    rows +
+    '<p style="margin:12px 0 0;font-size:13px;color:#8a7a68">Offer limited samay ke liye ho sakta hai.</p>';
+
+  return {
+    subject: drops.length === 1 ? `Price drop: ${drops[0].name}` : 'Aapki Wishlist ke products sasta ho gaye',
+    html: shell('Daam kam ho gaya! 🔔', body, { text: 'Wishlist dekhein', url: `${SITE}/wishlist.html` })
+  };
+}
+
+module.exports = { orderEmail, cartReminderEmail, backInStockEmail, birthdayEmail, priceDropEmail, ORDER_EVENTS };
