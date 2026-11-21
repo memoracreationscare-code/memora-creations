@@ -346,7 +346,16 @@
   function start() {
     if (started) return;
     started = true;
-    loadAnnouncement();
+
+    // Speed: do not fetch/show the popup while the page is still
+    // loading. It used to cover the hero and slow the first paint.
+    const go = () => setTimeout(loadAnnouncement, 2500);
+
+    if (document.readyState === 'complete') {
+      go();
+    } else {
+      window.addEventListener('load', go, { once: true });
+    }
   }
 
   if (document.readyState === 'loading') {
