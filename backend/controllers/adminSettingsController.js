@@ -18,7 +18,7 @@ const TEXT = {
 
 const BOOL = [
   'storeOpen', 'codEnabled', 'codAdvanceEnabled', 'returnsEnabled',
-  'autoRefundEnabled', 'freeDeliveryBar', 'emailNotificationsEnabled', 'birthdayEmailEnabled',
+  'autoRefundEnabled', 'freeDeliveryBar', 'emailNotificationsEnabled', 'birthdayEmailEnabled', 'priceDropEmailEnabled',
   'abandonedReminderEnabled', 'lowStockEmailEnabled', 'welcomeEnabled', 'referralEnabled', 'weeklySummaryEnabled', 'giftWrapEnabled', 'chatEnabled', 'shareEnabled', 'waOrderEnabled', 'gstEnabled', 'backupEmailEnabled', 'recentViewedEnabled', 'installAppEnabled', 'badgesEnabled', 'shuffleProducts', 'waUpdatesEnabled'
 ];
 

@@ -62,6 +62,7 @@ function defaults() {
 
     emailNotificationsEnabled: false,
     birthdayEmailEnabled: true,
+    priceDropEmailEnabled: true,
     emailNotificationsSince: null,
     abandonedReminderEnabled: false,
     lowStockEmailEnabled: false,

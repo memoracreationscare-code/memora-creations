@@ -19,7 +19,7 @@
 
   const BOOL = [
     'storeOpen', 'freeDeliveryBar', 'codEnabled', 'codAdvanceEnabled',
-    'returnsEnabled', 'autoRefundEnabled', 'emailNotificationsEnabled', 'birthdayEmailEnabled',
+    'returnsEnabled', 'autoRefundEnabled', 'emailNotificationsEnabled', 'birthdayEmailEnabled', 'priceDropEmailEnabled',
     'abandonedReminderEnabled', 'lowStockEmailEnabled', 'welcomeEnabled', 'referralEnabled', 'weeklySummaryEnabled', 'giftWrapEnabled', 'chatEnabled', 'shareEnabled', 'waOrderEnabled', 'gstEnabled', 'backupEmailEnabled', 'recentViewedEnabled', 'installAppEnabled', 'badgesEnabled', 'shuffleProducts', 'waUpdatesEnabled'
   ];
 

@@ -11,6 +11,15 @@ const wishlistSchema = new mongoose.Schema(
       index: true
     },
 
+    // Last price we saw for each saved product (productId -> rupees).
+    // Used only by the price-drop email; never shown to customers.
+    seenPrices: {
+      type: Map,
+      of: Number,
+      default: undefined,
+      select: false
+    },
+
     products: {
       type: [
         {
