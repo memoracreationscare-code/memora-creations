@@ -257,6 +257,13 @@ app.use('/api/auth/register', authLimiter);
 app.use('/api/admin/login', authLimiter);
 app.use('/api/payment', authLimiter);
 app.use('/api/cashfree', authLimiter);
+app.use('/api/coupons', rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 60,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: { success: false, message: 'Bahut zyada coupon koshish. Thodi der baad dobara try karein.' }
+}));
 
 // Password-reset requests only need a few tries per person.
 const resetLimiter = rateLimit({
