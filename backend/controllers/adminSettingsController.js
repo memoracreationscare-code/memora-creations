@@ -36,6 +36,8 @@ const NUMBER = {
   referralFriendAmount: [1, 5000],
   referralRewardAmount: [1, 5000],
   referralMinOrder: [0, 100000],
+  birthdayCouponAmount: [0, 5000],
+  birthdayCouponMinOrder: [0, 100000],
   giftWrapStandardFee: [0, 2000],
   giftWrapPremiumFee: [0, 2000],
   gstRate: [0, 28]
@@ -55,6 +57,8 @@ const NUMBER_LABEL = {
   referralFriendAmount: 'Friend reward',
   referralRewardAmount: 'Referrer reward',
   referralMinOrder: 'Referral minimum order',
+  birthdayCouponAmount: 'Birthday coupon amount',
+  birthdayCouponMinOrder: 'Birthday coupon minimum order',
   giftWrapStandardFee: 'Standard gift wrap price',
   giftWrapPremiumFee: 'Premium gift wrap price',
   gstRate: 'GST rate'

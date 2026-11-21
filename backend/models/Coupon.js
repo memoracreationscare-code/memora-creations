@@ -121,7 +121,7 @@ const couponSchema = new mongoose.Schema(
 
     source: {
       type: String,
-      enum: ['ADMIN', 'WELCOME', 'REFERRAL_FRIEND', 'REFERRAL_REWARD'],
+      enum: ['ADMIN', 'WELCOME', 'REFERRAL_FRIEND', 'REFERRAL_REWARD', 'BIRTHDAY'],
       default: 'ADMIN'
     },
 

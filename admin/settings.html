@@ -389,6 +389,10 @@
         <h2>✉️ Messages to customers (email)</h2>
         <p id="mailState" style="margin:0 0 10px;font-weight:700"></p>
         <label class="st-c"><input id="birthdayEmailEnabled" type="checkbox"><span><b>Send a Happy Birthday email</b><small>Once a year, on the customer's birthday (after 9 AM), to customers who saved their birthday and email in Profile. Works only when "Email the customer on every order update" below is on and the email service is set up.</small></span></label>
+        <div class="st-grid" style="margin:6px 0 12px">
+          <label class="st-f"><span>Birthday coupon (₹ off, 0 = no coupon)</span><input id="birthdayCouponAmount" class="input" type="number" placeholder="50"></label>
+          <label class="st-f"><span>Minimum order for it (₹)</span><input id="birthdayCouponMinOrder" class="input" type="number" placeholder="299"></label>
+        </div>
         <label class="st-c"><input id="emailNotificationsEnabled" type="checkbox"><span><b>Email the customer on every order update</b><small>Order placed, shipped, out for delivery, delivered, cancelled and refunded. Only orders placed after you switch this on.</small></span></label>
         <div style="margin-top:10px"><label class="st-c"><input id="abandonedReminderEnabled" type="checkbox"><span><b>Remind customers who left things in the cart</b><small>One email per cart. Only carts that change after you switch this on.</small></span></label></div>
         <div style="margin-top:10px"><label class="st-c"><input id="lowStockEmailEnabled" type="checkbox"><span><b>Email ME when a product is nearly out of stock</b><small>One email per product (3 or fewer left). Goes to the Email you set under Contact above.</small></span></label></div>

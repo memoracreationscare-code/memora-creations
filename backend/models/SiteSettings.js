@@ -47,6 +47,8 @@ const schema = new mongoose.Schema({
 
   emailNotificationsEnabled: Boolean,
   birthdayEmailEnabled: Boolean,
+  birthdayCouponAmount: { type: Number, min: 0, max: 5000 },
+  birthdayCouponMinOrder: { type: Number, min: 0, max: 100000 },
   emailNotificationsSince: Date,
   abandonedReminderEnabled: Boolean,
   lowStockEmailEnabled: Boolean,

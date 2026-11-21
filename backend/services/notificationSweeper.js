@@ -14,6 +14,7 @@
 */
 
 const BATCH = 15;
+const BIRTHDAY_COUPON_DAYS = 15;
 
 const STATUS_EVENT = {
   Shipped: 'SHIPPED',
@@ -29,6 +30,7 @@ function defaultDeps() {
     Order: models.Order,
     Cart: models.Cart,
     User: models.User,
+    Coupon: models.Coupon,
     settings: require('./settingsService'),
     mail: require('./mailService'),
     templates: require('../utils/emailTemplates'),
@@ -240,14 +242,42 @@ async function sweepBirthdayEmails(deps, now) {
 
     if (!claimed.modifiedCount) continue;
 
+    // Optional one-time gift coupon (amount 0 = none). A coupon problem never
+    // stops the greeting itself.
+    let coupon = null;
+    const amount = Number(s.birthdayCouponAmount) || 0;
+
+    if (amount > 0) {
+      try {
+        const made = await (deps.createCoupon || require('./referralService').createPersonalCoupon)({
+          userId: u._id,
+          source: 'BIRTHDAY',
+          amount,
+          minOrder: Number(s.birthdayCouponMinOrder) || 0,
+          days: BIRTHDAY_COUPON_DAYS,
+          description: `Happy Birthday gift: Rs ${amount} off`
+        });
+
+        if (made && made.code) coupon = { code: made.code, amount, minOrder: Number(s.birthdayCouponMinOrder) || 0, days: BIRTHDAY_COUPON_DAYS, id: made._id };
+      } catch (err) {
+        console.warn('[Birthday coupon]', err.message);
+      }
+    }
+
     try {
-      const message = templates.birthdayEmail(u);
+      const message = templates.birthdayEmail(u, coupon);
 
       await mail.sendMail({ to: u.email, subject: message.subject, html: message.html });
       result.sent += 1;
     } catch (err) {
       result.failed += 1;
       await User.updateOne({ _id: u._id }, { $unset: { birthdayEmailYear: 1 } });
+
+      // the email never left, so the retry makes a fresh coupon: switch this one off
+      if (coupon && coupon.id && deps.Coupon) {
+        await deps.Coupon.updateOne({ _id: coupon.id }, { $set: { isActive: false } }).catch(() => {});
+      }
+
       console.warn('[Birthday email]', err.message);
     }
   }

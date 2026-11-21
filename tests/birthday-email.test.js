@@ -92,3 +92,52 @@ test('the setting is wired end to end', () => {
   assert.match(read('admin/settings.html'), /id="birthdayEmailEnabled"/);
   assert.match(read('backend/models/User.js'), /birthdayEmailYear/);
 });
+
+test('birthday coupon: made once, shown in the email, one-time and personal', async () => {
+  const made = [];
+  const d = make({ users: [rahul], settings: { birthdayCouponAmount: 50, birthdayCouponMinOrder: 299 } });
+  d.createCoupon = async c => { made.push(c); return { _id: 'cp1', code: 'MCBDAY123' }; };
+  d.mail.sendMail = async m => { d.log.push(m.html); };
+  assert.deepStrictEqual(await sweepBirthdayEmails(d, NOON), { sent: 1, failed: 0 });
+  assert.strictEqual(made.length, 1);
+  assert.deepStrictEqual(
+    { userId: made[0].userId, source: made[0].source, amount: made[0].amount, minOrder: made[0].minOrder, days: made[0].days },
+    { userId: 'u1', source: 'BIRTHDAY', amount: 50, minOrder: 299, days: 15 }
+  );
+  assert.match(d.log[0], /MCBDAY123/);
+  assert.match(d.log[0], /₹50 off/);
+  // second run the same day: no second email, no second coupon
+  await sweepBirthdayEmails(d, NOON);
+  assert.strictEqual(made.length, 1);
+});
+
+test('amount 0 means no coupon; a coupon error still sends the greeting', async () => {
+  let calls = 0;
+  let d = make({ users: [rahul], settings: { birthdayCouponAmount: 0 } });
+  d.createCoupon = async () => { calls += 1; return { code: 'X' }; };
+  await sweepBirthdayEmails(d, NOON);
+  assert.strictEqual(calls, 0);
+  assert.strictEqual(d.log.length, 1);
+
+  d = make({ users: [rahul], settings: { birthdayCouponAmount: 50 } });
+  d.createCoupon = async () => { throw new Error('db'); };
+  assert.deepStrictEqual(await sweepBirthdayEmails(d, NOON), { sent: 1, failed: 0 });
+});
+
+test('if the email fails the unsent coupon is switched off', async () => {
+  const off = [];
+  const d = make({ users: [rahul], failSend: true, settings: { birthdayCouponAmount: 50 } });
+  d.createCoupon = async () => ({ _id: 'cp9', code: 'MCX' });
+  d.Coupon = { updateOne: async (f, u) => { off.push([f._id, u.$set.isActive]); } };
+  assert.deepStrictEqual(await sweepBirthdayEmails(d, NOON), { sent: 0, failed: 1 });
+  assert.deepStrictEqual(off, [['cp9', false]]);
+});
+
+test('coupon settings and source are wired', () => {
+  const read = f => fs.readFileSync(path.join(__dirname, '..', f), 'utf8');
+  assert.match(read('backend/models/Coupon.js'), /'BIRTHDAY'/);
+  assert.match(read('backend/controllers/adminSettingsController.js'), /birthdayCouponAmount: \[0, 5000\]/);
+  assert.match(read('admin/js/settings.js'), /'birthdayCouponAmount'/);
+  assert.match(read('admin/settings.html'), /id="birthdayCouponAmount"/);
+  assert.match(read('backend/services/settingsService.js'), /birthdayCouponAmount: 50/);
+});

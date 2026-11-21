@@ -62,6 +62,8 @@ function defaults() {
 
     emailNotificationsEnabled: false,
     birthdayEmailEnabled: true,
+    birthdayCouponAmount: 50,
+    birthdayCouponMinOrder: 299,
     emailNotificationsSince: null,
     abandonedReminderEnabled: false,
     lowStockEmailEnabled: false,

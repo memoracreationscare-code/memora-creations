@@ -114,13 +114,21 @@ function cartReminderEmail(cart) {
   };
 }
 
-function birthdayEmail(user) {
+function birthdayEmail(user, coupon) {
   const name = String((user && user.fullName) || '').split(' ')[0] || 'Dost';
   const body =
     `<p style="margin:0 0 10px">Dear ${esc(name)},</p>` +
     '<p style="margin:0 0 10px;font-size:16px"><b>Happy Birthday! 🎂🎉</b></p>' +
     '<p style="margin:0 0 10px">Memora Creations ki taraf se aapko janamdin ki dher saari shubhkamnayein. Aapka saal khushiyon, sehat aur sundar palon se bhara rahe.</p>' +
-    '<p style="margin:0">Aaj ke din apne liye ya kisi khaas ke liye koi sundar decor ya gift chun lijiye. 💝</p>';
+    '<p style="margin:0 0 10px">Aaj ke din apne liye ya kisi khaas ke liye koi sundar decor ya gift chun lijiye. 💝</p>' +
+    (coupon && coupon.code
+      ? `<div style="margin:14px 0 0;padding:14px;border:2px dashed #c99a6b;border-radius:12px;background:#fff8ef;text-align:center">` +
+        `<div style="font-size:13px;color:#8a5a3b">Aapke birthday ka tohfa 🎁</div>` +
+        `<div style="font-size:22px;font-weight:800;letter-spacing:2px;margin:6px 0">${esc(coupon.code)}</div>` +
+        `<div style="font-size:14px">${rupees(coupon.amount)} off` +
+        (coupon.minOrder ? ` on orders of ${rupees(coupon.minOrder)} or more` : '') +
+        `. Valid for ${esc(coupon.days || 15)} days, one use only.</div></div>`
+      : '');
 
   return {
     subject: `Happy Birthday ${name}! 🎂 - Memora Creations`,

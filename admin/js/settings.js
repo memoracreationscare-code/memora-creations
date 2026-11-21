@@ -14,6 +14,7 @@
     'returnWindowDays', 'codAutoReceiveDays', 'abandonedReminderHours',
     'welcomePercent', 'welcomeMaxDiscount', 'welcomeMinOrder',
     'referralFriendAmount', 'referralRewardAmount', 'referralMinOrder',
+    'birthdayCouponAmount', 'birthdayCouponMinOrder',
     'giftWrapStandardFee', 'giftWrapPremiumFee', 'gstRate'
   ];
 
