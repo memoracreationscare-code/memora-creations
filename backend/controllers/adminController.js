@@ -1308,6 +1308,7 @@ const resetUserPassword = asyncHandler(async (req, res) => {
     password,
     12
   );
+  user.passwordChangedAt = new Date();
 
   user.passwordResetTokenHash = undefined;
   user.passwordResetExpiresAt = undefined;

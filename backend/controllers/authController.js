@@ -585,6 +585,7 @@ const resetPassword =
         );
 
 
+      user.passwordChangedAt = new Date();
       user.passwordResetTokenHash =
         undefined;
 

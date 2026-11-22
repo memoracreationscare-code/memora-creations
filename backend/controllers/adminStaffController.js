@@ -82,6 +82,7 @@ const resetPassword = asyncHandler(async (req, res) => {
 
   checkPassword(req.body.password);
   staff.passwordHash = await bcrypt.hash(req.body.password, 12);
+  staff.passwordChangedAt = new Date();
   await staff.save();
 
   return ok(res, { message: 'Naya password set ho gaya.' });

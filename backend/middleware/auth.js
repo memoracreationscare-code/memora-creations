@@ -139,6 +139,22 @@ function clearAuthCookie(res, type = 'user') {
 }
 
 
+/* A password change signs out every older login (stolen cookies stop
+   working). Tokens carry "iat" in seconds. */
+
+function issuedBeforePasswordChange(payload, account) {
+
+  if (!account || !account.passwordChangedAt) return false;
+
+  const changed = Math.floor(
+    new Date(account.passwordChangedAt).getTime() / 1000
+  );
+
+  return Number(payload.iat || 0) < changed;
+
+}
+
+
 /* =====================================
    CUSTOMER AUTH
 ===================================== */
@@ -197,6 +213,13 @@ async function requireUser(req, res, next) {
 
       });
 
+    }
+
+    if (issuedBeforePasswordChange(payload, user)) {
+      return res.status(401).json({
+        success: false,
+        message: 'Password changed. Login again.'
+      });
     }
 
     req.user = user;
@@ -279,6 +302,13 @@ async function requireAdmin(req, res, next) {
 
     }
 
+    if (issuedBeforePasswordChange(payload, admin)) {
+      return res.status(401).json({
+        success: false,
+        message: 'Password changed. Login again.'
+      });
+    }
+
     req.admin = admin;
 
     return next();
@@ -304,6 +334,8 @@ async function requireAdmin(req, res, next) {
 ===================================== */
 
 module.exports = {
+
+  issuedBeforePasswordChange,
 
   signToken,
 
