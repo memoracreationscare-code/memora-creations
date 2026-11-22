@@ -63,6 +63,23 @@ app.use(
   })
 );
 
+/* API answers are JSON only: no page, script or frame may ever run
+   from them, and private data must never be cached by a browser/proxy. */
+
+const PRIVATE_API = /^\/api\/(auth|profile|orders|cart|wishlist|admin|payment|cashfree|custom-photos)(\/|$)/;
+
+app.use('/api', (req, res, next) => {
+  res.set('Content-Security-Policy', "default-src 'none'; frame-ancestors 'none'");
+  res.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=()');
+  res.set('X-Permitted-Cross-Domain-Policies', 'none');
+
+  if (PRIVATE_API.test(req.originalUrl || '')) {
+    res.set('Cache-Control', 'private, no-store');
+  }
+
+  next();
+});
+
 /* ========================================
    GZIP COMPRESSION
    Order and product lists are large JSON;
@@ -166,6 +183,7 @@ app.use('/api', (req, res, next) => {
   const fetchSite = req.get('sec-fetch-site');
 
   if (fetchSite === 'cross-site' && !browserOrigin) {
+    require('./utils/securityLog').logSecurity('BLOCKED_ORIGIN', req);
     return res.status(403).json({
       success: false,
       message: 'Cross-site request blocked.'
@@ -176,6 +194,7 @@ app.use('/api', (req, res, next) => {
     browserOrigin &&
     !allowedOrigins.has(browserOrigin)
   ) {
+    require('./utils/securityLog').logSecurity('BLOCKED_ORIGIN', req, browserOrigin);
     return res.status(403).json({
       success: false,
       message: 'Untrusted request origin.'
@@ -197,6 +216,7 @@ app.use('/api', (req, res, next) => {
           !allowedOrigins.has(refererOrigin) &&
           refererOrigin !== ownOrigin
         ) {
+          require('./utils/securityLog').logSecurity('BLOCKED_ORIGIN', req);
           return res.status(403).json({
             success: false,
             message: 'Untrusted request referer.'
@@ -240,7 +260,14 @@ app.use(sanitizeRequest);
    RATE LIMITING
 ======================================== */
 
+// Same answer as before, but the owner also sees the attempt in Activity.
+const onLimit = (req, res, _next, options) => {
+  require('./utils/securityLog').logSecurity('RATE_LIMITED', req);
+  res.status(options.statusCode).json(options.message);
+};
+
 const authLimiter = rateLimit({
+  handler: onLimit,
   windowMs: 15 * 60 * 1000,
   limit: 30,
   standardHeaders: 'draft-7',
@@ -258,6 +285,7 @@ app.use('/api/admin/login', authLimiter);
 app.use('/api/payment', authLimiter);
 app.use('/api/cashfree', authLimiter);
 app.use('/api/coupons', rateLimit({
+  handler: onLimit,
   windowMs: 15 * 60 * 1000,
   limit: 60,
   standardHeaders: 'draft-7',
@@ -267,6 +295,7 @@ app.use('/api/coupons', rateLimit({
 
 // Password-reset requests only need a few tries per person.
 const resetLimiter = rateLimit({
+  handler: onLimit,
   windowMs: 15 * 60 * 1000,
   limit: 10,
   standardHeaders: 'draft-7',
@@ -277,6 +306,16 @@ const resetLimiter = rateLimit({
       'Too many requests. Please try again later.'
   }
 });
+
+// Anyone can register a push subscription: stop bulk spam to the database.
+app.use('/api/push/subscribe', rateLimit({
+  handler: onLimit,
+  windowMs: 15 * 60 * 1000,
+  limit: 20,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: { success: false, message: 'Too many requests. Please try again later.' }
+}));
 
 app.use('/api/auth/forgot-password', resetLimiter);
 app.use('/api/auth/reset-password', resetLimiter);

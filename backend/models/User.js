@@ -137,6 +137,12 @@ const userSchema =
         select: false
       },
 
+      // Logins issued before this moment stop working (set on every password change).
+      passwordChangedAt: {
+        type: Date,
+        default: null
+      },
+
 
       // Small profile photo stored as an image data URL
       // (resized in the browser to about 256px).
