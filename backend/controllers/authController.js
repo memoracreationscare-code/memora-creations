@@ -340,6 +340,8 @@ const login =
         )
       ) {
 
+        require('../utils/securityLog').logSecurity('LOGIN_FAILED', req, mobile);
+
         throw error(
           401,
           'Invalid mobile number or password.'

@@ -178,6 +178,8 @@ const login = asyncHandler(async (req, res) => {
       admin.passwordHash
     ))
   ) {
+    require('../utils/securityLog').logSecurity('ADMIN_LOGIN_FAILED', req, email);
+
     throw error(
       401,
       'Invalid admin credentials.'
@@ -203,6 +205,7 @@ const login = asyncHandler(async (req, res) => {
     const twoFactor = require('../services/adminTwoFactor');
 
     if (!(await twoFactor.verifyLogin(Admin, admin, otp))) {
+      require('../utils/securityLog').logSecurity('ADMIN_OTP_FAILED', req, email);
       throw error(
         401,
         'Code galat hai. Dobara try karein (ya recovery code daalein).'
