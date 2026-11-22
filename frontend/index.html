@@ -86,6 +86,8 @@
 
   <link rel="stylesheet" href="/frontend/css/style.css?v=15">
   <link rel="preconnect" href="https://api.memoracreationscare.in" crossorigin>
+  <!-- The hero photo is a CSS background, so the browser finds it late: load it first. -->
+  <link rel="preload" as="image" href="/frontend/images/hero-decor.webp" type="image/webp" fetchpriority="high">
 
   <style>
     .home-announcement {
@@ -1159,9 +1161,15 @@
       }
 
       function homeProductCard(product) {
+        const rawImage = product.images?.[0]?.url;
         const image =
-          window.MC.optImg(product.images?.[0]?.url, 560) ||
+          window.MC.optImg(rawImage, 480) ||
           'https://placehold.co/600x600?text=Memora';
+
+        // Right-sized copies: phones download the small one (Cloudinary photos only).
+        const srcset = window.MC.optImg(rawImage, 480) !== rawImage
+          ? [320, 480, 640].map(w => `${window.MC.optImg(rawImage, w)} ${w}w`).join(', ')
+          : '';
 
         const discount = getDiscount(product);
         const inStock = Number(product.stock) > 0;
@@ -1181,6 +1189,7 @@
                 <img
                   class="home-product-image"
                   src="${esc(image)}"
+                  ${srcset ? `srcset="${esc(srcset)}" sizes="(max-width:380px) 100vw, (max-width:900px) 50vw, 25vw"` : ''}
                   alt="${esc(product.name)}"
                   loading="lazy"
                   decoding="async"
