@@ -349,7 +349,7 @@
 
     // Speed: do not fetch/show the popup while the page is still
     // loading. It used to cover the hero and slow the first paint.
-    const go = () => setTimeout(loadAnnouncement, 2500);
+    const go = () => setTimeout(loadAnnouncement, 8000);
 
     if (document.readyState === 'complete') {
       go();
