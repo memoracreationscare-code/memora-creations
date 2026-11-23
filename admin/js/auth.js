@@ -108,6 +108,6 @@
 // One shared side menu on every admin page.
 (() => {
   const script = document.createElement('script');
-  script.src = '/admin/js/nav.js?v=7';
+  script.src = '/admin/js/nav.js?v=10';
   document.head.appendChild(script);
 })();

@@ -969,6 +969,14 @@ const listOrders = asyncHandler(async (req, res) => {
 
   }
 
+  // Optional date filter (Indian days): ?from=2026-11-01&to=2026-11-23
+  const created = require('../utils/dateRange')
+    .istDayRange(req.query.from, req.query.to);
+
+  if (created) {
+    filter.createdAt = created;
+  }
+
   const orders = await Order.find(filter)
     .populate(
       'user',

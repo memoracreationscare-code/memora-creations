@@ -1709,7 +1709,8 @@ async function loadAdminOrders() {
       encodeURIComponent(search) +
       (window.mcOrderStatusFilter
         ? '&status=' + encodeURIComponent(window.mcOrderStatusFilter)
-        : '')
+        : '') +
+      dateQuery()
     );
 
     adminOrders = Array.isArray(data.orders)
@@ -1884,6 +1885,49 @@ async function loadAdminOrders() {
 
   }
 }
+
+
+/* =====================================
+   DATE FILTER (Se / Tak + Aaj, 7 din, Is mahine)
+===================================== */
+
+function dateQuery() {
+  const from = document.querySelector('#dateFrom')?.value || '';
+  const to = document.querySelector('#dateTo')?.value || '';
+
+  return (from ? '&from=' + encodeURIComponent(from) : '') +
+    (to ? '&to=' + encodeURIComponent(to) : '');
+}
+
+// Indian calendar day as YYYY-MM-DD, `back` days ago.
+function istDay(back) {
+  return new Date(Date.now() + 5.5 * 3600 * 1000 - back * 86400000)
+    .toISOString().slice(0, 10);
+}
+
+document.querySelector('#dateFilter')
+  ?.addEventListener('click', event => {
+
+    const button = event.target.closest('button[data-range]');
+
+    if (!button) return;
+
+    const from = document.querySelector('#dateFrom');
+    const to = document.querySelector('#dateTo');
+    const kind = button.dataset.range;
+
+    if (kind === 'clear') { from.value = ''; to.value = ''; }
+    else if (kind === 'today') { from.value = istDay(0); to.value = istDay(0); }
+    else if (kind === 'week') { from.value = istDay(6); to.value = istDay(0); }
+    else if (kind === 'month') { from.value = istDay(0).slice(0, 8) + '01'; to.value = istDay(0); }
+
+    loadAdminOrders();
+
+  });
+
+['#dateFrom', '#dateTo'].forEach(id => {
+  document.querySelector(id)?.addEventListener('change', loadAdminOrders);
+});
 
 
 /* =====================================

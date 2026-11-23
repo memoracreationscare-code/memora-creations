@@ -80,6 +80,6 @@ $('q').addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(load,3
 $('runNow').addEventListener('click',async()=>{const b=$('runNow');b.disabled=true;note('');try{const d=await req('/admin/referrals/run',{method:'POST',body:'{}'});note(d.rewarded?d.rewarded+' naye reward de diye gaye.':'Abhi koi naya reward baaki nahi hai.');load()}catch(e){note(e.message,true)}finally{b.disabled=false}});
 load();
 </script>
-<script src="/admin/js/nav.js?v=9"></script>
+<script src="/admin/js/nav.js?v=10"></script>
 </body>
 </html>
