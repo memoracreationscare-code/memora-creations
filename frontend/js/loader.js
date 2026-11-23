@@ -4,12 +4,12 @@
   Loaded in the <head> of every customer page.
 
   - First page of a visit: the loader shows right away and stays
-    for at least 1 second so the logo is seen, then fades out when
+    for a moment so the logo is seen, then fades out when
     the page has loaded.
   - Later pages of the same visit: the loader only appears if the
     page is still loading after half a second, so fast pages do not
     flash it.
-  - It never stays longer than 8 seconds, and it never appears if
+  - It never stays longer than 1.2 seconds, and it never appears if
     JavaScript is off.
 */
 
@@ -17,10 +17,10 @@
 
   const root = document.documentElement;
 
-  const MIN_VISIBLE_FIRST = 350;
+  const MIN_VISIBLE_FIRST = 250;
   const SHOW_AFTER_LATER = 500;
-  const MAX_WAIT = 2500;
-  const FADE_MS = 450;
+  const MAX_WAIT = 1200;
+  const FADE_MS = 250;
 
   let firstVisit = true;
 

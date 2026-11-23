@@ -20,7 +20,7 @@
   gap: 26px;
   background: #f7f1e5;
   opacity: 1;
-  transition: opacity .45s ease;
+  transition: opacity .25s ease;
 }
 
 html.mc-loading .mc-loader {
