@@ -13,7 +13,7 @@ test('hero photo is preloaded with high priority and the file exists', () => {
 });
 
 test('home product cards use right-sized srcset for Cloudinary photos only', () => {
-  assert.match(html, /\[320, 480, 640\]\.map\(w => `\$\{window\.MC\.optImg\(rawImage, w\)\} \$\{w\}w`\)/);
+  assert.match(html, /\[280, 360, 480, 640\]\.map\(w => `\$\{window\.MC\.optImg\(rawImage, w\)\} \$\{w\}w`\)/);
   assert.match(html, /srcset="\$\{esc\(srcset\)\}" sizes=/);
   assert.match(html, /: ''/);
 });

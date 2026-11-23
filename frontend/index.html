@@ -1168,7 +1168,7 @@
 
         // Right-sized copies: phones download the small one (Cloudinary photos only).
         const srcset = window.MC.optImg(rawImage, 480) !== rawImage
-          ? [320, 480, 640].map(w => `${window.MC.optImg(rawImage, w)} ${w}w`).join(', ')
+          ? [280, 360, 480, 640].map(w => `${window.MC.optImg(rawImage, w)} ${w}w`).join(', ')
           : '';
 
         const discount = getDiscount(product);
@@ -1189,7 +1189,7 @@
                 <img
                   class="home-product-image"
                   src="${esc(image)}"
-                  ${srcset ? `srcset="${esc(srcset)}" sizes="(max-width:380px) 100vw, (max-width:900px) 50vw, 25vw"` : ''}
+                  ${srcset ? `srcset="${esc(srcset)}" sizes="(max-width:380px) 100vw, (max-width:900px) 45vw, 25vw"` : ''}
                   alt="${esc(product.name)}"
                   loading="lazy"
                   decoding="async"
