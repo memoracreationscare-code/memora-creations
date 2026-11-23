@@ -27,3 +27,10 @@ test('optImg gives smaller files for smaller widths and leaves other URLs alone'
   assert.match(optImg(u, 640), /w_640\//);
   assert.strictEqual(optImg('https://example.com/a.jpg', 320), 'https://example.com/a.jpg');
 });
+
+test('home product list and categories are requested after the page has loaded', () => {
+  assert.match(html, /window\.addEventListener\('load', \(\) => setTimeout\(loadHomePage, 0\), \{ once: true \}\)/);
+  assert.match(html, /document\.readyState === 'complete'/);
+  // the only direct call left is the fallback inside that readyState check
+  assert.strictEqual((html.match(/^\s*loadHomePage\(\);$/gm) || []).length, 1);
+});

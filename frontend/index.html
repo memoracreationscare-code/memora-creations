@@ -1567,7 +1567,14 @@
         }
       });
 
-      loadHomePage();
+      // Speed: the product list and categories are below the first screen.
+      // Ask for them once the page has finished loading, so they do not
+      // compete with the hero (the first thing a customer sees).
+      if (document.readyState === 'complete') {
+        loadHomePage();
+      } else {
+        window.addEventListener('load', () => setTimeout(loadHomePage, 0), { once: true });
+      }
 
     })();
   </script>
