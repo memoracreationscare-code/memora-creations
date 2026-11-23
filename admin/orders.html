@@ -102,6 +102,11 @@
       font-size: 12px;
     }
 
+    .orders-dates { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:0 0 14px; }
+    .orders-dates label { display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700; color:#6d5a4b; }
+    .orders-dates .input { padding:7px 10px; max-width:150px; }
+    .orders-dates button { border:1px solid #e0d2c6; background:#fff; color:#302117; padding:7px 12px;
+      border-radius:999px; font-size:13px; font-weight:700; cursor:pointer; }
     .orders-filter { display:flex; gap:8px; flex-wrap:wrap; margin:0 0 14px; }
     .orders-filter button { border:1px solid #e0d2c6; background:#fff; color:#302117; padding:8px 14px;
       border-radius:999px; font-weight:700; cursor:pointer; font-size:13px; }
@@ -504,6 +509,17 @@
         <button type="button" data-status="Cancelled">Cancelled</button>
       </div>
 
+      <!-- DATE FILTER -->
+
+      <div class="orders-dates" id="dateFilter">
+        <label>Se <input type="date" id="dateFrom" class="input" aria-label="Order date from"></label>
+        <label>Tak <input type="date" id="dateTo" class="input" aria-label="Order date to"></label>
+        <button type="button" data-range="today">Aaj</button>
+        <button type="button" data-range="week">Pichhle 7 din</button>
+        <button type="button" data-range="month">Is mahine</button>
+        <button type="button" data-range="clear">Saaf karein</button>
+      </div>
+
       <!-- ORDERS TABLE -->
 
       <div class="orders-table-wrap">
@@ -567,7 +583,7 @@
   <!-- ADMIN AUTHENTICATION -->
 
   <script
-    src="/admin/js/auth.js?v=17"
+    src="/admin/js/auth.js?v=18"
   ></script>
 
   <!-- EXISTING ORDER MANAGEMENT -->
@@ -575,7 +591,7 @@
   <script src="/frontend/js/invoice-render.js?v=1"></script>
 
   <script
-    src="/admin/js/orders.js?v=17"
+    src="/admin/js/orders.js?v=18"
   ></script>
 
   <!-- COD PAYMENT MANAGEMENT -->

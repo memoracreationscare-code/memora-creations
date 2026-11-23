@@ -160,6 +160,7 @@
     { title: 'Catalog & Marketing', items: [
       ['products.html', '◈', 'Products'],
       ['product-import.html', '⇪', 'Import Products (CSV)'],
+      ['quick-stock.html', '⚡', 'Stock & Price (Bulk)'],
       ['banners.html', '🖼', 'Homepage Banners'],
       ['coupons.html', '%', 'Coupons'],
       ['sale.html', '🎉', 'Festival Sale'],

@@ -331,6 +331,10 @@ router.post(
   adminController.createProduct
 );
 
+// Owner tools: change many stocks/prices at once, see "notify me" demand.
+router.post('/products/bulk', require('../controllers/adminProductToolsController').bulk);
+router.get('/stock-requests', require('../controllers/adminProductToolsController').stockRequests);
+
 router.put(
   '/products/:id',
   adminController.updateProduct
