@@ -26,6 +26,6 @@ test('every page that loads extras.js uses the same new version', () => {
   const dir = path.join(__dirname, '..', 'frontend');
   for (const f of fs.readdirSync(dir).filter(x => x.endsWith('.html'))) {
     const h = fs.readFileSync(path.join(dir, f), 'utf8');
-    if (h.includes('extras.js')) assert.match(h, /extras\.js\?v=10/, f);
+    if (h.includes('extras.js')) assert.match(h, /extras\.js\?v=11/, f);
   }
 });

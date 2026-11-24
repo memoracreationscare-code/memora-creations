@@ -6,11 +6,11 @@
     'storeClosedMessage', 'whatsapp', 'phone', 'email', 'address', 'instagram',
     'facebook', 'youtube', 'heroKicker', 'heroLine1', 'heroHighlight',
     'heroDescription', 'heroButtonText',
-    'gstLegalName', 'gstin', 'gstState', 'chatFaq', 'waOrderText'
+    'gstLegalName', 'gstin', 'gstState', 'chatFaq', 'faqText', 'waOrderText'
   ];
 
   const NUMBER = [
-    'deliveryCharge', 'freeDeliveryAbove', 'customPhotoKeepDays', 'codAdvancePercent',
+    'deliveryCharge', 'freeDeliveryAbove', 'customPhotoKeepDays', 'codAdvancePercent', 'codMaxAmount',
     'returnWindowDays', 'codAutoReceiveDays', 'abandonedReminderHours',
     'welcomePercent', 'welcomeMaxDiscount', 'welcomeMinOrder',
     'referralFriendAmount', 'referralRewardAmount', 'referralMinOrder',
@@ -177,6 +177,29 @@
     state: $('#tfState'), start: $('#tfStart'), stop: $('#tfStop'),
     setup: $('#tfSetup'), codes: $('#tfCodes')
   };
+
+  // ---- change my own password ----
+  $('#pwSave')?.addEventListener('click', async () => {
+    const msg = $('#pwMsg');
+    const show = (t, bad) => { msg.textContent = t; msg.style.color = bad ? '#b42318' : '#1b6e2d'; };
+    const oldPw = $('#pwOld').value;
+    const newPw = $('#pwNew').value;
+
+    if (!oldPw || !newPw) return show('Dono password bharein.', true);
+    if (newPw !== $('#pwNew2').value) return show('Naya password dono baar alag likha hai.', true);
+
+    try {
+      const d = await api('/admin/change-password', {
+        method: 'POST',
+        body: JSON.stringify({ currentPassword: oldPw, newPassword: newPw })
+      });
+
+      $('#pwOld').value = $('#pwNew').value = $('#pwNew2').value = '';
+      show(d.message || 'Password badal gaya.');
+    } catch (e) {
+      show(e.message || 'Password nahi badla.', true);
+    }
+  });
 
   async function loadTwoFactor() {
     if (!tf.state) return;

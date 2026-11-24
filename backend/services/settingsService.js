@@ -44,6 +44,7 @@ function defaults() {
     codEnabled: true,
     codAdvanceEnabled: envBool('COD_ADVANCE_ENABLED'),
     codAdvancePercent: envNum('COD_ADVANCE_PERCENT', 30),
+    codMaxAmount: 0,
 
     returnsEnabled: true,
     returnWindowDays: envNum('RETURN_WINDOW_DAYS', 7),
@@ -88,6 +89,7 @@ function defaults() {
 
     chatEnabled: false,
     chatFaq: '',
+    faqText: '',
 
     customPhotoKeepDays: 30,
     shareEnabled: true,
@@ -117,7 +119,7 @@ function merge(saved) {
   }
 
   // Empty text is a valid choice for the optional contact fields.
-  for (const key of ['phone', 'email', 'instagram', 'facebook', 'youtube', 'heroKicker', 'heroLine1', 'heroHighlight', 'heroDescription', 'heroButtonText', 'gstLegalName', 'gstin']) {
+  for (const key of ['phone', 'email', 'instagram', 'facebook', 'youtube', 'heroKicker', 'heroLine1', 'heroHighlight', 'heroDescription', 'heroButtonText', 'faqText', 'gstLegalName', 'gstin']) {
     if (saved && typeof saved[key] === 'string') out[key] = saved[key];
   }
 

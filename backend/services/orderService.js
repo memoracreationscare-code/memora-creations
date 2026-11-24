@@ -397,6 +397,21 @@ function trustedGiftWrapping(value) {
    BUILD ORDER DOCUMENT
 ===================================== */
 
+function assertCodWithinLimit(paymentMethod, codAdvance, payableTotal) {
+  const max = Number(require('./settingsService').peek().codMaxAmount) || 0;
+
+  if (
+    max > 0 &&
+    (paymentMethod === 'COD' || codAdvance === true) &&
+    payableTotal > max
+  ) {
+    throw error(
+      400,
+      `COD ₹${max} tak ke order par available hai. Is order ke liye online payment chunein.`
+    );
+  }
+}
+
 async function buildOrderDocument({
   user,
   address,
@@ -616,6 +631,8 @@ async function buildOrderDocument({
 
     grandTotal: payableTotal,
     codAdvance: (() => {
+      assertCodWithinLimit(paymentMethod, codAdvance, payableTotal);
+
       if (codAdvance !== true) return { enabled: false };
 
       const split = splitAdvance(payableTotal);

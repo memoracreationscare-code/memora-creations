@@ -158,6 +158,31 @@
     }
   }
 
+  function applyFaq(s) {
+    const box = document.querySelector('#faq .container');
+    const rows = String(s.faqText || '')
+      .split('\n')
+      .map(l => l.split('|'))
+      .filter(p => p.length >= 2 && p[0].trim() && p.slice(1).join('|').trim())
+      .slice(0, 30);
+
+    if (!box || !rows.length) return;
+
+    box.querySelectorAll('.mc-faq-item').forEach(el => el.remove());
+
+    rows.forEach(p => {
+      const d = document.createElement('details');
+      const q = document.createElement('summary');
+      const a = document.createElement('p');
+
+      d.className = 'mc-faq-item';
+      q.textContent = p[0].trim();
+      a.textContent = p.slice(1).join('|').trim();
+      d.append(q, a);
+      box.append(d);
+    });
+  }
+
   function applyHero(s) {
     const hero = document.querySelector('.home-hero');
 
@@ -253,6 +278,7 @@
 
         applyContact(settings);
         applyHero(settings);
+        applyFaq(settings);
         applyStoreState(settings);
 
         // AI chat ("Ask Memora") appears only when the owner switched it on.

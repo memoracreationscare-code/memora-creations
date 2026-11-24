@@ -13,7 +13,7 @@ const TEXT = {
   storeClosedMessage: 300, address: 300, instagram: 200, facebook: 200,
   youtube: 200, email: 120, phone: 20, heroKicker: 60, heroLine1: 60,
   heroHighlight: 60, heroDescription: 300, heroButtonText: 40,
-  chatFaq: 2500, waOrderText: 300, gstLegalName: 100, gstin: 20, gstState: 40
+  chatFaq: 2500, faqText: 3000, waOrderText: 300, gstLegalName: 100, gstin: 20, gstState: 40
 };
 
 const BOOL = [
@@ -27,6 +27,7 @@ const NUMBER = {
   freeDeliveryAbove: [0, 1000000],
   customPhotoKeepDays: [3, 365],
   codAdvancePercent: [5, 90],
+  codMaxAmount: [0, 1000000],
   returnWindowDays: [1, 60],
   codAutoReceiveDays: [0, 60],
   abandonedReminderHours: [1, 168],
@@ -46,6 +47,7 @@ const NUMBER_LABEL = {
   freeDeliveryAbove: 'Free delivery above',
   customPhotoKeepDays: 'Customer photo keep days',
   codAdvancePercent: 'COD advance percent',
+  codMaxAmount: 'COD maximum order amount',
   returnWindowDays: 'Return days',
   codAutoReceiveDays: 'COD auto-receive days',
   abandonedReminderHours: 'Reminder hours',
