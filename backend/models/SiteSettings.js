@@ -28,6 +28,7 @@ const schema = new mongoose.Schema({
   freeDeliveryAbove: { type: Number, min: 0, max: 1000000 },
 
   codEnabled: Boolean,
+  codMaxAmount: { type: Number, min: 0, max: 1000000 },
   codAdvanceEnabled: Boolean,
   codAdvancePercent: { type: Number, min: 5, max: 90 },
 
@@ -75,6 +76,7 @@ const schema = new mongoose.Schema({
 
   chatEnabled: Boolean,
   chatFaq: str(2500),
+  faqText: str(3000),
 
   customPhotoKeepDays: Number,
   shareEnabled: Boolean,

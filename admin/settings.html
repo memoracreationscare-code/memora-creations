@@ -370,6 +370,7 @@
         <h2>💵 Cash on Delivery</h2>
         <label class="st-c"><input id="codEnabled" type="checkbox"><span><b>Allow Cash on Delivery</b><small>Turn OFF to accept only online payment.</small></span></label>
         <div style="margin-top:10px"><label class="st-c"><input id="codAdvanceEnabled" type="checkbox"><span><b>Take an advance on COD orders</b><small>The customer pays this share online, the rest in cash on delivery.</small></span></label></div>
+        <div class="st-grid" style="margin-top:10px"><label class="st-f"><span>COD maximum order amount (₹)</span><input id="codMaxAmount" class="input" type="number" placeholder="0"><small>Is se bade order par COD band, sirf online payment. 0 = koi limit nahi.</small></label></div>
         <div class="st-grid" style="margin-top:10px"><label class="st-f"><span>Advance percent (5 to 90)</span><input id="codAdvancePercent" class="input" type="number" placeholder="30"></label></div>
       </div>
 
@@ -442,6 +443,13 @@
           <label class="st-f"><span>GST rate (%)</span><input id="gstRate" class="input" type="number" placeholder="18"></label>
         </div>
         <small style="display:block;margin-top:8px;color:#7a6a58">Apne state ke customer ko CGST + SGST, doosre state ko IGST dikhta hai. Bill order ke andar "Invoice / GST Bill" button se khulta hai, wahan se PDF save kar sakte ho.</small>
+      </div>
+
+      <div class="st-box">
+        <h2>❓ Home page FAQ (Aksar pooche jaane wale sawal)</h2>
+        <label class="st-f"><span>Har line me ek sawal: &nbsp;Sawal | Jawab</span>
+          <textarea id="faqText" class="input" rows="8" maxlength="3000" placeholder="Custom order me kitne din lagte hain? | Custom order 3-5 din me taiyar hota hai.&#10;Gift wrap milta hai? | Haan, checkout par gift wrap chun sakte hain."></textarea>
+          <small>Khali chhodo to website par purane (pehle se likhe) 5 sawal dikhenge. Likhne par wahi dikhenge jo yahan likhe hain.</small></label>
       </div>
 
       <div class="st-box">
@@ -530,6 +538,18 @@
       <button id="tfStop" type="button" class="btn danger" hidden>2-step login band karo</button></p>
     </section>
 
+    <section class="ac-head" style="margin-top:22px" id="pwBox">
+      <h2>🔑 Apna admin password badlein</h2>
+      <p style="color:#6b5d52;font-size:14px;line-height:1.5">Naya password 10+ akshar ka ho, akshar aur number dono ke saath. Badalte hi baaki sab jagah ke purane login band ho jate hain (sirf ye browser chalta rahega).</p>
+      <div style="display:grid;gap:10px;max-width:340px">
+        <input id="pwOld" class="input" type="password" autocomplete="current-password" placeholder="Abhi ka password">
+        <input id="pwNew" class="input" type="password" autocomplete="new-password" placeholder="Naya password">
+        <input id="pwNew2" class="input" type="password" autocomplete="new-password" placeholder="Naya password dobara">
+        <button id="pwSave" type="button" class="btn">Password badlo</button>
+      </div>
+      <p id="pwMsg" style="font-weight:700;margin-top:10px"></p>
+    </section>
+
     <section class="ac-head" style="margin-top:22px">
       <h2>🚚 Shiprocket connection check</h2>
       <p>Dekhne ke liye ki website aur Shiprocket ka connection theek hai ya nahi.</p>
@@ -540,7 +560,7 @@
 
   <script src="/frontend/js/app.js?v=19"></script>
   <script src="/admin/js/auth.js?v=18"></script>
-  <script src="/admin/js/settings.js?v=13"></script>
+  <script src="/admin/js/settings.js?v=14"></script>
 
 </body>
 </html>

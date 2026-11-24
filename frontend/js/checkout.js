@@ -561,6 +561,7 @@
 
     lastTotal = Number(preview.grandTotal) || 0;
     updateAdvanceNotice();
+    applyCodLimit();
   }
 
   /*
@@ -578,6 +579,53 @@
 
   let codAdvance = { enabled: false, percent: 30 };
   let lastTotal = 0;
+  let codMaxAmount = 0;
+
+  // Owner can set a maximum order amount for COD (Admin -> Settings).
+  // The server enforces it too; this only hides the option politely.
+  function applyCodLimit() {
+    const cod = document.querySelector('input[name="paymentMethod"][value="COD"]');
+    const label = cod && cod.closest('label');
+
+    if (!cod || !label) return;
+
+    const over = codMaxAmount > 0 && lastTotal > codMaxAmount;
+    let note = document.getElementById('mcCodLimitNote');
+
+    cod.disabled = over;
+    label.style.opacity = over ? '0.55' : '';
+
+    if (over) {
+      if (!note) {
+        note = document.createElement('div');
+        note.id = 'mcCodLimitNote';
+        note.style.cssText = 'margin:6px 0 0;font-size:13px;color:#8a4b00';
+        label.insertAdjacentElement('afterend', note);
+      }
+
+      note.textContent = 'COD ₹' + codMaxAmount + ' tak ke order par available hai. Is order ke liye online payment chunein.';
+
+      if (cod.checked) {
+        const other = document.querySelector('input[name="paymentMethod"]:not([value="COD"])');
+
+        if (other) {
+          other.checked = true;
+          other.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      }
+    } else if (note) {
+      note.remove();
+    }
+  }
+
+  MC.api('/settings')
+    .then(data => {
+      const s = (data && (data.settings || data.data || data)) || {};
+
+      codMaxAmount = Number(s.codMaxAmount) || 0;
+      applyCodLimit();
+    })
+    .catch(() => {});
 
   function advanceSplit(total) {
     const paise = Math.round(Number(total || 0) * 100);

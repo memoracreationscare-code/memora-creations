@@ -107,6 +107,7 @@ router.get('/staff', staffController.list);
 router.post('/staff', staffController.create);
 router.patch('/staff/:id/toggle', staffController.toggle);
 router.patch('/staff/:id/password', staffController.resetPassword);
+router.post('/change-password', require('../controllers/adminPasswordController').change);
 
 router.get(
   '/activity',
