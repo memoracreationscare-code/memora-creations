@@ -45,6 +45,7 @@ function defaults() {
     codAdvanceEnabled: envBool('COD_ADVANCE_ENABLED'),
     codAdvancePercent: envNum('COD_ADVANCE_PERCENT', 30),
     codMaxAmount: 0,
+    shiprocketLowBalance: 500,
 
     returnsEnabled: true,
     returnWindowDays: envNum('RETURN_WINDOW_DAYS', 7),

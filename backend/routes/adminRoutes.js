@@ -712,6 +712,11 @@ router.post('/2fa/enable', require('../controllers/adminTwoFactorController').en
 router.post('/2fa/disable', require('../controllers/adminTwoFactorController').disable);
 
 router.get(
+  '/connections',
+  require('../controllers/adminConnectionsController').live
+);
+
+router.get(
   '/launch-check',
   require('../controllers/adminLaunchCheckController').check
 );

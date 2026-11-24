@@ -29,6 +29,7 @@ const schema = new mongoose.Schema({
 
   codEnabled: Boolean,
   codMaxAmount: { type: Number, min: 0, max: 1000000 },
+  shiprocketLowBalance: { type: Number, min: 0, max: 1000000 },
   codAdvanceEnabled: Boolean,
   codAdvancePercent: { type: Number, min: 5, max: 90 },
 
