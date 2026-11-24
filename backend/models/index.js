@@ -12,6 +12,10 @@ module.exports = {
 
   User: require('./User'),
 
+  SecretVault: require('./SecretVault'),
+
+  PageContent: require('./PageContent'),
+
   Admin: require('./Admin'),
 
   ActivityLog: require('./ActivityLog'),

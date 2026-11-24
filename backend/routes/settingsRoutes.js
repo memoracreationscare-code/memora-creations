@@ -59,4 +59,24 @@ router.get('/', async (_req, res) => {
   return res.json({ success: true, ok: true, settings: publicView(current) });
 });
 
+// Text the owner wrote for a policy / about page (plain text; empty = use the page's own text)
+router.get('/pages/:slug', async (req, res) => {
+  try {
+    const { PAGES } = require('../controllers/adminPagesController');
+    const slug = String(req.params.slug || '');
+
+    if (!Object.prototype.hasOwnProperty.call(PAGES, slug)) {
+      return res.status(404).json({ success: false, message: 'Not found' });
+    }
+
+    const doc = await require('../models/PageContent').findOne({ slug }).select('body').lean();
+
+    res.set('Cache-Control', 'public, max-age=60');
+
+    return res.json({ success: true, body: (doc && doc.body) || '' });
+  } catch (_) {
+    return res.json({ success: true, body: '' }); // never break a public page
+  }
+});
+
 module.exports = router;
