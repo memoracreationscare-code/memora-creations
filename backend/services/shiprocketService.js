@@ -4,6 +4,9 @@ const SHIPROCKET_BASE =
   'https://apiv2.shiprocket.in/v1/external';
 
 let cachedToken = null;
+
+/* Forget the saved login token (used after the owner changes the Shiprocket login). */
+function resetShiprocketToken() { cachedToken = null; tokenExpiresAt = 0; }
 let tokenExpiresAt = 0;
 
 
@@ -702,6 +705,7 @@ module.exports = {
 
   assignCourierAwb,
 
-  getWalletBalance
+  getWalletBalance,
+  resetShiprocketToken
 
 };

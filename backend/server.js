@@ -519,6 +519,9 @@ if (require.main === module) {
         // Read Cashfree refunds back into orders (also manual refunds).
         require('./services/refundSync').startRefundSync();
 
+        // Keys the owner saved in Admin -> Connections (override Render, never shown).
+        require('./services/secretsService').applyAll().catch(() => {});
+
         // Owner-editable shop settings (Admin -> Store Settings).
         require('./services/settingsService').startSettingsRefresh();
 

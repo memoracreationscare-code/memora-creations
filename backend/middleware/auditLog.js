@@ -30,6 +30,8 @@ const LABELS = [
   ['PUT', /^\/banners\/[^/]+$/, 'Banner badla'],
   ['DELETE', /^\/banners\/[^/]+$/, 'Banner hataya'],
   ['PUT', /^\/settings$/, 'Store Settings badli'],
+  ['POST', /^\/secrets$/, 'Keys / connections badli'],
+  ['PUT', /^\/pages\/[a-z-]+$/, 'Website page ka text badla'],
   ['POST', /^\/test-orders\/delete$/, 'Test orders hataye (cleanup)'],
   ['PATCH', /^\/return-requests\/[^/]+$/, 'Return request par faisla liya'],
   ['POST', /^\/cancel-followups\/[^/]+\/done$/, 'Cancel follow-up done kiya'],
