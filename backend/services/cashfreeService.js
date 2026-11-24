@@ -653,7 +653,26 @@ async function terminateCashfreeOrder(orderId) {
    EXPORT FUNCTIONS
 ===================================== */
 
+/* Asks Cashfree about an order that cannot exist. 404 = our keys were
+   accepted; 401/403 = keys are wrong. Creates and changes nothing. */
+async function pingCashfree() {
+  const config = getCashfreeConfig();
+  const response = await fetch(config.baseUrl + '/orders/memora_connection_check', {
+    headers: {
+      Accept: 'application/json',
+      'x-client-id': config.clientId,
+      'x-client-secret': config.clientSecret,
+      'x-api-version': CASHFREE_API_VERSION
+    },
+    signal: AbortSignal.timeout(15000)
+  });
+
+  return { status: response.status, env: config.env };
+}
+
 module.exports = {
+
+  pingCashfree,
 
   getCashfreeConfig,
 
