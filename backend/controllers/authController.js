@@ -146,6 +146,38 @@ const register =
       }
 
 
+      /* Date of birth; under 18 needs a parent / guardian's yes. */
+      const consentRules = require('../utils/parentConsent');
+      const dateOfBirth = consentRules.parseDob(req.body.dateOfBirth);
+
+      if (!dateOfBirth) {
+        throw error(400, 'Apni sahi date of birth chunein.');
+      }
+
+      const minor = consentRules.isMinor(dateOfBirth);
+      const parentName = cleanString(req.body.parentName, 100);
+      const parentEmail = cleanString(req.body.parentEmail, 150).toLowerCase();
+
+      if (minor) {
+        if (
+          parentName.length < 2 ||
+          !parentEmail ||
+          !validEmail(parentEmail) ||
+          parentEmail === String(email || '').toLowerCase()
+        ) {
+          throw error(
+            400,
+            '18 saal se kam umar me parent / guardian ka naam aur unka alag email zaroori hai (aapke apne email se alag).'
+          );
+        }
+
+        const declared = req.body.parentConsentDeclared;
+
+        if (declared !== true && declared !== 'on' && declared !== 'true') {
+          throw error(400, 'Parent / guardian ki sahmati ka box tick karna zaroori hai.');
+        }
+      }
+
       if (
         await User.findOne({
           mobile
@@ -182,6 +214,8 @@ const register =
         );
 
 
+      const consent = minor ? consentRules.newToken() : null;
+
       const user =
         await User.create({
 
@@ -192,6 +226,22 @@ const register =
           email,
 
           passwordHash,
+
+          dateOfBirth,
+
+          ...(minor
+            ? {
+                parentConsent: {
+                  required: true,
+                  status: 'PENDING',
+                  parentName,
+                  parentEmail,
+                  tokenHash: consent.hash,
+                  tokenExpiresAt: new Date(Date.now() + consentRules.LINK_DAYS * 86400000),
+                  requestedAt: new Date()
+                }
+              }
+            : {}),
 
           addresses: [
 
@@ -236,6 +286,24 @@ const register =
 
         });
 
+
+      /* Under 18: locked until the parent approves. No login cookie yet. */
+      if (minor) {
+        const sent = await require('./parentConsentController')
+          .sendConsentEmail(user, consent.token);
+
+        return ok(
+          res,
+          {
+            pendingParentConsent: true,
+            emailSent: sent,
+            message: sent
+              ? 'Account ban gaya hai, par chalu tab hoga jab aapke parent / guardian email par bheje link se haan karenge.'
+              : 'Account ban gaya hai, par parent ko email nahi ja paya. Login page par "Parent ko link dobara bhejein" use karein.'
+          },
+          201
+        );
+      }
 
       // Refer & Earn: never blocks sign-up.
       await require('../services/referralService')
@@ -349,6 +417,13 @@ const login =
 
       }
 
+
+      if (user.parentConsent && user.parentConsent.status === 'PENDING') {
+        throw error(
+          403,
+          'Aapke parent / guardian ki sahmati baaki hai. Unke email par bheje link se haan karna hoga. Link nahi mila to niche "Parent ko link dobara bhejein" dabayein.'
+        );
+      }
 
       user.lastLoginAt =
         new Date();

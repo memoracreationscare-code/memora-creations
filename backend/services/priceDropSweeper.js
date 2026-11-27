@@ -76,7 +76,7 @@ async function sweepPriceDrops(deps = defaultDeps()) {
     let sent = false;
 
     if (drops.length) {
-      const user = await User.findOne({ _id: list.user, isActive: true, email: { $exists: true, $ne: '' } })
+      const user = await User.findOne({ _id: list.user, isActive: true, 'parentConsent.required': { $ne: true }, email: { $exists: true, $ne: '' } })
         .select('fullName email').lean();
 
       if (user && user.email) {

@@ -578,6 +578,35 @@
 
         </form>
 
+        <!-- Under-18 sign-ups: send the parent's approval link again -->
+        <details id="parentResend" style="margin-top:16px;text-align:center">
+          <summary style="cursor:pointer;color:#8a5a3b;font-weight:700">Parent ko link dobara bhejein</summary>
+          <p style="margin:10px 0;font-size:14px">Aapne 18 saal se kam umar me account banaya tha aur parent ki haan baaki hai? Apna mobile number likhein.</p>
+          <input id="parentResendMobile" class="input" type="tel" inputmode="numeric" maxlength="10" placeholder="10 digit mobile number" style="max-width:260px">
+          <button id="parentResendBtn" class="btn" type="button" style="margin-top:8px">Link bhejein</button>
+          <p id="parentResendMsg" role="status" style="margin-top:8px;font-size:14px"></p>
+        </details>
+        <script>
+          (function () {
+            var btn = document.getElementById('parentResendBtn');
+            if (!btn) return;
+            btn.addEventListener('click', function () {
+              var m = document.getElementById('parentResendMobile').value.trim();
+              var out = document.getElementById('parentResendMsg');
+              btn.disabled = true;
+              fetch('https://api.memoracreationscare.in/api/auth/parent-consent/resend', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ mobile: m })
+              }).then(function (r) { return r.json(); })
+                .then(function (d) { out.textContent = d.message || 'Ho gaya.'; })
+                .catch(function () { out.textContent = 'Abhi nahi ho paya, thodi der baad try karein.'; })
+                .then(function () { btn.disabled = false; });
+            });
+          })();
+        </script>
+
 
         <!-- SIGNUP -->
 
@@ -649,7 +678,7 @@
   <!-- UPDATED AUTH SCRIPT -->
 
   <script
-    src="/frontend/js/auth.js?v=14"
+    src="/frontend/js/auth.js?v=15"
   ></script>
 
 

@@ -326,6 +326,8 @@
 
   /* SIGNUP */
 
+  let signupPending = false;
+
   bindForm('#signupForm', {
     loadingText: 'Creating Account...',
     endpoint: '/auth/register',
@@ -350,12 +352,19 @@
 
     successTitle: 'Account Created Successfully',
 
-    successMessage:
-      'Welcome to Memora Creations. Your account has been created successfully.',
+    successMessage(result) {
+      return result && result.pendingParentConsent
+        ? result.message
+        : 'Welcome to Memora Creations. Your account has been created successfully.';
+    },
 
-    successRedirect: HOME,
+    // Under 18: no login yet, the parent has to approve first.
+    successRedirect: () => (signupPending ? '/frontend/login.html' : HOME),
 
-    onSuccess: () => { try { localStorage.removeItem('mc_ref'); } catch (_) {} },
+    onSuccess: result => {
+      signupPending = Boolean(result && result.pendingParentConsent);
+      try { localStorage.removeItem('mc_ref'); } catch (_) {}
+    },
 
     errorTitle: 'Account Creation Failed'
   });

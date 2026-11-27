@@ -202,7 +202,11 @@ async function requireUser(req, res, next) {
       payload.sub
     );
 
-    if (!user || !user.isActive) {
+    if (
+      !user ||
+      !user.isActive ||
+      (user.parentConsent && ['PENDING', 'DENIED'].includes(user.parentConsent.status))
+    ) {
 
       return res.status(401).json({
 

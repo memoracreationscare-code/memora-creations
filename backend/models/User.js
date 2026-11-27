@@ -202,6 +202,24 @@ const userSchema =
         default: undefined
       },
 
+      /* Date of birth (asked at sign-up). Old accounts have none. */
+      dateOfBirth: {
+        type: Date,
+        default: undefined
+      },
+
+      /* Parent / guardian consent for sign-ups under 18 (see utils/parentConsent.js). */
+      parentConsent: {
+        required: { type: Boolean, default: undefined },
+        status: { type: String, enum: ['PENDING', 'GRANTED', 'DENIED'], default: undefined },
+        parentName: { type: String, maxlength: 100 },
+        parentEmail: { type: String, maxlength: 150 },
+        tokenHash: { type: String, select: false },
+        tokenExpiresAt: { type: Date, select: false },
+        requestedAt: Date,
+        decidedAt: Date
+      },
+
       /* Birthday as "MM-DD" (no year). Used for one birthday notification a year. */
       birthday: {
         type: String,

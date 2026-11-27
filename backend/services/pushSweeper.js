@@ -180,6 +180,7 @@ async function sweepBirthdays(deps, now) {
   const users = await User.find({
     birthday: t.md,
     isActive: true,
+    'parentConsent.required': { $ne: true }, // no marketing to under-18s
     birthdayPushYear: { $ne: t.year }
   }).select('_id fullName').limit(50).lean();
 
