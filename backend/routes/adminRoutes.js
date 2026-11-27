@@ -711,6 +711,8 @@ router.post('/2fa/setup', require('../controllers/adminTwoFactorController').set
 router.post('/2fa/enable', require('../controllers/adminTwoFactorController').enable);
 router.post('/2fa/disable', require('../controllers/adminTwoFactorController').disable);
 
+router.get('/payment-alerts', require('../controllers/adminPaymentAlertsController').list);
+
 router.get('/pages', require('../controllers/adminPagesController').list);
 router.get('/pages/:slug', require('../controllers/adminPagesController').get);
 router.put('/pages/:slug', require('../controllers/adminPagesController').put);
