@@ -717,6 +717,8 @@ router.get('/pages', require('../controllers/adminPagesController').list);
 router.get('/pages/:slug', require('../controllers/adminPagesController').get);
 router.put('/pages/:slug', require('../controllers/adminPagesController').put);
 
+router.post('/test-email', require('../controllers/adminConnectionsController').testEmail);
+
 router.get('/secrets', require('../controllers/adminSecretsController').list);
 router.post('/secrets', require('../controllers/adminSecretsController').update);
 

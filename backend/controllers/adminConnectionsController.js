@@ -76,13 +76,47 @@ async function checkCashfree(cf) {
   }
 }
 
+async function checkMail(mail, fetchFn = fetch) {
+  const which = mail.provider();
+
+  if (!which) {
+    return {
+      id: 'mail', level: 'bad', title: 'Email (customer ko mail)',
+      detail: 'Email service juda hi nahi hai: koi bhi mail (order, birthday, offer, password link) nahi jaa rahi. Keys & Connections me Brevo API key aur bhejne wala email daalein.'
+    };
+  }
+
+  if (which === 'brevo') {
+    try {
+      const r = await fetchFn('https://api.brevo.com/v3/account', {
+        headers: { 'api-key': process.env.BREVO_API_KEY, Accept: 'application/json' },
+        signal: AbortSignal.timeout(15000)
+      });
+
+      if (r.status === 401 || r.status === 403) {
+        return { id: 'mail', level: 'bad', title: 'Email (Brevo)', detail: 'Brevo ne API key nahi maani. Nayi key banakar Keys & Connections me daalein.' };
+      }
+
+      if (!r.ok) return { id: 'mail', level: 'warn', title: 'Email (Brevo)', detail: 'Brevo abhi jawab nahi de raha, thodi der baad dekhein.' };
+    } catch (_) {
+      return { id: 'mail', level: 'warn', title: 'Email (Brevo)', detail: 'Brevo tak pahunch nahi paye, thodi der baad dekhein.' };
+    }
+  }
+
+  return {
+    id: 'mail', level: 'ok', title: `Email (${which === 'brevo' ? 'Brevo' : 'Resend'})`,
+    detail: 'Key sahi hai. "Test email bhejo" se ek asli mail bhejkar pakka kar lein (sender email verified hona chahiye).'
+  };
+}
+
 async function gather({
   sr = require('../services/shiprocketService'),
   cf = require('../services/cashfreeService'),
-  settings = require('../services/settingsService')
+  settings = require('../services/settingsService'),
+  mail = require('../services/mailService')
 } = {}) {
   const low = Number(settings.peek().shiprocketLowBalance) || 0;
-  const checks = await Promise.all([checkShiprocket(sr, low), checkCashfree(cf)]);
+  const checks = await Promise.all([checkShiprocket(sr, low), checkCashfree(cf), checkMail(mail)]);
 
   return {
     checks,
@@ -92,4 +126,27 @@ async function gather({
 
 const live = asyncHandler(async (_req, res) => ok(res, await gather()));
 
-module.exports = { live, gather, checkShiprocket, checkCashfree, walletOf };
+/* POST /api/admin/test-email  { to? }  -> sends one real test mail (to the owner by default) */
+const testEmail = asyncHandler(async (req, res) => {
+  const { error } = require('../utils/http');
+  const mail = require('../services/mailService');
+  const asked = String((req.body || {}).to || '').trim();
+  const to = asked || String((req.admin && req.admin.email) || process.env.ADMIN_ALERT_EMAIL || '').trim();
+
+  if (!/^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,}$/.test(to)) throw error(400, 'Sahi email address likhein.');
+  if (!mail.mailConfigured()) throw error(400, 'Email service juda hi nahi hai. Pehle Brevo API key aur bhejne wala email daalein.');
+
+  try {
+    await mail.sendMail({
+      to,
+      subject: 'Memora Creations: test email',
+      html: '<p>Ye ek test email hai. Ye mil gayi, matlab aapki website se email theek jaa rahi hai. ✅</p>'
+    });
+  } catch (err) {
+    throw error(502, 'Email nahi gayi: ' + String(err.message || 'unknown').slice(0, 220));
+  }
+
+  return ok(res, { sent: true, to: to.replace(/^(.).*(@.*)$/, '$1***$2'), message: 'Test email bhej di gayi. Inbox (aur spam) dekhein.' });
+});
+
+module.exports = { live, gather, checkShiprocket, checkCashfree, checkMail, walletOf, testEmail };
