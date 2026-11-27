@@ -48,6 +48,22 @@ table.h{width:100%;border-collapse:collapse;font-size:14px}table.h th,table.h td
 <p>Daali hui key <b>encrypted</b> rakhi jaati hai aur yahan kabhi wapas nahi dikhti (sirf "set hai" dikhta hai). Save karne ke liye apna admin password dobara dena padta hai. Yahan daali key Render wali key ki jagah kaam karti hai; "Panel wali hatao" dabane par Render wali key wapas chalu ho jaati hai. Sirf aap (owner) ye page dekh sakte ho, staff nahi.</p>
 </section>
 <section class="card" style="margin-bottom:22px">
+<h2 class="section-title">Email chalu karne ke 4 kadam (Brevo, free)</h2>
+<ol style="line-height:1.8;margin:0 0 6px;padding-left:20px">
+<li><b>brevo.com</b> par free account banayein (300 email roz free).</li>
+<li>Brevo me <b>Senders &amp; IP → Senders</b> me wo email jodein jisse mail jayegi (jaise memoracreations.care@gmail.com) aur Brevo ka verification mail kholkar verify karein.</li>
+<li>Brevo me <b>SMTP &amp; API → API Keys</b> se nayi key banakar copy karein.</li>
+<li>Niche <b>"Email (Brevo) API key"</b> me wo key aur <b>"Email bhejne wala address"</b> me verified email daalein, apna admin password dekar Save karein. Phir niche "Test email bhejo" dabayein.</li>
+</ol>
+</section>
+<section class="card" style="margin-bottom:22px">
+<h2 class="section-title">Test email</h2>
+<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+<input id="testTo" type="email" placeholder="Khali = aapke admin email par" style="flex:1;min-width:220px;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font:inherit">
+<button id="testBtn" class="btn" type="button">Test email bhejo</button>
+</div>
+</section>
+<section class="card" style="margin-bottom:22px">
 <div id="fields"><p class="empty">Loading&hellip;</p></div>
 <div style="margin-top:18px;display:grid;gap:10px;max-width:420px">
 <label style="font-weight:700">Apna admin password (save ke liye)<input id="pw" type="password" autocomplete="current-password" style="width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font:inherit"></label>
@@ -85,6 +101,11 @@ $('save').addEventListener('click',async()=>{
  $('save').disabled=true;note('');
  try{const d=await req('/admin/secrets',{method:'POST',body:JSON.stringify({password:$('pw').value,updates})});$('pw').value='';draw(d.fields);note(d.message)}
  catch(e){note(e.message,true)}finally{$('save').disabled=false}
+});
+$('testBtn').addEventListener('click',async()=>{
+ $('testBtn').disabled=true;note('');
+ try{const d=await req('/admin/test-email',{method:'POST',body:JSON.stringify({to:$('testTo').value.trim()})});note(d.message+' ('+d.to+')')}
+ catch(e){note(e.message,true)}finally{$('testBtn').disabled=false}
 });
 load();
 </script>
