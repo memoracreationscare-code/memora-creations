@@ -148,9 +148,14 @@ async function sweepCartReminders(deps, now) {
   })
     .sort({ updatedAt: 1 })
     .limit(30)
-    .populate({ path: 'user', select: 'fullName email mobile isActive' })
+    .populate({ path: 'user', select: 'fullName email mobile isActive parentConsent.required' })
     .populate({ path: 'items.product', select: 'name sellingPrice stock isActive' })
     .lean();
+
+  // No marketing reminders to under-18 accounts.
+  for (let i = carts.length - 1; i >= 0; i -= 1) {
+    if (carts[i].user && carts[i].user.parentConsent && carts[i].user.parentConsent.required) carts.splice(i, 1);
+  }
 
   const userIds = carts.map(c => c.user && c.user._id).filter(Boolean);
   const latest = userIds.length
@@ -226,6 +231,7 @@ async function sweepBirthdayEmails(deps, now) {
   const users = await User.find({
     birthday: t.md,
     isActive: true,
+    'parentConsent.required': { $ne: true }, // no marketing to under-18s
     email: { $exists: true, $ne: '' },
     birthdayEmailYear: { $ne: t.year }
   }).select('_id fullName email').limit(30).lean();

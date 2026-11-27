@@ -214,6 +214,8 @@
       gap: 19px 16px;
     }
 
+    #parentBox[hidden] { display: none !important; }
+
     .signup-field {
       min-width: 0;
     }
@@ -601,6 +603,73 @@
             </div>
 
 
+            <!-- DATE OF BIRTH -->
+
+            <div class="signup-field">
+
+              <label for="signupDob">
+                Date of Birth *
+              </label>
+
+              <input
+                id="signupDob"
+                class="signup-input"
+                name="dateOfBirth"
+                type="date"
+                required
+                autocomplete="bday"
+              >
+
+            </div>
+
+
+            <!-- PARENT CONSENT (only if under 18) -->
+
+            <div class="signup-field" id="parentBox" hidden style="grid-column:1/-1;background:#fdf1e3;border-radius:14px;padding:14px 16px">
+
+              <p style="margin:0 0 10px;font-weight:700;color:#7a4b00">
+                18 saal se kam umar me parent / guardian ki sahmati zaroori hai. Unke email par ek link jaayega, unke haan karne ke baad hi account chalu hoga.
+              </p>
+
+              <label for="signupParentName">
+                Parent / Guardian ka naam *
+              </label>
+
+              <input
+                id="signupParentName"
+                class="signup-input"
+                name="parentName"
+                type="text"
+                maxlength="100"
+                autocomplete="off"
+              >
+
+              <label for="signupParentEmail" style="margin-top:10px;display:block">
+                Parent / Guardian ka email * (aapke apne email se alag)
+              </label>
+
+              <input
+                id="signupParentEmail"
+                class="signup-input"
+                name="parentEmail"
+                type="email"
+                maxlength="150"
+                autocomplete="off"
+              >
+
+              <label style="display:flex;gap:8px;align-items:flex-start;margin-top:12px;font-weight:400">
+                <input
+                  id="signupParentOk"
+                  name="parentConsentDeclared"
+                  type="checkbox"
+                  style="margin-top:4px"
+                >
+                <span>Mere parent / guardian ko is account ke baare me pata hai aur unhone mujhe ye email dene ko kaha hai.</span>
+              </label>
+
+            </div>
+
+
             <!-- REFERRAL CODE (optional) -->
 
             <div class="signup-field">
@@ -803,7 +872,7 @@
   <!-- UPDATED AUTH -->
 
   <script
-    src="/frontend/js/auth.js?v=14"
+    src="/frontend/js/auth.js?v=15"
   ></script>
 
 
@@ -847,6 +916,39 @@
 
         });
 
+      }
+
+
+      /* UNDER 18: show the parent / guardian block */
+
+      const dob = document.getElementById('signupDob');
+      const box = document.getElementById('parentBox');
+
+      if (dob && box) {
+        const today = new Date();
+
+        dob.max = today.toISOString().slice(0, 10);
+
+        const sync = () => {
+          const v = dob.value;
+          let minor = false;
+
+          if (/^\d{4}-\d{2}-\d{2}$/.test(v)) {
+            const [y, m, d] = v.split('-').map(Number);
+            let age = today.getFullYear() - y;
+
+            if (today.getMonth() + 1 < m || (today.getMonth() + 1 === m && today.getDate() < d)) age -= 1;
+            minor = age < 18;
+          }
+
+          box.hidden = !minor;
+          ['signupParentName', 'signupParentEmail', 'signupParentOk'].forEach(id => {
+            document.getElementById(id).required = minor;
+          });
+        };
+
+        dob.addEventListener('input', sync);
+        dob.addEventListener('change', sync);
       }
 
 
