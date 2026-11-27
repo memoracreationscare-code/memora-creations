@@ -128,19 +128,24 @@ const register =
       }
 
 
+      /* Delivery address is optional at sign-up (it is asked again at checkout).
+         If any of it is filled in, address line and a 6-digit PIN must both be right. */
+      const hasAddress = Boolean(
+        cleanString(address.addressLine, 300) ||
+        cleanString(String(address.pinCode || ''), 10)
+      );
+
       if (
-        !cleanString(
-          address.addressLine,
-          300
-        ) ||
-        !validPin(
-          address.pinCode
+        hasAddress &&
+        (
+          !cleanString(address.addressLine, 300) ||
+          !validPin(address.pinCode)
         )
       ) {
 
         throw error(
           400,
-          'A valid address and 6-digit PIN code are required.'
+          'Address bharein to poora address aur 6 digit PIN code dono sahi hone chahiye.'
         );
 
       }
@@ -243,7 +248,7 @@ const register =
               }
             : {}),
 
-          addresses: [
+          addresses: !hasAddress ? [] : [
 
             {
 
