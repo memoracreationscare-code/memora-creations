@@ -1324,9 +1324,16 @@ const resetUserPassword = asyncHandler(async (req, res) => {
 
   await user.save();
 
+  // Tell the customer the new password by email (only if they gave an email).
+  // A mail problem never undoes the change: the admin still sees the password on screen.
+  const emailed = await require('../services/passwordMail')
+    .sendNewPassword(user, password);
+
   return ok(res, {
-    message:
-      'Customer password updated successfully.'
+    emailed,
+    message: emailed
+      ? 'Customer password updated and emailed to the customer.'
+      : 'Customer password updated successfully.'
   });
 
 });

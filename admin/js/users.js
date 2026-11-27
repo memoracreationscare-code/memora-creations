@@ -909,7 +909,7 @@
 
               try {
 
-                await window.MC.api(
+                const saved = await window.MC.api(
                   '/admin/users/' +
                   user._id +
                   '/password',
@@ -928,7 +928,11 @@
 
 
                 window.MC.toast(
-                  'Customer password updated.',
+                  saved && saved.emailed
+                    ? 'Password badal gaya aur customer ke email par bhej diya gaya.'
+                    : (user.email
+                        ? 'Password badal gaya, par email nahi ja paya. Customer ko khud bata dein.'
+                        : 'Password badal gaya. Customer ka email nahi hai, use khud bata dein.'),
                   'success'
                 );
 
