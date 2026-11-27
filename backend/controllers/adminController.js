@@ -1318,21 +1318,24 @@ const resetUserPassword = asyncHandler(async (req, res) => {
   );
   user.passwordChangedAt = new Date();
 
-  user.passwordResetTokenHash = undefined;
-  user.passwordResetExpiresAt = undefined;
+  // A one-time link (7 days) so the customer can choose their own password.
+  // The password itself is never put in an email.
+  const link = require('../services/passwordMail').newLink();
+
+  user.passwordResetTokenHash = link.hash;
+  user.passwordResetExpiresAt = link.expiresAt;
   user.passwordResetRequestedAt = null;
 
   await user.save();
 
-  // Tell the customer the new password by email (only if they gave an email).
-  // A mail problem never undoes the change: the admin still sees the password on screen.
+  // Only if the customer gave an email. A mail problem never undoes the change.
   const emailed = await require('../services/passwordMail')
-    .sendNewPassword(user, password);
+    .sendResetLink(user, link.token);
 
   return ok(res, {
     emailed,
     message: emailed
-      ? 'Customer password updated and emailed to the customer.'
+      ? 'Customer password updated and a set-password link emailed to the customer.'
       : 'Customer password updated successfully.'
   });
 
