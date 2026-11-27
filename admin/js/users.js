@@ -929,7 +929,7 @@
 
                 window.MC.toast(
                   saved && saved.emailed
-                    ? 'Password badal gaya aur customer ke email par bhej diya gaya.'
+                    ? 'Password badal gaya aur customer ke email par "apna password set karein" link bhej diya gaya.'
                     : (user.email
                         ? 'Password badal gaya, par email nahi ja paya. Customer ko khud bata dein.'
                         : 'Password badal gaya. Customer ka email nahi hai, use khud bata dein.'),

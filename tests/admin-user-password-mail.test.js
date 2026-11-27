@@ -3,6 +3,7 @@
 const test = require('node:test');
 const assert = require('node:assert');
 const fs = require('node:fs');
+const crypto = require('node:crypto');
 const Module = require('node:module');
 
 let sent = [];
@@ -23,34 +24,44 @@ test.after(() => { Module._load = orig; });
 const pm = require('../backend/services/passwordMail');
 const user = { fullName: 'Asha <b>', mobile: '9876543210', email: 'asha@x.in' };
 
-test('customer with an email gets the new password, only at their own address', async () => {
-  sent = [];
-  assert.strictEqual(await pm.sendNewPassword(user, 'NewPass#123'), true);
-  assert.strictEqual(sent.length, 1);
-  assert.strictEqual(sent[0].to, 'asha@x.in');
-  assert.ok(sent[0].html.includes('NewPass#123'));
-  assert.ok(sent[0].html.includes('Profile'), 'tells them to change it');
+test('link: random, only its hash is for storing, expires in 7 days', () => {
+  const a = pm.newLink(); const b = pm.newLink();
+  assert.notStrictEqual(a.token, b.token);
+  assert.strictEqual(a.hash, crypto.createHash('sha256').update(a.token).digest('hex'));
+  const days = (a.expiresAt - Date.now()) / 86400000;
+  assert.ok(days > 6.9 && days <= 7);
 });
 
-test('names and passwords are escaped in the email', () => {
-  const m = pm.build(user, '<script>x</script>');
-  assert.ok(!m.html.includes('<script>x</script>'));
+test('email carries a set-password link and NEVER a password', async () => {
+  sent = [];
+  const l = pm.newLink();
+  assert.strictEqual(await pm.sendResetLink(user, l.token), true);
+  assert.strictEqual(sent[0].to, 'asha@x.in');
+  assert.ok(sent[0].html.includes('reset-password.html?token=' + l.token));
+  assert.doesNotMatch(sent[0].html, /naya password:|Aapka naya password/i);
+});
+
+test('names are escaped in the email', () => {
+  const m = pm.build(user, 'abc');
   assert.ok(!m.html.includes('Asha <b>'));
 });
 
-test('no email, no mail setup, or a provider error: returns false, never throws', async () => {
+test('no email, no mail setup, or a provider error: false, never throws', async () => {
   sent = [];
-  assert.strictEqual(await pm.sendNewPassword({ ...user, email: '' }, 'x1234567'), false);
+  assert.strictEqual(await pm.sendResetLink({ ...user, email: '' }, 't'), false);
   configured = false;
-  assert.strictEqual(await pm.sendNewPassword(user, 'x1234567'), false);
+  assert.strictEqual(await pm.sendResetLink(user, 't'), false);
   configured = true; fail = true;
-  assert.strictEqual(await pm.sendNewPassword(user, 'x1234567'), false);
+  assert.strictEqual(await pm.sendResetLink(user, 't'), false);
   assert.strictEqual(sent.length, 0);
 });
 
-test('admin reset sends the mail after saving, and the screen tells the owner', () => {
+test('admin reset stores the link hash before saving, mails after saving, and never mails the password', () => {
   const src = fs.readFileSync('backend/controllers/adminController.js', 'utf8');
-  const fn = src.slice(src.indexOf('const resetUserPassword'), src.indexOf('const resetUserPassword') + 3000);
-  assert.ok(fn.indexOf('await user.save()') < fn.indexOf('sendNewPassword'), 'saved first');
+  const i = src.indexOf('const resetUserPassword');
+  const fn = src.slice(i, i + 3500);
+  assert.ok(fn.indexOf('passwordResetTokenHash = link.hash') < fn.indexOf('await user.save()'));
+  assert.ok(fn.indexOf('await user.save()') < fn.indexOf('sendResetLink'));
+  assert.doesNotMatch(fn, /sendResetLink\([^)]*password\b[^)]*\)/);
   assert.match(fs.readFileSync('admin/js/users.js', 'utf8'), /saved\.emailed/);
 });
