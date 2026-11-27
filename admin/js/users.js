@@ -335,9 +335,29 @@
      PASSWORD SUCCESS POPUP
   ========================= */
 
+  function mailStatusHtml(saved) {
+
+    const esc = window.MC.esc;
+
+    if (saved && saved.emailed) {
+      return `<div style="background:#e9f7ee;color:#1d6b3a;border-radius:10px;padding:10px 12px;margin:-6px 0 16px;font-size:14px;font-weight:700">
+        ✉️ Customer ke email (${esc(saved.emailTo || '')}) par "apna password set karein" link bhej diya gaya.</div>`;
+    }
+
+    const why = {
+      NO_EMAIL: 'Is customer ke account me email nahi hai.',
+      MAIL_NOT_SET_UP: 'Website par email service chalu nahi hai (Render me Brevo/Resend key set karni hogi).',
+      SEND_FAILED: 'Email service ne mail nahi bheji. Thodi der baad dobara try karein ya key check karein.'
+    }[saved && saved.emailReason] || 'Email nahi gayi.';
+
+    return `<div style="background:#fff4e5;color:#8a4b00;border-radius:10px;padding:10px 12px;margin:-6px 0 16px;font-size:14px;font-weight:700">
+      ⚠️ Email nahi gayi. ${esc(why)} Customer ko ye password khud bata dein.</div>`;
+  }
+
   function showPasswordSuccess(
     user,
-    password
+    password,
+    saved
   ) {
 
     return new Promise(resolve => {
@@ -405,6 +425,8 @@
           ${window.MC.esc(user.fullName || 'Customer')}
           ka new password successfully set ho gaya hai.
         </div>
+
+        ${mailStatusHtml(saved)}
 
         <div style="
           text-align:left;
@@ -939,7 +961,8 @@
 
                 await showPasswordSuccess(
                   user,
-                  password
+                  password,
+                  saved
                 );
 
 
