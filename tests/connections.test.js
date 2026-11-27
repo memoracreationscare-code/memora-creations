@@ -95,8 +95,11 @@ test('test email: needs setup, valid address, shows the provider error, masks th
     assert.strictEqual(good.b.to, 'o***@x.in');
     boom = 'Email provider refused (400) sender not valid';
     const bad = await call({ to: 'a@b.in' });
-    assert.strictEqual(bad.err.statusCode, 502);
+    assert.strictEqual(bad.err.statusCode, 422, 'not 5xx: the server would hide the text');
     assert.match(bad.err.message, /sender not valid/);
+    assert.match(bad.err.message, /verify/);
+    boom = 'Email provider refused (401) Key not found';
+    assert.match((await call({ to: 'a@b.in' })).err.message, /API key/);
   } finally { Module._load = orig; }
 });
 
