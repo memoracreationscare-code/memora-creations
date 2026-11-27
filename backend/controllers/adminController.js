@@ -1329,11 +1329,15 @@ const resetUserPassword = asyncHandler(async (req, res) => {
   await user.save();
 
   // Only if the customer gave an email. A mail problem never undoes the change.
-  const emailed = await require('../services/passwordMail')
+  const mailResult = await require('../services/passwordMail')
     .sendResetLink(user, link.token);
+
+  const emailed = mailResult.sent;
 
   return ok(res, {
     emailed,
+    emailTo: mailResult.to,
+    emailReason: mailResult.reason,
     message: emailed
       ? 'Customer password updated and a set-password link emailed to the customer.'
       : 'Customer password updated successfully.'

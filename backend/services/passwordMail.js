@@ -45,19 +45,24 @@ function build(user, token) {
   };
 }
 
+const mask = e => String(e).replace(/^(.).*(@.*)$/, '$1***$2');
+
+/* -> { sent: true, to: 'a***@gmail.com' }  or  { sent: false, reason: 'NO_EMAIL' | 'MAIL_NOT_SET_UP' | 'SEND_FAILED' } */
 async function sendResetLink(user, token) {
   try {
     const to = String((user && user.email) || '').trim();
 
-    if (!to || !mail.mailConfigured()) return false;
+    if (!to) return { sent: false, reason: 'NO_EMAIL' };
+    if (!mail.mailConfigured()) return { sent: false, reason: 'MAIL_NOT_SET_UP' };
 
     const msg = build(user, token);
+    const ok = Boolean(await mail.sendMail({ to, subject: msg.subject, html: msg.html }));
 
-    return Boolean(await mail.sendMail({ to, subject: msg.subject, html: msg.html }));
+    return ok ? { sent: true, to: mask(to) } : { sent: false, reason: 'SEND_FAILED' };
   } catch (err) {
     console.warn('[Password mail] failed:', err.message);
-    return false;
+    return { sent: false, reason: 'SEND_FAILED' };
   }
 }
 
-module.exports = { sendResetLink, newLink, build };
+module.exports = { sendResetLink, newLink, build, mask };

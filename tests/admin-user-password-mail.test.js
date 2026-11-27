@@ -35,7 +35,9 @@ test('link: random, only its hash is for storing, expires in 7 days', () => {
 test('email carries a set-password link and NEVER a password', async () => {
   sent = [];
   const l = pm.newLink();
-  assert.strictEqual(await pm.sendResetLink(user, l.token), true);
+  const r = await pm.sendResetLink(user, l.token);
+  assert.strictEqual(r.sent, true);
+  assert.strictEqual(r.to, 'a***@x.in', 'address is masked for the screen');
   assert.strictEqual(sent[0].to, 'asha@x.in');
   assert.ok(sent[0].html.includes('reset-password.html?token=' + l.token));
   assert.doesNotMatch(sent[0].html, /naya password:|Aapka naya password/i);
@@ -48,11 +50,11 @@ test('names are escaped in the email', () => {
 
 test('no email, no mail setup, or a provider error: false, never throws', async () => {
   sent = [];
-  assert.strictEqual(await pm.sendResetLink({ ...user, email: '' }, 't'), false);
+  assert.deepStrictEqual(await pm.sendResetLink({ ...user, email: '' }, 't'), { sent: false, reason: 'NO_EMAIL' });
   configured = false;
-  assert.strictEqual(await pm.sendResetLink(user, 't'), false);
+  assert.deepStrictEqual(await pm.sendResetLink(user, 't'), { sent: false, reason: 'MAIL_NOT_SET_UP' });
   configured = true; fail = true;
-  assert.strictEqual(await pm.sendResetLink(user, 't'), false);
+  assert.deepStrictEqual(await pm.sendResetLink(user, 't'), { sent: false, reason: 'SEND_FAILED' });
   assert.strictEqual(sent.length, 0);
 });
 
@@ -63,5 +65,8 @@ test('admin reset stores the link hash before saving, mails after saving, and ne
   assert.ok(fn.indexOf('passwordResetTokenHash = link.hash') < fn.indexOf('await user.save()'));
   assert.ok(fn.indexOf('await user.save()') < fn.indexOf('sendResetLink'));
   assert.doesNotMatch(fn, /sendResetLink\([^)]*password\b[^)]*\)/);
-  assert.match(fs.readFileSync('admin/js/users.js', 'utf8'), /saved\.emailed/);
+  const ui = fs.readFileSync('admin/js/users.js', 'utf8');
+  assert.match(ui, /saved\.emailed/);
+  assert.match(ui, /mailStatusHtml\(saved\)/, 'popup shows whether the mail went');
+  assert.match(ui, /MAIL_NOT_SET_UP/);
 });
