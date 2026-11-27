@@ -126,6 +126,22 @@ async function gather({
 
 const live = asyncHandler(async (_req, res) => ok(res, await gather()));
 
+function explainMailError(err) {
+  const raw = String((err && err.message) || 'unknown').slice(0, 220);
+  const low = raw.toLowerCase();
+  let hint = '';
+
+  if (/sender|from|not valid|not verified|unverified/.test(low)) {
+    hint = 'Brevo me "bhejne wala address" verify nahi hua. Brevo → Senders me use verify karein, aur Keys & Connections me wahi address daalein.';
+  } else if (/401|403|unauthor|key not found|invalid.*key|api[- ]?key/.test(low)) {
+    hint = 'Brevo ne API key nahi maani. Brevo me nayi key banakar Keys & Connections me daalein.';
+  } else if (/timeout|timed out|abort|fetch failed|network/.test(low)) {
+    hint = 'Brevo tak pahunch nahi paye. Thodi der baad dobara try karein.';
+  }
+
+  return ('Email nahi gayi. ' + hint + ' (Detail: ' + raw + ')').replace('  ', ' ');
+}
+
 /* POST /api/admin/test-email  { to? }  -> sends one real test mail (to the owner by default) */
 const testEmail = asyncHandler(async (req, res) => {
   const { error } = require('../utils/http');
@@ -143,7 +159,8 @@ const testEmail = asyncHandler(async (req, res) => {
       html: '<p>Ye ek test email hai. Ye mil gayi, matlab aapki website se email theek jaa rahi hai. ✅</p>'
     });
   } catch (err) {
-    throw error(502, 'Email nahi gayi: ' + String(err.message || 'unknown').slice(0, 220));
+    // 422, not 5xx: the server hides the text of 5xx errors, and the owner needs to read this.
+    throw error(422, explainMailError(err));
   }
 
   return ok(res, { sent: true, to: to.replace(/^(.).*(@.*)$/, '$1***$2'), message: 'Test email bhej di gayi. Inbox (aur spam) dekhein.' });
