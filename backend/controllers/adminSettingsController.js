@@ -19,7 +19,7 @@ const TEXT = {
 const BOOL = [
   'storeOpen', 'codEnabled', 'codAdvanceEnabled', 'returnsEnabled',
   'autoRefundEnabled', 'freeDeliveryBar', 'emailNotificationsEnabled', 'birthdayEmailEnabled', 'priceDropEmailEnabled',
-  'abandonedReminderEnabled', 'lowStockEmailEnabled', 'welcomeEnabled', 'referralEnabled', 'weeklySummaryEnabled', 'giftWrapEnabled', 'chatEnabled', 'shareEnabled', 'waOrderEnabled', 'gstEnabled', 'backupEmailEnabled', 'recentViewedEnabled', 'installAppEnabled', 'badgesEnabled', 'shuffleProducts', 'waUpdatesEnabled'
+  'abandonedReminderEnabled', 'lowStockEmailEnabled', 'welcomeEnabled', 'referralEnabled', 'weeklySummaryEnabled', 'giftWrapEnabled', 'chatEnabled', 'shareEnabled', 'waOrderEnabled', 'gstEnabled', 'backupEmailEnabled', 'recentViewedEnabled', 'trustBadgesEnabled', 'installAppEnabled', 'badgesEnabled', 'shuffleProducts', 'waUpdatesEnabled'
 ];
 
 const NUMBER = {
