@@ -97,6 +97,7 @@ function defaults() {
     waOrderEnabled: true,
     waOrderText: '',
     recentViewedEnabled: true,
+    trustBadgesEnabled: true,
     badgesEnabled: true,
     shuffleProducts: true,
     installAppEnabled: true,
