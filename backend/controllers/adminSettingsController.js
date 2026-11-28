@@ -19,7 +19,7 @@ const TEXT = {
 const BOOL = [
   'storeOpen', 'codEnabled', 'codAdvanceEnabled', 'returnsEnabled',
   'autoRefundEnabled', 'freeDeliveryBar', 'emailNotificationsEnabled', 'birthdayEmailEnabled', 'priceDropEmailEnabled',
-  'abandonedReminderEnabled', 'lowStockEmailEnabled', 'welcomeEnabled', 'referralEnabled', 'weeklySummaryEnabled', 'giftWrapEnabled', 'chatEnabled', 'shareEnabled', 'waOrderEnabled', 'gstEnabled', 'backupEmailEnabled', 'recentViewedEnabled', 'trustBadgesEnabled', 'installAppEnabled', 'badgesEnabled', 'shuffleProducts', 'waUpdatesEnabled'
+  'abandonedReminderEnabled', 'lowStockEmailEnabled', 'welcomeEnabled', 'referralEnabled', 'weeklySummaryEnabled', 'giftWrapEnabled', 'chatEnabled', 'shareEnabled', 'waOrderEnabled', 'gstEnabled', 'backupEmailEnabled', 'recentViewedEnabled', 'trustBadgesEnabled', 'occasionReminderEnabled', 'installAppEnabled', 'badgesEnabled', 'shuffleProducts', 'waUpdatesEnabled'
 ];
 
 const NUMBER = {
@@ -30,6 +30,7 @@ const NUMBER = {
   codMaxAmount: [0, 1000000],
   shiprocketLowBalance: [0, 1000000],
   returnWindowDays: [1, 60],
+  occasionReminderDays: [1, 30],
   codAutoReceiveDays: [0, 60],
   abandonedReminderHours: [1, 168],
   welcomePercent: [1, 90],
@@ -51,6 +52,7 @@ const NUMBER_LABEL = {
   codMaxAmount: 'COD maximum order amount',
   shiprocketLowBalance: 'Shiprocket low wallet alert',
   returnWindowDays: 'Return days',
+  occasionReminderDays: 'Reminder days',
   codAutoReceiveDays: 'COD auto-receive days',
   abandonedReminderHours: 'Reminder hours',
   welcomePercent: 'Welcome discount percent',

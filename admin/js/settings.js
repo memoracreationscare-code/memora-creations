@@ -11,7 +11,7 @@
 
   const NUMBER = [
     'deliveryCharge', 'freeDeliveryAbove', 'customPhotoKeepDays', 'codAdvancePercent', 'codMaxAmount', 'shiprocketLowBalance',
-    'returnWindowDays', 'codAutoReceiveDays', 'abandonedReminderHours',
+    'returnWindowDays', 'occasionReminderDays', 'codAutoReceiveDays', 'abandonedReminderHours',
     'welcomePercent', 'welcomeMaxDiscount', 'welcomeMinOrder',
     'referralFriendAmount', 'referralRewardAmount', 'referralMinOrder',
     'giftWrapStandardFee', 'giftWrapPremiumFee', 'gstRate'
@@ -20,7 +20,7 @@
   const BOOL = [
     'storeOpen', 'freeDeliveryBar', 'codEnabled', 'codAdvanceEnabled',
     'returnsEnabled', 'autoRefundEnabled', 'emailNotificationsEnabled', 'birthdayEmailEnabled', 'priceDropEmailEnabled',
-    'abandonedReminderEnabled', 'lowStockEmailEnabled', 'welcomeEnabled', 'referralEnabled', 'weeklySummaryEnabled', 'giftWrapEnabled', 'chatEnabled', 'shareEnabled', 'waOrderEnabled', 'gstEnabled', 'backupEmailEnabled', 'recentViewedEnabled', 'trustBadgesEnabled', 'installAppEnabled', 'badgesEnabled', 'shuffleProducts', 'waUpdatesEnabled'
+    'abandonedReminderEnabled', 'lowStockEmailEnabled', 'welcomeEnabled', 'referralEnabled', 'weeklySummaryEnabled', 'giftWrapEnabled', 'chatEnabled', 'shareEnabled', 'waOrderEnabled', 'gstEnabled', 'backupEmailEnabled', 'recentViewedEnabled', 'trustBadgesEnabled', 'occasionReminderEnabled', 'installAppEnabled', 'badgesEnabled', 'shuffleProducts', 'waUpdatesEnabled'
   ];
 
   function showChat(configured) {
