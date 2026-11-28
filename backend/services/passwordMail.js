@@ -26,26 +26,24 @@ function newLink() {
 }
 
 function build(user, token, kind = 'admin') {
+  const { shell } = require('../utils/emailTemplates');
   const self = kind === 'self';
   const link = `${SITE}/frontend/reset-password.html?token=${encodeURIComponent(token)}`;
+  const lasts = self ? '1 ghante' : LINK_DAYS + ' din';
+
+  const body =
+    `<p style="margin:0 0 12px">Namaste ${esc(user.fullName)},</p>` +
+    (self
+      ? '<p style="margin:0 0 12px">Aapne Memora Creations account ka password badalne ki request ki thi. Neeche ke button se naya password set karein.</p>'
+      : '<p style="margin:0 0 12px">Aapke Memora Creations account ka password hamari team ne badal diya hai. Naya password humne aapko alag se bataya hoga.</p><p style="margin:0 0 12px">Aap chahein to neeche ke button se apna khud ka password bhi chun sakte hain.</p>') +
+    `<p style="margin:0;font-size:13px;color:#6d5a49">Ye link ${lasts} tak chalega aur sirf ek baar use ho sakta hai. Login ke liye aapka mobile number <b>${esc(user.mobile)}</b> hai.</p>` +
+    `<p style="margin:14px 0 0;font-size:13px;color:#6d5a49">${self ? 'Agar ye request aapne nahi ki thi, to is email ko ignore karein. Aapka purana password chalta rahega.' : 'Agar aapne password badalne ko nahi kaha tha, to turant humse sampark karein.'}</p>`;
 
   return {
     subject: self
       ? 'Memora Creations: password change karne ka link'
       : 'Memora Creations: apna naya password set karein',
-    html: `
-      <div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;line-height:1.6;color:#3a2a1d">
-        <h2>Namaste ${esc(user.fullName)},</h2>
-        ${self
-          ? '<p>Aapne Memora Creations account ka password badalne ki request ki thi. Neeche ke button se naya password set karein:</p>'
-          : '<p>Aapke Memora Creations account ka password hamari team ne badal diya hai. Naya password humne aapko alag se bataya hoga.</p><p>Aap chahein to is link se apna khud ka password bhi chun sakte hain:</p>'}
-        <p style="margin:22px 0">
-          <a href="${esc(link)}" style="background:#8a5a3b;color:#fff;padding:13px 22px;border-radius:30px;text-decoration:none;font-weight:bold">Apna password set karein</a>
-        </p>
-        <p>Ye link ${self ? '1 ghante' : LINK_DAYS + ' din'} tak chalega aur sirf ek baar use ho sakta hai. Login ke liye aapka mobile number ${esc(user.mobile)} hai.</p>
-        <p>${self ? 'Agar ye request aapne nahi ki thi, to is email ko ignore karein, aapka purana password chalta rahega.' : 'Agar aapne password badalne ko nahi kaha tha, to turant humse sampark karein.'}</p>
-        <p style="color:#7d6e62;font-size:13px">Memora Creations, Kotwa Kalan, Kushinagar, Uttar Pradesh</p>
-      </div>`
+    html: shell('Apna password set karein', body, { text: 'Naya password set karein', url: link }, { preheader: `Ye link ${lasts} tak chalega.` })
   };
 }
 

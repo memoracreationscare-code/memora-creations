@@ -156,7 +156,7 @@ const testEmail = asyncHandler(async (req, res) => {
     await mail.sendMail({
       to,
       subject: 'Memora Creations: test email',
-      html: '<p>Ye ek test email hai. Ye mil gayi, matlab aapki website se email theek jaa rahi hai. ✅</p>'
+      html: require('../utils/emailTemplates').shell('Test email ✅', '<p style="margin:0">Ye ek test email hai. Ye mil gayi, matlab aapki website se email theek jaa rahi hai.</p>', null, { preheader: 'Email setup theek chal raha hai.' })
     });
   } catch (err) {
     // 422, not 5xx: the server hides the text of 5xx errors, and the owner needs to read this.

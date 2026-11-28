@@ -10,26 +10,58 @@ const esc = v => String(v ?? '').replace(/[&<>"']/g, c => (
 
 const rupees = n => '₹' + (Math.round(Number(n || 0) * 100) / 100).toLocaleString('en-IN');
 
-function shell(title, bodyHtml, button) {
-  return `<!doctype html><html><body style="margin:0;background:#f7f1e5;font-family:Arial,sans-serif;color:#3b2a1d">
-  <div style="max-width:560px;margin:0 auto;padding:18px">
-    <div style="background:#fff;border-radius:16px;padding:24px">
-      <div style="font-size:13px;letter-spacing:3px;color:#8a5a3b;font-weight:700">MEMORA CREATIONS</div>
-      <h2 style="margin:12px 0 10px;font-size:21px">${esc(title)}</h2>
-      ${bodyHtml}
-      ${button ? `<p style="margin:22px 0 4px"><a href="${esc(button.url)}" style="background:#8a5a3b;color:#fff;text-decoration:none;padding:12px 20px;border-radius:10px;font-weight:700;display:inline-block">${esc(button.text)}</a></p>` : ''}
-    </div>
-    <p style="text-align:center;font-size:12px;color:#8a7a68">Memora Creations, Kotwa Kalan, Kushinagar, Uttar Pradesh 274305</p>
-  </div></body></html>`;
+/* Support details shown in every email: from Admin -> Settings, else the shop's own. */
+function support() {
+  let s = {};
+
+  try { s = require('../services/settingsService').peek(); } catch (_) { /* defaults below */ }
+
+  const wa = String(s.whatsapp || '918874050204').replace(/\D/g, '');
+  const email = String(s.email || 'memoracreations.care@gmail.com');
+  const shown = wa.length === 12 && wa.startsWith('91') ? `+91 ${wa.slice(2, 7)} ${wa.slice(7)}` : '+' + wa;
+
+  return { wa, email, shown };
+}
+
+/* One look for every email: brand header, card, button, help box, footer.
+   Email-safe (tables + inline styles), readable on phones and in dark mode. */
+function shell(title, bodyHtml, button, opts = {}) {
+  const sp = support();
+  const pre = opts.preheader ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent">${esc(opts.preheader)}</div>` : '';
+
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>${esc(title)}</title></head>
+<body style="margin:0;padding:0;background:#f3ebe2;font-family:Arial,Helvetica,sans-serif;color:#3b2a1d">${pre}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f3ebe2"><tr><td align="center" style="padding:24px 12px">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:580px">
+    <tr><td align="center" style="background:#3d2517;border-radius:16px 16px 0 0;padding:26px 20px 22px">
+      <div style="font-family:Georgia,'Times New Roman',serif;font-size:26px;letter-spacing:6px;color:#f1d3a8;font-weight:bold">MEMORA</div>
+      <div style="font-size:11px;letter-spacing:5px;color:#c9a27a;margin-top:4px">CREATIONS</div>
+    </td></tr>
+    <tr><td style="background:#ffffff;padding:30px 28px 26px;border-left:1px solid #eadfd3;border-right:1px solid #eadfd3">
+      <h1 style="margin:0 0 6px;font-family:Georgia,'Times New Roman',serif;font-size:24px;line-height:1.3;color:#2b1b12;font-weight:normal">${esc(title)}</h1>
+      <div style="width:46px;height:3px;background:#b9855a;margin:10px 0 20px;border-radius:2px"></div>
+      <div style="font-size:15px;line-height:1.7;color:#3b2a1d">${bodyHtml}</div>
+      ${button ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:26px 0 6px"><tr><td align="center" bgcolor="#8a5a3b" style="border-radius:10px"><a href="${esc(button.url)}" style="display:inline-block;padding:14px 28px;font-size:15px;font-weight:bold;color:#ffffff;text-decoration:none;border-radius:10px">${esc(button.text)}</a></td></tr></table>` : ''}
+    </td></tr>
+    <tr><td style="background:#faf5ef;padding:18px 28px;border:1px solid #eadfd3;border-top:0;border-radius:0 0 16px 16px">
+      <div style="font-size:13px;color:#6d5a49;line-height:1.7"><b style="color:#3b2a1d">Madad chahiye?</b><br>
+      WhatsApp: <a href="https://wa.me/${esc(sp.wa)}" style="color:#8a5a3b;text-decoration:none">${esc(sp.shown)}</a> &nbsp;|&nbsp; Email: <a href="mailto:${esc(sp.email)}" style="color:#8a5a3b;text-decoration:none">${esc(sp.email)}</a></div>
+    </td></tr>
+    <tr><td align="center" style="padding:18px 10px 4px;font-size:12px;color:#8a7a68;line-height:1.6">
+      Memora Creations &middot; Kotwa Kalan, Kushinagar, Uttar Pradesh 274305<br>
+      <a href="https://memoracreationscare.in" style="color:#8a7a68">memoracreationscare.in</a>
+    </td></tr>
+  </table>
+</td></tr></table></body></html>`;
 }
 
 function itemsTable(items) {
   const rows = (items || []).map(i =>
-    `<tr><td style="padding:6px 0">${esc(i.name)} × ${esc(i.quantity)}</td>` +
-    `<td style="padding:6px 0;text-align:right">${rupees(i.lineTotal != null ? i.lineTotal : (i.unitPrice ?? i.price ?? 0) * (i.quantity || 1))}</td></tr>`
+    `<tr><td style="padding:9px 0;border-bottom:1px solid #f0e8de">${esc(i.name)} × ${esc(i.quantity)}</td>` +
+    `<td style="padding:9px 0;border-bottom:1px solid #f0e8de;text-align:right">${rupees(i.lineTotal != null ? i.lineTotal : (i.unitPrice ?? i.price ?? 0) * (i.quantity || 1))}</td></tr>`
   ).join('');
 
-  return `<table style="width:100%;border-collapse:collapse;font-size:14px;border-top:1px solid #eee;margin-top:8px">${rows}</table>`;
+  return `<table style="width:100%;border-collapse:collapse;font-size:14px;margin-top:10px"><tr><td style="padding:8px 0;border-bottom:2px solid #eadfd3;font-size:12px;letter-spacing:1px;color:#8a7a68">ITEM</td><td style="padding:8px 0;border-bottom:2px solid #eadfd3;font-size:12px;letter-spacing:1px;color:#8a7a68;text-align:right">AMOUNT</td></tr>${rows}</table>`;
 }
 
 const ORDER_EVENTS = {
@@ -83,7 +115,7 @@ function orderEmail(event, order) {
   const body =
     `<p style="margin:0 0 10px">Hi ${esc(name)},</p>` +
     `<p style="margin:0 0 10px">${esc(m.text)}</p>` +
-    `<p style="margin:0;font-size:14px"><b>Order:</b> ${esc(order.orderId)} &nbsp; <b>Total:</b> ${rupees(order.grandTotal)}</p>` +
+    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#faf5ef;border-radius:10px;margin:14px 0 6px"><tr><td style="padding:12px 16px;font-size:14px"><span style="color:#8a7a68">Order</span><br><b>${esc(order.orderId)}</b></td><td align="right" style="padding:12px 16px;font-size:14px"><span style="color:#8a7a68">Total</span><br><b>${rupees(order.grandTotal)}</b></td></tr></table>` +
     itemsTable(order.items);
 
   return {
@@ -165,4 +197,4 @@ function priceDropEmail(user, drops) {
   };
 }
 
-module.exports = { orderEmail, cartReminderEmail, backInStockEmail, birthdayEmail, priceDropEmail, ORDER_EVENTS };
+module.exports = { shell, esc, orderEmail, cartReminderEmail, backInStockEmail, birthdayEmail, priceDropEmail, ORDER_EVENTS };
