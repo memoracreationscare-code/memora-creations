@@ -556,26 +556,40 @@ const forgotPassword =
         });
 
 
+      const MESSAGE =
+        'Password change karne ka link aapke email par bhej diya gaya hai. Mail na mile (ya account me email na ho) to Customer Support se contact karein.';
+
       if (user) {
+        const now = Date.now();
+        const last = user.passwordResetRequestedAt
+          ? new Date(user.passwordResetRequestedAt).getTime()
+          : 0;
+        const locked =
+          !user.isActive ||
+          Boolean(
+            user.parentConsent &&
+            ['PENDING', 'DENIED'].includes(user.parentConsent.status)
+          );
 
-        user.passwordResetRequestedAt =
-          new Date();
+        // Still shows in Admin -> Customers as "password reset requested".
+        user.passwordResetRequestedAt = new Date(now);
 
+        // Emails the link at once; at most one mail every 2 minutes per customer.
+        if (!locked && user.email && now - last > 2 * 60 * 1000) {
+          const pm = require('../services/passwordMail');
+          const link = pm.newLink();
 
-        await user.save();
-
+          user.passwordResetTokenHash = link.hash;
+          user.passwordResetExpiresAt = new Date(now + 60 * 60 * 1000); // 1 hour
+          await user.save();
+          await pm.sendResetLink(user, link.token, 'self');
+        } else {
+          await user.save();
+        }
       }
 
-
-      return ok(
-        res,
-        {
-
-          message:
-            'Password reset ke liye support se contact karein.'
-
-        }
-      );
+      // Same answer for everyone: a stranger cannot learn which numbers are customers.
+      return ok(res, { message: MESSAGE });
 
     }
   );

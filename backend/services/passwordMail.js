@@ -25,21 +25,25 @@ function newLink() {
   };
 }
 
-function build(user, token) {
+function build(user, token, kind = 'admin') {
+  const self = kind === 'self';
   const link = `${SITE}/frontend/reset-password.html?token=${encodeURIComponent(token)}`;
 
   return {
-    subject: 'Memora Creations: apna naya password set karein',
+    subject: self
+      ? 'Memora Creations: password change karne ka link'
+      : 'Memora Creations: apna naya password set karein',
     html: `
       <div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;line-height:1.6;color:#3a2a1d">
         <h2>Namaste ${esc(user.fullName)},</h2>
-        <p>Aapke Memora Creations account ka password hamari team ne badal diya hai. Naya password humne aapko alag se bataya hoga.</p>
-        <p>Aap chahein to is link se apna khud ka password bhi chun sakte hain:</p>
+        ${self
+          ? '<p>Aapne Memora Creations account ka password badalne ki request ki thi. Neeche ke button se naya password set karein:</p>'
+          : '<p>Aapke Memora Creations account ka password hamari team ne badal diya hai. Naya password humne aapko alag se bataya hoga.</p><p>Aap chahein to is link se apna khud ka password bhi chun sakte hain:</p>'}
         <p style="margin:22px 0">
           <a href="${esc(link)}" style="background:#8a5a3b;color:#fff;padding:13px 22px;border-radius:30px;text-decoration:none;font-weight:bold">Apna password set karein</a>
         </p>
-        <p>Ye link ${LINK_DAYS} din tak chalega aur sirf ek baar use ho sakta hai. Login ke liye aapka mobile number ${esc(user.mobile)} hai.</p>
-        <p>Agar aapne password badalne ko nahi kaha tha, to turant humse sampark karein.</p>
+        <p>Ye link ${self ? '1 ghante' : LINK_DAYS + ' din'} tak chalega aur sirf ek baar use ho sakta hai. Login ke liye aapka mobile number ${esc(user.mobile)} hai.</p>
+        <p>${self ? 'Agar ye request aapne nahi ki thi, to is email ko ignore karein, aapka purana password chalta rahega.' : 'Agar aapne password badalne ko nahi kaha tha, to turant humse sampark karein.'}</p>
         <p style="color:#7d6e62;font-size:13px">Memora Creations, Kotwa Kalan, Kushinagar, Uttar Pradesh</p>
       </div>`
   };
@@ -48,14 +52,14 @@ function build(user, token) {
 const mask = e => String(e).replace(/^(.).*(@.*)$/, '$1***$2');
 
 /* -> { sent: true, to: 'a***@gmail.com' }  or  { sent: false, reason: 'NO_EMAIL' | 'MAIL_NOT_SET_UP' | 'SEND_FAILED' } */
-async function sendResetLink(user, token) {
+async function sendResetLink(user, token, kind = 'admin') {
   try {
     const to = String((user && user.email) || '').trim();
 
     if (!to) return { sent: false, reason: 'NO_EMAIL' };
     if (!mail.mailConfigured()) return { sent: false, reason: 'MAIL_NOT_SET_UP' };
 
-    const msg = build(user, token);
+    const msg = build(user, token, kind);
     const ok = Boolean(await mail.sendMail({ to, subject: msg.subject, html: msg.html }));
 
     return ok ? { sent: true, to: mask(to) } : { sent: false, reason: 'SEND_FAILED' };
