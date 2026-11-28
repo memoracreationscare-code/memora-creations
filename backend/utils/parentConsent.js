@@ -59,19 +59,17 @@ const hashToken = token => crypto.createHash('sha256').update(String(token)).dig
 const esc = v => String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 function consentEmail({ parentName, childName, link }) {
+  const { shell } = require('./emailTemplates');
+
+  const body =
+    `<p style="margin:0 0 12px">Namaste ${esc(parentName)},</p>` +
+    `<p style="margin:0 0 12px"><b>${esc(childName)}</b> ne Memora Creations (home decor aur gifts ki website) par account banana chaha hai. Unki umar 18 saal se kam hai, isliye kanoon ke hisaab se hum aapki (parent / guardian ki) sahmati ke bina account nahi chala sakte.</p>` +
+    '<p style="margin:0 0 12px">Account me ye jaankari rahegi: naam, mobile number, delivery address aur orders. Hum ise sirf orders poore karne aur delivery ke liye use karte hain.</p>' +
+    `<p style="margin:0;font-size:13px;color:#6d5a49">Ye link ${LINK_DAYS} din tak chalega. Agar aapko is bachche ke baare me pata nahi hai, to bas is email ko ignore karein, account chalu nahi hoga.</p>`;
+
   return {
     subject: 'Memora Creations: aapke bachche ke account ke liye aapki sahmati chahiye',
-    html: `
-      <div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;line-height:1.6;color:#3a2a1d">
-        <h2>Namaste ${esc(parentName)},</h2>
-        <p><b>${esc(childName)}</b> ne Memora Creations (home decor aur gifts ki website) par account banana chaha hai. Unki umar 18 saal se kam hai, isliye kanoon ke hisaab se hum aapki (parent / guardian ki) sahmati ke bina account nahi chala sakte.</p>
-        <p>Account me ye jaankari rahegi: naam, mobile number, delivery address aur orders. Hum ise sirf orders poore karne aur delivery ke liye use karte hain.</p>
-        <p style="margin:24px 0">
-          <a href="${esc(link)}" style="background:#8a5a3b;color:#fff;padding:13px 22px;border-radius:30px;text-decoration:none;font-weight:bold">Dekhein aur faisla karein</a>
-        </p>
-        <p>Ye link ${LINK_DAYS} din tak chalega. Agar aapko is bachche ke baare me pata nahi hai, to bas is email ko ignore karein, account chalu nahi hoga.</p>
-        <p style="color:#7d6e62;font-size:13px">Memora Creations, Kotwa Kalan, Kushinagar, Uttar Pradesh</p>
-      </div>`
+    html: shell('Parent / Guardian ki sahmati', body, { text: 'Dekhein aur faisla karein', url: link }, { preheader: `${childName} ke account ke liye aapki sahmati chahiye.` })
   };
 }
 
