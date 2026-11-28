@@ -120,11 +120,19 @@
     return MC.optImg(product.images?.[0]?.url, 560) || placeholder;
   }
 
-  function priceMarkup(product, prefix) {
+  /* "Aap ₹X bacha rahe hain": only from the real original vs selling price */
+  function saveLine(product) {
+    const save = Math.round((Number(product.originalPrice) || 0) - (Number(product.sellingPrice) || 0));
+    return save > 0 && Number(product.sellingPrice) > 0
+      ? `<div class="mc-save" style="margin-top:4px;font-size:13.5px;font-weight:700;color:#1f7a4a">Aap ${money(save)} bacha rahe hain</div>`
+      : '';
+  }
+
+  function priceMarkup(product, prefix, withSave) {
     return `<span class="${prefix === 'premium' ? 'premium-price' : ''}">${money(product.sellingPrice)}</span>` +
       (Number(product.originalPrice) > Number(product.sellingPrice)
         ? `<span class="${prefix === 'premium' ? 'premium-old-price' : 'old'}">${money(product.originalPrice)}</span>`
-        : '');
+        : '') + (withSave ? saveLine(product) : '');
   }
 
   /* "🔥 Diwali Sale · 20% off · ends in 2d 5h" while a festival sale is running */
@@ -217,7 +225,7 @@
           <span class="pill">${esc(product.category?.name || 'Collection')}</span>
           <h2>${esc(product.name)}</h2>
           ${MC.ratingHtml(product)}
-          <div class="product-popup-price">${priceMarkup(product)}${offBadge(product)}</div>
+          <div class="product-popup-price">${priceMarkup(product, undefined, true)}${offBadge(product)}</div>
           <p class="muted">${esc(product.description || '')}</p>
           <p class="mc-stock ${stock ? '' : 'out'}">${stock ? (stock <= 5 ? `Sirf ${stock} bache hain` : 'In Stock') : 'Out of Stock'}</p>
 
@@ -547,7 +555,7 @@
             <h1>${esc(product.name)}</h1>
             ${MC.ratingHtml(product)}
             <p>${esc(product.description || '')}</p>
-            <div class="price">${priceMarkup(product)}</div>
+            <div class="price">${priceMarkup(product, undefined, true)}</div>
             ${saleBanner(product)}
             <p>${stock ? (stock <= 5 ? `🔥 Only ${stock} left - order soon` : `✅ In Stock (${stock})`) : '❌ OUT OF STOCK'}</p>
             ${stock ? '' : `
@@ -630,7 +638,7 @@
           ? { sellingPrice: chosen.price ?? product.sellingPrice, originalPrice: chosen.originalPrice ?? product.originalPrice }
           : product;
         const priceBox = $('.price', box);
-        if (priceBox) priceBox.innerHTML = priceMarkup(shown);
+        if (priceBox) priceBox.innerHTML = priceMarkup(shown, undefined, true);
         const qtyInput = $('#qty');
         if (qtyInput) { qtyInput.max = Math.max(1, stockNow()); qtyInput.value = 1; }
       });
