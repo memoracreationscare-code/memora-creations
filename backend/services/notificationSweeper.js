@@ -261,11 +261,62 @@ async function sweepBirthdayEmails(deps, now) {
   return result;
 }
 
+/*
+  "Khaas din" reminder: N days before a date the customer saved (default 7),
+  once per entry per year, after 9 AM IST. The year is written BEFORE sending,
+  and removed again if the send fails, so a repeat run can never send two.
+*/
+async function sweepOccasionReminders(deps, now) {
+  const { User, settings, mail, templates } = deps;
+  const s = settings.peek();
+  const result = { sent: 0, failed: 0 };
+
+  if (!User || !s.emailNotificationsEnabled || s.occasionReminderEnabled === false || !mail.mailConfigured()) return result;
+  if (istDate(now).hour < 9) return result;
+
+  const days = Math.min(30, Math.max(1, Math.floor(Number(s.occasionReminderDays)) || 7));
+  const target = istDate(new Date(now.getTime() + days * 86400000));
+
+  const users = await User.find({
+    isActive: true,
+    'parentConsent.required': { $ne: true },
+    email: { $exists: true, $ne: '' },
+    specialDates: { $elemMatch: { date: target.md, remindYear: { $ne: target.year } } }
+  }).select('_id fullName email specialDates').limit(30).lean();
+
+  for (const u of users) {
+    for (const d of (u.specialDates || [])) {
+      if (d.date !== target.md || d.remindYear === target.year) continue;
+
+      const claimed = await User.updateOne(
+        { _id: u._id, specialDates: { $elemMatch: { _id: d._id, remindYear: { $ne: target.year } } } },
+        { $set: { 'specialDates.$.remindYear': target.year } }
+      );
+
+      if (!claimed.modifiedCount) continue;
+
+      try {
+        const message = templates.occasionReminderEmail(u, d, days);
+
+        await mail.sendMail({ to: u.email, subject: message.subject, html: message.html });
+        result.sent += 1;
+      } catch (err) {
+        result.failed += 1;
+        await User.updateOne({ _id: u._id, 'specialDates._id': d._id }, { $unset: { 'specialDates.$.remindYear': 1 } });
+        console.warn('[Occasion reminder]', err.message);
+      }
+    }
+  }
+
+  return result;
+}
+
 async function sweepNotifications(deps = defaultDeps(), now = new Date()) {
   return {
     orders: await sweepOrderEmails(deps, now),
     carts: await sweepCartReminders(deps, now),
-    birthdays: await sweepBirthdayEmails(deps, now)
+    birthdays: await sweepBirthdayEmails(deps, now),
+    occasions: await sweepOccasionReminders(deps, now)
   };
 }
 
@@ -286,7 +337,7 @@ function startNotificationSweeper() {
 
       const r = await sweepNotifications();
 
-      if (r.orders.sent || r.carts.sent || r.orders.failed || r.carts.failed || r.birthdays.sent || r.birthdays.failed) {
+      if (r.orders.sent || r.carts.sent || r.orders.failed || r.carts.failed || r.birthdays.sent || r.birthdays.failed || r.occasions.sent || r.occasions.failed) {
         console.log('[Notifications]', JSON.stringify(r));
       }
     } catch (err) {
@@ -299,4 +350,4 @@ function startNotificationSweeper() {
   timer.unref();
 }
 
-module.exports = { sweepNotifications, sweepBirthdayEmails, wantedEvents, startNotificationSweeper };
+module.exports = { sweepNotifications, sweepBirthdayEmails, sweepOccasionReminders, wantedEvents, startNotificationSweeper };

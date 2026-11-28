@@ -146,6 +146,23 @@ function cartReminderEmail(cart) {
   };
 }
 
+function occasionReminderEmail(user, d, days) {
+  const name = String((user && user.fullName) || '').split(' ')[0] || 'Dost';
+  const who = String((d && d.name) || 'Khaas insaan');
+  const what = d && d.occasion === 'Anniversary' ? 'anniversary' : d && d.occasion === 'Birthday' ? 'birthday' : 'khaas din';
+  const when = days <= 1 ? 'kal' : `${days} din baad`;
+  const body =
+    `<p style="margin:0 0 10px">Dear ${esc(name)},</p>` +
+    `<p style="margin:0 0 10px;font-size:16px"><b>${esc(who)} ka ${esc(what)} ${esc(when)} hai! 🎁</b></p>` +
+    '<p style="margin:0 0 10px">Aapne ye din Memora Creations me save kiya tha, isliye yaad dila rahe hain. Abhi order karein to gift time par pahunch jayega.</p>' +
+    '<p style="margin:0;font-size:12px;color:#8a7a68">Ye yaad dilana band karne ke liye profile page se ye din hata dein.</p>';
+
+  return {
+    subject: `${who} ka ${what} ${when} hai 🎁 - Memora Creations`,
+    html: shell(`${who} ka ${what} aane wala hai`, body, { text: 'Gift dhundhein', url: `${SITE}/gift-guide.html` }, { preheader: `${who} ka ${what} ${when} hai.` })
+  };
+}
+
 function birthdayEmail(user) {
   const name = String((user && user.fullName) || '').split(' ')[0] || 'Dost';
   const body =
@@ -197,4 +214,4 @@ function priceDropEmail(user, drops) {
   };
 }
 
-module.exports = { shell, esc, orderEmail, cartReminderEmail, backInStockEmail, birthdayEmail, priceDropEmail, ORDER_EVENTS };
+module.exports = { occasionReminderEmail, shell, esc, orderEmail, cartReminderEmail, backInStockEmail, birthdayEmail, priceDropEmail, ORDER_EVENTS };

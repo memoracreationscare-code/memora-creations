@@ -98,6 +98,8 @@ function defaults() {
     waOrderText: '',
     recentViewedEnabled: true,
     trustBadgesEnabled: true,
+    occasionReminderEnabled: true,
+    occasionReminderDays: 7,
     badgesEnabled: true,
     shuffleProducts: true,
     installAppEnabled: true,

@@ -39,6 +39,7 @@ function publicView(s) {
     waOrderText: s.waOrderText || '',
     recentViewedEnabled: s.recentViewedEnabled !== false,
     trustBadgesEnabled: s.trustBadgesEnabled !== false,
+    occasionReminderEnabled: s.occasionReminderEnabled !== false,
     badgesEnabled: s.badgesEnabled !== false,
     shuffleProducts: s.shuffleProducts !== false,
     installAppEnabled: s.installAppEnabled !== false,

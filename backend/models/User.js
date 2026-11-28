@@ -232,6 +232,17 @@ const userSchema =
         default: undefined
       },
 
+      /* "Khaas din" the customer saved (Maa ka birthday, anniversary...). One reminder email a year per entry. */
+      specialDates: {
+        type: [new mongoose.Schema({
+          name: { type: String, trim: true, maxlength: 60, required: true },
+          occasion: { type: String, enum: ['Birthday', 'Anniversary', 'Other'], default: 'Birthday' },
+          date: { type: String, match: /^(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/, required: true },
+          remindYear: { type: Number, default: undefined }
+        })],
+        default: undefined
+      },
+
       /* Year the birthday email was last sent (one per year). */
       birthdayEmailYear: {
         type: Number,
